@@ -1,13 +1,30 @@
+import 'package:elapse_app/classes/Filters/eventSearchFilters.dart';
+import 'package:elapse_app/classes/Miscellaneous/location.dart';
+import 'package:elapse_app/classes/Tournament/division.dart';
+import 'package:elapse_app/classes/Tournament/tournament.dart';
+import 'package:elapse_app/requests/teamLookup.dart';
+import 'package:elapse_app/requests/tournamentRequests.dart';
 import 'package:flutter/material.dart';
 
 void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
+
+  void initState() {
+    print("App started");
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -68,6 +85,46 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Tournament tournament = Tournament(
+    id: 49725,
+    schedule: [],
+    seasonID: 1,
+    teams: [],
+    awards: [],
+    location: Location(
+      venue: "venue",
+      address1: "address1",
+      address2: "address2",
+      city: "city",
+      region: "state",
+      country: "country",
+    ),
+    startDate: DateTime.now(),
+    divisions: [
+      Division(id: 1, name: "Science", order: 1),
+      Division(id: 2, name: "Technology", order: 2),
+      Division(id: 3, name: "Engineering", order: 3),
+      Division(id: 4, name: "Math", order: 4),
+      Division(id: 5, name: "Arts", order: 5),
+      Division(id: 6, name: "Opportunity", order: 6),
+      Division(id: 7, name: "Innovate", order: 7),
+      Division(id: 8, name: "Researcb", order: 8),
+      Division(id: 9, name: "Spirit", order: 9),
+      Division(id: 10, name: "Design", order: 10),
+      Division(id: 11, name: "High School", order: 11),
+    ],
+    endDate: null,
+  );
+
+  EventSearchFilters filters = EventSearchFilters(
+    seasonID: 181,
+    eventName: null,
+    gradeLevelID: null,
+    levelClassID: null,
+    startDate: null,
+    endDate: null,
+  );
+
   @override
   Widget build(BuildContext context) {
     // This method is rerun every time setState is called, for instance as done
@@ -116,7 +173,9 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
+        onPressed: () async {
+          await getTournaments(filters);
+        },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.

@@ -1,16 +1,16 @@
 import 'package:elapse_app/classes/Team/team.dart';
-import 'package:elapse_app/classes/Tournament/tournament.dart';
+import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
 
 class Award {
   String name;
-  Tournament tournament;
-  String qualification;
+  TournamentPreview tournament;
+  List<String> qualifications;
   Team? team;
 
   Award({
     required this.name,
     required this.tournament,
-    required this.qualification,
+    required this.qualifications,
     this.team,
   });
 }
