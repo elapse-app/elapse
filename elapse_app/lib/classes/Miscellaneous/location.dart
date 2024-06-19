@@ -1,11 +1,17 @@
 class Location {
-  String city;
-  String region;
-  String country;
+  String? venue;
+  String? city;
+  String? region;
+  String? country;
+  String? address1;
+  String? address2;
 
   Location({
-    required this.city,
-    required this.region,
-    required this.country,
+    this.venue,
+    this.city,
+    this.region,
+    this.country,
+    this.address1,
+    this.address2,
   });
 }

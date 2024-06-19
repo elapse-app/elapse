@@ -1,29 +1,33 @@
 import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/classes/Team/team.dart';
+import 'package:elapse_app/classes/Tournament/division.dart';
 
 class Tournament {
-  List<Match> schedule;
+  int id;
+
+  List<List<Match>> schedule;
   List<Team> teams;
   List<Award> awards;
 
+  int seasonID;
+
   Location location;
-  String venue;
-  String address1;
-  String address2;
 
   DateTime startDate;
   DateTime? endDate;
 
+  List<Division> divisions;
+
   Tournament({
+    required this.id,
     required this.schedule,
+    required this.seasonID,
     required this.teams,
     required this.awards,
     required this.location,
-    required this.venue,
-    required this.address1,
-    required this.address2,
     required this.startDate,
+    required this.divisions,
     this.endDate,
   });
 }
