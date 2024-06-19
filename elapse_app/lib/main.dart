@@ -2,7 +2,7 @@ import 'package:elapse_app/classes/Filters/eventSearchFilters.dart';
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
-import 'package:elapse_app/requests/teamLookup.dart';
+import 'package:elapse_app/requests/schedule.dart';
 import 'package:elapse_app/requests/tournamentRequests.dart';
 import 'package:flutter/material.dart';
 
@@ -87,10 +87,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Tournament tournament = Tournament(
     id: 49725,
-    schedule: [],
     seasonID: 1,
-    teams: [],
-    awards: [],
     location: Location(
       venue: "venue",
       address1: "address1",
@@ -174,7 +171,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          await getTournaments(filters);
+          final values = await getTournamentSchedule(49725, 1);
+          print(
+              '${values[25].gameName} ${values[25].blueAllianceNum} ${values[25].redAllianceNum}');
         },
         tooltip: 'Increment',
         child: const Icon(Icons.add),
