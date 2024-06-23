@@ -1,5 +1,9 @@
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/providers/color_provider.dart';
+import 'package:elapse_app/screens/explore/explore.dart';
+import 'package:elapse_app/screens/home/home.dart';
+import 'package:elapse_app/screens/my_team/my_team.dart';
+import 'package:elapse_app/screens/tournament/tournament.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
@@ -28,7 +32,15 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
+  int selectedIndex = 0;
+
   @override
+  List<Widget> screens = [
+    HomeScreen(),
+    TournamentScreen(),
+    MyTeamScreen(),
+    ExploreScreen(),
+  ];
   Widget build(BuildContext context) {
     return Consumer<ColorProvider>(builder: (context, colorProvider, child) {
       bool systemDefined = false;
@@ -39,9 +51,11 @@ class _MyAppState extends State<MyApp> {
       ;
 
       if (widget.prefs.getString("theme") == "system") {
-        print("system");
         systemDefined = true;
       }
+
+      ColorScheme chosenTheme =
+          systemDefined ? systemTheme : colorProvider.colorScheme;
       return MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
@@ -60,32 +74,46 @@ class _MyAppState extends State<MyApp> {
           //
           // This works for code too, not just values: Most code changes can be
           // tested with just a hot reload.
-          colorScheme: systemDefined ? systemTheme : colorProvider.colorScheme,
+          colorScheme: chosenTheme,
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
           fontFamily: "Manrope",
-          useMaterial3: true,
         ),
         home: Scaffold(
-          appBar: AppBar(title: Text("Nice")),
-          body: Container(
-              child: Row(
-            children: [
-              TextButton(
-                  onPressed: () {
-                    colorProvider.setLight();
-                  },
-                  child: const Text("Light")),
-              TextButton(
-                  onPressed: () {
-                    colorProvider.setDark();
-                  },
-                  child: const Text("Dark")),
-              TextButton(
-                  onPressed: () {
-                    colorProvider.setSystem();
-                  },
-                  child: const Text("System"))
+          body: screens[selectedIndex],
+          bottomNavigationBar: NavigationBar(
+            selectedIndex: selectedIndex,
+            indicatorColor: chosenTheme.primary,
+            animationDuration: const Duration(milliseconds: 500),
+            labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+            onDestinationSelected: (value) =>
+                setState(() => selectedIndex = value),
+            destinations: [
+              NavigationDestination(
+                  selectedIcon:
+                      Icon(Icons.home_rounded, color: chosenTheme.secondary),
+                  icon: const Icon(Icons.home_outlined),
+                  label: "Home"),
+              NavigationDestination(
+                selectedIcon: Icon(Icons.emoji_events_rounded,
+                    color: chosenTheme.secondary),
+                icon: const Icon(Icons.emoji_events_outlined),
+                label: "Tournament",
+              ),
+              NavigationDestination(
+                selectedIcon: Icon(Icons.people_alt_rounded,
+                    color: chosenTheme.secondary),
+                icon: const Icon(Icons.people_alt_outlined),
+                label: "My Team",
+              ),
+              NavigationDestination(
+                selectedIcon:
+                    Icon(Icons.explore_rounded, color: chosenTheme.secondary),
+                icon: const Icon(Icons.explore_outlined),
+                label: "Explore",
+              ),
             ],
-          )),
+          ),
         ),
       );
     });

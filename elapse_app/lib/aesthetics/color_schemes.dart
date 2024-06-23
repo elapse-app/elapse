@@ -9,7 +9,7 @@ ColorScheme lightScheme = const ColorScheme(
   surface: Colors.white,
   error: Colors.red,
   onPrimary: Colors.black,
-  onSecondary: Colors.black,
+  onSecondary: Color.fromRGBO(98, 98, 98, 1),
   onSurface: Colors.black,
   onError: Colors.white,
 );
@@ -29,7 +29,7 @@ ColorScheme darkScheme = const ColorScheme(
   surface: Colors.black,
   error: Colors.red,
   onPrimary: Colors.white,
-  onSecondary: Colors.white,
+  onSecondary: Color.fromRGBO(241, 241, 241, 1),
   onSurface: Colors.white,
   onError: Colors.white,
 );
