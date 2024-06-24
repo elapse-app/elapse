@@ -1,3 +1,4 @@
+import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -7,49 +8,54 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: Stack(
-        children: [
-          Container(height: 300, color: Theme.of(context).colorScheme.primary),
-          CustomScrollView(
-            slivers: [
-              SliverAppBar.medium(
-                automaticallyImplyLeading: false,
-                expandedHeight: 120,
-                centerTitle: false,
-                title: Row(
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar.large(
+            automaticallyImplyLeading: false,
+            expandedHeight: 125,
+            centerTitle: false,
+            flexibleSpace: FlexibleSpaceBar(
+              expandedTitleScale: 1,
+              collapseMode: CollapseMode.parallax,
+              title: Padding(
+                padding: const EdgeInsets.only(left: 20, right: 12),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back),
-                      onPressed: () {
-                        Navigator.of(context, rootNavigator: true).pop();
-                      },
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        icon: Icon(Icons.arrow_back)),
+                    const Text(
+                      "Settings",
+                      style:
+                          TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
                     ),
-                    const Text("Settings",
-                        style: TextStyle(
-                            fontSize: 30, fontWeight: FontWeight.w500)),
                   ],
                 ),
-                backgroundColor: Theme.of(context).colorScheme.primary,
               ),
-              SliverToBoxAdapter(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
-                    ),
-                  ),
-                  height: 1000,
-                ),
-              ),
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Container(
-                  color: Theme.of(context).colorScheme.surface,
-                ),
-              ),
-            ],
+              centerTitle: false,
+            ),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+          ),
+          const RoundedTop(),
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                return ListTile(
+                  tileColor: Theme.of(context).colorScheme.surface,
+                  title: Text('Item #$index'),
+                );
+              },
+              childCount: 5, // Replace with the number of items in your list
+            ),
+          ),
+          SliverFillRemaining(
+            fillOverscroll: true,
+            child: Container(
+              color: Theme.of(context).colorScheme.surface,
+            ),
           ),
         ],
       ),
