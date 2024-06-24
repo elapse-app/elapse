@@ -34,13 +34,13 @@ class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   int selectedIndex = 0;
 
-  @override
   List<Widget> screens = [
     HomeScreen(),
     TournamentScreen(),
     MyTeamScreen(),
     ExploreScreen(),
   ];
+  @override
   Widget build(BuildContext context) {
     return Consumer<ColorProvider>(builder: (context, colorProvider, child) {
       bool systemDefined = false;
