@@ -35,10 +35,10 @@ class _MyAppState extends State<MyApp> {
   int selectedIndex = 0;
 
   List<Widget> screens = [
-    HomeScreen(),
-    TournamentScreen(),
-    MyTeamScreen(),
-    ExploreScreen(),
+    const HomeScreen(),
+    const TournamentScreen(tournamentID: 52543),
+    const MyTeamScreen(),
+    const ExploreScreen(),
   ];
   @override
   Widget build(BuildContext context) {
