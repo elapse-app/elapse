@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:elapse_app/classes/Tournament/match.dart';
+import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:http/http.dart' as http;
 
-Future<List<Match>> getTournamentSchedule(
+Future<List<Game>>? getTournamentSchedule(
     int tournamentID, int divisionID) async {
   // Fetch data for each division in parallel
   final divisionMatches = await _fetchDivisionMatches(tournamentID, divisionID);
@@ -25,8 +25,8 @@ Future<List<Match>> getTournamentSchedule(
   return divisionMatches;
 }
 
-Future<List<Match>> _fetchDivisionMatches(int eventId, divisionID) async {
-  List<Match> divisionMatches = [];
+Future<List<Game>> _fetchDivisionMatches(int eventId, divisionID) async {
+  List<Game> divisionMatches = [];
   final response = await http.get(
     Uri.parse(
         "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionID/matches"),
@@ -38,8 +38,7 @@ Future<List<Match>> _fetchDivisionMatches(int eventId, divisionID) async {
 
   if (response.statusCode == 200) {
     final parsed = jsonDecode(response.body)["data"] as List;
-    divisionMatches =
-        parsed.map<Match>((json) => Match.fromJson(json)).toList();
+    divisionMatches = parsed.map<Game>((json) => Game.fromJson(json)).toList();
   } else {
     print(response.body);
     throw Exception("Failed to load schedule");
@@ -60,7 +59,7 @@ Future<List<Match>> _fetchDivisionMatches(int eventId, divisionID) async {
 }
 
 Future<void> _fetchAdditionalPage(
-    int eventId, int divisionId, int page, List<Match> divisionMatches) async {
+    int eventId, int divisionId, int page, List<Game> divisionMatches) async {
   final response = await http.get(
     Uri.parse(
         "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/matches?page=$page"),
@@ -73,7 +72,7 @@ Future<void> _fetchAdditionalPage(
   if (response.statusCode == 200) {
     final parsed = jsonDecode(response.body)["data"] as List;
     divisionMatches
-        .addAll(parsed.map<Match>((json) => Match.fromJson(json)).toList());
+        .addAll(parsed.map<Game>((json) => Game.fromJson(json)).toList());
   } else {
     print(response.body);
     throw Exception("Failed to load schedule");

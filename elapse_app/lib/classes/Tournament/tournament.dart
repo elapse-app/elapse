@@ -5,6 +5,7 @@ class Tournament {
   int id;
 
   int seasonID;
+  String name;
 
   Location location;
 
@@ -15,6 +16,7 @@ class Tournament {
 
   Tournament({
     required this.id,
+    required this.name,
     required this.seasonID,
     required this.location,
     required this.startDate,

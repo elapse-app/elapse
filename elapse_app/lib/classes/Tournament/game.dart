@@ -1,4 +1,4 @@
-class Match {
+class Game {
   List<int>? redAllianceID;
   List<int>? blueAllianceID;
 
@@ -19,7 +19,7 @@ class Match {
   DateTime? adjustedScheduledTime;
   DateTime? startedTime;
 
-  Match({
+  Game({
     this.redAllianceID,
     this.blueAllianceID,
     this.redAllianceNum,
@@ -36,7 +36,7 @@ class Match {
     this.blueScore,
   });
 
-  factory Match.fromJson(Map<String, dynamic> json) {
+  factory Game.fromJson(Map<String, dynamic> json) {
     List<int> redAllianceID = [];
     List<int> blueAllianceID = [];
     int redScore = 0;
@@ -82,7 +82,7 @@ class Match {
     secondPart = secondPart.split("#")[1];
     gameName = "$firstPart$secondPart";
 
-    return Match(
+    return Game(
       redAllianceID: redAllianceID,
       blueAllianceID: blueAllianceID,
       redAllianceNum: redAllianceNum,
