@@ -7,6 +7,7 @@ import 'package:elapse_app/screens/tournament/tournament.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +15,12 @@ void main() async {
   // runApp(MyApp(
   //   prefs: prefs,
   // ));
+
+  //Set android system navbar colour
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    systemNavigationBarColor: Colors.transparent, // Navigation bar color
+  ));
+
   runApp(
     ChangeNotifierProvider(
       create: (context) => ColorProvider(prefs: prefs),
