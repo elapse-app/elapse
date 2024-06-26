@@ -21,6 +21,8 @@ void main() async {
     systemNavigationBarColor: Colors.transparent, // Navigation bar color
   ));
 
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
   runApp(
     ChangeNotifierProvider(
       create: (context) => ColorProvider(prefs: prefs),
