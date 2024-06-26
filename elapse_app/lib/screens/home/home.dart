@@ -32,7 +32,7 @@ class HomeScreen extends StatelessWidget {
                         const Text(
                           "Good Afternoon",
                           style: TextStyle(
-                              fontSize: 30, fontWeight: FontWeight.w500),
+                              fontSize: 30, fontWeight: FontWeight.w600),
                         ),
                         SizedBox(
                           height: sizedBoxHeight,

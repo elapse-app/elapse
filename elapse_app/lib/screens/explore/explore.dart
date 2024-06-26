@@ -22,7 +22,7 @@ class ExploreScreen extends StatelessWidget {
                 padding: EdgeInsets.only(left: 20, right: 12),
                 child: Text(
                   "Explore",
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
                 ),
               ),
               centerTitle: false,

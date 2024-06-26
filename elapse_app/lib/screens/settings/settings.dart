@@ -30,7 +30,7 @@ class SettingsScreen extends StatelessWidget {
                     const Text(
                       "Settings",
                       style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
+                          TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),

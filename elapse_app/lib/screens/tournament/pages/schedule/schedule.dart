@@ -64,9 +64,9 @@ class _SchedulePageState extends State<SchedulePage> {
                     children: [
                       GameWidget(game: game),
                       index != snapshot.data!.length - 1
-                          ? Divider(
+                          ? const Divider(
                               height: 3,
-                              color: Theme.of(context).colorScheme.tertiary,
+                              color: Color.fromRGBO(123, 123, 123, 1),
                             )
                           : Container(),
                     ],

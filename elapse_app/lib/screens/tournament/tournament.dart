@@ -54,7 +54,7 @@ class _TournamentScreenState extends State<TournamentScreen> {
                     Text(
                       titles[selectedIndex],
                       style: const TextStyle(
-                          fontSize: 30, fontWeight: FontWeight.w500),
+                          fontSize: 30, fontWeight: FontWeight.w600),
                     ),
                     IconButton(
                       icon: const Icon(
