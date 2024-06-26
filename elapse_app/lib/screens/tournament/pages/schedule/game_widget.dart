@@ -30,6 +30,18 @@ class _GameWidgetState extends State<GameWidget> {
     } else {
       colorPallete = lightPallete;
     }
+
+    FontWeight blueFontWeight = FontWeight.w500;
+    FontWeight redFontWeight = FontWeight.w500;
+
+    if (widget.game.blueScore != null && widget.game.redScore != null) {
+      if (widget.game.blueScore! > widget.game.redScore!) {
+        blueFontWeight = FontWeight.w700;
+      } else if (widget.game.blueScore! < widget.game.redScore!) {
+        redFontWeight = FontWeight.w700;
+      }
+    }
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
@@ -38,88 +50,122 @@ class _GameWidgetState extends State<GameWidget> {
             MaterialPageRoute(
                 builder: (context) => GameScreen(
                       game: widget.game,
-                      colorPallete: colorPallete,
                     )));
       },
       child: Container(
-        height: 55,
+        height: 60,
         alignment: Alignment.center,
-        child: Row(
+        child: Flex(
+          direction: Axis.horizontal,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Row(
-              children: [
-                SizedBox(
-                  width: 95,
-                  child: Text(
+            Flexible(
+              flex: 95,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Spacer(),
+                  Text(
                     widget.game.gameName,
                     style: const TextStyle(
-                        fontSize: 32, height: 1, fontWeight: FontWeight.w500),
+                        fontSize: 28, height: 1, fontWeight: FontWeight.w500),
                     overflow: TextOverflow.fade,
                     maxLines: 1,
                   ),
-                ),
-                SizedBox(
-                  width: 60,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        time,
-                        style: const TextStyle(
-                            fontSize: 13,
-                            height: 1,
-                            fontWeight: FontWeight.w400),
-                      ),
-                      Text(
-                        widget.game.fieldName ?? "",
-                        style: const TextStyle(
-                            fontSize: 13,
-                            height: 1,
-                            fontWeight: FontWeight.w300),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      )
-                    ],
+                  SizedBox(
+                    height: 5,
                   ),
-                ),
-              ],
+                  Text(
+                    time,
+                    style: const TextStyle(
+                        fontSize: 13, height: 1, fontWeight: FontWeight.w400),
+                  ),
+                  Spacer()
+                ],
+              ),
             ),
-            SizedBox(
-              width: 75,
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: widget.game.redAllianceNum!.map((e) {
-                    return Text(
-                      e,
+            SizedBox(width: 5),
+            Flexible(
+              flex: 120,
+              child: Flex(
+                direction: Axis.horizontal,
+                children: [
+                  Flexible(
+                    fit: FlexFit.tight,
+                    flex: 50,
+                    child: Text(
+                      widget.game.redScore?.toString() ?? "",
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 24,
                           height: 1,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: redFontWeight,
                           color: colorPallete.redAllianceText),
-                    );
-                  }).toList()),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Flexible(
+                    fit: FlexFit.tight,
+                    flex: 65,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: widget.game.redAllianceNum!.map((e) {
+                        return Text(
+                          e,
+                          style: TextStyle(
+                              fontSize: 16,
+                              height: 1,
+                              fontWeight: FontWeight.w600,
+                              color: colorPallete.redAllianceText),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
+              ),
             ),
-            SizedBox(
-              width: 75,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: widget.game.blueAllianceNum!.map(
-                  (e) {
-                    return Text(
-                      e,
+            Flexible(
+              flex: 120,
+              child: Flex(
+                direction: Axis.horizontal,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Flexible(
+                    fit: FlexFit.tight,
+                    flex: 65,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: widget.game.blueAllianceNum!.map(
+                        (e) {
+                          return Text(
+                            e,
+                            style: TextStyle(
+                                fontSize: 16,
+                                height: 1,
+                                fontWeight: FontWeight.w600,
+                                color: colorPallete.blueAllianceText),
+                          );
+                        },
+                      ).toList(),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Flexible(
+                    fit: FlexFit.tight,
+                    flex: 45,
+                    child: Text(
+                      widget.game.blueScore?.toString() ?? "",
+                      textAlign: TextAlign.right,
                       style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 24,
                           height: 1,
-                          fontWeight: FontWeight.w600,
+                          fontWeight: blueFontWeight,
                           color: colorPallete.blueAllianceText),
-                    );
-                  },
-                ).toList(),
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
