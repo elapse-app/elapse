@@ -34,7 +34,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   @override
   Widget build(BuildContext context) {
     List<Widget> pages = [
-      SchedulePage(divisionID: division.id, tournamentID: widget.tournamentID),
+      SchedulePage(
+        division: division,
+      ),
       const RankingsPage(),
       const SkillsPage(),
       const InfoPage(),
