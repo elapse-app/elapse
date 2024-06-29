@@ -49,6 +49,7 @@ class _MyAppState extends State<MyApp> {
   ];
   @override
   Widget build(BuildContext context) {
+    widget.prefs.setString("theme", "system");
     return Consumer<ColorProvider>(builder: (context, colorProvider, child) {
       bool systemDefined = false;
       ColorScheme systemTheme =

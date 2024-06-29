@@ -119,28 +119,6 @@ class GameScreen extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            status == "Played"
-                                ? Row(children: [
-                                    Text(
-                                      game.redScore.toString(),
-                                      style: TextStyle(
-                                          fontSize: 52,
-                                          height: 1,
-                                          color: colorPallete.redAllianceText),
-                                    ),
-                                    Text(
-                                      "-",
-                                      style: TextStyle(fontSize: 40),
-                                    ),
-                                    Text(
-                                      game.blueScore.toString(),
-                                      style: TextStyle(
-                                          fontSize: 52,
-                                          height: 1,
-                                          color: colorPallete.blueAllianceText),
-                                    ),
-                                  ])
-                                : Spacer(),
                           ],
                         ),
                         Column(
@@ -188,12 +166,23 @@ class GameScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Red Alliance",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Red Alliance",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(game.redScore?.toString() ?? "",
+                              style: TextStyle(
+                                  fontSize: 32,
+                                  height: 1,
+                                  fontWeight: FontWeight.w500,
+                                  color: colorPallete.redAllianceText))
+                        ],
                       ),
                       SizedBox(
                         height: 20,
@@ -256,12 +245,23 @@ class GameScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
-                        "Blue Alliance",
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w500,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            "Blue Alliance",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          Text(game.blueScore?.toString() ?? "",
+                              style: TextStyle(
+                                  fontSize: 32,
+                                  height: 1,
+                                  fontWeight: FontWeight.w500,
+                                  color: colorPallete.blueAllianceText))
+                        ],
                       ),
                       SizedBox(
                         height: 20,

@@ -1,13 +1,16 @@
 import 'dart:convert';
 
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
+import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/division.dart';
+import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
+import 'package:elapse_app/requests/getTeams.dart';
+import 'package:elapse_app/requests/schedule.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 
 Future<Tournament> getTournamentDetails(int tournamentID) async {
-  Tournament tournament;
   final response = await http.get(
     Uri.parse("https://www.robotevents.com/api/v2/events/$tournamentID"),
     headers: {
@@ -16,24 +19,33 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
     },
   );
 
-  if (response.statusCode == 200) {
+  try {
     final parsed = jsonDecode(response.body);
-    tournament = Tournament(
-        id: tournamentID,
-        name: parsed["name"],
-        seasonID: parsed["season"]["id"],
-        location: Location(venue: parsed["location"]["venue"]),
-        startDate: DateTime.parse(parsed["start"]),
-        endDate: DateTime.parse(parsed["end"]),
-        divisions: parsed["divisions"].map<Division>((division) {
-          return Division(
-              id: division["id"],
-              name: division["name"],
-              order: division["order"]);
-        }).toList());
-  } else {
-    throw Exception("Failed to load tournament details");
-  }
 
-  return tournament;
+    List<Division> divisions = await Future.wait(
+        parsed["divisions"].map<Future<Division>>((division) async {
+      List<Game>? games =
+          await getTournamentSchedule(tournamentID, division["id"]);
+      List<Team>? teams = await getTeams(tournamentID, division["id"]);
+      return Division(
+        id: division["id"],
+        name: division["name"],
+        order: division["order"],
+        games: games,
+        teams: teams,
+      );
+    }).toList());
+
+    return Tournament(
+      id: tournamentID,
+      name: parsed["name"],
+      seasonID: parsed["season"]["id"],
+      location: Location(venue: parsed["location"]["venue"]),
+      startDate: DateTime.parse(parsed["start"]),
+      endDate: DateTime.parse(parsed["end"]),
+      divisions: divisions,
+    );
+  } catch (e) {
+    throw (e);
+  }
 }

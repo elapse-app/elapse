@@ -35,6 +35,10 @@ class _SchedulePageState extends State<SchedulePage> {
 
   @override
   Widget build(BuildContext context) {
+    Color dividerColor =
+        Theme.of(context).colorScheme.brightness == Brightness.dark
+            ? const Color.fromRGBO(31, 31, 31, 1)
+            : const Color.fromRGBO(224, 224, 224, 1);
     return FutureBuilder(
       future: games,
       builder: ((context, snapshot) {
@@ -59,14 +63,14 @@ class _SchedulePageState extends State<SchedulePage> {
               (context, index) {
                 final game = snapshot.data![index];
                 return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 23.0),
                   child: Column(
                     children: [
                       GameWidget(game: game),
                       index != snapshot.data!.length - 1
-                          ? const Divider(
+                          ? Divider(
                               height: 3,
-                              color: Color.fromRGBO(123, 123, 123, 1),
+                              color: dividerColor,
                             )
                           : Container(),
                     ],
