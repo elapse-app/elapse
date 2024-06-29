@@ -16,9 +16,9 @@ ColorScheme lightScheme = const ColorScheme(
 
 ColorPallete lightPallete = ColorPallete(
   redAllianceBackground: const Color.fromRGBO(255, 215, 215, 1),
-  redAllianceText: const Color.fromRGBO(137, 53, 53, 1),
+  redAllianceText: const Color.fromRGBO(187, 51, 51, 1),
   blueAllianceBackground: const Color.fromRGBO(221, 245, 255, 1),
-  blueAllianceText: const Color.fromRGBO(9, 56, 75, 1),
+  blueAllianceText: const Color.fromRGBO(22, 98, 128, 1),
 );
 
 ColorScheme darkScheme = const ColorScheme(

@@ -1,6 +1,7 @@
 import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
+import 'package:elapse_app/extras/twelve_hour.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -24,6 +25,8 @@ class _GameWidgetState extends State<GameWidget> {
       time = DateFormat.Hm().format(widget.game.scheduledTime!);
     }
 
+    time = twelveHour(time);
+
     ColorPallete colorPallete;
     if (Theme.of(context).colorScheme.brightness == Brightness.dark) {
       colorPallete = darkPallete;
@@ -31,15 +34,57 @@ class _GameWidgetState extends State<GameWidget> {
       colorPallete = lightPallete;
     }
 
-    FontWeight blueFontWeight = FontWeight.w500;
-    FontWeight redFontWeight = FontWeight.w500;
+    Color gameColor = Theme.of(context).colorScheme.onSurface;
 
     if (widget.game.blueScore != null && widget.game.redScore != null) {
       if (widget.game.blueScore! > widget.game.redScore!) {
-        blueFontWeight = FontWeight.w700;
+        gameColor = colorPallete.blueAllianceText;
       } else if (widget.game.blueScore! < widget.game.redScore!) {
-        redFontWeight = FontWeight.w700;
+        gameColor = colorPallete.redAllianceText;
       }
+    }
+
+    Widget gameText;
+    if (widget.game.gameName.substring(0, 1) == "R") {
+      gameText = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        Text("R",
+            style: TextStyle(
+              fontSize: 40,
+              height: 1,
+              fontWeight: FontWeight.w400,
+              color: gameColor,
+            )),
+        Text("16",
+            style: TextStyle(
+              fontSize: 20,
+              height: 1.3,
+              fontWeight: FontWeight.w400,
+              color: gameColor,
+            )),
+        Text(widget.game.gameName.substring(3, 4),
+            style: TextStyle(
+              color: gameColor,
+              fontSize: 40,
+              height: 1,
+              fontWeight: FontWeight.w400,
+            ))
+      ]);
+    } else {
+      gameText = Text(widget.game.gameName,
+          style: TextStyle(
+            letterSpacing: -2,
+            fontSize: 40,
+            height: 1,
+            color: gameColor,
+            fontWeight: FontWeight.w400,
+          ));
+    }
+
+    Color timeColor = Theme.of(context).colorScheme.onSurface;
+    if (widget.game.startedTime != null) {
+      timeColor = Theme.of(context).colorScheme.brightness == Brightness.dark
+          ? const Color.fromARGB(255, 111, 111, 111)
+          : const Color.fromRGBO(164, 164, 164, 1);
     }
 
     return GestureDetector(
@@ -53,7 +98,7 @@ class _GameWidgetState extends State<GameWidget> {
                     )));
       },
       child: Container(
-        height: 60,
+        height: 72,
         alignment: Alignment.center,
         child: Flex(
           direction: Axis.horizontal,
@@ -61,81 +106,104 @@ class _GameWidgetState extends State<GameWidget> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Flexible(
-              flex: 95,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Spacer(),
-                  Text(
-                    widget.game.gameName,
-                    style: const TextStyle(
-                        fontSize: 28, height: 1, fontWeight: FontWeight.w500),
-                    overflow: TextOverflow.fade,
-                    maxLines: 1,
-                  ),
-                  SizedBox(
-                    height: 5,
-                  ),
-                  Text(
-                    time,
-                    style: const TextStyle(
-                        fontSize: 13, height: 1, fontWeight: FontWeight.w400),
-                  ),
-                  Spacer()
-                ],
-              ),
-            ),
-            SizedBox(width: 5),
-            Flexible(
+              fit: FlexFit.tight,
               flex: 120,
-              child: Flex(
-                direction: Axis.horizontal,
+              child: Row(
                 children: [
+                  Flexible(
+                    fit: FlexFit.tight,
+                    flex: 65,
+                    child: gameText,
+                  ),
                   Flexible(
                     fit: FlexFit.tight,
                     flex: 50,
-                    child: Text(
-                      widget.game.redScore?.toString() ?? "",
-                      style: TextStyle(
-                          fontSize: 24,
-                          height: 1,
-                          fontWeight: redFontWeight,
-                          color: colorPallete.redAllianceText),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Flexible(
-                    fit: FlexFit.tight,
-                    flex: 65,
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: widget.game.redAllianceNum!.map((e) {
-                        return Text(
-                          e,
+                      children: [
+                        Text(
+                          time,
                           style: TextStyle(
-                              fontSize: 16,
-                              height: 1,
-                              fontWeight: FontWeight.w600,
-                              color: colorPallete.redAllianceText),
-                        );
-                      }).toList(),
+                              fontSize: 16, height: 1, color: timeColor),
+                          maxLines: 1,
+                        ),
+                        widget.game.redScore != null
+                            ? Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    widget.game.redScore.toString(),
+                                    style: TextStyle(
+                                        color: colorPallete.redAllianceText,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        height: 1),
+                                  ),
+                                  Text("-",
+                                      style: TextStyle(
+                                          color: timeColor,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          height: 1)),
+                                  Text(
+                                    widget.game.blueScore.toString(),
+                                    style: TextStyle(
+                                        color: colorPallete.blueAllianceText,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        height: 1),
+                                  ),
+                                ],
+                              )
+                            : Text(widget.game.fieldName!,
+                                style: const TextStyle(fontSize: 16, height: 1))
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
             Flexible(
-              flex: 120,
-              child: Flex(
-                direction: Axis.horizontal,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              flex: 25,
+              child: Container(
+                  height: 50,
+                  child: VerticalDivider(
+                    thickness: 0.5,
+                    color: Theme.of(context).colorScheme.tertiary,
+                  )),
+            ),
+            Flexible(
+              fit: FlexFit.tight,
+              flex: 84,
+              child: Row(
                 children: [
                   Flexible(
                     fit: FlexFit.tight,
-                    flex: 65,
+                    flex: 42,
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: widget.game.redAllianceNum!.map(
+                        (e) {
+                          return Text(
+                            e,
+                            style: TextStyle(
+                                fontSize: 16,
+                                height: 1,
+                                fontWeight: FontWeight.w500,
+                                color: colorPallete.redAllianceText),
+                          );
+                        },
+                      ).toList(),
+                    ),
+                  ),
+                  Flexible(
+                    fit: FlexFit.tight,
+                    flex: 42,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: widget.game.blueAllianceNum!.map(
                         (e) {
@@ -144,25 +212,11 @@ class _GameWidgetState extends State<GameWidget> {
                             style: TextStyle(
                                 fontSize: 16,
                                 height: 1,
-                                fontWeight: FontWeight.w600,
+                                fontWeight: FontWeight.w500,
                                 color: colorPallete.blueAllianceText),
                           );
                         },
                       ).toList(),
-                    ),
-                  ),
-                  SizedBox(width: 10),
-                  Flexible(
-                    fit: FlexFit.tight,
-                    flex: 45,
-                    child: Text(
-                      widget.game.blueScore?.toString() ?? "",
-                      textAlign: TextAlign.right,
-                      style: TextStyle(
-                          fontSize: 24,
-                          height: 1,
-                          fontWeight: blueFontWeight,
-                          color: colorPallete.blueAllianceText),
                     ),
                   ),
                 ],
