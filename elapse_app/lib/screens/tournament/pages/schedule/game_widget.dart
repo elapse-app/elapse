@@ -176,12 +176,12 @@ class _GameWidgetState extends State<GameWidget> {
             ),
             Flexible(
               fit: FlexFit.tight,
-              flex: 84,
+              flex: 88,
               child: Row(
                 children: [
                   Flexible(
                     fit: FlexFit.tight,
-                    flex: 42,
+                    flex: 44,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -201,7 +201,7 @@ class _GameWidgetState extends State<GameWidget> {
                   ),
                   Flexible(
                     fit: FlexFit.tight,
-                    flex: 42,
+                    flex: 44,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.end,
