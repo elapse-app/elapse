@@ -46,7 +46,8 @@ class EventTeamStats {
     final parsedRankings = jsonDecode(rankings.body)["data"] as List;
 
 
-    List<Game>? matches = await getQualifierMatches(eventId, divisionId);
+    // Get qualifier matches
+    List<Game>? matches = (await getTournamentSchedule(eventId, divisionId))?.where((f) => f.roundNum == 2).toList();
 
     EventTeamStats teamStats = EventTeamStats();
     Map<int, TeamStats> stats = teamStats.stats;
