@@ -10,7 +10,7 @@ class Team {
   Location? location;
   String? grade;
   SeasonStats? seasonStats;
-  TournamentStats? tournamentStats;
+  TeamStats? tournamentStats;
 
   Team(
       {required this.id,
