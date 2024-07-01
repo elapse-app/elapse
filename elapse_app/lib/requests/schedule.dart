@@ -5,18 +5,6 @@ import 'dart:io';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:http/http.dart' as http;
 
-Future<List<Game>>? getQualifierMatches(int tournamentID, int divisionID) async {
-  List<Game>? schedule = await getTournamentSchedule(tournamentID, divisionID);
-
-  List<Game>? qualifiers = [];
-  for (int i = 0; i < schedule!.length; i++) {
-    if (schedule[i].roundNum == 2) {
-      qualifiers.add(schedule[i]);
-    }
-  }
-  return qualifiers;
-}
-
 Future<List<Game>>? getTournamentSchedule(
     int tournamentID, int divisionID) async {
   // Fetch data for each division in parallel
