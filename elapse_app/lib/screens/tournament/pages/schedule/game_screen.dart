@@ -3,18 +3,22 @@ import 'dart:math';
 import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
+import 'package:elapse_app/classes/Tournament/tstats.dart';
+import 'package:elapse_app/extras/twelve_hour.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class GameScreen extends StatelessWidget {
-  const GameScreen({super.key, required this.game});
+  const GameScreen({super.key, required this.game, required this.rankings});
 
   final Game game;
+  final Map<int, TeamStats>? rankings;
 
   @override
   Widget build(BuildContext context) {
+    print(rankings);
     ColorPallete colorPallete;
     if (Theme.of(context).colorScheme.brightness == Brightness.dark) {
       colorPallete = darkPallete;
@@ -33,6 +37,11 @@ class GameScreen extends StatelessWidget {
     if (game.redScore != null) {
       status = "Played";
     }
+
+    Color dividerColor =
+        Theme.of(context).colorScheme.brightness == Brightness.dark
+            ? const Color.fromARGB(255, 55, 55, 55)
+            : const Color.fromARGB(255, 211, 211, 211);
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -88,12 +97,12 @@ class GameScreen extends StatelessWidget {
             sliver: SliverList(
               delegate: SliverChildListDelegate([
                 Container(
-                  height: 275,
+                  height: 220,
                   decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.tertiary,
                       borderRadius: BorderRadius.circular(18)),
                   child: Padding(
-                    padding: const EdgeInsets.all(15.0),
+                    padding: const EdgeInsets.all(18.0),
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,9 +122,10 @@ class GameScreen extends StatelessWidget {
                                 SizedBox(
                                   height: 10,
                                 ),
-                                const Text(
-                                  "Match Number",
-                                  style: TextStyle(fontSize: 16, height: 1),
+                                Text(
+                                  status,
+                                  style:
+                                      const TextStyle(fontSize: 16, height: 1),
                                 ),
                               ],
                             ),
@@ -130,7 +140,7 @@ class GameScreen extends StatelessWidget {
                                   const Text("Start Time",
                                       style:
                                           TextStyle(fontSize: 24, height: 1)),
-                                  Text(time,
+                                  Text(twelveHour(time),
                                       style: const TextStyle(
                                           fontSize: 24,
                                           height: 1,
@@ -154,7 +164,6 @@ class GameScreen extends StatelessWidget {
                                 ])
                           ],
                         ),
-                        Text(status, style: TextStyle(fontSize: 16, height: 1))
                       ],
                     ),
                   ),
@@ -184,50 +193,95 @@ class GameScreen extends StatelessWidget {
                                   color: colorPallete.redAllianceText))
                         ],
                       ),
-                      SizedBox(
-                        height: 20,
+                      const SizedBox(
+                        height: 8,
                       ),
                       Column(
-                        children: game.redAllianceNum!.map(
+                        children: game.redAlliancePreview!.map(
                           (e) {
                             return Column(
                               children: [
                                 Container(
-                                  padding: EdgeInsets.symmetric(vertical: 5),
-                                  child: Row(
+                                  height: 72,
+                                  child: Flex(
+                                    direction: Axis.horizontal,
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
-                                      Text(
-                                        e,
-                                        style: TextStyle(
-                                            fontSize: 40,
-                                            height: 1,
-                                            fontWeight: FontWeight.w400,
-                                            color:
-                                                colorPallete.redAllianceText),
+                                      Flexible(
+                                        flex: 120,
+                                        fit: FlexFit.tight,
+                                        child: Text(e.teamName,
+                                            style: TextStyle(
+                                                fontSize: 40,
+                                                height: 1,
+                                                fontWeight: FontWeight.w400,
+                                                color: colorPallete
+                                                    .redAllianceText)),
                                       ),
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text("Rank",
-                                              style: TextStyle(
-                                                  color: colorPallete
-                                                      .redAllianceText)),
-                                          Text("Record",
-                                              style: TextStyle(
-                                                  color: colorPallete
-                                                      .redAllianceText))
-                                        ],
-                                      )
+                                      Flexible(
+                                        flex: 50,
+                                        fit: FlexFit.tight,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                                "Rank ${rankings![e.teamID]!.rank}",
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                )),
+                                            Text(
+                                                "${rankings![e.teamID]!.wins}-${rankings![e.teamID]!.losses}-${rankings![e.teamID]!.ties}",
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                ))
+                                          ],
+                                        ),
+                                      ),
+                                      Flexible(
+                                        flex: 20,
+                                        fit: FlexFit.tight,
+                                        child: Container(
+                                            height: 50,
+                                            child: VerticalDivider(
+                                              thickness: 0.5,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .tertiary,
+                                            )),
+                                      ),
+                                      Flexible(
+                                        flex: 50,
+                                        fit: FlexFit.tight,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                                "${rankings![e.teamID]!.wp} WP",
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                )),
+                                            Text(
+                                                "${rankings![e.teamID]!.ap} AP",
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                ))
+                                          ],
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
                                 Divider(
-                                  color: Color.fromRGBO(123, 123, 123, 1),
+                                  color: dividerColor,
                                   thickness: 1,
                                 )
                               ],
@@ -235,11 +289,11 @@ class GameScreen extends StatelessWidget {
                           },
                         ).toList(),
                       ),
-                      Row(
-                        children: [Text("")],
-                      )
                     ],
                   ),
+                ),
+                const SizedBox(
+                  height: 28,
                 ),
                 Container(
                   child: Column(
@@ -267,46 +321,91 @@ class GameScreen extends StatelessWidget {
                         height: 20,
                       ),
                       Column(
-                        children: game.blueAllianceNum!.map(
+                        children: game.blueAlliancePreview!.map(
                           (e) {
                             return Column(
                               children: [
                                 Container(
-                                  padding: EdgeInsets.symmetric(vertical: 5),
-                                  child: Row(
+                                  height: 72,
+                                  child: Flex(
+                                    direction: Axis.horizontal,
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
-                                      Text(
-                                        e,
-                                        style: TextStyle(
-                                            fontSize: 40,
-                                            height: 1,
-                                            fontWeight: FontWeight.w400,
-                                            color:
-                                                colorPallete.blueAllianceText),
+                                      Flexible(
+                                        flex: 120,
+                                        fit: FlexFit.tight,
+                                        child: Text(e.teamName,
+                                            style: TextStyle(
+                                                fontSize: 40,
+                                                height: 1,
+                                                fontWeight: FontWeight.w400,
+                                                color: colorPallete
+                                                    .blueAllianceText)),
                                       ),
-                                      Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text("Rank",
-                                              style: TextStyle(
-                                                  color: colorPallete
-                                                      .blueAllianceText)),
-                                          Text("Record",
-                                              style: TextStyle(
-                                                  color: colorPallete
-                                                      .blueAllianceText))
-                                        ],
-                                      )
+                                      Flexible(
+                                        flex: 50,
+                                        fit: FlexFit.tight,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                                "Rank ${rankings![e.teamID]!.rank}",
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                )),
+                                            Text(
+                                                "${rankings![e.teamID]!.wins}-${rankings![e.teamID]!.losses}-${rankings![e.teamID]!.ties}",
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                ))
+                                          ],
+                                        ),
+                                      ),
+                                      Flexible(
+                                        flex: 20,
+                                        fit: FlexFit.tight,
+                                        child: Container(
+                                            height: 50,
+                                            child: VerticalDivider(
+                                              thickness: 0.5,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .tertiary,
+                                            )),
+                                      ),
+                                      Flexible(
+                                        flex: 50,
+                                        fit: FlexFit.tight,
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.end,
+                                          children: [
+                                            Text(
+                                                "${rankings![e.teamID]!.wp} WP",
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                )),
+                                            Text(
+                                                "${rankings![e.teamID]!.ap} AP",
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                ))
+                                          ],
+                                        ),
+                                      ),
                                     ],
                                   ),
                                 ),
                                 Divider(
-                                  color: Color.fromRGBO(123, 123, 123, 1),
+                                  color: dividerColor,
                                   thickness: 1,
                                 )
                               ],

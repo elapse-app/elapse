@@ -98,6 +98,9 @@ class TournamentLoadingScreen extends StatelessWidget {
                   ],
                 ),
               )),
+          const SliverToBoxAdapter(
+            child: LinearProgressIndicator(),
+          )
         ],
       ),
     );
