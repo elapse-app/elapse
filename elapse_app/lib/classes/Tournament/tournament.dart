@@ -1,5 +1,6 @@
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/classes/Tournament/division.dart';
+import 'package:elapse_app/classes/Tournament/tstats.dart';
 
 class Tournament {
   int id;
