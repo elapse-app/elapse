@@ -1,4 +1,5 @@
 import 'package:elapse_app/classes/Tournament/division.dart';
+import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +16,7 @@ class _SchedulePageState extends State<SchedulePage> {
   @override
   @override
   Widget build(BuildContext context) {
+    calcEventStats(53690, 10);
     Color dividerColor =
         Theme.of(context).colorScheme.brightness == Brightness.dark
             ? const Color.fromARGB(255, 55, 55, 55)
