@@ -1,9 +1,8 @@
-class Game {
-  List<int>? redAllianceID;
-  List<int>? blueAllianceID;
+import 'package:elapse_app/classes/Team/teamPreview.dart';
 
-  List<String>? redAllianceNum;
-  List<String>? blueAllianceNum;
+class Game {
+  List<TeamPreview>? redAlliancePreview;
+  List<TeamPreview>? blueAlliancePreview;
 
   int? redScore;
   int? blueScore;
@@ -20,10 +19,8 @@ class Game {
   DateTime? startedTime;
 
   Game({
-    this.redAllianceID,
-    this.blueAllianceID,
-    this.redAllianceNum,
-    this.blueAllianceNum,
+    this.redAlliancePreview,
+    this.blueAlliancePreview,
     required this.gameNum,
     required this.roundNum,
     required this.gameName,
@@ -39,6 +36,8 @@ class Game {
   factory Game.fromJson(Map<String, dynamic> json) {
     List<int> redAllianceID = [];
     List<int> blueAllianceID = [];
+    List<TeamPreview> redAlliancePreview = [];
+    List<TeamPreview> blueAlliancePreview = [];
     int redScore = 0;
 
     List<String> redAllianceNum = [];
@@ -48,26 +47,31 @@ class Game {
     num roundNum = json["round"] == 6 ? 2.5 : json["round"];
 
     List<dynamic> alliances = json["alliances"];
+
     if (alliances[0]["color"] == "red") {
       for (int i = 0; i < alliances[0]["teams"].length; i++) {
-        redAllianceID.add(alliances[0]["teams"][i]["team"]["id"]);
-        redAllianceNum.add(alliances[0]["teams"][i]["team"]["name"]);
+        redAlliancePreview.add(TeamPreview(
+            teamID: alliances[0]["teams"][i]["team"]["id"],
+            teamName: alliances[0]["teams"][i]["team"]["name"]));
       }
       redScore = alliances[0]["score"];
       for (int i = 0; i < alliances[1]["teams"].length; i++) {
-        blueAllianceID.add(alliances[1]["teams"][i]["team"]["id"]);
-        blueAllianceNum.add(alliances[1]["teams"][i]["team"]["name"]);
+        blueAlliancePreview.add(TeamPreview(
+            teamID: alliances[1]["teams"][i]["team"]["id"],
+            teamName: alliances[1]["teams"][i]["team"]["name"]));
       }
       blueScore = alliances[1]["score"];
     } else {
       for (int i = 0; i < alliances[1]["teams"].length; i++) {
-        redAllianceID.add(alliances[1]["teams"][i]["team"]["id"]);
-        redAllianceNum.add(alliances[1]["teams"][i]["team"]["name"]);
+        redAlliancePreview.add(TeamPreview(
+            teamID: alliances[1]["teams"][i]["team"]["id"],
+            teamName: alliances[1]["teams"][i]["team"]["name"]));
       }
       redScore = alliances[1]["score"];
       for (int i = 0; i < alliances[0]["teams"].length; i++) {
-        blueAllianceID.add(alliances[0]["teams"][i]["team"]["id"]);
-        blueAllianceNum.add(alliances[0]["teams"][i]["team"]["name"]);
+        blueAlliancePreview.add(TeamPreview(
+            teamID: alliances[0]["teams"][i]["team"]["id"],
+            teamName: alliances[0]["teams"][i]["team"]["name"]));
       }
       blueScore = alliances[0]["score"];
     }
@@ -83,10 +87,8 @@ class Game {
     gameName = "$firstPart$secondPart";
 
     return Game(
-      redAllianceID: redAllianceID,
-      blueAllianceID: blueAllianceID,
-      redAllianceNum: redAllianceNum,
-      blueAllianceNum: blueAllianceNum,
+      redAlliancePreview: redAlliancePreview,
+      blueAlliancePreview: blueAlliancePreview,
       redScore: redScore,
       blueScore: blueScore,
       roundNum: roundNum,
