@@ -1,6 +1,5 @@
 import 'package:elapse_app/classes/Tournament/division.dart';
-import 'package:elapse_app/classes/Tournament/game.dart';
-import 'package:elapse_app/requests/schedule.dart';
+import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -17,10 +16,11 @@ class _SchedulePageState extends State<SchedulePage> {
   @override
   @override
   Widget build(BuildContext context) {
+    calcEventStats(53690, 10);
     Color dividerColor =
         Theme.of(context).colorScheme.brightness == Brightness.dark
-            ? const Color.fromRGBO(31, 31, 31, 1)
-            : const Color.fromRGBO(224, 224, 224, 1);
+            ? const Color.fromARGB(255, 55, 55, 55)
+            : const Color.fromARGB(255, 211, 211, 211);
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (context, index) {
@@ -29,7 +29,10 @@ class _SchedulePageState extends State<SchedulePage> {
             padding: const EdgeInsets.symmetric(horizontal: 23.0),
             child: Column(
               children: [
-                GameWidget(game: game),
+                GameWidget(
+                  game: game,
+                  rankings: widget.division.teamStats,
+                ),
                 index != widget.division.games!.length - 1
                     ? Divider(
                         height: 3,
@@ -40,7 +43,7 @@ class _SchedulePageState extends State<SchedulePage> {
             ),
           );
         },
-        childCount: widget.division.games!.length,
+        childCount: widget.division.games?.length ?? 0,
       ),
     );
   }

@@ -1,14 +1,16 @@
 import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
+import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/extras/twelve_hour.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class GameWidget extends StatefulWidget {
-  const GameWidget({super.key, required this.game});
+  const GameWidget({super.key, required this.game, required this.rankings});
   final Game game;
+  final Map<int, TeamStats>? rankings;
 
   @override
   State<GameWidget> createState() => _GameWidgetState();
@@ -83,8 +85,8 @@ class _GameWidgetState extends State<GameWidget> {
     Color timeColor = Theme.of(context).colorScheme.onSurface;
     if (widget.game.startedTime != null) {
       timeColor = Theme.of(context).colorScheme.brightness == Brightness.dark
-          ? const Color.fromARGB(255, 111, 111, 111)
-          : const Color.fromRGBO(164, 164, 164, 1);
+          ? const Color.fromARGB(255, 168, 168, 168)
+          : const Color.fromARGB(255, 118, 118, 118);
     }
 
     return GestureDetector(
@@ -95,6 +97,7 @@ class _GameWidgetState extends State<GameWidget> {
             MaterialPageRoute(
                 builder: (context) => GameScreen(
                       game: widget.game,
+                      rankings: widget.rankings,
                     )));
       },
       child: Container(
@@ -185,10 +188,10 @@ class _GameWidgetState extends State<GameWidget> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: widget.game.redAllianceNum!.map(
+                      children: widget.game.redAlliancePreview!.map(
                         (e) {
                           return Text(
-                            e,
+                            e.teamName,
                             style: TextStyle(
                                 fontSize: 16,
                                 height: 1,
@@ -205,10 +208,10 @@ class _GameWidgetState extends State<GameWidget> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.end,
-                      children: widget.game.blueAllianceNum!.map(
+                      children: widget.game.blueAlliancePreview!.map(
                         (e) {
                           return Text(
-                            e,
+                            e.teamName,
                             style: TextStyle(
                                 fontSize: 16,
                                 height: 1,

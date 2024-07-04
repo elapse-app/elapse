@@ -10,6 +10,7 @@ String twelveHour(String time) {
     }
     String adjustedHour = hour == 0 ? "00" : hour.toString();
     String adjustedMinute = minute == 0 ? "00" : minute.toString();
+    adjustedMinute = minute < 10 ? "0$minute" : minute.toString();
     return "$adjustedHour:$adjustedMinute $suffix";
   } catch (e) {
     return time;
