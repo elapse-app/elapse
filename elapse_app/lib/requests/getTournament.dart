@@ -5,7 +5,6 @@ import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/requests/getTeams.dart';
-import 'package:elapse_app/requests/schedule.dart';
 import 'package:elapse_app/requests/token.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
@@ -31,16 +30,13 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
       List<Future<void>> divisionDetails = [];
       divisionDetails.add(getTeams(tournamentID, division["id"])
           .then((teams) => returnDivision.teams = teams)
-          .catchError((e) {
-        print(e);
-      }));
+          .catchError((e) => print(e)));
       divisionDetails
           .add(calcEventStats(tournamentID, division["id"]).then((teamStats) {
         returnDivision.teamStats = teamStats[1];
         returnDivision.games = teamStats[0];
-      }).catchError((e) {
-        print(e);
-      }));
+      }).catchError((e) => print(e)));
+      ;
       await Future.wait(divisionDetails);
       return returnDivision;
     }).toList());
@@ -55,7 +51,6 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
       divisions: divisions,
     );
   } catch (e) {
-    print(e);
     throw (e);
   }
 }

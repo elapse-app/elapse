@@ -45,7 +45,7 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
       .then((m) => matches = m.where((e) => e.roundNum == 2).toList()));
   requestFutures.add(http.get(
     Uri.parse(
-        "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/rankings"),
+        "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/rankings?per_page=250"),
     headers: {
       HttpHeaders.authorizationHeader: TOKEN,
     },
@@ -82,6 +82,7 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
   List<Future<void>> pgFutures = [];
   int teamsLastPage = jsonDecode(rankings.body)["meta"]["last_page"];
   for (int pg = 2; pg <= teamsLastPage; pg++) {
+    print("getting additional rankings");
     Future<void> pgResponse = http.get(
         Uri.parse(
             "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/rankings?page=$pg"),
@@ -118,19 +119,20 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
   await Future.wait(pgFutures);
 
   // Process matches
+  // Process matches
   List<double> redScores = [];
   List<double> blueScores = [];
 
+  int statsLength = stats.keys.length;
+
   List<Map<int, double>> redMatchTeams = List.generate(matches.length, (_) {
-    return Map.fromIterables(
-        stats.keys, List<double>.filled(stats.keys.length, 0));
+    return Map.fromIterables(stats.keys, List<double>.filled(statsLength, 0));
   });
   List<Map<int, double>> blueMatchTeams = List.generate(matches.length, (_) {
-    return Map.fromIterables(
-        stats.keys, List<double>.filled(stats.keys.length, 0));
+    return Map.fromIterables(stats.keys, List<double>.filled(statsLength, 0));
   });
 
-  // Determine which teams played in each match and each match's scores
+// Determine which teams played in each match and each match's scores
   for (int i = 0; i < matches.length; i++) {
     Game match = matches[i];
 
@@ -143,16 +145,29 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
     blueMatchTeams[i][match.blueAlliancePreview![1].teamID] = 1;
   }
 
-  // OPR and DPR calculations
-  List<double> scores = redScores + blueScores;
-  List<double> oppScores = blueScores + redScores;
+// Combine red and blue match teams
   List<List<double>> matchTeams =
       redMatchTeams.map((map) => map.values.toList()).toList() +
           blueMatchTeams.map((map) => map.values.toList()).toList();
 
-  Matrix mScores = Matrix.column(scores);
-  Matrix mOppScores = Matrix.column(oppScores);
-  Matrix mMatches = Matrix.fromList(matchTeams);
+// Debugging: Print lengths of each nested list
+  for (int i = 0; i < matchTeams.length; i++) {
+    print("Length of matchTeams[$i]: ${matchTeams[i].length}");
+  }
+
+// Ensure all nested lists have the expected length
+  int expectedLength = stats.keys.length;
+  for (int i = 0; i < matchTeams.length; i++) {
+    if (matchTeams[i].length != expectedLength) {
+      throw Exception(
+          "Wrong nested list length: ${matchTeams[i].length}, expected length: $expectedLength at index $i");
+    }
+  }
+
+  Matrix mScores = Matrix.column(redScores + blueScores);
+  Matrix mOppScores = Matrix.column(blueScores + redScores);
+  Matrix mMatches =
+      Matrix.fromList(matchTeams); // This is where the error occurs
   Matrix mMatchesT = mMatches.transpose();
 
   Matrix mOPR = (mMatchesT * mMatches).solve(mMatchesT * mScores);

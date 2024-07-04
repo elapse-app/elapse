@@ -30,7 +30,7 @@ Future<List<Game>> _fetchDivisionMatches(int eventId, divisionID) async {
   List<Game> divisionMatches = [];
   final response = await http.get(
     Uri.parse(
-        "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionID/matches"),
+        "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionID/matches?per_page=250"),
     headers: {
       HttpHeaders.authorizationHeader: TOKEN,
     },
@@ -53,7 +53,7 @@ Future<List<Game>> _fetchDivisionMatches(int eventId, divisionID) async {
           _fetchAdditionalPage(eventId, divisionID, page, divisionMatches));
     }
     await Future.wait(pageFutures);
-  }
+  } else {}
 
   return divisionMatches;
 }
@@ -62,7 +62,7 @@ Future<void> _fetchAdditionalPage(
     int eventId, int divisionId, int page, List<Game> divisionMatches) async {
   final response = await http.get(
     Uri.parse(
-        "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/matches?page=$page"),
+        "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/matches?page=$page?per_page=250"),
     headers: {
       HttpHeaders.authorizationHeader: TOKEN,
     },
@@ -73,8 +73,6 @@ Future<void> _fetchAdditionalPage(
     divisionMatches
         .addAll(parsed.map<Game>((json) => Game.fromJson(json)).toList());
   } else {
-    print("status code was not 200");
-    print(response.body);
     throw Exception("Failed to load schedule");
   }
 }

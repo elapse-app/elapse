@@ -46,7 +46,7 @@ Future<SeasonStats> fetchTeamSeasonStats(int teamId, int seasonID) async {
   // Fetch team data
   final awardInfo = http.get(
     Uri.parse(
-        "https://www.robotevents.com/api/v2/teams/$teamId/awards?season%5B%5D=$seasonID"),
+        "https://www.robotevents.com/api/v2/teams/$teamId/awards?season%5B%5D=$seasonID?per_page=100"),
     headers: {
       HttpHeaders.authorizationHeader: TOKEN,
     },

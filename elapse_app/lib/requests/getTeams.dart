@@ -9,7 +9,7 @@ Future<List<Team>> getTeams(int tournamentID, int divisionID) async {
   List<Team> teams = [];
   final response = await http.get(
     Uri.parse(
-        "https://www.robotevents.com/api/v2/events/$tournamentID/divisions/$divisionID/rankings"),
+        "https://www.robotevents.com/api/v2/events/$tournamentID/divisions/$divisionID/rankings?per_page=250"),
     headers: {
       HttpHeaders.authorizationHeader: TOKEN,
     },
