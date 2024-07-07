@@ -122,7 +122,6 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
   await Future.wait(pgFutures);
 
   // Process matches
-  // Process matches
   List<double> redScores = [];
   List<double> blueScores = [];
 
@@ -137,32 +136,43 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
     return Map.fromIterables(stats.keys, List<double>.filled(statsLength, 0));
   });
 
-// Determine which teams played in each match and each match's scores
+  // Determine which teams played in each match and each match's scores
   for (int i = 0; i < qualiMatches.length; i++) {
     Game match = qualiMatches[i];
 
     redScores.add((match.redScore ?? 0).toDouble());
     blueScores.add((match.blueScore ?? 0).toDouble());
 
-    redMatchTeams[i][match.redAlliancePreview![0].teamID] = 1;
-    redMatchTeams[i][match.redAlliancePreview![1].teamID] = 1;
-    blueMatchTeams[i][match.blueAlliancePreview![0].teamID] = 1;
-    blueMatchTeams[i][match.blueAlliancePreview![1].teamID] = 1;
+    if (redMatchTeams[i].containsKey(match.redAlliancePreview![0].teamID)) {
+      redMatchTeams[i][match.redAlliancePreview![0].teamID] = 1;
+    } else {
+      print("Match $i: Team ${match.redAlliancePreview?[0].teamName} is not in the rankings and therefore has not been included in calculations");
+    }
+    if (redMatchTeams[i].containsKey(match.redAlliancePreview![1].teamID)) {
+      redMatchTeams[i][match.redAlliancePreview![1].teamID] = 1;
+    } else {
+      print("Match $i: Team ${match.redAlliancePreview?[1].teamName} is not in the rankings and therefore has not been included in calculations");
+    }
+    if (blueMatchTeams[i].containsKey(match.blueAlliancePreview![0].teamID)) {
+      blueMatchTeams[i][match.blueAlliancePreview![0].teamID] = 1;
+    } else {
+      print("Match $i: Team ${match.blueAlliancePreview?[0].teamName} is not in the rankings and therefore has not been included in calculations");
+    }
+    if (blueMatchTeams[i].containsKey(match.blueAlliancePreview![1].teamID)) {
+      blueMatchTeams[i][match.blueAlliancePreview![1].teamID] = 1;
+    } else {
+      print("Match $i: Team ${match.blueAlliancePreview?[1].teamName} is not in the rankings and therefore has not been included in calculations");
+    }
   }
 
-// Combine red and blue match teams
+  // Combine red and blue match teams
   List<List<double>> matchTeams =
       redMatchTeams.map((map) => map.values.toList()).toList() +
           blueMatchTeams.map((map) => map.values.toList()).toList();
 
-// Debugging: Print lengths of each nested list
-
-// Ensure all nested lists have the expected length
-
   Matrix mScores = Matrix.column(redScores + blueScores);
   Matrix mOppScores = Matrix.column(blueScores + redScores);
-  Matrix mMatches =
-      Matrix.fromList(matchTeams); // This is where the error occurs
+  Matrix mMatches = Matrix.fromList(matchTeams);
   Matrix mMatchesT = mMatches.transpose();
 
   Matrix mOPR = (mMatchesT * mMatches).solve(mMatchesT * mScores);
