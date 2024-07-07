@@ -1,7 +1,7 @@
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/screens/tournament/pages/info.dart';
-import 'package:elapse_app/screens/tournament/pages/rankings.dart';
+import 'package:elapse_app/screens/tournament/pages/rankings/rankings.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/schedule.dart';
 import 'package:elapse_app/screens/tournament/pages/skills.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
@@ -20,8 +20,9 @@ class TournamentLoadedScreen extends StatefulWidget {
 
 class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   int selectedIndex = 0;
-
+  int filterIndex = 0;
   List<String> titles = ["Schedule", "Rankings", "Skills", "Info"];
+  List<String> filters = ["rank", "opr", "dpr", "ccwm", "ap", "sp"];
 
   late Division division;
 
@@ -37,7 +38,11 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
       SchedulePage(
         division: division,
       ),
-      const RankingsPage(),
+      RankingsPage(
+          rankings: division.teamStats!,
+          teams: widget.tournament.teams,
+          sort: filters[filterIndex],
+          games: division.games),
       const SkillsPage(),
       const InfoPage(),
     ];
@@ -122,43 +127,65 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
           SliverPersistentHeader(
-              pinned: true,
-              delegate: SliverHeaderDelegate(
-                minHeight: 70.0,
-                maxHeight: 70.0,
-                child: Stack(
-                  children: [
-                    Container(
-                        height: 300,
-                        color: Theme.of(context).colorScheme.primary),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(30),
-                          topRight: Radius.circular(30),
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 25, vertical: 13),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _buildIconButton(
-                                context, Icons.calendar_view_day_outlined, 0),
-                            _buildIconButton(context,
-                                Icons.format_list_numbered_outlined, 1),
-                            _buildIconButton(
-                                context, Icons.sports_esports_outlined, 2),
-                            _buildIconButton(context, Icons.info_outlined, 3),
-                          ],
-                        ),
+            pinned: true,
+            delegate: SliverHeaderDelegate(
+              minHeight: 70.0,
+              maxHeight: 70.0,
+              child: Stack(
+                children: [
+                  Container(
+                      height: 300,
+                      color: Theme.of(context).colorScheme.primary),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
                       ),
                     ),
-                  ],
-                ),
-              )),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 25, vertical: 13),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildIconButton(
+                              context, Icons.calendar_view_day_outlined, 0),
+                          _buildIconButton(
+                              context, Icons.format_list_numbered_outlined, 1),
+                          _buildIconButton(
+                              context, Icons.sports_esports_outlined, 2),
+                          _buildIconButton(context, Icons.info_outlined, 3),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          selectedIndex == 1
+              ? SliverToBoxAdapter(
+                  child: Container(
+                    height: 50,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      children: [
+                        SizedBox(
+                          width: 23,
+                        ),
+                        _buildFilterButton(context, "Rank", 0),
+                        _buildFilterButton(context, "OPR", 1),
+                        _buildFilterButton(context, "DPR", 2),
+                        _buildFilterButton(context, "CCWM", 3),
+                        _buildFilterButton(context, "AP", 4),
+                        _buildFilterButton(context, "SP", 5),
+                      ],
+                    ),
+                  ),
+                )
+              : const SliverToBoxAdapter(),
           pages[selectedIndex],
         ],
       ),
@@ -186,13 +213,37 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             size: 24,
             color: Theme.of(context).colorScheme.secondary,
           ),
-          onPressed: () async {
+          onPressed: () {
             setState(() {
               selectedIndex = index;
             });
           },
         ),
       ],
+    );
+  }
+
+  TextButton _buildFilterButton(BuildContext context, String name, int index) {
+    Color backgroundColor = index == filterIndex
+        ? Theme.of(context).colorScheme.primary
+        : Theme.of(context).colorScheme.surface;
+    return TextButton(
+      style: TextButton.styleFrom(
+          padding: const EdgeInsets.symmetric(horizontal: 4)),
+      child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          decoration: BoxDecoration(
+              color: backgroundColor,
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Theme.of(context).colorScheme.primary)),
+          child: Text(name,
+              style:
+                  TextStyle(color: Theme.of(context).colorScheme.onSurface))),
+      onPressed: () {
+        setState(() {
+          filterIndex = index;
+        });
+      },
     );
   }
 }
