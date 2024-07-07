@@ -8,7 +8,12 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class GameWidget extends StatefulWidget {
-  const GameWidget({super.key, required this.game, required this.rankings});
+  const GameWidget(
+      {super.key,
+      required this.game,
+      required this.rankings,
+      required this.games});
+  final List<Game> games;
   final Game game;
   final Map<int, TeamStats>? rankings;
 
@@ -98,6 +103,7 @@ class _GameWidgetState extends State<GameWidget> {
                 builder: (context) => GameScreen(
                       game: widget.game,
                       rankings: widget.rankings,
+                      games: widget.games,
                     )));
       },
       child: Container(

@@ -7,7 +7,6 @@ class Division {
   String name;
   int order;
   List<Game>? games;
-  List<Team>? teams;
   Map<int, TeamStats>? teamStats;
 
   Division(
@@ -15,6 +14,5 @@ class Division {
       required this.name,
       required this.order,
       this.games,
-      this.teams,
       this.teamStats});
 }
