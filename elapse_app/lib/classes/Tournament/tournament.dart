@@ -1,6 +1,6 @@
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
+import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/division.dart';
-import 'package:elapse_app/classes/Tournament/tstats.dart';
 
 class Tournament {
   int id;
@@ -14,6 +14,7 @@ class Tournament {
   DateTime? endDate;
 
   List<Division> divisions;
+  List<Team> teams;
 
   Tournament({
     required this.id,
@@ -22,6 +23,7 @@ class Tournament {
     required this.location,
     required this.startDate,
     required this.divisions,
+    required this.teams,
     this.endDate,
   });
 }

@@ -62,7 +62,7 @@ Future<void> _fetchAdditionalPage(
     int eventId, int divisionId, int page, List<Game> divisionMatches) async {
   final response = await http.get(
     Uri.parse(
-        "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/matches?page=$page?per_page=250"),
+        "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/matches?page=$page&per_page=250"),
     headers: {
       HttpHeaders.authorizationHeader: TOKEN,
     },

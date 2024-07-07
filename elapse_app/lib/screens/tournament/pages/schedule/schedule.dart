@@ -32,6 +32,7 @@ class _SchedulePageState extends State<SchedulePage> {
                 GameWidget(
                   game: game,
                   rankings: widget.division.teamStats,
+                  games: widget.division.games!,
                 ),
                 index != widget.division.games!.length - 1
                     ? Divider(

@@ -36,13 +36,16 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
   Map<int, TeamStats> stats = {};
 
   // Get qualifier matches
-  List<Game> matches = [];
+  List<Game> allMatches = [];
+  List<Game> qualiMatches = [];
   var rankings;
   List parsedRankings = [];
 
   List<Future<void>> requestFutures = [];
-  requestFutures.add(getTournamentSchedule(eventId, divisionId)!
-      .then((m) => matches = m.where((e) => e.roundNum == 2).toList()));
+  requestFutures.add(getTournamentSchedule(eventId, divisionId)!.then((m) {
+    allMatches = m;
+    qualiMatches = m.where((e) => e.roundNum == 2).toList();
+  }));
   requestFutures.add(http.get(
     Uri.parse(
         "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/rankings?per_page=250"),
@@ -125,16 +128,18 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
 
   int statsLength = stats.keys.length;
 
-  List<Map<int, double>> redMatchTeams = List.generate(matches.length, (_) {
+  List<Map<int, double>> redMatchTeams =
+      List.generate(qualiMatches.length, (_) {
     return Map.fromIterables(stats.keys, List<double>.filled(statsLength, 0));
   });
-  List<Map<int, double>> blueMatchTeams = List.generate(matches.length, (_) {
+  List<Map<int, double>> blueMatchTeams =
+      List.generate(qualiMatches.length, (_) {
     return Map.fromIterables(stats.keys, List<double>.filled(statsLength, 0));
   });
 
 // Determine which teams played in each match and each match's scores
-  for (int i = 0; i < matches.length; i++) {
-    Game match = matches[i];
+  for (int i = 0; i < qualiMatches.length; i++) {
+    Game match = qualiMatches[i];
 
     redScores.add((match.redScore ?? 0).toDouble());
     blueScores.add((match.blueScore ?? 0).toDouble());
@@ -151,18 +156,8 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
           blueMatchTeams.map((map) => map.values.toList()).toList();
 
 // Debugging: Print lengths of each nested list
-  for (int i = 0; i < matchTeams.length; i++) {
-    print("Length of matchTeams[$i]: ${matchTeams[i].length}");
-  }
 
 // Ensure all nested lists have the expected length
-  int expectedLength = stats.keys.length;
-  for (int i = 0; i < matchTeams.length; i++) {
-    if (matchTeams[i].length != expectedLength) {
-      throw Exception(
-          "Wrong nested list length: ${matchTeams[i].length}, expected length: $expectedLength at index $i");
-    }
-  }
 
   Matrix mScores = Matrix.column(redScores + blueScores);
   Matrix mOppScores = Matrix.column(blueScores + redScores);
@@ -183,5 +178,5 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
     i++;
   }
 
-  return [matches, stats];
+  return [allMatches, stats];
 }

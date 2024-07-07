@@ -1,24 +1,27 @@
-import 'dart:math';
-
 import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/extras/twelve_hour.dart';
+import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class GameScreen extends StatelessWidget {
-  const GameScreen({super.key, required this.game, required this.rankings});
+  const GameScreen(
+      {super.key,
+      required this.game,
+      required this.rankings,
+      required this.games});
 
   final Game game;
   final Map<int, TeamStats>? rankings;
+  final List<Game> games;
 
   @override
   Widget build(BuildContext context) {
-    print(rankings);
     ColorPallete colorPallete;
     if (Theme.of(context).colorScheme.brightness == Brightness.dark) {
       colorPallete = darkPallete;
@@ -199,93 +202,37 @@ class GameScreen extends StatelessWidget {
                       Column(
                         children: game.redAlliancePreview!.map(
                           (e) {
-                            return Column(
-                              children: [
-                                Container(
-                                  height: 72,
-                                  child: Flex(
-                                    direction: Axis.horizontal,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Flexible(
-                                        flex: 120,
-                                        fit: FlexFit.tight,
-                                        child: Text(e.teamName,
-                                            style: TextStyle(
-                                                fontSize: 40,
-                                                height: 1,
-                                                fontWeight: FontWeight.w400,
-                                                color: colorPallete
-                                                    .redAllianceText)),
-                                      ),
-                                      Flexible(
-                                        flex: 50,
-                                        fit: FlexFit.tight,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                                "Rank ${rankings![e.teamID]!.rank}",
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                )),
-                                            Text(
-                                                "${rankings![e.teamID]!.wins}-${rankings![e.teamID]!.losses}-${rankings![e.teamID]!.ties}",
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                ))
-                                          ],
-                                        ),
-                                      ),
-                                      Flexible(
-                                        flex: 20,
-                                        fit: FlexFit.tight,
-                                        child: Container(
-                                            height: 50,
-                                            child: VerticalDivider(
-                                              thickness: 0.5,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .tertiary,
-                                            )),
-                                      ),
-                                      Flexible(
-                                        flex: 50,
-                                        fit: FlexFit.tight,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                                "${rankings![e.teamID]!.wp} WP",
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                )),
-                                            Text(
-                                                "${rankings![e.teamID]!.ap} AP",
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                ))
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Divider(
-                                  color: dividerColor,
-                                  thickness: 1,
-                                )
-                              ],
-                            );
+                            TeamStats? teamStats = rankings?[e.teamID];
+                            if (teamStats == null) {
+                              return Column(
+                                children: [
+                                  EmptyRanking(
+                                      teamName: e.teamName,
+                                      allianceColor:
+                                          colorPallete.redAllianceText),
+                                  Divider(
+                                    color: dividerColor,
+                                    thickness: 1,
+                                  )
+                                ],
+                              );
+                            } else {
+                              return Column(
+                                children: [
+                                  StandardRanking(
+                                      teamName: e.teamName,
+                                      teamStats: teamStats,
+                                      games: games,
+                                      rankings: rankings!,
+                                      allianceColor:
+                                          colorPallete.redAllianceText),
+                                  Divider(
+                                    color: dividerColor,
+                                    thickness: 1,
+                                  )
+                                ],
+                              );
+                            }
                           },
                         ).toList(),
                       ),
@@ -323,93 +270,37 @@ class GameScreen extends StatelessWidget {
                       Column(
                         children: game.blueAlliancePreview!.map(
                           (e) {
-                            return Column(
-                              children: [
-                                Container(
-                                  height: 72,
-                                  child: Flex(
-                                    direction: Axis.horizontal,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    children: [
-                                      Flexible(
-                                        flex: 120,
-                                        fit: FlexFit.tight,
-                                        child: Text(e.teamName,
-                                            style: TextStyle(
-                                                fontSize: 40,
-                                                height: 1,
-                                                fontWeight: FontWeight.w400,
-                                                color: colorPallete
-                                                    .blueAllianceText)),
-                                      ),
-                                      Flexible(
-                                        flex: 50,
-                                        fit: FlexFit.tight,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                                "Rank ${rankings![e.teamID]!.rank}",
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                )),
-                                            Text(
-                                                "${rankings![e.teamID]!.wins}-${rankings![e.teamID]!.losses}-${rankings![e.teamID]!.ties}",
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                ))
-                                          ],
-                                        ),
-                                      ),
-                                      Flexible(
-                                        flex: 20,
-                                        fit: FlexFit.tight,
-                                        child: Container(
-                                            height: 50,
-                                            child: VerticalDivider(
-                                              thickness: 0.5,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .tertiary,
-                                            )),
-                                      ),
-                                      Flexible(
-                                        flex: 50,
-                                        fit: FlexFit.tight,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceEvenly,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.end,
-                                          children: [
-                                            Text(
-                                                "${rankings![e.teamID]!.wp} WP",
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                )),
-                                            Text(
-                                                "${rankings![e.teamID]!.ap} AP",
-                                                style: TextStyle(
-                                                  fontSize: 16,
-                                                ))
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Divider(
-                                  color: dividerColor,
-                                  thickness: 1,
-                                )
-                              ],
-                            );
+                            TeamStats? teamStats = rankings?[e.teamID];
+                            if (teamStats == null) {
+                              return Column(
+                                children: [
+                                  EmptyRanking(
+                                      teamName: e.teamName,
+                                      allianceColor:
+                                          colorPallete.blueAllianceText),
+                                  Divider(
+                                    color: dividerColor,
+                                    thickness: 1,
+                                  )
+                                ],
+                              );
+                            } else {
+                              return Column(
+                                children: [
+                                  StandardRanking(
+                                      teamName: e.teamName,
+                                      teamStats: teamStats,
+                                      games: games,
+                                      rankings: rankings!,
+                                      allianceColor:
+                                          colorPallete.blueAllianceText),
+                                  Divider(
+                                    color: dividerColor,
+                                    thickness: 1,
+                                  )
+                                ],
+                              );
+                            }
                           },
                         ).toList(),
                       ),

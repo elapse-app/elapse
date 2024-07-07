@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
+import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
@@ -28,9 +29,6 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
         order: division["order"],
       );
       List<Future<void>> divisionDetails = [];
-      divisionDetails.add(getTeams(tournamentID, division["id"])
-          .then((teams) => returnDivision.teams = teams)
-          .catchError((e) => print(e)));
       divisionDetails
           .add(calcEventStats(tournamentID, division["id"]).then((teamStats) {
         returnDivision.teamStats = teamStats[1];
@@ -41,6 +39,9 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
       return returnDivision;
     }).toList());
 
+    List<Team> teams = await getTeams(tournamentID);
+
+    print(teams.length);
     return Tournament(
       id: tournamentID,
       name: parsed["name"],
@@ -48,6 +49,7 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
       location: Location(venue: parsed["location"]["venue"]),
       startDate: DateTime.parse(parsed["start"]),
       endDate: DateTime.parse(parsed["end"]),
+      teams: teams,
       divisions: divisions,
     );
   } catch (e) {
