@@ -1,12 +1,9 @@
-import 'dart:async';
-
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/screens/explore/explore.dart';
 import 'package:elapse_app/screens/home/home.dart';
 import 'package:elapse_app/screens/my_team/my_team.dart';
 import 'package:elapse_app/screens/tournament/tournament.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
@@ -26,24 +23,12 @@ void main() async {
 
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-  FlutterError.onError = (FlutterErrorDetails details) {
-    FlutterError.dumpErrorToConsole(details);
-    if (kDebugMode) {
-      debugPrintStack(stackTrace: details.stack);
-    }
-  };
-  runZonedGuarded(() {
-    runApp(
-      ChangeNotifierProvider(
-        create: (context) => ColorProvider(prefs: prefs),
-        child: MyApp(prefs: prefs),
-      ),
-    );
-    ;
-  }, (error, stackTrace) {
-    print('Caught error: $error');
-    debugPrintStack(stackTrace: stackTrace);
-  });
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => ColorProvider(prefs: prefs),
+      child: MyApp(prefs: prefs),
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {

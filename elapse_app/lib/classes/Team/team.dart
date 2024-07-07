@@ -25,8 +25,8 @@ class Team {
   factory Team.fromJson(Map<String, dynamic> json) {
     return Team(
       id: json["id"],
-      teamName: json["name"],
-      teamNumber: json["name"],
+      teamName: json["team_name"],
+      teamNumber: json["number"],
       organization: json["organization"],
       location: Location(
           city: json["city"],
