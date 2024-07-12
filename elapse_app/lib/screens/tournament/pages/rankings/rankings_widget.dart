@@ -1,5 +1,7 @@
+import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
+import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -10,12 +12,16 @@ class StandardRanking extends StatelessWidget {
     required this.rankings,
     required this.teamName,
     required this.games,
+    this.team,
+    required this.teamID,
     required this.allianceColor,
   });
   final Map<int, TeamStats> rankings;
   final String teamName;
   final TeamStats teamStats;
   final List<Game>? games;
+  final Team? team;
+  final int teamID;
   final Color allianceColor;
   @override
   Widget build(BuildContext context) {
@@ -26,8 +32,11 @@ class StandardRanking extends StatelessWidget {
     int wp = teamStats.wp;
     int ap = teamStats.ap;
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () {
-        tournamentStatsPage(context, teamStats, games, rankings, teamName);
+        tournamentStatsPage(
+            context, teamStats, games, rankings, teamName, teamID,
+            team: team);
       },
       child: Container(
         height: 72,
@@ -43,6 +52,7 @@ class StandardRanking extends StatelessWidget {
                   style: TextStyle(
                       fontSize: 40,
                       height: 1,
+                      letterSpacing: -1.5,
                       fontWeight: FontWeight.w400,
                       color: allianceColor)),
             ),
@@ -107,6 +117,8 @@ class OPRRanking extends StatelessWidget {
       required this.teamName,
       required this.stat,
       required this.games,
+      this.team,
+      required this.teamID,
       required this.allianceColor});
 
   final Map<int, TeamStats> rankings;
@@ -114,7 +126,9 @@ class OPRRanking extends StatelessWidget {
   final String teamName;
   final TeamStats teamStats;
   final List<Game>? games;
+  final Team? team;
   final Color allianceColor;
+  final int teamID;
 
   @override
   Widget build(BuildContext context) {
@@ -135,8 +149,17 @@ class OPRRanking extends StatelessWidget {
       value = ccwm;
     }
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () {
-        tournamentStatsPage(context, teamStats, games, rankings, teamName);
+        tournamentStatsPage(
+          context,
+          teamStats,
+          games,
+          rankings,
+          teamName,
+          teamID,
+          team: team,
+        );
       },
       child: Container(
         height: 72,
@@ -152,6 +175,7 @@ class OPRRanking extends StatelessWidget {
                   style: TextStyle(
                       fontSize: 40,
                       height: 1,
+                      letterSpacing: -1.5,
                       fontWeight: FontWeight.w400,
                       color: allianceColor)),
             ),
@@ -210,34 +234,52 @@ class OPRRanking extends StatelessWidget {
 
 class EmptyRanking extends StatelessWidget {
   const EmptyRanking(
-      {super.key, required this.teamName, required this.allianceColor});
+      {super.key,
+      required this.teamName,
+      required this.teamID,
+      required this.allianceColor});
 
   final String teamName;
+  final int teamID;
   final Color allianceColor;
   @override
   Widget build(BuildContext context) {
-    return Container(
-      alignment: Alignment.centerLeft,
-      height: 72,
-      child: Text(
-        teamName,
-        style: TextStyle(
-            fontSize: 40,
-            height: 1,
-            fontWeight: FontWeight.w400,
-            color: allianceColor),
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TeamScreen(
+              teamID: teamID,
+              teamName: teamName,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        alignment: Alignment.centerLeft,
+        height: 72,
+        child: Text(
+          teamName,
+          style: TextStyle(
+              fontSize: 40,
+              height: 1,
+              fontWeight: FontWeight.w400,
+              color: allianceColor),
+        ),
       ),
     );
   }
 }
 
 Future<void> tournamentStatsPage(
-  BuildContext context,
-  TeamStats teamStats,
-  List<Game>? games,
-  Map<int, TeamStats> rankings,
-  String teamName,
-) {
+    BuildContext context,
+    TeamStats teamStats,
+    List<Game>? games,
+    Map<int, TeamStats> rankings,
+    String teamName,
+    int teamID,
+    {Team? team}) {
   int rank = teamStats.rank;
   int wins = teamStats.wins;
   int losses = teamStats.losses;
@@ -245,15 +287,6 @@ Future<void> tournamentStatsPage(
   double opr = teamStats.opr;
   double dpr = teamStats.dpr;
   double ccwm = teamStats.ccwm;
-
-  Color statsDividerColor =
-      Theme.of(context).colorScheme.brightness == Brightness.dark
-          ? const Color.fromARGB(255, 55, 55, 55)
-          : const Color.fromRGBO(151, 151, 151, 1);
-  Color dividerColor =
-      Theme.of(context).colorScheme.brightness == Brightness.dark
-          ? const Color.fromARGB(255, 55, 55, 55)
-          : const Color.fromARGB(255, 211, 211, 211);
 
   List<Game> teamGames = games!.where(
     (element) {
@@ -296,9 +329,30 @@ Future<void> tournamentStatsPage(
                       style: const TextStyle(
                           fontSize: 24, height: 1, fontWeight: FontWeight.w500),
                     ),
-                    const Icon(
-                      Icons.info_outlined,
-                      size: 24,
+                    TextButton(
+                      iconAlignment: IconAlignment.end,
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => TeamScreen(
+                              teamID: teamID,
+                              teamName: teamName,
+                              team: team,
+                            ),
+                          ),
+                        );
+                      },
+                      child: Row(
+                        children: [
+                          Text(
+                            "View More",
+                            style: TextStyle(
+                                fontSize: 16,
+                                color: Theme.of(context).colorScheme.secondary),
+                          ),
+                        ],
+                      ),
                     )
                   ],
                 ),
@@ -429,7 +483,6 @@ Future<void> tournamentStatsPage(
                       ),
                       Divider(
                         height: 3,
-                        color: statsDividerColor,
                       ),
                       const SizedBox(
                         height: 18,
@@ -437,6 +490,7 @@ Future<void> tournamentStatsPage(
                       Row(
                         children: [
                           Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 "$opr",
@@ -453,6 +507,7 @@ Future<void> tournamentStatsPage(
                             width: 18,
                           ),
                           Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 "$dpr",
@@ -469,6 +524,7 @@ Future<void> tournamentStatsPage(
                             width: 18,
                           ),
                           Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 "$ccwm",
@@ -507,10 +563,12 @@ Future<void> tournamentStatsPage(
                               game: game,
                               games: games,
                               rankings: rankings,
+                              teamName: teamName,
+                              isAllianceColoured: false,
                             ),
                             Divider(
                               height: 3,
-                              color: dividerColor,
+                              color: Theme.of(context).colorScheme.surfaceDim,
                             ),
                           ],
                         ),
