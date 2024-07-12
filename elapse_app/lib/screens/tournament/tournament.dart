@@ -1,6 +1,5 @@
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
-import 'package:elapse_app/requests/getTournament.dart';
 import 'package:elapse_app/screens/tournament/pages/main/loaded.dart';
 import 'package:elapse_app/screens/tournament/pages/main/loading.dart';
 import 'package:flutter/material.dart';

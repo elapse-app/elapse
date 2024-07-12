@@ -2,8 +2,7 @@ import "dart:convert";
 
 import "package:elapse_app/classes/Tournament/game.dart";
 import 'package:elapse_app/classes/Tournament/tskills.dart';
-import "package:elapse_app/requests/schedule.dart";
-import "package:elapse_app/requests/token.dart";
+import "package:elapse_app/extras/token.dart";
 
 import "package:ml_linalg/matrix.dart";
 import "package:http/http.dart" as http;
@@ -146,22 +145,26 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
     if (redMatchTeams[i].containsKey(match.redAlliancePreview![0].teamID)) {
       redMatchTeams[i][match.redAlliancePreview![0].teamID] = 1;
     } else {
-      print("Match $i: Team ${match.redAlliancePreview?[0].teamName} is not in the rankings and therefore has not been included in calculations");
+      print(
+          "Match $i: Team ${match.redAlliancePreview?[0].teamName} is not in the rankings and therefore has not been included in calculations");
     }
     if (redMatchTeams[i].containsKey(match.redAlliancePreview![1].teamID)) {
       redMatchTeams[i][match.redAlliancePreview![1].teamID] = 1;
     } else {
-      print("Match $i: Team ${match.redAlliancePreview?[1].teamName} is not in the rankings and therefore has not been included in calculations");
+      print(
+          "Match $i: Team ${match.redAlliancePreview?[1].teamName} is not in the rankings and therefore has not been included in calculations");
     }
     if (blueMatchTeams[i].containsKey(match.blueAlliancePreview![0].teamID)) {
       blueMatchTeams[i][match.blueAlliancePreview![0].teamID] = 1;
     } else {
-      print("Match $i: Team ${match.blueAlliancePreview?[0].teamName} is not in the rankings and therefore has not been included in calculations");
+      print(
+          "Match $i: Team ${match.blueAlliancePreview?[0].teamName} is not in the rankings and therefore has not been included in calculations");
     }
     if (blueMatchTeams[i].containsKey(match.blueAlliancePreview![1].teamID)) {
       blueMatchTeams[i][match.blueAlliancePreview![1].teamID] = 1;
     } else {
-      print("Match $i: Team ${match.blueAlliancePreview?[1].teamName} is not in the rankings and therefore has not been included in calculations");
+      print(
+          "Match $i: Team ${match.blueAlliancePreview?[1].teamName} is not in the rankings and therefore has not been included in calculations");
     }
   }
 

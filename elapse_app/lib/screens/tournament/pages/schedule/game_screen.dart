@@ -1,5 +1,6 @@
 import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
+import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/extras/twelve_hour.dart';
@@ -28,7 +29,7 @@ class GameScreen extends StatelessWidget {
     } else {
       colorPallete = lightPallete;
     }
-    String time = "";
+    String time = "No Time";
     if (game.startedTime != null) {
       time = DateFormat.Hm().format(game.startedTime!);
     }
@@ -41,10 +42,38 @@ class GameScreen extends StatelessWidget {
       status = "Played";
     }
 
-    Color dividerColor =
-        Theme.of(context).colorScheme.brightness == Brightness.dark
-            ? const Color.fromARGB(255, 55, 55, 55)
-            : const Color.fromARGB(255, 211, 211, 211);
+    Widget gameText;
+    if (game.gameName.substring(0, 1) == "R") {
+      gameText = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        const Text("R",
+            style: TextStyle(
+              fontSize: 64,
+              height: 1,
+              fontWeight: FontWeight.w400,
+            )),
+        const Text("16",
+            style: TextStyle(
+              fontSize: 32,
+              height: 1.25,
+              letterSpacing: -1,
+              fontWeight: FontWeight.w500,
+            )),
+        Text(game.gameName.substring(3, 4),
+            style: const TextStyle(
+              fontSize: 64,
+              height: 1,
+              fontWeight: FontWeight.w400,
+            ))
+      ]);
+    } else {
+      gameText = Text(game.gameName,
+          style: const TextStyle(
+            fontSize: 64,
+            height: 1,
+            fontWeight: FontWeight.w400,
+          ));
+    }
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -117,11 +146,7 @@ class GameScreen extends StatelessWidget {
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(
-                                  game.gameName,
-                                  style:
-                                      const TextStyle(fontSize: 64, height: 1),
-                                ),
+                                gameText,
                                 SizedBox(
                                   height: 10,
                                 ),
@@ -208,10 +233,13 @@ class GameScreen extends StatelessWidget {
                                 children: [
                                   EmptyRanking(
                                       teamName: e.teamName,
+                                      teamID: e.teamID,
                                       allianceColor:
                                           colorPallete.redAllianceText),
                                   Divider(
-                                    color: dividerColor,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .surfaceDim,
                                     thickness: 1,
                                   )
                                 ],
@@ -223,11 +251,14 @@ class GameScreen extends StatelessWidget {
                                       teamName: e.teamName,
                                       teamStats: teamStats,
                                       games: games,
+                                      teamID: e.teamID,
                                       rankings: rankings!,
                                       allianceColor:
                                           colorPallete.redAllianceText),
                                   Divider(
-                                    color: dividerColor,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .surfaceDim,
                                     thickness: 1,
                                   )
                                 ],
@@ -276,10 +307,13 @@ class GameScreen extends StatelessWidget {
                                 children: [
                                   EmptyRanking(
                                       teamName: e.teamName,
+                                      teamID: e.teamID,
                                       allianceColor:
                                           colorPallete.blueAllianceText),
                                   Divider(
-                                    color: dividerColor,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .surfaceDim,
                                     thickness: 1,
                                   )
                                 ],
@@ -290,12 +324,15 @@ class GameScreen extends StatelessWidget {
                                   StandardRanking(
                                       teamName: e.teamName,
                                       teamStats: teamStats,
+                                      teamID: e.teamID,
                                       games: games,
                                       rankings: rankings!,
                                       allianceColor:
                                           colorPallete.blueAllianceText),
                                   Divider(
-                                    color: dividerColor,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .surfaceDim,
                                     thickness: 1,
                                   )
                                 ],

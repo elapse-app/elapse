@@ -58,7 +58,6 @@ class _MyAppState extends State<MyApp> {
           MediaQuery.of(context).platformBrightness == Brightness.dark
               ? darkScheme
               : lightScheme;
-      ;
 
       if (widget.prefs.getString("theme") == "system") {
         systemDefined = true;

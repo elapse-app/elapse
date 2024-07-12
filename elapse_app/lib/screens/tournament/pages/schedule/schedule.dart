@@ -17,10 +17,6 @@ class _SchedulePageState extends State<SchedulePage> {
   @override
   Widget build(BuildContext context) {
     calcEventStats(53690, 10);
-    Color dividerColor =
-        Theme.of(context).colorScheme.brightness == Brightness.dark
-            ? const Color.fromARGB(255, 55, 55, 55)
-            : const Color.fromARGB(255, 211, 211, 211);
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (context, index) {
@@ -37,7 +33,7 @@ class _SchedulePageState extends State<SchedulePage> {
                 index != widget.division.games!.length - 1
                     ? Divider(
                         height: 3,
-                        color: dividerColor,
+                        color: Theme.of(context).colorScheme.surfaceDim,
                       )
                     : Container(),
               ],

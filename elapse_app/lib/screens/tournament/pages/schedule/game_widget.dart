@@ -7,29 +7,28 @@ import 'package:elapse_app/screens/tournament/pages/schedule/game_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class GameWidget extends StatefulWidget {
+class GameWidget extends StatelessWidget {
   const GameWidget(
       {super.key,
       required this.game,
       required this.rankings,
-      required this.games});
+      required this.games,
+      this.teamName,
+      this.isAllianceColoured});
   final List<Game> games;
   final Game game;
   final Map<int, TeamStats>? rankings;
+  final String? teamName;
+  final bool? isAllianceColoured;
 
-  @override
-  State<GameWidget> createState() => _GameWidgetState();
-}
-
-class _GameWidgetState extends State<GameWidget> {
   @override
   Widget build(BuildContext context) {
-    String time = "";
-    if (widget.game.startedTime != null) {
-      time = DateFormat.Hm().format(widget.game.startedTime!);
+    String time = "No Time";
+    if (game.startedTime != null) {
+      time = DateFormat.Hm().format(game.startedTime!);
     }
-    if (widget.game.scheduledTime != null) {
-      time = DateFormat.Hm().format(widget.game.scheduledTime!);
+    if (game.scheduledTime != null) {
+      time = DateFormat.Hm().format(game.scheduledTime!);
     }
 
     time = twelveHour(time);
@@ -41,18 +40,37 @@ class _GameWidgetState extends State<GameWidget> {
       colorPallete = lightPallete;
     }
 
+    String winningAlliance = "none";
     Color gameColor = Theme.of(context).colorScheme.onSurface;
 
-    if (widget.game.blueScore != null && widget.game.redScore != null) {
-      if (widget.game.blueScore! > widget.game.redScore!) {
+    if (game.blueScore != null && game.redScore != null) {
+      if (game.blueScore! > game.redScore!) {
         gameColor = colorPallete.blueAllianceText;
-      } else if (widget.game.blueScore! < widget.game.redScore!) {
+        winningAlliance = "blue";
+      } else if (game.blueScore! < game.redScore!) {
         gameColor = colorPallete.redAllianceText;
+        winningAlliance = "red";
       }
     }
 
+    if (isAllianceColoured == false) {
+      gameColor = Theme.of(context).colorScheme.onSurface;
+    }
+
+    if (winningAlliance == "red" &&
+        game.redAlliancePreview!
+            .any((element) => element.teamName == teamName)) {
+      gameColor = colorPallete.greenText;
+    } else if (winningAlliance == "blue" &&
+        game.blueAlliancePreview!
+            .any((element) => element.teamName == teamName)) {
+      gameColor = colorPallete.greenText;
+    } else if (winningAlliance != "none" && teamName != null) {
+      gameColor = colorPallete.redAllianceText;
+    }
+
     Widget gameText;
-    if (widget.game.gameName.substring(0, 1) == "R") {
+    if (game.gameName.substring(0, 1) == "R") {
       gameText = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
         Text("R",
             style: TextStyle(
@@ -65,10 +83,11 @@ class _GameWidgetState extends State<GameWidget> {
             style: TextStyle(
               fontSize: 20,
               height: 1.3,
+              letterSpacing: -1,
               fontWeight: FontWeight.w400,
               color: gameColor,
             )),
-        Text(widget.game.gameName.substring(3, 4),
+        Text(game.gameName.substring(3, 4),
             style: TextStyle(
               color: gameColor,
               fontSize: 40,
@@ -77,9 +96,9 @@ class _GameWidgetState extends State<GameWidget> {
             ))
       ]);
     } else {
-      gameText = Text(widget.game.gameName,
+      gameText = Text(game.gameName,
           style: TextStyle(
-            letterSpacing: -2,
+            letterSpacing: -1.75,
             fontSize: 40,
             height: 1,
             color: gameColor,
@@ -87,12 +106,10 @@ class _GameWidgetState extends State<GameWidget> {
           ));
     }
 
-    Color timeColor = Theme.of(context).colorScheme.onSurface;
-    if (widget.game.startedTime != null) {
-      timeColor = Theme.of(context).colorScheme.brightness == Brightness.dark
-          ? const Color.fromARGB(255, 168, 168, 168)
-          : const Color.fromARGB(255, 118, 118, 118);
-    }
+    Color timeColor =
+        Theme.of(context).colorScheme.brightness == Brightness.dark
+            ? const Color.fromARGB(255, 168, 168, 168)
+            : const Color.fromARGB(255, 118, 118, 118);
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -101,9 +118,9 @@ class _GameWidgetState extends State<GameWidget> {
             context,
             MaterialPageRoute(
                 builder: (context) => GameScreen(
-                      game: widget.game,
-                      rankings: widget.rankings,
-                      games: widget.games,
+                      game: game,
+                      rankings: rankings,
+                      games: games,
                     )));
       },
       child: Container(
@@ -137,13 +154,13 @@ class _GameWidgetState extends State<GameWidget> {
                               fontSize: 16, height: 1, color: timeColor),
                           maxLines: 1,
                         ),
-                        widget.game.redScore != null
+                        game.redScore != null
                             ? Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
-                                    widget.game.redScore.toString(),
+                                    game.redScore.toString(),
                                     style: TextStyle(
                                         color: colorPallete.redAllianceText,
                                         fontSize: 16,
@@ -157,7 +174,7 @@ class _GameWidgetState extends State<GameWidget> {
                                           fontWeight: FontWeight.w500,
                                           height: 1)),
                                   Text(
-                                    widget.game.blueScore.toString(),
+                                    game.blueScore.toString(),
                                     style: TextStyle(
                                         color: colorPallete.blueAllianceText,
                                         fontSize: 16,
@@ -166,7 +183,7 @@ class _GameWidgetState extends State<GameWidget> {
                                   ),
                                 ],
                               )
-                            : Text(widget.game.fieldName!,
+                            : Text(game.fieldName!,
                                 style: const TextStyle(fontSize: 16, height: 1))
                       ],
                     ),
@@ -194,7 +211,7 @@ class _GameWidgetState extends State<GameWidget> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: widget.game.redAlliancePreview!.map(
+                      children: game.redAlliancePreview!.map(
                         (e) {
                           return Text(
                             e.teamName,
@@ -214,7 +231,7 @@ class _GameWidgetState extends State<GameWidget> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.end,
-                      children: widget.game.blueAlliancePreview!.map(
+                      children: game.blueAlliancePreview!.map(
                         (e) {
                           return Text(
                             e.teamName,

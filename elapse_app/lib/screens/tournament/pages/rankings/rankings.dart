@@ -45,10 +45,6 @@ class RankingsPage extends StatelessWidget {
       });
     }
 
-    Color dividerColor =
-        Theme.of(context).colorScheme.brightness == Brightness.dark
-            ? const Color.fromARGB(255, 55, 55, 55)
-            : const Color.fromARGB(255, 211, 211, 211);
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 23),
       sliver: SliverList(
@@ -67,9 +63,11 @@ class RankingsPage extends StatelessWidget {
                     rankings: rankings,
                     teamStats: teamStats,
                     games: games,
+                    teamID: team.id,
+                    team: team,
                     allianceColor: Theme.of(context).colorScheme.onSurface),
                 Divider(
-                  color: dividerColor,
+                  color: Theme.of(context).colorScheme.surfaceDim,
                   height: 3,
                 )
               ],
@@ -82,9 +80,11 @@ class RankingsPage extends StatelessWidget {
                     rankings: rankings,
                     teamStats: teamStats,
                     games: games,
+                    teamID: team.id,
+                    team: team,
                     allianceColor: Theme.of(context).colorScheme.onSurface),
                 Divider(
-                  color: dividerColor,
+                  color: Theme.of(context).colorScheme.surfaceDim,
                   height: 3,
                 )
               ],
