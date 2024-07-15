@@ -26,7 +26,7 @@ class TeamStats {
   double avgScore = 0;
   int totalScore = 0;
 
-  TournamentSkills? tournamentSkills;
+  TeamSkills? tournamentSkills;
 
   TeamStats();
 }
@@ -37,6 +37,7 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
   // Get qualifier matches
   List<Game> allMatches = [];
   List<Game> qualiMatches = [];
+  Map<int, TeamSkills> skills = {};
   var rankings;
   List parsedRankings = [];
 
@@ -44,6 +45,9 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
   requestFutures.add(getTournamentSchedule(eventId, divisionId)!.then((m) {
     allMatches = m;
     qualiMatches = m.where((e) => e.roundNum == 2).toList();
+  }));
+  requestFutures.add(getSkillsRankings(eventId).then((s) {
+    skills = s;
   }));
   requestFutures.add(http.get(
     Uri.parse(
@@ -79,6 +83,8 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
     stats[teamId]?.highScore = t["high_score"] ?? 0;
     stats[teamId]?.avgScore = (t["average_points"] ?? 0).toDouble();
     stats[teamId]?.totalScore = t["total_points"] ?? 0;
+
+    stats[teamId]?.tournamentSkills = skills[teamId];
   }
 
   List<Future<void>> pgFutures = [];
@@ -114,6 +120,8 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
         stats[teamId]?.highScore = t["high_score"] ?? 0;
         stats[teamId]?.avgScore = (t["average_points"] ?? 0).toDouble();
         stats[teamId]?.totalScore = t["total_points"] ?? 0;
+
+        stats[teamId]?.tournamentSkills = skills[teamId];
       }
     });
     pgFutures.add(pgResponse);
