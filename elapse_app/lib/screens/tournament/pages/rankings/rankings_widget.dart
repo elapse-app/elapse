@@ -1,5 +1,7 @@
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
+import 'package:elapse_app/classes/Tournament/tournament.dart';
+import 'package:elapse_app/classes/Tournament/tskills.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
@@ -11,6 +13,7 @@ class StandardRanking extends StatelessWidget {
     required this.teamStats,
     required this.rankings,
     required this.teamName,
+    required this.skills,
     required this.games,
     this.team,
     required this.teamID,
@@ -20,6 +23,7 @@ class StandardRanking extends StatelessWidget {
   final String teamName;
   final TeamStats teamStats;
   final List<Game>? games;
+  final Map<int, TournamentSkills> skills;
   final Team? team;
   final int teamID;
   final Color allianceColor;
@@ -35,7 +39,7 @@ class StandardRanking extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       onTap: () {
         tournamentStatsPage(
-            context, teamStats, games, rankings, teamName, teamID,
+            context, teamStats, games, rankings, skills, teamName, teamID,
             team: team);
       },
       child: Container(
@@ -114,6 +118,7 @@ class OPRRanking extends StatelessWidget {
       {super.key,
       required this.teamStats,
       required this.rankings,
+      required this.skills,
       required this.teamName,
       required this.stat,
       required this.games,
@@ -122,6 +127,7 @@ class OPRRanking extends StatelessWidget {
       required this.allianceColor});
 
   final Map<int, TeamStats> rankings;
+  final Map<int, TournamentSkills> skills;
   final String stat;
   final String teamName;
   final TeamStats teamStats;
@@ -156,6 +162,7 @@ class OPRRanking extends StatelessWidget {
           teamStats,
           games,
           rankings,
+          skills,
           teamName,
           teamID,
           team: team,
@@ -277,6 +284,7 @@ Future<void> tournamentStatsPage(
     TeamStats teamStats,
     List<Game>? games,
     Map<int, TeamStats> rankings,
+    Map<int, TournamentSkills> skills,
     String teamName,
     int teamID,
     {Team? team}) {
@@ -473,7 +481,7 @@ Future<void> tournamentStatsPage(
                             "Skills Rank",
                             style: TextStyle(fontSize: 24),
                           ),
-                          Text("000",
+                          Text("${skills[teamID]?.rank ?? "N/A"}",
                               style: const TextStyle(
                                   fontSize: 24, fontWeight: FontWeight.w500))
                         ],
@@ -564,6 +572,7 @@ Future<void> tournamentStatsPage(
                               games: games,
                               rankings: rankings,
                               teamName: teamName,
+                              skills: skills,
                               isAllianceColoured: false,
                             ),
                             Divider(

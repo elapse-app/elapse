@@ -1,5 +1,6 @@
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
+import 'package:elapse_app/classes/Tournament/tskills.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dart';
 import 'package:flutter/material.dart';
@@ -10,10 +11,14 @@ class RankingsPage extends StatelessWidget {
       required this.rankings,
       required this.teams,
       required this.games,
+      required this.searchQuery,
+      required this.skills,
       required this.sort});
   final Map<int, TeamStats> rankings;
+  final Map<int, TournamentSkills> skills;
   final List<Team> teams;
   final List<Game>? games;
+  final String searchQuery;
   final String sort;
   @override
   Widget build(BuildContext context) {
@@ -45,6 +50,16 @@ class RankingsPage extends StatelessWidget {
       });
     }
 
+    if (searchQuery.isNotEmpty) {
+      divisionTeams = divisionTeams
+          .where((e) =>
+              e.teamNumber!.toLowerCase().contains(searchQuery.toLowerCase()) ||
+              e.teamName!.toLowerCase().contains(searchQuery.toLowerCase()))
+          .toList();
+    } else {
+      divisionTeams = divisionTeams;
+    }
+
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 23),
       sliver: SliverList(
@@ -64,6 +79,7 @@ class RankingsPage extends StatelessWidget {
                     teamStats: teamStats,
                     games: games,
                     teamID: team.id,
+                    skills: skills,
                     team: team,
                     allianceColor: Theme.of(context).colorScheme.onSurface),
                 Divider(
@@ -81,6 +97,7 @@ class RankingsPage extends StatelessWidget {
                     teamStats: teamStats,
                     games: games,
                     teamID: team.id,
+                    skills: skills,
                     team: team,
                     allianceColor: Theme.of(context).colorScheme.onSurface),
                 Divider(

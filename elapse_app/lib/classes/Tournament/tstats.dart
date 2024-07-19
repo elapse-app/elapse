@@ -26,7 +26,7 @@ class TeamStats {
   double avgScore = 0;
   int totalScore = 0;
 
-  TeamSkills? tournamentSkills;
+  TournamentSkills? tournamentSkills;
 
   TeamStats();
 }
@@ -37,7 +37,7 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
   // Get qualifier matches
   List<Game> allMatches = [];
   List<Game> qualiMatches = [];
-  Map<int, TeamSkills> skills = {};
+  Map<int, TournamentSkills> skills = {};
   var rankings;
   List parsedRankings = [];
 
@@ -45,9 +45,6 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
   requestFutures.add(getTournamentSchedule(eventId, divisionId)!.then((m) {
     allMatches = m;
     qualiMatches = m.where((e) => e.roundNum == 2).toList();
-  }));
-  requestFutures.add(getSkillsRankings(eventId).then((s) {
-    skills = s;
   }));
   requestFutures.add(http.get(
     Uri.parse(
