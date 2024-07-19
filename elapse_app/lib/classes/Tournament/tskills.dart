@@ -1,24 +1,99 @@
 import 'package:elapse_app/classes/Team/team.dart';
 
-class TournamentSkills {
-  int score;
+import "dart:convert";
+import 'package:elapse_app/extras/token.dart';
+import 'package:http/http.dart' as http;
+import "dart:io";
 
-  int autonScore;
-  int autonAttempts;
+class TeamSkills {
+  int rank = 0;
+  int score = 0;
 
-  int driverScore;
-  int driverAttempts;
-  int rank;
+  int autonScore = 0;
+  int autonAttempts = 0;
 
-  Team team;
+  int driverScore = 0;
+  int driverAttempts = 0;
 
-  TournamentSkills({
-    required this.score,
-    required this.autonScore,
-    required this.autonAttempts,
-    required this.driverScore,
-    required this.driverAttempts,
-    required this.rank,
-    required this.team,
-  });
+  TeamSkills();
+}
+
+Future<Map<int, TeamSkills>> getSkillsRankings(int eventId) async {
+  Map<int, TeamSkills> rankings = {};
+
+  List<Team> teams = [];
+  var skills;
+  List parsedSkills = [];
+
+  List<Future<void>> requestFutures = [];
+  requestFutures.add(getTeams(eventId).then((t) {
+    teams = t;
+  }));
+  requestFutures.add(http.get(
+    Uri.parse(
+        "https://www.robotevents.com/api/v2/events/$eventId/skills?per_page=250"),
+    headers: {
+      HttpHeaders.authorizationHeader: TOKEN,
+    },
+  ).then((s) {
+    skills = s;
+
+    if (s.statusCode != 200) {
+      throw Exception("Failed to get rankings");
+    }
+    parsedSkills = jsonDecode(s.body)["data"] as List;
+  }));
+  await Future.wait(requestFutures);
+
+  rankings.addAll(Map<int, TeamSkills>.fromEntries(
+      teams.map((v) => MapEntry(v.id, TeamSkills()))));
+  for (final t in parsedSkills) {
+    int teamId = t["team"]["id"];
+
+    rankings[teamId]?.rank = t["rank"];
+    if (t["type"] == "programming") {
+      rankings[teamId]?.autonScore = t["score"];
+      rankings[teamId]?.autonAttempts = t["attempts"];
+    } else {
+      rankings[teamId]?.driverScore = t["score"];
+      rankings[teamId]?.driverAttempts = t["attempts"];
+    }
+    rankings[teamId]?.score = rankings[teamId]!.autonScore + rankings[teamId]!.driverScore;
+  }
+  List<Future<void>> pgFutures = [];
+  int teamsLastPage = jsonDecode(skills.body)["meta"]["last_page"];
+  for (int pg = 2; pg <= teamsLastPage; pg++) {
+    print("getting additional skills");
+    Future<void> pgResponse = http.get(
+        Uri.parse(
+            "https://www.robotevents.com/api/v2/events/$eventId/skills?page=$pg&per_page=250"),
+        headers: {
+          HttpHeaders.authorizationHeader: TOKEN,
+        }).then((pgResponse) {
+      if (pgResponse.statusCode != 200) {
+        throw Exception("Failed to get skills page $pg");
+      }
+      final parsedPg = jsonDecode(pgResponse.body)["data"] as List;
+
+      rankings.addAll(Map<int, TeamSkills>.fromEntries(
+          teams.map((v) => MapEntry(v.id, TeamSkills()))));
+      for (final t in parsedPg) {
+        int teamId = t["team"]["id"];
+
+        rankings[teamId]?.rank = t["rank"];
+        if (t["type"] == "programming") {
+          rankings[teamId]?.autonScore = t["score"];
+          rankings[teamId]?.autonAttempts = t["attempts"];
+        } else {
+          rankings[teamId]?.driverScore = t["score"];
+          rankings[teamId]?.driverAttempts = t["attempts"];
+        }
+        rankings[teamId]?.score = rankings[teamId]!.autonScore + rankings[teamId]!.driverScore;
+      }
+    });
+    pgFutures.add(pgResponse);
+  }
+  await Future.wait(pgFutures);
+
+  return rankings;
 }
