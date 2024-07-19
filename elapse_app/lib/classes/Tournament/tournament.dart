@@ -1,6 +1,7 @@
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/division.dart';
+import 'package:elapse_app/classes/Tournament/tskills.dart';
 
 import 'dart:convert';
 
@@ -23,6 +24,8 @@ class Tournament {
   List<Division> divisions;
   List<Team> teams;
 
+  Map<int, TournamentSkills>? tournamentSkills;
+
   Tournament({
     required this.id,
     required this.name,
@@ -32,6 +35,7 @@ class Tournament {
     required this.divisions,
     required this.teams,
     this.endDate,
+    this.tournamentSkills,
   });
 }
 
@@ -58,13 +62,17 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
           .add(calcEventStats(tournamentID, division["id"]).then((teamStats) {
         returnDivision.teamStats = teamStats[1];
         returnDivision.games = teamStats[0];
-      }).catchError((e) => print(e)));
+      }));
       ;
       await Future.wait(divisionDetails);
       return returnDivision;
     }).toList());
 
-    List<Team> teams = await getTeams(tournamentID);
+    Future<List<Team>> futureTeams = getTeams(tournamentID);
+    Map<int, TournamentSkills> skills =
+        await getSkillsRankings(tournamentID, futureTeams);
+
+    List<Team> teams = await futureTeams;
 
     return Tournament(
       id: tournamentID,
@@ -75,6 +83,7 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
       endDate: DateTime.parse(parsed["end"]),
       teams: teams,
       divisions: divisions,
+      tournamentSkills: skills,
     );
   } catch (e) {
     throw (e);
