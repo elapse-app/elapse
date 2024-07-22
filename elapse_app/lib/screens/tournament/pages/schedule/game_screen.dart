@@ -105,24 +105,6 @@ class GameScreen extends StatelessWidget {
                 ),
               ),
               centerTitle: false,
-              background: const SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 20, right: 12, bottom: 20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Spacer(),
-                          SettingsButton(),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ),
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
