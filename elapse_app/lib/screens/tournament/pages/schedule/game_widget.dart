@@ -1,6 +1,7 @@
 import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
+import 'package:elapse_app/classes/Tournament/tskills.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/extras/twelve_hour.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_screen.dart';
@@ -13,11 +14,13 @@ class GameWidget extends StatelessWidget {
       required this.game,
       required this.rankings,
       required this.games,
+      required this.skills,
       this.teamName,
       this.isAllianceColoured});
   final List<Game> games;
   final Game game;
   final Map<int, TeamStats>? rankings;
+  final Map<int, TournamentSkills>? skills;
   final String? teamName;
   final bool? isAllianceColoured;
 
@@ -121,6 +124,7 @@ class GameWidget extends StatelessWidget {
                       game: game,
                       rankings: rankings,
                       games: games,
+                      skills: skills,
                     )));
       },
       child: Container(

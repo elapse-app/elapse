@@ -16,35 +16,27 @@ class TournamentLoadingScreen extends StatelessWidget {
             automaticallyImplyLeading: false,
             expandedHeight: 125,
             centerTitle: false,
-            flexibleSpace: FlexibleSpaceBar(
+            flexibleSpace: const FlexibleSpaceBar(
               expandedTitleScale: 1,
               collapseMode: CollapseMode.parallax,
               title: Padding(
-                padding: const EdgeInsets.only(left: 20.0, right: 12.0),
+                padding: EdgeInsets.only(left: 20.0, right: 12.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
                       "Loading Tournament",
-                      style: const TextStyle(
-                          fontSize: 30, fontWeight: FontWeight.w600),
+                      style:
+                          TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
                     ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.search,
-                        size: 30,
-                      ),
-                      onPressed: () {},
-                    )
                   ],
                 ),
               ),
               centerTitle: false,
-              background: const SafeArea(
+              background: SafeArea(
                 child: Padding(
-                  padding:
-                      const EdgeInsets.only(left: 20, right: 12, bottom: 20),
+                  padding: EdgeInsets.only(left: 20, right: 12, bottom: 20),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
