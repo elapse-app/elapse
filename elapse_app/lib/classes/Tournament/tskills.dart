@@ -5,7 +5,7 @@ import 'package:elapse_app/extras/token.dart';
 import 'package:http/http.dart' as http;
 import "dart:io";
 
-class TeamSkills {
+class TournamentSkills {
   int rank = 0;
   int score = 0;
 
@@ -15,18 +15,19 @@ class TeamSkills {
   int driverScore = 0;
   int driverAttempts = 0;
 
-  TeamSkills();
+  TournamentSkills();
 }
 
-Future<Map<int, TeamSkills>> getSkillsRankings(int eventId) async {
-  Map<int, TeamSkills> rankings = {};
+Future<Map<int, TournamentSkills>> getSkillsRankings(
+    int eventId, Future<List<Team>> futureTeams) async {
+  Map<int, TournamentSkills> rankings = {};
 
   List<Team> teams = [];
   var skills;
   List parsedSkills = [];
 
   List<Future<void>> requestFutures = [];
-  requestFutures.add(getTeams(eventId).then((t) {
+  requestFutures.add(futureTeams.then((t) {
     teams = t;
   }));
   requestFutures.add(http.get(
@@ -45,8 +46,11 @@ Future<Map<int, TeamSkills>> getSkillsRankings(int eventId) async {
   }));
   await Future.wait(requestFutures);
 
-  rankings.addAll(Map<int, TeamSkills>.fromEntries(
-      teams.map((v) => MapEntry(v.id, TeamSkills()))));
+  rankings.addAll(Map<int, TournamentSkills>.fromEntries(
+    teams.map(
+      (v) => MapEntry(v.id, TournamentSkills()),
+    ),
+  ));
   for (final t in parsedSkills) {
     int teamId = t["team"]["id"];
 
@@ -58,7 +62,8 @@ Future<Map<int, TeamSkills>> getSkillsRankings(int eventId) async {
       rankings[teamId]?.driverScore = t["score"];
       rankings[teamId]?.driverAttempts = t["attempts"];
     }
-    rankings[teamId]?.score = rankings[teamId]!.autonScore + rankings[teamId]!.driverScore;
+    rankings[teamId]?.score =
+        rankings[teamId]!.autonScore + rankings[teamId]!.driverScore;
   }
   List<Future<void>> pgFutures = [];
   int teamsLastPage = jsonDecode(skills.body)["meta"]["last_page"];
@@ -75,8 +80,8 @@ Future<Map<int, TeamSkills>> getSkillsRankings(int eventId) async {
       }
       final parsedPg = jsonDecode(pgResponse.body)["data"] as List;
 
-      rankings.addAll(Map<int, TeamSkills>.fromEntries(
-          teams.map((v) => MapEntry(v.id, TeamSkills()))));
+      rankings.addAll(Map<int, TournamentSkills>.fromEntries(
+          teams.map((v) => MapEntry(v.id, TournamentSkills()))));
       for (final t in parsedPg) {
         int teamId = t["team"]["id"];
 
@@ -88,7 +93,8 @@ Future<Map<int, TeamSkills>> getSkillsRankings(int eventId) async {
           rankings[teamId]?.driverScore = t["score"];
           rankings[teamId]?.driverAttempts = t["attempts"];
         }
-        rankings[teamId]?.score = rankings[teamId]!.autonScore + rankings[teamId]!.driverScore;
+        rankings[teamId]?.score =
+            rankings[teamId]!.autonScore + rankings[teamId]!.driverScore;
       }
     });
     pgFutures.add(pgResponse);

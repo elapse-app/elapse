@@ -1,8 +1,10 @@
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/screens/tournament/pages/info.dart';
+import 'package:elapse_app/screens/tournament/pages/main/search_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/schedule.dart';
+import 'package:elapse_app/screens/tournament/pages/search/search_page.dart';
 import 'package:elapse_app/screens/tournament/pages/skills.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
@@ -24,12 +26,27 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   List<String> titles = ["Schedule", "Rankings", "Skills", "Info"];
   List<String> filters = ["rank", "opr", "dpr", "ccwm", "ap", "sp"];
 
+  final FocusNode _focusNode = FocusNode();
+
   late Division division;
+  late bool inSearch;
+  late String searchQuery;
+  late String savedQuery;
+  late double appBarHeight;
 
   @override
   void initState() {
     super.initState();
     division = widget.tournament.divisions[0];
+    inSearch = false;
+    searchQuery = "";
+    savedQuery = "";
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
   }
 
   @override
@@ -37,15 +54,19 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
     List<Widget> pages = [
       SchedulePage(
         division: division,
+        tournament: widget.tournament,
       ),
       RankingsPage(
+          searchQuery: searchQuery,
           rankings: division.teamStats!,
           teams: widget.tournament.teams,
           sort: filters[filterIndex],
+          skills: widget.tournament.tournamentSkills!,
           games: division.games),
       const SkillsPage(),
       const InfoPage(),
     ];
+    ValueNotifier<double> appBarHeightNotifier = ValueNotifier<double>(125);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
@@ -68,13 +89,38 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                       style: const TextStyle(
                           fontSize: 30, fontWeight: FontWeight.w600),
                     ),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.search,
-                        size: 30,
+                    Hero(
+                      tag: "search",
+                      child: IconButton(
+                        icon: const Icon(
+                          Icons.search,
+                          size: 30,
+                        ),
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              transitionDuration: Duration(milliseconds: 300),
+                              reverseTransitionDuration:
+                                  Duration(milliseconds: 300),
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) =>
+                                      SearchScreen(
+                                tournament: widget.tournament,
+                                division: division,
+                              ),
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
+                        },
                       ),
-                      onPressed: () {},
-                    )
+                    ),
                   ],
                 ),
               ),
@@ -131,41 +177,44 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             delegate: SliverHeaderDelegate(
               minHeight: 70.0,
               maxHeight: 70.0,
-              child: Stack(
-                children: [
-                  Container(
-                      height: 300,
-                      color: Theme.of(context).colorScheme.primary),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        topRight: Radius.circular(30),
+              child: Hero(
+                tag: "top",
+                child: Stack(
+                  children: [
+                    Container(
+                        height: 300,
+                        color: Theme.of(context).colorScheme.primary),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(25),
+                          topRight: Radius.circular(25),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 25, vertical: 13),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildIconButton(
+                                context, Icons.calendar_view_day_outlined, 0),
+                            _buildIconButton(context,
+                                Icons.format_list_numbered_outlined, 1),
+                            _buildIconButton(
+                                context, Icons.sports_esports_outlined, 2),
+                            _buildIconButton(context, Icons.info_outlined, 3),
+                          ],
+                        ),
                       ),
                     ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 25, vertical: 13),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          _buildIconButton(
-                              context, Icons.calendar_view_day_outlined, 0),
-                          _buildIconButton(
-                              context, Icons.format_list_numbered_outlined, 1),
-                          _buildIconButton(
-                              context, Icons.sports_esports_outlined, 2),
-                          _buildIconButton(context, Icons.info_outlined, 3),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),
-          selectedIndex == 1
+          selectedIndex == 1 && !inSearch
               ? SliverToBoxAdapter(
                   child: Container(
                     height: 50,

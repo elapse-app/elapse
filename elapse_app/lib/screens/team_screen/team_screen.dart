@@ -108,7 +108,7 @@ class _TeamScreenState extends State<TeamScreen> {
                       height: 5,
                     ),
                     const Text(
-                      "Team Name",
+                      "Team Number",
                       style: TextStyle(fontSize: 16),
                     ),
                     const SizedBox(
@@ -288,14 +288,14 @@ class _TeamScreenState extends State<TeamScreen> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(team.organization ?? "",
+                                        Text(team.teamName ?? "",
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                             style: const TextStyle(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.w500)),
                                         const Text(
-                                          "Organization",
+                                          "Team Name",
                                           style: TextStyle(
                                             fontSize: 16,
                                           ),
@@ -378,8 +378,10 @@ class _TeamScreenState extends State<TeamScreen> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Container(
-                                              child: LinearProgressIndicator(),
-                                              width: 25,
+                                              child:
+                                                  CircularProgressIndicator(),
+                                              width: 20,
+                                              height: 20,
                                             ),
                                             const SizedBox(height: 8),
                                             const Text(
@@ -396,8 +398,10 @@ class _TeamScreenState extends State<TeamScreen> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Container(
-                                              child: LinearProgressIndicator(),
-                                              width: 50,
+                                              child:
+                                                  CircularProgressIndicator(),
+                                              width: 20,
+                                              height: 20,
                                             ),
                                             const SizedBox(height: 8),
                                             const Text(
@@ -415,8 +419,9 @@ class _TeamScreenState extends State<TeamScreen> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Container(
-                                          child: LinearProgressIndicator(),
-                                          width: 50,
+                                          child: CircularProgressIndicator(),
+                                          width: 20,
+                                          height: 20,
                                         ),
                                         const Text(
                                           "Organization",
