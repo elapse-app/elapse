@@ -84,8 +84,12 @@ class Game {
     firstPart = firstPart == "Practice " ? "P" : firstPart;
     firstPart = firstPart == "Final" ? "F" : firstPart;
     String secondPart = json["name"].split(" ")[1];
+
     secondPart = secondPart.split("-")[0];
     secondPart = secondPart.split("#")[1];
+    if (firstPart == "F") {
+      secondPart = json["matchnum"].toString();
+    }
     gameName = "$firstPart$secondPart";
 
     return Game(
@@ -152,7 +156,7 @@ Future<List<Game>> _fetchDivisionMatches(int eventId, divisionID) async {
           _fetchAdditionalPage(eventId, divisionID, page, divisionMatches));
     }
     await Future.wait(pageFutures);
-  } else {}
+  }
 
   return divisionMatches;
 }
