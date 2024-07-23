@@ -62,8 +62,7 @@ Future<Map<int, TournamentSkills>> getSkillsRankings(
       rankings[teamId]?.driverScore = t["score"];
       rankings[teamId]?.driverAttempts = t["attempts"];
     }
-    rankings[teamId]?.score =
-        rankings[teamId]!.autonScore + rankings[teamId]!.driverScore;
+    rankings[teamId]?.score = rankings[teamId]!.autonScore + rankings[teamId]!.driverScore;
   }
   List<Future<void>> pgFutures = [];
   int teamsLastPage = jsonDecode(skills.body)["meta"]["last_page"];
@@ -80,8 +79,6 @@ Future<Map<int, TournamentSkills>> getSkillsRankings(
       }
       final parsedPg = jsonDecode(pgResponse.body)["data"] as List;
 
-      rankings.addAll(Map<int, TournamentSkills>.fromEntries(
-          teams.map((v) => MapEntry(v.id, TournamentSkills()))));
       for (final t in parsedPg) {
         int teamId = t["team"]["id"];
 
@@ -93,8 +90,7 @@ Future<Map<int, TournamentSkills>> getSkillsRankings(
           rankings[teamId]?.driverScore = t["score"];
           rankings[teamId]?.driverAttempts = t["attempts"];
         }
-        rankings[teamId]?.score =
-            rankings[teamId]!.autonScore + rankings[teamId]!.driverScore;
+        rankings[teamId]?.score = rankings[teamId]!.autonScore + rankings[teamId]!.driverScore;
       }
     });
     pgFutures.add(pgResponse);
