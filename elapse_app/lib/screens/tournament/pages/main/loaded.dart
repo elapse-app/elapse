@@ -89,37 +89,35 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                       style: const TextStyle(
                           fontSize: 30, fontWeight: FontWeight.w600),
                     ),
-                    Hero(
-                      tag: "search",
-                      child: IconButton(
-                        icon: const Icon(
-                          Icons.search,
-                          size: 30,
-                        ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            PageRouteBuilder(
-                              transitionDuration: Duration(milliseconds: 300),
-                              reverseTransitionDuration:
-                                  Duration(milliseconds: 300),
-                              pageBuilder:
-                                  (context, animation, secondaryAnimation) =>
-                                      SearchScreen(
-                                tournament: widget.tournament,
-                                division: division,
-                              ),
-                              transitionsBuilder: (context, animation,
-                                  secondaryAnimation, child) {
-                                return FadeTransition(
-                                  opacity: animation,
-                                  child: child,
-                                );
-                              },
-                            ),
-                          );
-                        },
+                    IconButton(
+                      icon: const Icon(
+                        Icons.search,
+                        size: 30,
                       ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            transitionDuration: Duration(milliseconds: 300),
+                            reverseTransitionDuration:
+                                Duration(milliseconds: 300),
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) =>
+                                    SearchScreen(
+                              tournament: widget.tournament,
+                              division: division,
+                            ),
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              // Create a Tween that transitions the new screen from fully transparent to fully opaque
+                              return FadeTransition(
+                                opacity: animation,
+                                child: child,
+                              );
+                            },
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
