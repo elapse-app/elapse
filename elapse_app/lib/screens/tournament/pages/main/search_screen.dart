@@ -88,7 +88,7 @@ class _SearchScreenState extends State<SearchScreen> {
               expandedTitleScale: 1,
               collapseMode: CollapseMode.parallax,
               title: Padding(
-                padding: const EdgeInsets.only(left: 20.0, right: 12.0),
+                padding: const EdgeInsets.only(left: 15, right: 15),
                 child: SafeArea(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
@@ -112,17 +112,15 @@ class _SearchScreenState extends State<SearchScreen> {
                                 children: [
                                   Flexible(
                                       flex: 1,
-                                      child: Hero(
-                                          tag: "search",
-                                          child: IconButton(
-                                            icon: const Icon(
-                                              Icons.arrow_back,
-                                              size: 24,
-                                            ),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                          ))),
+                                      child: IconButton(
+                                        icon: const Icon(
+                                          Icons.arrow_back,
+                                          size: 24,
+                                        ),
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                      )),
                                   Flexible(
                                     flex: 6,
                                     child: TextField(
