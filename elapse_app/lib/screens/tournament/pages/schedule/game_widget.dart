@@ -62,11 +62,11 @@ class GameWidget extends StatelessWidget {
 
     if (winningAlliance == "red" &&
         game.redAlliancePreview!
-            .any((element) => element.teamName == teamName)) {
+            .any((element) => element.teamNumber == teamName)) {
       gameColor = colorPallete.greenText;
     } else if (winningAlliance == "blue" &&
         game.blueAlliancePreview!
-            .any((element) => element.teamName == teamName)) {
+            .any((element) => element.teamNumber == teamName)) {
       gameColor = colorPallete.greenText;
     } else if (winningAlliance != "none" && teamName != null) {
       gameColor = colorPallete.redAllianceText;
@@ -218,7 +218,7 @@ class GameWidget extends StatelessWidget {
                       children: game.redAlliancePreview!.map(
                         (e) {
                           return Text(
-                            e.teamName,
+                            e.teamNumber,
                             style: TextStyle(
                                 fontSize: 16,
                                 height: 1,
@@ -238,7 +238,7 @@ class GameWidget extends StatelessWidget {
                       children: game.blueAlliancePreview!.map(
                         (e) {
                           return Text(
-                            e.teamName,
+                            e.teamNumber,
                             style: TextStyle(
                                 fontSize: 16,
                                 height: 1,

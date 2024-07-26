@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 
 class TournamentScreen extends StatefulWidget {
   final int tournamentID;
-  const TournamentScreen({super.key, required this.tournamentID});
+  final bool isPreview;
+  const TournamentScreen(
+      {super.key, required this.tournamentID, required this.isPreview});
 
   @override
   State<TournamentScreen> createState() => _TournamentScreenState();
@@ -38,6 +40,7 @@ class _TournamentScreenState extends State<TournamentScreen> {
           return TournamentLoadedScreen(
             tournamentID: widget.tournamentID,
             tournament: snapshot.data as Tournament,
+            isPreview: widget.isPreview,
           );
         } else {
           print(snapshot.error);

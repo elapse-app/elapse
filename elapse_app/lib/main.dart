@@ -45,7 +45,7 @@ class _MyAppState extends State<MyApp> {
 
   List<Widget> screens = [
     const HomeScreen(),
-    const TournamentScreen(tournamentID: 52543),
+    const TournamentScreen(tournamentID: 52543, isPreview: false),
     const MyTeamScreen(),
     const ExploreScreen(),
   ];
