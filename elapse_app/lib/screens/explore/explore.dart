@@ -1,4 +1,5 @@
 import 'package:elapse_app/classes/Miscellaneous/recent_search.dart';
+import 'package:elapse_app/screens/explore/search.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
@@ -54,33 +55,82 @@ class ExploreScreen extends StatelessWidget {
             ),
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
-          const RoundedTop(),
+          SliverPersistentHeader(
+            pinned: true,
+            delegate: SliverHeaderDelegate(
+                minHeight: 25,
+                maxHeight: 25,
+                child: Hero(
+                  tag: "top",
+                  child: Stack(
+                    children: [
+                      Container(
+                        color: Theme.of(context).colorScheme.primary,
+                        height: 25,
+                      ),
+                      Container(
+                        height: 25,
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(25),
+                            topRight: Radius.circular(25),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )),
+          ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 23),
             sliver: SliverToBoxAdapter(
               child: Column(
                 children: [
-                  Container(
-                    height: 60,
-                    padding: const EdgeInsets.symmetric(horizontal: 18),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Theme.of(context).colorScheme.primary,
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          transitionDuration: const Duration(milliseconds: 300),
+                          reverseTransitionDuration:
+                              const Duration(milliseconds: 300),
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  const ExploreSearch(),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            // Create a Tween that transitions the new screen from fully transparent to fully opaque
+                            return FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    child: Container(
+                      height: 60,
+                      padding: const EdgeInsets.symmetric(horizontal: 18),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Theme.of(context).colorScheme.primary,
+                        ),
+                        borderRadius: BorderRadius.circular(30),
                       ),
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    child: const Row(
-                      children: [
-                        Icon(
-                          Icons.search,
-                          size: 24,
-                        ),
-                        SizedBox(width: 13),
-                        Text(
-                          "Search teams or tournaments",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                      ],
+                      child: const Row(
+                        children: [
+                          Icon(
+                            Icons.search,
+                            size: 24,
+                          ),
+                          SizedBox(width: 13),
+                          Text(
+                            "Search teams or tournaments",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

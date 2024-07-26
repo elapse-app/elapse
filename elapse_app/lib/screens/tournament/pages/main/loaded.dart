@@ -4,7 +4,6 @@ import 'package:elapse_app/screens/tournament/pages/info.dart';
 import 'package:elapse_app/screens/tournament/pages/main/search_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/schedule.dart';
-import 'package:elapse_app/screens/tournament/pages/search/search_page.dart';
 import 'package:elapse_app/screens/tournament/pages/skills.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
@@ -13,8 +12,12 @@ import 'package:flutter/material.dart';
 class TournamentLoadedScreen extends StatefulWidget {
   final int tournamentID;
   final Tournament tournament;
+  final bool isPreview;
   const TournamentLoadedScreen(
-      {super.key, required this.tournamentID, required this.tournament});
+      {super.key,
+      required this.tournamentID,
+      required this.tournament,
+      this.isPreview = false});
 
   @override
   State<TournamentLoadedScreen> createState() => _TournamentLoadedScreenState();
@@ -84,10 +87,23 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      titles[selectedIndex],
-                      style: const TextStyle(
-                          fontSize: 30, fontWeight: FontWeight.w600),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        widget.isPreview
+                            ? IconButton(
+                                icon: const Icon(Icons.arrow_back),
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              )
+                            : Container(),
+                        Text(
+                          titles[selectedIndex],
+                          style: const TextStyle(
+                              fontSize: 30, fontWeight: FontWeight.w600),
+                        ),
+                      ],
                     ),
                     IconButton(
                       icon: const Icon(

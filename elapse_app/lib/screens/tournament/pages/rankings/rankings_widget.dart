@@ -298,10 +298,10 @@ Future<void> tournamentStatsPage(
 
   List<Game> teamGames = games!.where(
     (element) {
-      return element.redAlliancePreview?[0].teamName == teamName ||
-          element.redAlliancePreview?[1].teamName == teamName ||
-          element.blueAlliancePreview?[0].teamName == teamName ||
-          element.blueAlliancePreview?[1].teamName == teamName;
+      return element.redAlliancePreview?[0].teamNumber == teamName ||
+          element.redAlliancePreview?[1].teamNumber == teamName ||
+          element.blueAlliancePreview?[0].teamNumber == teamName ||
+          element.blueAlliancePreview?[1].teamNumber == teamName;
     },
   ).toList();
 

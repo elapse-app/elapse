@@ -39,12 +39,14 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print(widget.division.teamStats?.isEmpty);
     List<Team> filteredTeams = widget.tournament.teams.where((e) {
       return (e.teamName!.toLowerCase().contains(searchQuery.toLowerCase()) ||
               e.teamNumber!
                   .toLowerCase()
                   .contains(searchQuery.toLowerCase())) &&
-          widget.division.teamStats![e.id] != null;
+          (widget.division.teamStats![e.id] != null ||
+              widget.division.teamStats?.isEmpty == true);
     }).toList();
     List<Game> filteredGames;
 
@@ -57,21 +59,21 @@ class _SearchScreenState extends State<SearchScreen> {
         if (searchQuery.isEmpty) {
           return true;
         }
-        bool gameContainsSearchQuery = e.blueAlliancePreview![0].teamName
+        bool gameContainsSearchQuery = e.blueAlliancePreview![0].teamNumber
                 .contains(searchQuery.toUpperCase()) ||
-            e.blueAlliancePreview![1].teamName
+            e.blueAlliancePreview![1].teamNumber
                 .contains(searchQuery.toUpperCase()) ||
-            e.redAlliancePreview![0].teamName
+            e.redAlliancePreview![0].teamNumber
                 .contains(searchQuery.toUpperCase()) ||
-            e.redAlliancePreview![1].teamName
+            e.redAlliancePreview![1].teamNumber
                 .contains(searchQuery.toUpperCase()) ||
             e.gameName.contains(searchQuery.toUpperCase());
 
         bool gameContainsFilteredTeam =
-            teamNumbers.contains(e.blueAlliancePreview![0].teamName) ||
-                teamNumbers.contains(e.blueAlliancePreview![1].teamName) ||
-                teamNumbers.contains(e.redAlliancePreview![0].teamName) ||
-                teamNumbers.contains(e.redAlliancePreview![1].teamName);
+            teamNumbers.contains(e.blueAlliancePreview![0].teamNumber) ||
+                teamNumbers.contains(e.blueAlliancePreview![1].teamNumber) ||
+                teamNumbers.contains(e.redAlliancePreview![0].teamNumber) ||
+                teamNumbers.contains(e.redAlliancePreview![1].teamNumber);
 
         return gameContainsSearchQuery || gameContainsFilteredTeam;
       }).toList();
@@ -237,16 +239,23 @@ class _SearchScreenState extends State<SearchScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 23.0),
                         child: Column(
                           children: [
-                            StandardRanking(
-                              teamStats: widget.division.teamStats![team.id]!,
-                              rankings: widget.division.teamStats!,
-                              teamName: team.teamNumber!,
-                              skills: widget.tournament.tournamentSkills!,
-                              games: widget.division.games!,
-                              teamID: team.id,
-                              allianceColor:
-                                  Theme.of(context).colorScheme.onSurface,
-                            ),
+                            widget.division.teamStats![team.id] == null
+                                ? EmptyRanking(
+                                    teamName: team.teamNumber ?? "",
+                                    teamID: team.id,
+                                    allianceColor:
+                                        Theme.of(context).colorScheme.onSurface)
+                                : StandardRanking(
+                                    teamStats:
+                                        widget.division.teamStats![team.id]!,
+                                    rankings: widget.division.teamStats!,
+                                    teamName: team.teamNumber!,
+                                    skills: widget.tournament.tournamentSkills!,
+                                    games: widget.division.games!,
+                                    teamID: team.id,
+                                    allianceColor:
+                                        Theme.of(context).colorScheme.onSurface,
+                                  ),
                             index != filteredTeams.length - 1
                                 ? Divider(
                                     height: 3,

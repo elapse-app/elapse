@@ -24,14 +24,15 @@ class Award {
     List<TeamPreview> teamWinners = [];
     for (var a in json["teamWinners"]) {
       Map<String, dynamic> team = a["team"] as Map<String, dynamic>;
-      teamWinners.add(TeamPreview(teamName: team["name"], teamID: team["id"]));
+      teamWinners
+          .add(TeamPreview(teamNumber: team["name"], teamID: team["id"]));
     }
 
     List<TeamPreview> individualWinners = [];
     for (var a in json["individualWinners"]) {
       Map<String, dynamic> team = a["team"] as Map<String, dynamic>;
       individualWinners
-          .add(TeamPreview(teamName: team["name"], teamID: team["id"]));
+          .add(TeamPreview(teamNumber: team["name"], teamID: team["id"]));
     }
 
     List<String> qualifications = [];
@@ -39,7 +40,6 @@ class Award {
       qualifications.add(a);
     }
 
-    print(json["title"]);
     String awardName = "";
     List<String> splitName = json["title"].split(" ");
     for (int i = 0; i < splitName.length; i++) {
