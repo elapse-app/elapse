@@ -24,7 +24,7 @@ class _TeamScreenState extends State<TeamScreen> {
   void initState() {
     super.initState();
     team = fetchTeam(widget.teamID);
-    teamStats = getTrueSkillDataForTeam(widget.teamID);
+    teamStats = getTrueSkillDataForTeam(widget.teamName);
     teamTournaments = fetchTeamTournaments(widget.teamID, 181);
     teamAwards = getAwards(widget.teamID, 181);
   }
