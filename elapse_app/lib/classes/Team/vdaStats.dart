@@ -4,36 +4,35 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class VDAStats {
-  int id;
+  int id = 0;
   String teamNum;
   double opr;
   double dpr;
   double ccwm;
 
-  int wins;
-  int losses;
-  int ties;
-  int matches;
-  double winPercent;
+  num? wins;
+  num? losses;
+  num? ties;
+  num? matches;
+  double? winPercent;
 
-  double trueSkill;
-  int trueSkillGlobalRank;
-  int trueSkillRegionRank;
+  double? trueSkill;
+  num? trueSkillGlobalRank;
+  num? trueSkillRegionRank;
 
-  int regionalQual;
-  int worldsQual;
+  num? regionalQual;
+  num? worldsQual;
 
-  String region;
+  String? region;
 
-  int? skillsScore;
-  int? maxAuto;
-  int? maxDriver;
+  num? skillsScore;
+  num? maxAuto;
+  num? maxDriver;
 
-  int? worldSkillsRank;
-  int? regionSkillsRank;
+  num? worldSkillsRank;
+  num? regionSkillsRank;
 
   VDAStats({
-    required this.id,
     required this.teamNum,
     required this.opr,
     required this.dpr,
@@ -58,15 +57,14 @@ class VDAStats {
 
   factory VDAStats.fromJson(Map<String, dynamic> json) {
     return VDAStats(
-      id: json["id"].truncate(),
       teamNum: json["team_number"],
       opr: json["opr"],
       dpr: json["dpr"],
       ccwm: json["ccwm"],
-      wins: json["total_wins"].truncate(),
-      losses: json["total_losses"].truncate(),
-      ties: json["total_ties"].truncate(),
-      matches: json["total_matches"].truncate(),
+      wins: json["total_wins"]?.truncate(),
+      losses: json["total_losses"]?.truncate(),
+      ties: json["total_ties"]?.truncate(),
+      matches: json["total_matches"]?.truncate(),
       winPercent: json["total_winning_percent"],
       trueSkill: json["trueskill"],
       trueSkillGlobalRank: json["ts_ranking"],
@@ -85,8 +83,11 @@ class VDAStats {
 
 Future<List<VDAStats>> getTrueSkillData() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.remove("vdaData");
+  prefs.remove("vdaExpiry");
   final String? vdaData = prefs.getString("vdaData");
   final String? expiryDate = prefs.getString("vdaExpiry");
+
   List<dynamic> parsed = [];
 
   if (vdaData == null ||
@@ -94,10 +95,11 @@ Future<List<VDAStats>> getTrueSkillData() async {
       DateTime.parse(expiryDate).isBefore(DateTime.now())) {
     print("getting new data");
     final response = await http.get(
-      Uri.parse("https://vrc-data-analysis.com/v1/allteams"),
+      Uri.parse("https://vrc-data-analysis.com/v1/historical_allteams/181"),
     );
 
     parsed = jsonDecode(response.body) as List;
+    print(parsed);
     prefs.setString("vdaData", response.body);
     prefs.setString("vdaExpiry",
         DateTime.now().add(const Duration(minutes: 20)).toString());
@@ -112,7 +114,7 @@ Future<List<VDAStats>> getTrueSkillData() async {
   return vdaStats;
 }
 
-Future<VDAStats> getTrueSkillDataForTeam(int teamId) async {
+Future<VDAStats> getTrueSkillDataForTeam(String teamNum) async {
   final response = await getTrueSkillData();
-  return response.firstWhere((element) => element.id == teamId);
+  return response.firstWhere((element) => element.teamNum == teamNum);
 }
