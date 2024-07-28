@@ -1,6 +1,7 @@
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TeamWidget extends StatelessWidget {
   const TeamWidget({
@@ -9,15 +10,37 @@ class TeamWidget extends StatelessWidget {
     required this.teamID,
     this.teamName,
     this.location,
+    this.saveSearch = false,
+    this.prefs,
+    this.saveState,
   });
   final String teamNumber;
   final int teamID;
   final String? teamName;
   final Location? location;
+  final bool saveSearch;
+  final SharedPreferences? prefs;
+  final Function? saveState;
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () {
+        if (saveSearch) {
+          saveState;
+          List<String> recentSearches =
+              prefs!.getStringList("recentTeamSearches") ?? <String>[];
+
+          recentSearches
+              .remove('{"searchTerm": "$teamNumber", "teamID": $teamID}');
+          recentSearches
+              .add('{"searchTerm": "$teamNumber", "teamID": $teamID}');
+          if (recentSearches.length > 10) {
+            recentSearches.removeAt(0);
+          }
+
+          prefs!.setStringList("recentTeamSearches", recentSearches);
+        }
         Navigator.push(
           context,
           MaterialPageRoute(

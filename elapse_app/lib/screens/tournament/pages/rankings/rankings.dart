@@ -3,6 +3,7 @@ import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tskills.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dart';
+import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:flutter/material.dart';
 
 class RankingsPage extends StatelessWidget {
@@ -60,6 +61,13 @@ class RankingsPage extends StatelessWidget {
       divisionTeams = divisionTeams;
     }
 
+    if (rankings.isEmpty) {
+      return SliverToBoxAdapter(
+        child: BigErrorMessage(
+            icon: Icons.format_list_numbered_outlined,
+            message: "Rankings currently not available"),
+      );
+    }
     return SliverPadding(
       padding: const EdgeInsets.symmetric(horizontal: 23),
       sliver: SliverList(

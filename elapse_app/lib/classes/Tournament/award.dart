@@ -8,14 +8,14 @@ import 'dart:io';
 class Award {
   String name;
   List<String> qualifications;
-  TournamentPreview? tournament;
+  String? tournamentName;
   List<TeamPreview>? teamWinners;
   List<TeamPreview>? individualWinners;
 
   Award({
     required this.name,
     required this.qualifications,
-    this.tournament,
+    this.tournamentName,
     this.teamWinners,
     this.individualWinners,
   });
@@ -52,10 +52,7 @@ class Award {
     return Award(
       name: awardName,
       qualifications: qualifications,
-      tournament: TournamentPreview(
-        id: json["event"]["id"],
-        name: json["event"]["name"],
-      ),
+      tournamentName: json["event"]["name"],
       teamWinners: teamWinners,
       individualWinners: individualWinners,
     );

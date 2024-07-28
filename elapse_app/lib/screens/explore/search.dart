@@ -1,26 +1,48 @@
+import 'dart:convert';
+
 import 'package:elapse_app/classes/Filters/eventSearchFilters.dart';
+import 'package:elapse_app/classes/Miscellaneous/recent_search.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
+import 'package:elapse_app/screens/team_screen/team_screen.dart';
+import 'package:elapse_app/screens/tournament/tournament.dart';
+import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/team_widget.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ExploreSearch extends StatefulWidget {
-  const ExploreSearch({super.key});
-
+  const ExploreSearch({super.key, required this.prefs});
+  final SharedPreferences prefs;
   @override
   State<ExploreSearch> createState() => _ExploreSearchState();
 }
 
-class _ExploreSearchState extends State<ExploreSearch> {
+class _ExploreSearchState extends State<ExploreSearch>
+    with TickerProviderStateMixin {
   final FocusNode _focusNode = FocusNode();
   String searchQuery = "";
-  int selectedIndex = -1;
+  int selectedIndex = 0;
   Future<List<TeamPreview>>? teamSearch;
-  Future<List<TournamentPreview>>? tournamentSearch;
+  Future<SearchPageData>? tournamentSearch;
   List<String> titles = ["Search for Something", "Teams", "Tournaments"];
+  List<RecentTeamSearch> recentTeamSearches = [];
+  List<RecentTournamentSearch> recentTournamentSearches = [];
+
+  int currentPage = 1;
+  double leftOpacity = 1;
+  double rightOpacity = 1;
+
+  EventSearchFilters filters = EventSearchFilters(
+    seasonID: 190,
+    eventName: "",
+    startDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
+    endDate: DateFormat("yyyy-MM-dd")
+        .format(DateTime.now().add(Duration(days: 365))),
+  );
 
   @override
   void initState() {
@@ -28,6 +50,28 @@ class _ExploreSearchState extends State<ExploreSearch> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
+
+    List<String> recentTeamStrings =
+        widget.prefs.getStringList("recentTeamSearches") ?? <String>[];
+
+    for (int i = recentTeamStrings.length - 1; i >= 0; i--) {
+      var json = jsonDecode(recentTeamStrings[i]);
+      recentTeamSearches.add(RecentTeamSearch(
+        searchTerm: json["searchTerm"],
+        teamID: json["teamID"],
+      ));
+    }
+
+    List<String> recentTournamentStrings =
+        widget.prefs.getStringList("recentTournamentSearches") ?? <String>[];
+
+    for (int i = recentTournamentStrings.length - 1; i >= 0; i--) {
+      var json = jsonDecode(recentTournamentStrings[i]);
+      recentTournamentSearches.add(RecentTournamentSearch(
+        searchTerm: json["searchTerm"],
+        tournamentID: json["tournamentID"],
+      ));
+    }
   }
 
   @override
@@ -39,15 +83,10 @@ class _ExploreSearchState extends State<ExploreSearch> {
   void _onSearchSubmitted(String query) {
     setState(() {
       searchQuery = query;
-      selectedIndex = 0;
+      filters.eventName = query;
       teamSearch = fetchTeamPreview(searchQuery);
-      tournamentSearch = getTournaments(EventSearchFilters(
-        seasonID: 190,
-        eventName: searchQuery,
-        startDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-        endDate: DateFormat("yyyy-MM-dd")
-            .format(DateTime.now().add(Duration(days: 365))),
-      ));
+      tournamentSearch = getTournaments(filters);
+      currentPage - 1;
     });
   }
 
@@ -91,18 +130,18 @@ class _ExploreSearchState extends State<ExploreSearch> {
                                   Flexible(
                                       flex: 1,
                                       child: IconButton(
-                                        icon: const Icon(
-                                          Icons.arrow_back,
-                                          size: 24,
-                                        ),
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                      )),
+                                          icon: const Icon(
+                                            Icons.arrow_back,
+                                            size: 24,
+                                          ),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          })),
                                   Flexible(
                                     flex: 6,
                                     child: TextField(
                                       focusNode: _focusNode,
+                                      textInputAction: TextInputAction.search,
                                       onSubmitted: _onSearchSubmitted,
                                       cursorColor: Theme.of(context)
                                           .colorScheme
@@ -186,39 +225,180 @@ class _ExploreSearchState extends State<ExploreSearch> {
           SliverPersistentHeader(
             pinned: true,
             delegate: SliverHeaderDelegate(
-                minHeight: 50,
-                maxHeight: 50,
-                child: Hero(
-                  tag: "top",
-                  child: Stack(
-                    children: [
-                      Container(
-                        color: Theme.of(context).colorScheme.primary,
-                        height: 50,
+                minHeight: 60,
+                maxHeight: 60,
+                child: Stack(
+                  children: [
+                    Container(
+                      color: Theme.of(context).colorScheme.primary,
+                      height: 60,
+                    ),
+                    Container(
+                      height: 60,
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 23, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(25),
+                          topRight: Radius.circular(25),
+                        ),
                       ),
-                      Container(
-                        height: 50,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 23, vertical: 10),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.surface,
-                          borderRadius: const BorderRadius.only(
-                            topLeft: Radius.circular(25),
-                            topRight: Radius.circular(25),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            titles[selectedIndex + 1],
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.w500),
                           ),
-                        ),
-                        child: Row(
-                          children: [
-                            Text(
-                              titles[selectedIndex + 1],
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w500),
-                            ),
-                          ],
-                        ),
+                          selectedIndex == 1
+                              ? FutureBuilder(
+                                  future: tournamentSearch,
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      return Row(
+                                        children: [
+                                          GestureDetector(
+                                            onTap: () {
+                                              if (currentPage - 1 != 0) {
+                                                setState(
+                                                  () {
+                                                    currentPage -= 1;
+                                                    tournamentSearch =
+                                                        getTournaments(filters,
+                                                            page: currentPage);
+                                                  },
+                                                );
+                                              }
+                                            },
+                                            onTapDown: (details) {
+                                              setState(() {
+                                                leftOpacity = 0.75;
+                                              });
+                                            },
+                                            onTapUp: (details) {
+                                              setState(() {
+                                                leftOpacity = 1;
+                                              });
+                                            },
+                                            onTapCancel: () {
+                                              setState(() {
+                                                leftOpacity = 1.0;
+                                              });
+                                            },
+                                            child: AnimatedOpacity(
+                                              opacity: leftOpacity,
+                                              duration: const Duration(
+                                                  milliseconds: 150),
+                                              child: Icon(
+                                                Icons.arrow_back_ios_outlined,
+                                                color: currentPage != 1
+                                                    ? Theme.of(context)
+                                                        .colorScheme
+                                                        .secondary
+                                                        .withOpacity(
+                                                            rightOpacity)
+                                                    : Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurface
+                                                        .withOpacity(0.5),
+                                                size: 20,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(
+                                            width: 8,
+                                          ),
+                                          Text(
+                                            "${currentPage.toString()}/${snapshot.data?.maxPage}",
+                                            style: TextStyle(fontSize: 18),
+                                          ),
+                                          const SizedBox(
+                                            width: 8,
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              if (currentPage !=
+                                                  snapshot.data?.maxPage) {
+                                                setState(
+                                                  () {
+                                                    currentPage += 1;
+                                                    tournamentSearch =
+                                                        getTournaments(filters,
+                                                            page: currentPage);
+                                                  },
+                                                );
+                                              }
+                                            },
+                                            onTapDown: (details) {
+                                              setState(() {
+                                                rightOpacity = 0.75;
+                                              });
+                                            },
+                                            onTapUp: (details) {
+                                              setState(() {
+                                                rightOpacity = 1;
+                                              });
+                                            },
+                                            onTapCancel: () {
+                                              setState(() {
+                                                rightOpacity = 1.0;
+                                              });
+                                            },
+                                            child: AnimatedOpacity(
+                                              opacity: rightOpacity,
+                                              duration: const Duration(
+                                                  milliseconds: 150),
+                                              child: Icon(
+                                                Icons.arrow_forward_ios_rounded,
+                                                color: currentPage !=
+                                                        snapshot.data?.maxPage
+                                                    ? Theme.of(context)
+                                                        .colorScheme
+                                                        .secondary
+                                                        .withOpacity(
+                                                            rightOpacity)
+                                                    : Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurface
+                                                        .withOpacity(0.5),
+                                                size: 20,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      );
+                                    } else {
+                                      return Row(
+                                        children: [
+                                          Icon(
+                                            Icons.arrow_back_ios_outlined,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .surfaceDim,
+                                            size: 20,
+                                          ),
+                                          const SizedBox(
+                                            width: 16,
+                                          ),
+                                          Icon(
+                                            Icons.arrow_forward_ios_outlined,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .surfaceDim,
+                                            size: 20,
+                                          ),
+                                        ],
+                                      );
+                                    }
+                                  },
+                                )
+                              : Container()
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 )),
           ),
           selectedIndex == 0
@@ -239,21 +419,9 @@ class _ExploreSearchState extends State<ExploreSearch> {
                           );
                         } else if (snapshot.hasData) {
                           if (snapshot.data?.isEmpty ?? true) {
-                            return const Center(
-                              child: Column(
-                                children: [
-                                  SizedBox(
-                                    height: 50,
-                                  ),
-                                  Icon(
-                                    Icons.search_off_outlined,
-                                    size: 128,
-                                    weight: 0.1,
-                                  ),
-                                  Text("No teams found"),
-                                ],
-                              ),
-                            );
+                            return const BigErrorMessage(
+                                icon: Icons.search_off_outlined,
+                                message: "No Teams Found");
                           }
                           return Column(
                             children: snapshot.data!
@@ -264,6 +432,17 @@ class _ExploreSearchState extends State<ExploreSearch> {
                                           teamID: team.teamID,
                                           teamName: team.teamName,
                                           location: team.location,
+                                          saveSearch: true,
+                                          prefs: widget.prefs,
+                                          saveState: () {
+                                            setState(() {
+                                              recentTeamSearches.add(
+                                                  RecentTeamSearch(
+                                                      searchTerm:
+                                                          team.teamNumber,
+                                                      teamID: team.teamID));
+                                            });
+                                          },
                                         ),
                                         Divider(
                                           color: Theme.of(context)
@@ -275,8 +454,113 @@ class _ExploreSearchState extends State<ExploreSearch> {
                                 .toList(),
                           );
                         } else {
+                          if (recentTeamSearches.isNotEmpty) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Column(
+                                  children: recentTeamSearches
+                                      .map((e) => GestureDetector(
+                                            behavior: HitTestBehavior.opaque,
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      TeamScreen(
+                                                    teamID: e.teamID!,
+                                                    teamName: e.searchTerm,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: SizedBox(
+                                              height: 60,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.history_rounded,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .onSurface
+                                                            .withOpacity(0.7),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 15,
+                                                      ),
+                                                      Text(
+                                                        e.searchTerm,
+                                                        style: TextStyle(
+                                                          fontSize: 24,
+                                                          color: Theme.of(
+                                                                  context)
+                                                              .colorScheme
+                                                              .onSurface
+                                                              .withOpacity(0.7),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Divider(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .surfaceDim,
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ))
+                                      .toList(),
+                                ),
+                                TextButton(
+                                  style: TextButton.styleFrom(
+                                      padding: const EdgeInsets.only(
+                                          left: 0,
+                                          top: 10,
+                                          right: 10,
+                                          bottom: 10),
+                                      minimumSize: Size(50, 30),
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      alignment: Alignment.centerLeft),
+                                  onPressed: () {
+                                    setState(() {
+                                      recentTeamSearches = [];
+                                      widget.prefs.setStringList(
+                                          "recentTeamSearches", []);
+                                    });
+                                  },
+                                  child: Text(
+                                    "Clear Searches",
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondary,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 14),
+                                  ),
+                                )
+                              ],
+                            );
+                          }
                           return const Center(
-                            child: Text("Search for teams or tournaments"),
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: 50,
+                                ),
+                                Icon(
+                                  Icons.search_outlined,
+                                  size: 128,
+                                  weight: 0.1,
+                                ),
+                                Text("Search for a team"),
+                              ],
+                            ),
                           );
                         }
                       },
@@ -291,20 +575,153 @@ class _ExploreSearchState extends State<ExploreSearch> {
                     child: FutureBuilder(
                       future: tournamentSearch,
                       builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return const Center(
+                              child: CircularProgressIndicator());
+                        }
                         if (snapshot.hasData) {
+                          if (snapshot.data?.tournaments.isEmpty == true) {
+                            return const BigErrorMessage(
+                                icon: Icons.search_off_outlined,
+                                message: "No Tournaments Found");
+                          }
                           List<TournamentPreview> tournaments =
-                              snapshot.data as List<TournamentPreview>;
+                              snapshot.data?.tournaments ?? [];
                           return Column(
                               children: tournaments
                                   .map((e) => TournamentPreviewWidget(
-                                      tournamentPreview: e))
+                                        tournamentPreview: e,
+                                        saveSearch: true,
+                                        prefs: widget.prefs,
+                                        saveState: () {
+                                          setState(() {
+                                            recentTournamentSearches.add(
+                                                RecentTournamentSearch(
+                                                    searchTerm: e.name,
+                                                    tournamentID: e.id));
+                                          });
+                                        },
+                                      ))
                                   .toList());
                         } else if (snapshot.hasError) {
                           return Center(
                               child: Text("Error: ${snapshot.error}"));
                         } else {
+                          if (recentTournamentSearches.isNotEmpty) {
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Column(
+                                  children: recentTournamentSearches
+                                      .map((e) => GestureDetector(
+                                            behavior: HitTestBehavior.opaque,
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      TournamentScreen(
+                                                    tournamentID:
+                                                        e.tournamentID,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: SizedBox(
+                                              height: 60,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.start,
+                                                children: [
+                                                  Row(
+                                                    children: [
+                                                      Icon(
+                                                        Icons.history_rounded,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .onSurface
+                                                            .withOpacity(0.7),
+                                                      ),
+                                                      const SizedBox(
+                                                        width: 15,
+                                                      ),
+                                                      Expanded(
+                                                        child: Text(
+                                                          e.searchTerm,
+                                                          style: TextStyle(
+                                                            fontSize: 18,
+                                                            color: Theme.of(
+                                                                    context)
+                                                                .colorScheme
+                                                                .onSurface
+                                                                .withOpacity(
+                                                                    0.7),
+                                                          ),
+                                                          maxLines: 1,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Divider(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .surfaceDim,
+                                                  )
+                                                ],
+                                              ),
+                                            ),
+                                          ))
+                                      .toList(),
+                                ),
+                                TextButton(
+                                  style: TextButton.styleFrom(
+                                      padding: const EdgeInsets.only(
+                                          left: 0,
+                                          top: 10,
+                                          right: 10,
+                                          bottom: 10),
+                                      minimumSize: Size(50, 30),
+                                      tapTargetSize:
+                                          MaterialTapTargetSize.shrinkWrap,
+                                      alignment: Alignment.centerLeft),
+                                  onPressed: () {
+                                    setState(() {
+                                      recentTournamentSearches = [];
+                                      widget.prefs.setStringList(
+                                          "recentTournamentSearch", []);
+                                    });
+                                  },
+                                  child: Text(
+                                    "Clear Searches",
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondary,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 14),
+                                  ),
+                                )
+                              ],
+                            );
+                          }
                           return const Center(
-                              child: CircularProgressIndicator());
+                            child: Column(
+                              children: [
+                                SizedBox(
+                                  height: 50,
+                                ),
+                                Icon(
+                                  Icons.search_outlined,
+                                  size: 128,
+                                  weight: 0.1,
+                                ),
+                                Text("Search for a tournament"),
+                              ],
+                            ),
+                          );
                         }
                       },
                     ),
@@ -343,11 +760,10 @@ class _ExploreSearchState extends State<ExploreSearch> {
 
     return GestureDetector(
       onTap: () {
-        if (searchQuery != "") {
-          setState(() {
-            selectedIndex = buttonIndex;
-          });
-        }
+        setState(() {
+          selectedIndex = buttonIndex;
+          currentPage = 1;
+        });
       },
       child: AnimatedContainer(
         curve: Curves.fastOutSlowIn,
@@ -361,23 +777,16 @@ class _ExploreSearchState extends State<ExploreSearch> {
               : unselectedContainerColor.withOpacity(
                   ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
           border: Border.all(
-            width: 1.5,
-            color: searchQuery != ""
-                ? Theme.of(context).colorScheme.primary.withOpacity(
-                    ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)
-                : disabledContainerColor.withOpacity(
-                    ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
-          ),
+              width: 1.5,
+              color: Theme.of(context).colorScheme.primary.withOpacity(
+                  ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)),
           borderRadius: borderRadius,
         ),
         child: Text(
           text,
           style: TextStyle(
-            color: searchQuery != ""
-                ? Theme.of(context).colorScheme.secondary.withOpacity(
-                    ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)
-                : disabledTextColor.withOpacity(
-                    ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+            color: Theme.of(context).colorScheme.secondary.withOpacity(
+                ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
