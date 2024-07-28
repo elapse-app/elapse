@@ -699,7 +699,7 @@ class _TeamScreenState extends State<TeamScreen> {
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           textAlign: TextAlign.start,
-                                          e.tournament?.name ?? "",
+                                          e.tournamentName ?? "",
                                           style: const TextStyle(fontSize: 16),
                                         )
                                       ],

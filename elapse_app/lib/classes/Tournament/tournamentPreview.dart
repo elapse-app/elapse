@@ -45,8 +45,17 @@ class TournamentPreview {
   }
 }
 
+class SearchPageData {
+  List<TournamentPreview> tournaments;
+  int maxPage;
+
+  SearchPageData({required this.tournaments, required this.maxPage});
+}
+
 Future<List<TournamentPreview>> fetchTeamTournaments(
-    int teamId, int seasonID) async {
+  int teamId,
+  int seasonID,
+) async {
   // Fetch team data
 
   final tournamentInfo = http.get(
@@ -67,26 +76,35 @@ Future<List<TournamentPreview>> fetchTeamTournaments(
   return tournaments;
 }
 
-Future<List<TournamentPreview>> getTournaments(
-    EventSearchFilters filters) async {
+Future<SearchPageData> getTournaments(EventSearchFilters filters,
+    {int page = 1}) async {
   try {
     final parser = await Chaleno().load(
-        "https://www.robotevents.com/robot-competitions/vex-robotics-competition?country_id=*&seasonId=${filters.seasonID}&eventType=&name=${filters.eventName}&grade_level_id=${filters.gradeLevelID}&level_class_id=${filters.levelClassID}&from_date=${filters.startDate}&to_date=${filters.endDate}&event_region=&city=&distance=30");
+        "https://www.robotevents.com/robot-competitions/vex-robotics-competition?country_id=*&seasonId=${filters.seasonID}&eventType=&name=${filters.eventName}&grade_level_id=${filters.gradeLevelID}&level_class_id=${filters.levelClassID}&from_date=${filters.startDate}&to_date=${filters.endDate}&event_region=&city=&distance=30&page=$page");
 
-    print(
-        "https://www.robotevents.com/robot-competitions/vex-robotics-competition?country_id=*&seasonId=${filters.seasonID}&eventType=&name=${filters.eventName}&grade_level_id=${filters.gradeLevelID}&level_class_id=${filters.levelClassID}&from_date=${filters.startDate}&to_date=${filters.endDate}&event_region=&city=&distance=30");
     List<Result> result = parser!.querySelectorAll(
         '#competitions-app > div.col-sm-8.results > div > div > div');
 
+    List<Result> pages = parser.querySelectorAll(
+        '#competitions-app > div.col-sm-8.results > nav > ul > li');
+    int maxPage = pages.length - 2;
+    if (maxPage < 1) {
+      maxPage = 1;
+    }
+    List<Future<TournamentPreview?>> tournamentFutures = [];
     List<TournamentPreview> tournaments = [];
     for (var e in result) {
-      TournamentPreview? tournament = await itemParse(e.text);
-      if (tournament != null) {
-        tournaments.add(tournament);
-      }
+      tournamentFutures.add(itemParse(e.text));
     }
 
-    return tournaments;
+    await Future.wait(tournamentFutures).then((value) {
+      tournaments = value
+          .where((element) => element != null)
+          .toList()
+          .cast<TournamentPreview>();
+    });
+
+    return SearchPageData(tournaments: tournaments, maxPage: maxPage);
   } catch (e) {
     throw e;
   }

@@ -10,14 +10,10 @@ import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
 
 class TournamentLoadedScreen extends StatefulWidget {
-  final int tournamentID;
   final Tournament tournament;
   final bool isPreview;
   const TournamentLoadedScreen(
-      {super.key,
-      required this.tournamentID,
-      required this.tournament,
-      this.isPreview = false});
+      {super.key, required this.tournament, this.isPreview = false});
 
   @override
   State<TournamentLoadedScreen> createState() => _TournamentLoadedScreenState();
@@ -69,7 +65,6 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
       const SkillsPage(),
       const InfoPage(),
     ];
-    ValueNotifier<double> appBarHeightNotifier = ValueNotifier<double>(125);
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
@@ -87,24 +82,22 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        widget.isPreview
-                            ? IconButton(
-                                icon: const Icon(Icons.arrow_back),
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                              )
-                            : Container(),
-                        Text(
-                          titles[selectedIndex],
-                          style: const TextStyle(
-                              fontSize: 30, fontWeight: FontWeight.w600),
-                        ),
-                      ],
+                    widget.isPreview
+                        ? IconButton(
+                            padding: const EdgeInsets.only(top: 10),
+                            constraints: BoxConstraints(),
+                            icon: const Icon(Icons.arrow_back),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          )
+                        : Container(),
+                    Text(
+                      titles[selectedIndex],
+                      style: const TextStyle(
+                          fontSize: 30, fontWeight: FontWeight.w600),
                     ),
+                    Spacer(),
                     IconButton(
                       icon: const Icon(
                         Icons.search,
@@ -228,7 +221,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
               ),
             ),
           ),
-          selectedIndex == 1 && !inSearch
+          selectedIndex == 1 &&
+                  !inSearch &&
+                  division.teamStats?.isNotEmpty == true
               ? SliverToBoxAdapter(
                   child: Container(
                     height: 50,
