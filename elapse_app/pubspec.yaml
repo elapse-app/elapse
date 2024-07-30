@@ -41,6 +41,7 @@ dependencies:
     provider: ^6.1.2
     ml_linalg: ^13.12.6
     side_sheet: ^1.0.4
+    maps_launcher: ^2.2.1
 
 dev_dependencies:
     flutter_test:

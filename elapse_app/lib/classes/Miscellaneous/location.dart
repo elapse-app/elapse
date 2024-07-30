@@ -5,6 +5,7 @@ class Location {
   String? country;
   String? address1;
   String? address2;
+  String? postalCode;
 
   Location({
     this.venue,
@@ -13,5 +14,6 @@ class Location {
     this.country,
     this.address1,
     this.address2,
+    this.postalCode,
   });
 }

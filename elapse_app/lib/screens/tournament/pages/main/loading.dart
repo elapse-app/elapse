@@ -78,8 +78,7 @@ class TournamentLoadingScreen extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              _buildIconButton(
-                                  context, Icons.calendar_view_day_outlined, 0),
+                              _buildIconButton(context, Icons.schedule, 0),
                               _buildIconButton(context,
                                   Icons.format_list_numbered_outlined, 1),
                               _buildIconButton(
