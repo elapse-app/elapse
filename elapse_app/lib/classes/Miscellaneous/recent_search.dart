@@ -1,11 +1,19 @@
-class RecentSearch {
+class RecentTeamSearch {
   final String searchTerm;
-  final int? teamID;
-  final int? tournamentID;
+  final int teamID;
 
-  RecentSearch({
+  RecentTeamSearch({
     required this.searchTerm,
-    this.teamID,
-    this.tournamentID,
+    required this.teamID,
+  });
+}
+
+class RecentTournamentSearch {
+  final String searchTerm;
+  final int tournamentID;
+
+  RecentTournamentSearch({
+    required this.searchTerm,
+    required this.tournamentID,
   });
 }

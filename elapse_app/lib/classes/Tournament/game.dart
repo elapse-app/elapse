@@ -54,26 +54,26 @@ class Game {
       for (int i = 0; i < alliances[0]["teams"].length; i++) {
         redAlliancePreview.add(TeamPreview(
             teamID: alliances[0]["teams"][i]["team"]["id"],
-            teamName: alliances[0]["teams"][i]["team"]["name"]));
+            teamNumber: alliances[0]["teams"][i]["team"]["name"]));
       }
       redScore = alliances[0]["score"];
       for (int i = 0; i < alliances[1]["teams"].length; i++) {
         blueAlliancePreview.add(TeamPreview(
             teamID: alliances[1]["teams"][i]["team"]["id"],
-            teamName: alliances[1]["teams"][i]["team"]["name"]));
+            teamNumber: alliances[1]["teams"][i]["team"]["name"]));
       }
       blueScore = alliances[1]["score"];
     } else {
       for (int i = 0; i < alliances[1]["teams"].length; i++) {
         redAlliancePreview.add(TeamPreview(
             teamID: alliances[1]["teams"][i]["team"]["id"],
-            teamName: alliances[1]["teams"][i]["team"]["name"]));
+            teamNumber: alliances[1]["teams"][i]["team"]["name"]));
       }
       redScore = alliances[1]["score"];
       for (int i = 0; i < alliances[0]["teams"].length; i++) {
         blueAlliancePreview.add(TeamPreview(
             teamID: alliances[0]["teams"][i]["team"]["id"],
-            teamName: alliances[0]["teams"][i]["team"]["name"]));
+            teamNumber: alliances[0]["teams"][i]["team"]["name"]));
       }
       blueScore = alliances[0]["score"];
     }
@@ -82,6 +82,7 @@ class Game {
     String firstPart = json["name"].split(" ")[0];
     firstPart = firstPart == "Qualifier" ? "Q" : firstPart;
     firstPart = firstPart == "Practice " ? "P" : firstPart;
+    firstPart = firstPart == "Practice" ? "P" : firstPart;
     firstPart = firstPart == "Final" ? "F" : firstPart;
     String secondPart = json["name"].split(" ")[1];
 

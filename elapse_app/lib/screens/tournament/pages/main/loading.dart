@@ -57,37 +57,40 @@ class TournamentLoadingScreen extends StatelessWidget {
               delegate: SliverHeaderDelegate(
                 minHeight: 70.0,
                 maxHeight: 70.0,
-                child: Stack(
-                  children: [
-                    Container(
-                        height: 300,
-                        color: Theme.of(context).colorScheme.primary),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(30),
-                          topRight: Radius.circular(30),
+                child: Hero(
+                  tag: "top",
+                  child: Stack(
+                    children: [
+                      Container(
+                          height: 300,
+                          color: Theme.of(context).colorScheme.primary),
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.surface,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(30),
+                            topRight: Radius.circular(30),
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 25, vertical: 13),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              _buildIconButton(
+                                  context, Icons.calendar_view_day_outlined, 0),
+                              _buildIconButton(context,
+                                  Icons.format_list_numbered_outlined, 1),
+                              _buildIconButton(
+                                  context, Icons.sports_esports_outlined, 2),
+                              _buildIconButton(context, Icons.info_outlined, 3),
+                            ],
+                          ),
                         ),
                       ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 25, vertical: 13),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _buildIconButton(
-                                context, Icons.calendar_view_day_outlined, 0),
-                            _buildIconButton(context,
-                                Icons.format_list_numbered_outlined, 1),
-                            _buildIconButton(
-                                context, Icons.sports_esports_outlined, 2),
-                            _buildIconButton(context, Icons.info_outlined, 3),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               )),
           const SliverToBoxAdapter(

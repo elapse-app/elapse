@@ -217,7 +217,7 @@ class GameScreen extends StatelessWidget {
                               return Column(
                                 children: [
                                   EmptyRanking(
-                                      teamName: e.teamName,
+                                      teamName: e.teamNumber,
                                       teamID: e.teamID,
                                       allianceColor:
                                           colorPallete.redAllianceText),
@@ -233,7 +233,7 @@ class GameScreen extends StatelessWidget {
                               return Column(
                                 children: [
                                   StandardRanking(
-                                      teamName: e.teamName,
+                                      teamName: e.teamNumber,
                                       teamStats: teamStats,
                                       games: games,
                                       teamID: e.teamID,
@@ -292,7 +292,7 @@ class GameScreen extends StatelessWidget {
                               return Column(
                                 children: [
                                   EmptyRanking(
-                                      teamName: e.teamName,
+                                      teamName: e.teamNumber,
                                       teamID: e.teamID,
                                       allianceColor:
                                           colorPallete.blueAllianceText),
@@ -308,7 +308,7 @@ class GameScreen extends StatelessWidget {
                               return Column(
                                 children: [
                                   StandardRanking(
-                                      teamName: e.teamName,
+                                      teamName: e.teamNumber,
                                       teamStats: teamStats,
                                       teamID: e.teamID,
                                       games: games,

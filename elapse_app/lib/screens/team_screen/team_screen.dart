@@ -3,7 +3,7 @@ import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/vdaStats.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
-import 'package:elapse_app/screens/tournament/widgets/tournament_preview_widget.dart';
+import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
@@ -24,7 +24,7 @@ class _TeamScreenState extends State<TeamScreen> {
   void initState() {
     super.initState();
     team = fetchTeam(widget.teamID);
-    teamStats = getTrueSkillDataForTeam(widget.teamID);
+    teamStats = getTrueSkillDataForTeam(widget.teamName);
     teamTournaments = fetchTeamTournaments(widget.teamID, 181);
     teamAwards = getAwards(widget.teamID, 181);
   }
@@ -164,7 +164,7 @@ class _TeamScreenState extends State<TeamScreen> {
                                   ),
                                   Spacer(),
                                   Text(
-                                    "${stats.winPercent}%",
+                                    "${stats.winPercent == null ? "" : stats.winPercent}%",
                                     style: const TextStyle(
                                         fontSize: 24,
                                         fontWeight: FontWeight.w500),
@@ -175,7 +175,7 @@ class _TeamScreenState extends State<TeamScreen> {
                           );
                         } else if (snapshot.hasError) {
                           print(snapshot.error);
-                          return Text("${snapshot.error}");
+                          return Container();
                         } else {
                           return Column(
                             children: [
@@ -226,292 +226,33 @@ class _TeamScreenState extends State<TeamScreen> {
                             builder: (context, snapshot) {
                               if (snapshot.hasData) {
                                 Team team = snapshot.data as Team;
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Flex(
-                                      direction: Axis.horizontal,
-                                      children: [
-                                        Flexible(
-                                          flex: 5,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                getGrade(team.grade),
-                                                style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              ),
-                                              const Text(
-                                                "Grade",
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                        const SizedBox(width: 18),
-                                        Flexible(
-                                          flex: 17,
-                                          child: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                getLocation(team.location),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight:
-                                                        FontWeight.w500),
-                                              ),
-                                              const Text(
-                                                "Location",
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    SizedBox(
-                                      height: 18,
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(team.teamName ?? "",
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500)),
-                                        const Text(
-                                          "Team Name",
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ],
+                                return TeamBio(
+                                  grade: team.grade ?? "",
+                                  location: team.location ?? Location(),
+                                  teamName: team.teamName ?? "",
+                                  organization: team.organization ?? "",
                                 );
                               } else if (snapshot.hasError) {
-                                return const Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "",
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500),
-                                            ),
-                                            Text(
-                                              "Grade",
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        SizedBox(width: 18),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              "",
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  fontWeight: FontWeight.w500),
-                                            ),
-                                            Text(
-                                              "Grade",
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text("",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500)),
-                                        Text(
-                                          "Organization",
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ],
+                                return TeamBio(
+                                  grade: "",
+                                  location: Location(),
+                                  teamName: "",
+                                  organization: "",
                                 );
                               } else {
-                                return Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                              width: 20,
-                                              height: 20,
-                                            ),
-                                            const SizedBox(height: 8),
-                                            const Text(
-                                              "Grade",
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(width: 18),
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Container(
-                                              child:
-                                                  CircularProgressIndicator(),
-                                              width: 20,
-                                              height: 20,
-                                            ),
-                                            const SizedBox(height: 8),
-                                            const Text(
-                                              "Location",
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Container(
-                                          child: CircularProgressIndicator(),
-                                          width: 20,
-                                          height: 20,
-                                        ),
-                                        const Text(
-                                          "Organization",
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        )
-                                      ],
-                                    ),
-                                  ],
-                                );
+                                return TeamBio(
+                                    grade: "",
+                                    location: Location(),
+                                    teamName: "",
+                                    organization: "");
                               }
                             },
                           )
-                        : Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Flex(
-                                direction: Axis.horizontal,
-                                children: [
-                                  Flexible(
-                                    flex: 5,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          getGrade(widget.team?.grade),
-                                          style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        const Text(
-                                          "Grade",
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 18),
-                                  Flexible(
-                                    flex: 17,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          textWidthBasis: TextWidthBasis.parent,
-                                          getLocation(widget.team?.location),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500),
-                                        ),
-                                        const Text(
-                                          "Location",
-                                          style: TextStyle(
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 18,
-                              ),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(widget.team?.organization ?? "",
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500)),
-                                  const Text(
-                                    "Organization",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                    ),
-                                  )
-                                ],
-                              ),
-                            ],
-                          ),
+                        : TeamBio(
+                            grade: getGrade(widget.team?.grade),
+                            location: widget.team?.location ?? Location(),
+                            teamName: widget.team?.teamName ?? "",
+                            organization: widget.team?.organization ?? ""),
                   ],
                 ),
               ),
@@ -538,6 +279,13 @@ class _TeamScreenState extends State<TeamScreen> {
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         VDAStats stats = snapshot.data as VDAStats;
+                        if (stats.worldSkillsRank == null) {
+                          stats.worldSkillsRank = 0;
+                          stats.skillsScore = 0;
+                          stats.maxDriver = 0;
+                          stats.maxAuto = 0;
+                        }
+
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -608,7 +356,7 @@ class _TeamScreenState extends State<TeamScreen> {
                           ],
                         );
                       } else if (snapshot.hasError) {
-                        return const Text("An error occured");
+                        return const Text("Skills Data Unavailable");
                       } else {
                         return const Center(
                           child: SizedBox(
@@ -645,6 +393,14 @@ class _TeamScreenState extends State<TeamScreen> {
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         VDAStats stats = snapshot.data as VDAStats;
+                        if (stats.trueSkill == null) {
+                          stats.trueSkillGlobalRank = 0;
+                          stats.trueSkill = 0;
+                          stats.trueSkillRegionRank = 0;
+                          stats.opr = 0;
+                          stats.dpr = 0;
+                          stats.ccwm = 0;
+                        }
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -754,7 +510,7 @@ class _TeamScreenState extends State<TeamScreen> {
                           ],
                         );
                       } else if (snapshot.hasError) {
-                        return const Text("An error occured");
+                        return const Text("TrueSkill Data Unavailable");
                       } else {
                         return const Center(
                           child: SizedBox(
@@ -797,6 +553,12 @@ class _TeamScreenState extends State<TeamScreen> {
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
                           VDAStats stats = snapshot.data as VDAStats;
+                          if (stats.wins == null) {
+                            stats.wins = 0;
+                            stats.losses = 0;
+                            stats.ties = 0;
+                            stats.matches = 0;
+                          }
                           return Row(
                             children: [
                               Column(
@@ -857,6 +619,8 @@ class _TeamScreenState extends State<TeamScreen> {
                               const SizedBox(width: 18),
                             ],
                           );
+                        } else if (snapshot.hasError) {
+                          return const Text("Total Stats Unavailable");
                         } else {
                           return const Center(
                             child: SizedBox(
@@ -935,7 +699,7 @@ class _TeamScreenState extends State<TeamScreen> {
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                           textAlign: TextAlign.start,
-                                          e.tournament?.name ?? "",
+                                          e.tournamentName ?? "",
                                           style: const TextStyle(fontSize: 16),
                                         )
                                       ],
@@ -1024,11 +788,114 @@ class _TeamScreenState extends State<TeamScreen> {
   }
 }
 
+class TeamBio extends StatelessWidget {
+  const TeamBio({
+    super.key,
+    required this.grade,
+    required this.location,
+    required this.teamName,
+    required this.organization,
+  });
+
+  final String grade;
+  final Location location;
+  final String teamName;
+  final String organization;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Flex(
+          direction: Axis.horizontal,
+          children: [
+            Flexible(
+              flex: 2,
+              fit: FlexFit.tight,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    getGrade(grade),
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  const Text(
+                    "Grade",
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 18),
+            Flexible(
+              flex: 10,
+              fit: FlexFit.tight,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    getLocation(location),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  const Text(
+                    "Location",
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        SizedBox(
+          height: 25,
+        ),
+        Flex(
+          direction: Axis.horizontal,
+          children: [
+            Flexible(
+              flex: 12,
+              fit: FlexFit.tight,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    teamName,
+                    maxLines: 1,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  const Text(
+                    "Team Name",
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
 String getGrade(String? grade) {
   if (grade == "High School") {
     return "HS";
   } else if (grade == "Middle School") {
     return "MS";
+  } else if (grade == "College") {
+    return "CG";
   } else {
     return "NG";
   }
