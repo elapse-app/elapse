@@ -65,7 +65,7 @@ class RankingsPage extends StatelessWidget {
       return SliverToBoxAdapter(
         child: BigErrorMessage(
             icon: Icons.format_list_numbered_outlined,
-            message: "Rankings currently not available"),
+            message: "Rankings not available"),
       );
     }
     return SliverPadding(

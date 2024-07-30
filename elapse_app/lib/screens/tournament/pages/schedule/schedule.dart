@@ -17,7 +17,7 @@ class SchedulePage extends StatelessWidget {
       return const SliverToBoxAdapter(
         child: BigErrorMessage(
           icon: Icons.schedule,
-          message: "No games currently scheduled",
+          message: "No games scheduled",
         ),
       );
     }
