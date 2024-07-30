@@ -151,25 +151,25 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
       redMatchTeams[i][match.redAlliancePreview![0].teamID] = 1;
     } else {
       print(
-          "Match $i: Team ${match.redAlliancePreview?[0].teamName} is not in the rankings and therefore has not been included in calculations");
+          "Match $i: Team ${match.redAlliancePreview?[0].teamNumber} is not in the rankings and therefore has not been included in calculations");
     }
     if (redMatchTeams[i].containsKey(match.redAlliancePreview![1].teamID)) {
       redMatchTeams[i][match.redAlliancePreview![1].teamID] = 1;
     } else {
       print(
-          "Match $i: Team ${match.redAlliancePreview?[1].teamName} is not in the rankings and therefore has not been included in calculations");
+          "Match $i: Team ${match.redAlliancePreview?[1].teamNumber} is not in the rankings and therefore has not been included in calculations");
     }
     if (blueMatchTeams[i].containsKey(match.blueAlliancePreview![0].teamID)) {
       blueMatchTeams[i][match.blueAlliancePreview![0].teamID] = 1;
     } else {
       print(
-          "Match $i: Team ${match.blueAlliancePreview?[0].teamName} is not in the rankings and therefore has not been included in calculations");
+          "Match $i: Team ${match.blueAlliancePreview?[0].teamNumber} is not in the rankings and therefore has not been included in calculations");
     }
     if (blueMatchTeams[i].containsKey(match.blueAlliancePreview![1].teamID)) {
       blueMatchTeams[i][match.blueAlliancePreview![1].teamID] = 1;
     } else {
       print(
-          "Match $i: Team ${match.blueAlliancePreview?[1].teamName} is not in the rankings and therefore has not been included in calculations");
+          "Match $i: Team ${match.blueAlliancePreview?[1].teamNumber} is not in the rankings and therefore has not been included in calculations");
     }
   }
 

@@ -43,14 +43,14 @@ class _MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   int selectedIndex = 0;
 
-  List<Widget> screens = [
-    const HomeScreen(),
-    const TournamentScreen(tournamentID: 52543),
-    const MyTeamScreen(),
-    const ExploreScreen(),
-  ];
   @override
   Widget build(BuildContext context) {
+    List<Widget> screens = [
+      const HomeScreen(),
+      const TournamentScreen(tournamentID: 52543),
+      const MyTeamScreen(),
+      ExploreScreen(prefs: widget.prefs),
+    ];
     widget.prefs.setString("theme", "system");
     return Consumer<ColorProvider>(builder: (context, colorProvider, child) {
       bool systemDefined = false;

@@ -1,40 +1,45 @@
 import 'dart:convert';
 
+import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class VDAStats {
   int id;
   String teamNum;
-  double opr;
-  double dpr;
-  double ccwm;
+  String? teamName;
+  double? opr;
+  double? dpr;
+  double? ccwm;
 
-  int wins;
-  int losses;
-  int ties;
-  int matches;
-  double winPercent;
+  num? wins;
+  num? losses;
+  num? ties;
+  num? matches;
+  double? winPercent;
 
-  double trueSkill;
-  int trueSkillGlobalRank;
-  int trueSkillRegionRank;
+  double? trueSkill;
+  num? trueSkillGlobalRank;
+  num? trueSkillRegionRank;
 
-  int regionalQual;
-  int worldsQual;
+  num? regionalQual;
+  num? worldsQual;
 
-  String region;
+  String? region;
 
-  int? skillsScore;
-  int? maxAuto;
-  int? maxDriver;
+  Location? location;
 
-  int? worldSkillsRank;
-  int? regionSkillsRank;
+  num? skillsScore;
+  num? maxAuto;
+  num? maxDriver;
+
+  num? worldSkillsRank;
+  num? regionSkillsRank;
 
   VDAStats({
     required this.id,
     required this.teamNum,
+    required this.teamName,
     required this.opr,
     required this.dpr,
     required this.ccwm,
@@ -49,6 +54,7 @@ class VDAStats {
     required this.regionalQual,
     required this.worldsQual,
     required this.region,
+    this.location,
     this.skillsScore,
     this.maxAuto,
     this.maxDriver,
@@ -58,15 +64,16 @@ class VDAStats {
 
   factory VDAStats.fromJson(Map<String, dynamic> json) {
     return VDAStats(
-      id: json["id"].truncate(),
+      id: json["id"],
       teamNum: json["team_number"],
+      teamName: json["team_name"],
       opr: json["opr"],
       dpr: json["dpr"],
       ccwm: json["ccwm"],
-      wins: json["total_wins"].truncate(),
-      losses: json["total_losses"].truncate(),
-      ties: json["total_ties"].truncate(),
-      matches: json["total_matches"].truncate(),
+      wins: json["total_wins"]?.truncate(),
+      losses: json["total_losses"]?.truncate(),
+      ties: json["total_ties"]?.truncate(),
+      matches: json["total_matches"]?.truncate(),
       winPercent: json["total_winning_percent"],
       trueSkill: json["trueskill"],
       trueSkillGlobalRank: json["ts_ranking"],
@@ -74,6 +81,10 @@ class VDAStats {
       regionalQual: json["qualified_for_regionals"],
       worldsQual: json["qualified_for_worlds"],
       region: json["loc_region"],
+      location: Location(
+        region: json["loc_region"],
+        country: json["loc_country"],
+      ),
       skillsScore: json["score_total_max"]?.truncate(),
       maxAuto: json["score_auto_max"]?.truncate(),
       maxDriver: json["score_driver_max"]?.truncate(),
@@ -87,6 +98,7 @@ Future<List<VDAStats>> getTrueSkillData() async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final String? vdaData = prefs.getString("vdaData");
   final String? expiryDate = prefs.getString("vdaExpiry");
+
   List<dynamic> parsed = [];
 
   if (vdaData == null ||
@@ -112,7 +124,7 @@ Future<List<VDAStats>> getTrueSkillData() async {
   return vdaStats;
 }
 
-Future<VDAStats> getTrueSkillDataForTeam(int teamId) async {
+Future<VDAStats> getTrueSkillDataForTeam(String teamNum) async {
   final response = await getTrueSkillData();
-  return response.firstWhere((element) => element.id == teamId);
+  return response.firstWhere((element) => element.teamNum == teamNum);
 }
