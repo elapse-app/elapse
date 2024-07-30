@@ -1,5 +1,6 @@
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/classes/Team/team.dart';
+import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/tskills.dart';
 
@@ -15,6 +16,7 @@ class Tournament {
 
   int seasonID;
   String name;
+  String sku;
 
   Location location;
 
@@ -25,15 +27,18 @@ class Tournament {
   List<Team> teams;
 
   Map<int, TournamentSkills>? tournamentSkills;
+  List<Award> awards;
 
   Tournament({
     required this.id,
     required this.name,
+    required this.sku,
     required this.seasonID,
     required this.location,
     required this.startDate,
     required this.divisions,
     required this.teams,
+    required this.awards,
     this.endDate,
     this.tournamentSkills,
   });
@@ -69,21 +74,36 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
     }).toList());
 
     Future<List<Team>> futureTeams = getTeams(tournamentID);
+    print("Getting Teams");
     Map<int, TournamentSkills> skills =
         await getSkillsRankings(tournamentID, futureTeams);
+    print("Getting skills");
 
     List<Team> teams = await futureTeams;
+    print("Got teams");
+
+    List<Award> awards = await getTournamentAwards(tournamentID);
 
     return Tournament(
       id: tournamentID,
       name: parsed["name"],
       seasonID: parsed["season"]["id"],
-      location: Location(venue: parsed["location"]["venue"]),
+      sku: parsed["sku"],
+      location: Location(
+        venue: parsed["location"]["venue"],
+        city: parsed["location"]["city"],
+        region: parsed["location"]["region"],
+        country: parsed["location"]["country"],
+        address1: parsed["location"]["address_1"],
+        address2: parsed["location"]["address_2"],
+        postalCode: parsed["location"]["postcode"],
+      ),
       startDate: DateTime.parse(parsed["start"]),
       endDate: DateTime.parse(parsed["end"]),
       teams: teams,
       divisions: divisions,
       tournamentSkills: skills,
+      awards: awards,
     );
   } catch (e) {
     throw (e);

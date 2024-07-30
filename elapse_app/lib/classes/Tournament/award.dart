@@ -37,16 +37,16 @@ class Award {
 
     List<String> qualifications = [];
     for (var a in json["qualifications"]) {
-      qualifications.add(a);
+      qualifications.add(parseQualification(a));
     }
 
     String awardName = "";
     List<String> splitName = json["title"].split(" ");
-    for (int i = 0; i < splitName.length; i++) {
+    for (int i = 0; i < splitName.length - 1; i++) {
       if (splitName[i] == "(VRC/VEXU/VAIRC)") {
         break;
       }
-      awardName += splitName[i] + " ";
+      awardName += "${splitName[i]} ";
     }
 
     return Award(
@@ -73,4 +73,30 @@ Future<List<Award>> getAwards(int teamID, int seasonID) async {
       parsed.map<Award>((json) => Award.fromJson(json)).toList();
 
   return awards;
+}
+
+Future<List<Award>> getTournamentAwards(int tournamentID) async {
+  final response = await http.get(
+    Uri.parse("https://www.robotevents.com/api/v2/events/$tournamentID/awards"),
+    headers: {
+      HttpHeaders.authorizationHeader: TOKEN,
+    },
+  );
+
+  final parsed = jsonDecode(response.body)["data"] as List;
+  List<Award> awards =
+      parsed.map<Award>((json) => Award.fromJson(json)).toList();
+
+  return awards;
+}
+
+String parseQualification(String qualification) {
+  String parsed = "NQ";
+  if (qualification == "World Championship") {
+    parsed = "WC";
+  }
+  if (qualification == "Event Region Championship") {
+    parsed = "RC";
+  }
+  return parsed;
 }

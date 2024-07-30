@@ -1,10 +1,10 @@
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
-import 'package:elapse_app/screens/tournament/pages/info.dart';
+import 'package:elapse_app/screens/tournament/pages/info/info.dart';
 import 'package:elapse_app/screens/tournament/pages/main/search_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/schedule.dart';
-import 'package:elapse_app/screens/tournament/pages/skills.dart';
+import 'package:elapse_app/screens/tournament/pages/skills/skills.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
@@ -62,8 +62,15 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
           sort: filters[filterIndex],
           skills: widget.tournament.tournamentSkills!,
           games: division.games),
-      const SkillsPage(),
-      const InfoPage(),
+      SkillsPage(
+          skills: widget.tournament.tournamentSkills!,
+          teams: widget.tournament.teams,
+          divisions: widget.tournament.divisions),
+      InfoPage(
+        // InfoPage is a StatelessWidget
+        tournament: widget.tournament,
+        awards: widget.tournament.awards,
+      ),
     ];
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -205,8 +212,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            _buildIconButton(
-                                context, Icons.calendar_view_day_outlined, 0),
+                            _buildIconButton(context, Icons.schedule, 0),
                             _buildIconButton(context,
                                 Icons.format_list_numbered_outlined, 1),
                             _buildIconButton(
