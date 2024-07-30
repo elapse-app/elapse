@@ -82,6 +82,7 @@ class Game {
     String firstPart = json["name"].split(" ")[0];
     firstPart = firstPart == "Qualifier" ? "Q" : firstPart;
     firstPart = firstPart == "Practice " ? "P" : firstPart;
+    firstPart = firstPart == "Practice" ? "P" : firstPart;
     firstPart = firstPart == "Final" ? "F" : firstPart;
     String secondPart = json["name"].split(" ")[1];
 
