@@ -25,6 +25,7 @@ class _TeamScreenState extends State<TeamScreen> {
   void initState() {
     super.initState();
     isSaved = false;
+    displaySave = true;
     team = fetchTeam(widget.teamID);
     teamStats = getTrueSkillDataForTeam(widget.teamName);
     teamTournaments = fetchTeamTournaments(widget.teamID, 181);
@@ -33,6 +34,7 @@ class _TeamScreenState extends State<TeamScreen> {
     prefsFuture!.then((prefs) {
       setState(() {
         isSaved = alreadySaved(prefs);
+        displaySave = !isMainTeam(prefs);
       });
     });
   }
@@ -43,6 +45,11 @@ class _TeamScreenState extends State<TeamScreen> {
             '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}') ||
         prefs.getString("savedTeam") ==
             '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}';
+  }
+
+  bool isMainTeam(SharedPreferences prefs) {
+    return prefs.getString("savedTeam") ==
+        '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}';
   }
 
   Future<SharedPreferences> getPrefs() async {
@@ -72,6 +79,7 @@ class _TeamScreenState extends State<TeamScreen> {
 
   Future<SharedPreferences>? prefsFuture;
   late bool isSaved;
+  late bool displaySave;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,24 +112,6 @@ class _TeamScreenState extends State<TeamScreen> {
                 ),
               ),
               centerTitle: false,
-              background: const SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 20, right: 12, bottom: 20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Spacer(),
-                          SettingsButton(),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ),
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
@@ -146,19 +136,21 @@ class _TeamScreenState extends State<TeamScreen> {
                           style: const TextStyle(
                               fontSize: 64, height: 1, letterSpacing: -2),
                         ),
-                        IconButton(
-                            focusColor: Colors.transparent,
-                            highlightColor: Colors.transparent,
-                            padding:
-                                EdgeInsets.only(left: 10, top: 10, bottom: 10),
-                            constraints: BoxConstraints(),
-                            icon: Icon(
-                              isSaved
-                                  ? Icons.bookmark_rounded
-                                  : Icons.bookmark_add_outlined,
-                              size: 36,
-                            ),
-                            onPressed: toggleSaveTeam)
+                        displaySave
+                            ? IconButton(
+                                focusColor: Colors.transparent,
+                                highlightColor: Colors.transparent,
+                                padding: EdgeInsets.only(
+                                    left: 10, top: 10, bottom: 10),
+                                constraints: BoxConstraints(),
+                                icon: Icon(
+                                  isSaved
+                                      ? Icons.bookmark_rounded
+                                      : Icons.bookmark_add_outlined,
+                                  size: 36,
+                                ),
+                                onPressed: toggleSaveTeam)
+                            : Container()
                       ],
                     ),
                     const SizedBox(

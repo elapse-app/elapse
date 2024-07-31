@@ -23,7 +23,7 @@ class MyTeams extends StatefulWidget {
 }
 
 class _MyTeamsState extends State<MyTeams> {
-  final String savedTeam = '{"teamID": 102426, "teamNumber": "540W"}';
+  late String savedTeam;
   late TeamPreview savedTeamPreview;
 
   List<TeamPreview> savedTeamPreviews = [];
@@ -34,6 +34,7 @@ class _MyTeamsState extends State<MyTeams> {
   int seasonID = 190;
   @override
   void initState() {
+    final String savedTeam = widget.prefs.getString("savedTeam") ?? "";
     savedTeamPreview = TeamPreview(
         teamID: jsonDecode(savedTeam)["teamID"],
         teamNumber: jsonDecode(savedTeam)["teamNumber"]);
