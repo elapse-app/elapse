@@ -21,7 +21,6 @@ class Game {
   String? fieldName;
 
   DateTime? scheduledTime;
-  DateTime? adjustedScheduledTime;
   DateTime? startedTime;
 
   Game({
@@ -33,7 +32,6 @@ class Game {
     required this.instance,
     this.fieldName,
     this.scheduledTime,
-    this.adjustedScheduledTime,
     this.startedTime,
     this.redScore,
     this.blueScore,
@@ -104,7 +102,6 @@ class Game {
       gameName: gameName,
       fieldName: json["field"],
       scheduledTime: DateTime.tryParse(json["scheduled"] ?? ""),
-      adjustedScheduledTime: DateTime.tryParse(json["scheduled"] ?? ""),
       startedTime: DateTime.tryParse(json["started"] ?? ""),
     );
   }
