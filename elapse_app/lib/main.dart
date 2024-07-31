@@ -11,6 +11,9 @@ import 'package:flutter/services.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
   SharedPreferences prefs = await SharedPreferences.getInstance();
   // runApp(MyApp(
   //   prefs: prefs,
