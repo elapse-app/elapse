@@ -1,6 +1,7 @@
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
+import 'package:elapse_app/screens/tournament/pages/info/all_teams.dart';
 import 'package:elapse_app/screens/tournament/pages/info/award_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:maps_launcher/maps_launcher.dart';
@@ -115,6 +116,35 @@ class InfoPage extends StatelessWidget {
                     ],
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(
+              height: 25,
+            ),
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AllTeams(
+                              teams: tournament.teams,
+                            )));
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: const BorderRadius.all(Radius.circular(18)),
+                    color: Theme.of(context).colorScheme.tertiary),
+                padding: const EdgeInsets.all(18),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "All Teams",
+                      style: TextStyle(fontSize: 24),
+                    ),
+                    Icon(Icons.arrow_forward)
+                  ],
+                ),
               ),
             ),
             const SizedBox(

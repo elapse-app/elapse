@@ -40,7 +40,9 @@ class _TeamScreenState extends State<TeamScreen> {
   bool alreadySaved(SharedPreferences prefs) {
     List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
     return savedTeams.contains(
-        '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}');
+            '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}') ||
+        prefs.getString("savedTeam") ==
+            '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}';
   }
 
   Future<SharedPreferences> getPrefs() async {
