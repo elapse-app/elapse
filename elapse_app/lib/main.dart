@@ -15,6 +15,7 @@ void main() async {
     DeviceOrientation.portraitUp,
   ]);
   SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs.setString("savedTeam", '{"teamID": 161877, "teamNumber": "16868C"}');
   // runApp(MyApp(
   //   prefs: prefs,
   // ));
