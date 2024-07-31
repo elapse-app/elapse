@@ -7,6 +7,7 @@ import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TeamScreen extends StatefulWidget {
   const TeamScreen(
@@ -23,16 +24,52 @@ class _TeamScreenState extends State<TeamScreen> {
   @override
   void initState() {
     super.initState();
+    isSaved = false;
     team = fetchTeam(widget.teamID);
     teamStats = getTrueSkillDataForTeam(widget.teamName);
     teamTournaments = fetchTeamTournaments(widget.teamID, 181);
     teamAwards = getAwards(widget.teamID, 181);
+    prefsFuture = getPrefs();
+    prefsFuture!.then((prefs) {
+      setState(() {
+        isSaved = alreadySaved(prefs);
+      });
+    });
+  }
+
+  bool alreadySaved(SharedPreferences prefs) {
+    List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
+    return savedTeams.contains(
+        '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}');
+  }
+
+  Future<SharedPreferences> getPrefs() async {
+    return await SharedPreferences.getInstance();
+  }
+
+  void toggleSaveTeam() async {
+    final SharedPreferences prefs = await getPrefs();
+    List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
+    if (isSaved) {
+      savedTeams.remove(
+          '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}');
+    } else {
+      savedTeams.add(
+          '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}');
+    }
+    prefs.setStringList("savedTeams", savedTeams);
+    setState(() {
+      isSaved = !isSaved;
+    });
   }
 
   Future<Team>? team;
   Future<VDAStats>? teamStats;
   Future<List<TournamentPreview>>? teamTournaments;
   Future<List<Award>>? teamAwards;
+
+  Future<SharedPreferences>? prefsFuture;
+  late bool isSaved;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,10 +136,28 @@ class _TeamScreenState extends State<TeamScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      widget.teamName,
-                      style: const TextStyle(
-                          fontSize: 64, height: 1, letterSpacing: -2),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          widget.teamName,
+                          style: const TextStyle(
+                              fontSize: 64, height: 1, letterSpacing: -2),
+                        ),
+                        IconButton(
+                            focusColor: Colors.transparent,
+                            highlightColor: Colors.transparent,
+                            padding:
+                                EdgeInsets.only(left: 10, top: 10, bottom: 10),
+                            constraints: BoxConstraints(),
+                            icon: Icon(
+                              isSaved
+                                  ? Icons.bookmark_rounded
+                                  : Icons.bookmark_add_outlined,
+                              size: 36,
+                            ),
+                            onPressed: toggleSaveTeam)
+                      ],
                     ),
                     const SizedBox(
                       height: 5,
@@ -779,9 +834,9 @@ class _TeamScreenState extends State<TeamScreen> {
           ),
           const SliverToBoxAdapter(
             child: SizedBox(
-              height: 50,
+              height: 10,
             ),
-          )
+          ),
         ],
       ),
     );

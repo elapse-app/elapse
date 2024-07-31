@@ -30,7 +30,7 @@ class GameWidget extends StatelessWidget {
     if (game.startedTime != null) {
       time = DateFormat.Hm().format(game.startedTime!);
     }
-    if (game.scheduledTime != null) {
+    if (game.scheduledTime != null && game.startedTime == null) {
       time = DateFormat.Hm().format(game.scheduledTime!);
     }
 

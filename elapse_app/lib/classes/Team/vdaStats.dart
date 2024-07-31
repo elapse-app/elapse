@@ -111,8 +111,8 @@ Future<List<VDAStats>> getTrueSkillData() async {
 
     parsed = jsonDecode(response.body) as List;
     prefs.setString("vdaData", response.body);
-    prefs.setString("vdaExpiry",
-        DateTime.now().add(const Duration(minutes: 20)).toString());
+    prefs.setString(
+        "vdaExpiry", DateTime.now().add(const Duration(hours: 2)).toString());
     parsed = jsonDecode(response.body) as List;
   } else {
     print("getting cached data");
