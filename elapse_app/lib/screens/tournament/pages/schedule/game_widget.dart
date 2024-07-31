@@ -1,6 +1,7 @@
 import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
+import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
 import 'package:elapse_app/classes/Tournament/tskills.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/extras/twelve_hour.dart';
@@ -9,29 +10,41 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class GameWidget extends StatelessWidget {
-  const GameWidget(
-      {super.key,
-      required this.game,
-      required this.rankings,
-      required this.games,
-      required this.skills,
-      this.teamName,
-      this.isAllianceColoured});
+  const GameWidget({
+    super.key,
+    required this.game,
+    required this.rankings,
+    required this.games,
+    required this.skills,
+    this.teamName,
+    this.isAllianceColoured,
+    this.useLiveTiming,
+  });
   final List<Game> games;
   final Game game;
   final Map<int, TeamStats>? rankings;
   final Map<int, TournamentSkills>? skills;
   final String? teamName;
   final bool? isAllianceColoured;
+  final bool? useLiveTiming;
 
   @override
   Widget build(BuildContext context) {
     String time = "No Time";
     if (game.startedTime != null) {
-      time = DateFormat.Hm().format(game.startedTime!);
+      time = DateFormat.Hm().format(game.startedTime!.toLocal());
     }
-    if (game.scheduledTime != null && game.startedTime == null) {
-      time = DateFormat.Hm().format(game.scheduledTime!);
+    if (game.scheduledTime != null || game.startedTime == null) {
+      DateTime start;
+      if (useLiveTiming == true) {
+        start = game.startedTime!
+            .toLocal()
+            .add(Duration(minutes: getCurrentDelay(games).toInt()));
+        time = DateFormat.Hm().format(start);
+      } else {
+        start = game.startedTime!.toLocal();
+        time = DateFormat.Hm().format(start);
+      }
     }
 
     time = twelveHour(time);

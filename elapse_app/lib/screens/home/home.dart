@@ -1,15 +1,20 @@
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
+import 'package:elapse_app/main.dart';
+import 'package:elapse_app/providers/tournament_mode_provider.dart';
 import 'package:elapse_app/screens/tournament/tournament.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/settings/settings.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.teamID});
+  const HomeScreen({super.key, required this.teamID, required this.prefs});
   final int teamID;
+  final SharedPreferences prefs;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -252,6 +257,21 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 ),
                                                 TextButton(
                                                   onPressed: () {
+                                                    widget.prefs.setBool(
+                                                        "isTournamentMode",
+                                                        true);
+                                                    widget.prefs.setInt(
+                                                        "tournamentID",
+                                                        upcoming.id);
+
+                                                    myAppKey.currentState!
+                                                        .reloadApp();
+
+                                                    Provider.of<TournamentModeProvider>(
+                                                            context,
+                                                            listen: false)
+                                                        .setTournamentMode(
+                                                            true);
                                                     Navigator.pop(context);
                                                   },
                                                   child: Text(

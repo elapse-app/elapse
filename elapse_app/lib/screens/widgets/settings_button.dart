@@ -8,7 +8,7 @@ class SettingsButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return IconButton(
       icon: const Icon(
-        Icons.account_circle_rounded,
+        Icons.settings,
         weight: 0.1,
       ),
       iconSize: 30,
