@@ -2,23 +2,24 @@ import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/screens/tournament/pages/main/loaded.dart';
 import 'package:elapse_app/screens/tournament/pages/main/loading.dart';
+import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 
-class TournamentScreen extends StatefulWidget {
+class TMTournamentScreen extends StatefulWidget {
   final int tournamentID;
   final bool isPreview;
   final Future<Tournament>? tournamentFuture;
-  const TournamentScreen(
+  const TMTournamentScreen(
       {super.key,
       required this.tournamentID,
       this.isPreview = true,
       this.tournamentFuture});
 
   @override
-  State<TournamentScreen> createState() => _TournamentScreenState();
+  State<TMTournamentScreen> createState() => _TMTournamentScreenState();
 }
 
-class _TournamentScreenState extends State<TournamentScreen> {
+class _TMTournamentScreenState extends State<TMTournamentScreen> {
   Future<Tournament>? tournament;
   int selectedIndex = 0;
 
@@ -43,7 +44,20 @@ class _TournamentScreenState extends State<TournamentScreen> {
       future: tournament,
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const TournamentLoadingScreen();
+          return Scaffold(
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            body: CustomScrollView(
+              slivers: [
+                SliverAppBar.large(
+                  automaticallyImplyLeading: false,
+                  expandedHeight: 125,
+                  centerTitle: false,
+                  backgroundColor: Theme.of(context).colorScheme.primary,
+                ),
+                RoundedTop()
+              ],
+            ),
+          );
         } else if (snapshot.hasData) {
           return TournamentLoadedScreen(
             tournament: snapshot.data as Tournament,

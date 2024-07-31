@@ -1,3 +1,7 @@
+import 'dart:convert';
+
+import 'package:elapse_app/classes/Team/team.dart';
+import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/screens/tournament/pages/info/info.dart';
@@ -8,6 +12,7 @@ import 'package:elapse_app/screens/tournament/pages/skills/skills.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TournamentLoadedScreen extends StatefulWidget {
   final Tournament tournament;
@@ -33,9 +38,41 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   late String savedQuery;
   late double appBarHeight;
 
+  List<Team> rankingsTeams = [];
+  List<TeamPreview> savedTeams = [];
+  bool useSavedTeams = false;
+  bool useLiveTiming = true;
+
+  void savedPress() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    setState(() {
+      useSavedTeams = !useSavedTeams;
+      if (useSavedTeams) {
+        final String savedTeam = prefs.getString("savedTeam") ?? "";
+        TeamPreview savedTeamPreview = TeamPreview(
+            teamID: jsonDecode(savedTeam)["teamID"],
+            teamNumber: jsonDecode(savedTeam)["teamNumber"]);
+        List<String> savedTeamsString = prefs.getStringList("savedTeams") ?? [];
+        savedTeams.add(savedTeamPreview);
+        savedTeams.addAll(savedTeamsString
+            .map((e) => TeamPreview(
+                teamID: jsonDecode(e)["teamID"],
+                teamNumber: jsonDecode(e)["teamNumber"]))
+            .toList());
+        rankingsTeams = widget.tournament.teams
+            .where((element) =>
+                savedTeams.any((element2) => element2.teamID == element.id))
+            .toList();
+      } else {
+        rankingsTeams = widget.tournament.teams;
+      }
+    });
+  }
+
   @override
   void initState() {
     super.initState();
+    rankingsTeams = widget.tournament.teams;
     division = widget.tournament.divisions[0];
     inSearch = false;
     searchQuery = "";
@@ -57,16 +94,16 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    saveTournament(widget.tournament);
     List<Widget> pages = [
       SchedulePage(
         division: division,
         tournament: widget.tournament,
+        useLiveTiming: useLiveTiming,
       ),
       RankingsPage(
           searchQuery: searchQuery,
           rankings: division.teamStats!,
-          teams: widget.tournament.teams,
+          teams: rankingsTeams,
           sort: filters[filterIndex],
           skills: widget.tournament.tournamentSkills!,
           games: division.games),
@@ -235,24 +272,67 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
               ),
             ),
           ),
-          selectedIndex == 1 &&
-                  !inSearch &&
-                  division.teamStats?.isNotEmpty == true
+          selectedIndex == 0 && division.teamStats?.isNotEmpty == true
               ? SliverToBoxAdapter(
                   child: Container(
-                    height: 50,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
+                    padding: EdgeInsets.symmetric(horizontal: 23),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        SizedBox(
-                          width: 23,
+                        Text(
+                          "Enable Live Timing",
+                          style: TextStyle(fontSize: 16),
                         ),
-                        _buildFilterButton(context, "Rank", 0),
-                        _buildFilterButton(context, "OPR", 1),
-                        _buildFilterButton(context, "DPR", 2),
-                        _buildFilterButton(context, "CCWM", 3),
-                        _buildFilterButton(context, "AP", 4),
-                        _buildFilterButton(context, "SP", 5),
+                        Switch(
+                          value: useLiveTiming,
+                          onChanged: (bool value) {
+                            setState(() {
+                              useLiveTiming = value;
+                            });
+                          },
+                        )
+                      ],
+                    ),
+                  ),
+                )
+              : SliverToBoxAdapter(),
+          selectedIndex == 1 && division.teamStats?.isNotEmpty == true
+              ? SliverToBoxAdapter(
+                  child: Container(
+                    padding: const EdgeInsets.only(left: 23),
+                    height: 50,
+                    child: Flex(
+                      direction: Axis.horizontal,
+                      children: [
+                        Flexible(
+                          flex: 1,
+                          child: IconButton(
+                            icon: Icon(
+                              useSavedTeams
+                                  ? Icons.bookmark
+                                  : Icons.bookmark_outline,
+                              size: 30,
+                            ),
+                            onPressed: savedPress,
+                          ),
+                        ),
+                        Flexible(
+                          flex: 4,
+                          child: ListView(
+                            scrollDirection: Axis.horizontal,
+                            children: [
+                              SizedBox(
+                                width: 13,
+                              ),
+                              _buildFilterButton(context, "Rank", 0),
+                              _buildFilterButton(context, "OPR", 1),
+                              _buildFilterButton(context, "DPR", 2),
+                              _buildFilterButton(context, "CCWM", 3),
+                              _buildFilterButton(context, "AP", 4),
+                              _buildFilterButton(context, "SP", 5),
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),

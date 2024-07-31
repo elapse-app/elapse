@@ -6,10 +6,14 @@ import 'package:flutter/material.dart';
 
 class SchedulePage extends StatelessWidget {
   const SchedulePage(
-      {super.key, required this.division, required this.tournament});
+      {super.key,
+      required this.division,
+      required this.tournament,
+      required this.useLiveTiming});
 
   final Division division;
   final Tournament tournament;
+  final bool useLiveTiming;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +38,7 @@ class SchedulePage extends StatelessWidget {
                     rankings: division.teamStats,
                     games: division.games!,
                     skills: tournament.tournamentSkills,
+                    useLiveTiming: useLiveTiming,
                   ),
                   index != division.games!.length - 1
                       ? Divider(
