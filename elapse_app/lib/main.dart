@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:elapse_app/aesthetics/color_schemes.dart';
+import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/screens/explore/explore.dart';
 import 'package:elapse_app/screens/home/home.dart';
@@ -49,8 +52,12 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    TeamPreview savedTeam = TeamPreview(
+        teamNumber:
+            jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"],
+        teamID: jsonDecode(widget.prefs.getString("savedTeam"))["teamID"]);
     List<Widget> screens = [
-      const HomeScreen(),
+      HomeScreen(teamID: savedTeam.teamID),
       const TournamentScreen(tournamentID: 52543, isPreview: false),
       MyTeams(
         prefs: widget.prefs,

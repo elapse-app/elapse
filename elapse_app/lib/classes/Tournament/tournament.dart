@@ -42,6 +42,95 @@ class Tournament {
     this.endDate,
     this.tournamentSkills,
   });
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "name": name,
+      "sku": sku,
+      "seasonID": seasonID,
+      "location": location.toJson(),
+      "startDate": startDate.toIso8601String(),
+      "endDate": endDate?.toIso8601String(),
+      "divisions": divisions.map((e) => e.toJson()).toList(),
+      "teams": teams.map((e) => e.toJson()).toList(),
+      "awards": awards.map((e) => e.toJson()).toList(),
+      "tournamentSkills": tournamentSkills?.map((key, value) {
+        return MapEntry(key.toString(), value.toJson());
+      })
+    };
+  }
+}
+
+Future<void> updateTournament(Tournament tournament) async {
+  List<Future> tournamentFutures = [];
+
+  tournamentFutures.add(getTournamentAwards(tournament.id).then((awards) {
+    tournament.awards = awards;
+  }));
+
+  tournamentFutures.add(
+      getSkillsRankings(tournament.id, Future.value(tournament.teams))
+          .then((skills) {
+    tournament.tournamentSkills = skills;
+  }));
+
+  for (Division division in tournament.divisions) {
+    tournamentFutures
+        .add(calcEventStats(tournament.id, division.id).then((teamStats) {
+      division.teamStats = teamStats[1];
+      division.games = teamStats[0];
+    }));
+  }
+
+  await Future.wait(tournamentFutures);
+}
+
+void saveTournament(Tournament tournament) {
+  String json = jsonEncode(tournament.toJson());
+  print(loadTournament(json).name);
+}
+
+Tournament loadTournament(json) {
+  List<Division> divisions = [];
+  final tournament = jsonDecode(json);
+  for (var a in tournament["divisions"]) {
+    divisions.add(loadDivision(a));
+  }
+
+  print(divisions[0].games);
+
+  List<Team> teams = [];
+  for (var a in tournament["teams"]) {
+    teams.add(loadTeam(a));
+  }
+
+  List<Award> awards = [];
+  for (var a in tournament["awards"]) {
+    awards.add(loadAward(a));
+  }
+
+  Map<int, TournamentSkills>? tournamentSkills;
+  if (tournament["tournamentSkills"] != null) {
+    Map<String, dynamic> stringedSkills = tournament["tournamentSkills"];
+    tournamentSkills = stringedSkills.map((key, value) {
+      return MapEntry(int.parse(key), loadSkills(value));
+    });
+  }
+
+  return Tournament(
+    id: tournament["id"],
+    name: tournament["name"],
+    sku: tournament["sku"],
+    seasonID: tournament["seasonID"],
+    location: loadLocation(tournament["location"]),
+    startDate: DateTime.parse(tournament["startDate"]),
+    endDate: DateTime.tryParse(tournament["endDate"]),
+    divisions: divisions,
+    teams: teams,
+    awards: awards,
+    tournamentSkills: tournamentSkills,
+  );
 }
 
 Future<Tournament> getTournamentDetails(int tournamentID) async {

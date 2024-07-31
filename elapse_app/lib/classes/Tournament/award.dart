@@ -57,6 +57,41 @@ class Award {
       individualWinners: individualWinners,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "name": name,
+      "qualifications": qualifications,
+      "tournamentName": tournamentName,
+      "teamWinners": teamWinners?.map((e) => e.toJson()).toList(),
+      "individualWinners": individualWinners?.map((e) => e.toJson()).toList(),
+    };
+  }
+}
+
+Award loadAward(award) {
+  List<TeamPreview> teamWinners = [];
+  for (var a in award["teamWinners"]) {
+    teamWinners.add(loadTeamPreview(a));
+  }
+
+  List<TeamPreview> individualWinners = [];
+  for (var a in award["individualWinners"]) {
+    individualWinners.add(loadTeamPreview(a));
+  }
+
+  List<String> qualifications = [];
+  for (var a in award["qualifications"]) {
+    qualifications.add(parseQualification(a));
+  }
+
+  return Award(
+    name: award["name"],
+    qualifications: qualifications,
+    tournamentName: award["tournamentName"],
+    teamWinners: teamWinners,
+    individualWinners: individualWinners,
+  );
 }
 
 Future<List<Award>> getAwards(int teamID, int seasonID) async {
