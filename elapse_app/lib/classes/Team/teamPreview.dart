@@ -18,6 +18,20 @@ class TeamPreview {
       required this.teamID,
       this.location,
       this.teamName});
+
+  Map<String, dynamic> toJson() {
+    return {
+      'teamNumber': teamNumber,
+      'teamID': teamID,
+    };
+  }
+}
+
+TeamPreview loadTeamPreview(teamPreview) {
+  return TeamPreview(
+    teamNumber: teamPreview["teamNumber"],
+    teamID: teamPreview["teamID"],
+  );
 }
 
 Future<List<TeamPreview>> fetchTeamPreview(String searchQuery) async {

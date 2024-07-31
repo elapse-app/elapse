@@ -16,6 +16,27 @@ class TournamentSkills {
   int driverAttempts = 0;
 
   TournamentSkills();
+
+  Map<String, dynamic> toJson() {
+    return {
+      "rank": rank,
+      "score": score,
+      "autonScore": autonScore,
+      "autonAttempts": autonAttempts,
+      "driverScore": driverScore,
+      "driverAttempts": driverAttempts,
+    };
+  }
+}
+
+TournamentSkills loadSkills(skills) {
+  return TournamentSkills()
+    ..rank = skills["rank"]
+    ..score = skills["score"]
+    ..autonScore = skills["autonScore"]
+    ..autonAttempts = skills["autonAttempts"]
+    ..driverScore = skills["driverScore"]
+    ..driverAttempts = skills["driverAttempts"];
 }
 
 Future<Map<int, TournamentSkills>> getSkillsRankings(
@@ -62,7 +83,8 @@ Future<Map<int, TournamentSkills>> getSkillsRankings(
       rankings[teamId]?.driverScore = t["score"];
       rankings[teamId]?.driverAttempts = t["attempts"];
     }
-    rankings[teamId]?.score = rankings[teamId]!.autonScore + rankings[teamId]!.driverScore;
+    rankings[teamId]?.score =
+        rankings[teamId]!.autonScore + rankings[teamId]!.driverScore;
   }
   List<Future<void>> pgFutures = [];
   int teamsLastPage = jsonDecode(skills.body)["meta"]["last_page"];
@@ -90,7 +112,8 @@ Future<Map<int, TournamentSkills>> getSkillsRankings(
           rankings[teamId]?.driverScore = t["score"];
           rankings[teamId]?.driverAttempts = t["attempts"];
         }
-        rankings[teamId]?.score = rankings[teamId]!.autonScore + rankings[teamId]!.driverScore;
+        rankings[teamId]?.score =
+            rankings[teamId]!.autonScore + rankings[teamId]!.driverScore;
       }
     });
     pgFutures.add(pgResponse);

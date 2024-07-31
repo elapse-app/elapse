@@ -29,6 +29,45 @@ class TeamStats {
   TournamentSkills? tournamentSkills;
 
   TeamStats();
+
+  Map<String, dynamic> toJson() {
+    return {
+      "rank": rank,
+      "wins": wins,
+      "losses": losses,
+      "ties": ties,
+      "wp": wp,
+      "ap": ap,
+      "sp": sp,
+      "opr": opr,
+      "dpr": dpr,
+      "ccwm": ccwm,
+      "highScore": highScore,
+      "avgScore": avgScore,
+      "totalScore": totalScore,
+      "tournamentSkills": tournamentSkills?.toJson(),
+    };
+  }
+}
+
+TeamStats loadTeamStats(stats) {
+  return TeamStats()
+    ..rank = stats["rank"]
+    ..wins = stats["wins"]
+    ..losses = stats["losses"]
+    ..ties = stats["ties"]
+    ..wp = stats["wp"]
+    ..ap = stats["ap"]
+    ..sp = stats["sp"]
+    ..opr = stats["opr"]
+    ..dpr = stats["dpr"]
+    ..ccwm = stats["ccwm"]
+    ..highScore = stats["highScore"]
+    ..avgScore = stats["avgScore"]
+    ..totalScore = stats["totalScore"]
+    ..tournamentSkills = stats["tournamentSkills"] != null
+        ? loadSkills(stats["tournamentSkills"])
+        : null;
 }
 
 Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {

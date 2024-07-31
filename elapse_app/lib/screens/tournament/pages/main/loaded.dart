@@ -20,7 +20,7 @@ class TournamentLoadedScreen extends StatefulWidget {
 }
 
 class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
-  int selectedIndex = 0;
+  late int selectedIndex;
   int filterIndex = 0;
   List<String> titles = ["Schedule", "Rankings", "Skills", "Info"];
   List<String> filters = ["rank", "opr", "dpr", "ccwm", "ap", "sp"];
@@ -40,6 +40,13 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
     inSearch = false;
     searchQuery = "";
     savedQuery = "";
+
+    if (widget.tournament.divisions[0].games == null ||
+        widget.tournament.divisions[0].games!.isEmpty) {
+      selectedIndex = 3;
+    } else {
+      selectedIndex = 0;
+    }
   }
 
   @override
@@ -50,6 +57,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    saveTournament(widget.tournament);
     List<Widget> pages = [
       SchedulePage(
         division: division,

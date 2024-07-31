@@ -105,6 +105,28 @@ class Game {
       startedTime: DateTime.tryParse(json["started"] ?? ""),
     );
   }
+
+  Map<String, dynamic> toJson() {
+    List<Map<String, dynamic>> redAlliancePreviewStrings;
+    List<Map<String, dynamic>> blueAlliancePreviewStrings;
+    redAlliancePreviewStrings =
+        this.redAlliancePreview!.map((team) => team.toJson()).toList();
+    blueAlliancePreviewStrings =
+        this.blueAlliancePreview!.map((team) => team.toJson()).toList();
+    return {
+      "redAlliancePreview": redAlliancePreviewStrings,
+      "blueAlliancePreview": blueAlliancePreviewStrings,
+      "redScore": redScore,
+      "blueScore": blueScore,
+      "roundNum": roundNum,
+      "gameNum": gameNum,
+      "instance": instance,
+      "gameName": gameName,
+      "fieldName": fieldName,
+      "scheduledTime": scheduledTime?.toIso8601String(),
+      "startedTime": startedTime?.toIso8601String(),
+    };
+  }
 }
 
 Future<List<Game>>? getTournamentSchedule(
@@ -176,4 +198,31 @@ Future<void> _fetchAdditionalPage(
   } else {
     throw Exception("Failed to load schedule");
   }
+}
+
+Game loadGame(game) {
+  List<TeamPreview> redAlliancePreview =
+      (game["redAlliancePreview"]).map<TeamPreview>((e) {
+    return TeamPreview(teamNumber: e["teamNumber"], teamID: e["teamID"]);
+  }).toList() as List<TeamPreview>;
+
+  List<TeamPreview> blueAlliancePreview =
+      game["blueAlliancePreview"].map<TeamPreview>((e) {
+    print(e["teamNumber"]);
+    print(e["teamID"]);
+    return TeamPreview(teamNumber: e["teamNumber"], teamID: e["teamID"]);
+  }).toList() as List<TeamPreview>;
+  return Game(
+    redAlliancePreview: redAlliancePreview,
+    blueAlliancePreview: blueAlliancePreview,
+    redScore: game["redScore"],
+    blueScore: game["blueScore"],
+    roundNum: game["roundNum"],
+    gameNum: game["gameNum"],
+    instance: game["instance"],
+    gameName: game["gameName"],
+    fieldName: game["fieldName"],
+    scheduledTime: DateTime.tryParse(game["scheduledTime"].toString()),
+    startedTime: DateTime.tryParse(game["startedTime"].toString()),
+  );
 }

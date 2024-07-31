@@ -39,6 +39,28 @@ class Team {
       grade: json["grade"],
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      "id": id,
+      "team_name": teamName,
+      "number": teamNumber,
+      "organization": organization,
+      "location": location?.toJson(),
+      "grade": grade,
+    };
+  }
+}
+
+Team loadTeam(team) {
+  return Team(
+    id: team["id"],
+    teamName: team["team_name"],
+    teamNumber: team["number"],
+    organization: team["organization"],
+    location: loadLocation(team["location"]),
+    grade: team["grade"],
+  );
 }
 
 Future<List<Team>> getTeams(int tournamentID) async {
