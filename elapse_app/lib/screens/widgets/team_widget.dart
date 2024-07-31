@@ -52,7 +52,7 @@ class TeamWidget extends StatelessWidget {
         );
       },
       child: Container(
-        height: 60,
+        height: 72,
         child: Flex(
           direction: Axis.horizontal,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
