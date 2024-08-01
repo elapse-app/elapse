@@ -39,7 +39,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(widget.division.teamStats?.isEmpty);
     List<Team> filteredTeams = widget.tournament.teams.where((e) {
       return (e.teamName!.toLowerCase().contains(searchQuery.toLowerCase()) ||
               e.teamNumber!

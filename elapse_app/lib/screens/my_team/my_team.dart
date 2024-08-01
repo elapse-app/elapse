@@ -238,7 +238,6 @@ class _MyTeamsState extends State<MyTeams> {
                             ],
                           );
                         } else if (snapshot.hasError) {
-                          print(snapshot.error);
                           return Container();
                         } else {
                           return Column(
@@ -777,7 +776,6 @@ class _MyTeamsState extends State<MyTeams> {
                       ),
                     );
                   } else if (snapshot.hasError) {
-                    print(snapshot.error);
                     return Container();
                   } else {
                     return const Center(
@@ -825,7 +823,6 @@ class _MyTeamsState extends State<MyTeams> {
                               .toList(),
                         );
                       } else if (snapshot.hasError) {
-                        print(snapshot.error);
                         return Container();
                       } else {
                         return Container();

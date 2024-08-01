@@ -34,7 +34,6 @@ double getCurrentDelay(List<Game> games) {
   while (gameIndex > 0 && count < 5 && iterations < 10) {
     if (games[gameIndex].startedTime != null &&
         games[gameIndex].scheduledTime != null) {
-      print("condition");
       delaySum += games[gameIndex]
           .startedTime!
           .difference(games[gameIndex].scheduledTime!)

@@ -88,19 +88,12 @@ Future<void> updateTournament(Tournament tournament) async {
   await Future.wait(tournamentFutures);
 }
 
-void saveTournament(Tournament tournament) {
-  String json = jsonEncode(tournament.toJson());
-  print(loadTournament(json).name);
-}
-
 Tournament loadTournament(json) {
   List<Division> divisions = [];
   final tournament = jsonDecode(json);
   for (var a in tournament["divisions"]) {
     divisions.add(loadDivision(a));
   }
-
-  print(divisions[0].games);
 
   List<Team> teams = [];
   for (var a in tournament["teams"]) {
@@ -165,13 +158,10 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
     }).toList());
 
     Future<List<Team>> futureTeams = getTeams(tournamentID);
-    print("Getting Teams");
     Map<int, TournamentSkills> skills =
         await getSkillsRankings(tournamentID, futureTeams);
-    print("Getting skills");
 
     List<Team> teams = await futureTeams;
-    print("Got teams");
 
     List<Award> awards = await getTournamentAwards(tournamentID);
 
@@ -204,26 +194,24 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
 Future<Tournament> TMTournamentDetails(
     int tournamentID, SharedPreferences prefs) async {
   Tournament tournament;
-  if (prefs.getString("tournament-$tournamentID") == null) {
+  if (prefs.getString("savedTournament") == null) {
     tournament = await getTournamentDetails(tournamentID);
-    prefs.setString(
-        "tournament-$tournamentID", jsonEncode(tournament.toJson()));
+    prefs.setString("savedTournament", jsonEncode(tournament.toJson()));
     return tournament;
   } else {
-    tournament = loadTournament(prefs.getString("tournament-$tournamentID")!);
+    tournament = loadTournament(prefs.getString("savedTournament")!);
 
-    DateTime? updateTime = DateTime.tryParse(
-        prefs.getString("tournament-$tournamentID-updateTime") ?? "");
+    DateTime? updateTime =
+        DateTime.tryParse(prefs.getString("updateTime") ?? "");
 
     if (updateTime == null || DateTime.now().isAfter(updateTime)) {
       await updateTournament(tournament);
-      prefs.setString("tournament-$tournamentID-updateTime",
+      prefs.setString("updateTime",
           DateTime.now().add(const Duration(minutes: 1)).toIso8601String());
       // Update every minute
     }
 
-    prefs.setString(
-        "tournament-$tournamentID", jsonEncode(tournament.toJson()));
+    prefs.setString("savedTournament", jsonEncode(tournament.toJson()));
     return tournament;
   }
 }

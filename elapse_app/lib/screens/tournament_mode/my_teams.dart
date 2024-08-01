@@ -241,7 +241,6 @@ class TMMyTeamsState extends State<TMMyTeams> {
                             ],
                           );
                         } else if (snapshot.hasError) {
-                          print(snapshot.error);
                           return Container();
                         } else {
                           return Column(
@@ -857,7 +856,6 @@ class TMMyTeamsState extends State<TMMyTeams> {
                       ),
                     );
                   } else if (snapshot.hasError) {
-                    print(snapshot.error);
                     return Container();
                   } else {
                     return const Center(
@@ -905,7 +903,6 @@ class TMMyTeamsState extends State<TMMyTeams> {
                               .toList(),
                         );
                       } else if (snapshot.hasError) {
-                        print(snapshot.error);
                         return Container();
                       } else {
                         return Container();
