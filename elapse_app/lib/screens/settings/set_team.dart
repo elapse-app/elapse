@@ -48,6 +48,13 @@ class _SetMainTeamState extends State<SetMainTeam> {
                   const SizedBox(
                     height: 50,
                   ),
+                  IconButton(
+                      padding: EdgeInsets.only(right: 10, bottom: 10, top: 10),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      highlightColor: Colors.transparent,
+                      icon: Icon(Icons.arrow_back, size: 48)),
                   const Text(
                     "Set your Main Team",
                     style: TextStyle(
