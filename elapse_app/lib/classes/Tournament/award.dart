@@ -1,5 +1,4 @@
 import 'package:elapse_app/classes/Team/teamPreview.dart';
-import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
 import 'package:elapse_app/extras/token.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -99,7 +98,7 @@ Future<List<Award>> getAwards(int teamID, int seasonID) async {
     Uri.parse(
         "https://www.robotevents.com/api/v2/teams/$teamID/awards?season%5B%5D=$seasonID&per_page=250"),
     headers: {
-      HttpHeaders.authorizationHeader: TOKEN,
+      HttpHeaders.authorizationHeader: getToken(),
     },
   );
 
@@ -114,7 +113,7 @@ Future<List<Award>> getTournamentAwards(int tournamentID) async {
   final response = await http.get(
     Uri.parse("https://www.robotevents.com/api/v2/events/$tournamentID/awards"),
     headers: {
-      HttpHeaders.authorizationHeader: TOKEN,
+      HttpHeaders.authorizationHeader: getToken(),
     },
   );
 

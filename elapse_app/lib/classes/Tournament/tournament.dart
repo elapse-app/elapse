@@ -11,6 +11,8 @@ import 'package:elapse_app/extras/token.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class Tournament {
   int id;
 
@@ -137,7 +139,7 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
   final response = await http.get(
     Uri.parse("https://www.robotevents.com/api/v2/events/$tournamentID"),
     headers: {
-      HttpHeaders.authorizationHeader: TOKEN,
+      HttpHeaders.authorizationHeader: getToken(),
     },
   );
 
@@ -196,5 +198,34 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
     );
   } catch (e) {
     throw (e);
+  }
+}
+
+Future<Tournament> TMTournamentDetails(
+    int tournamentID, SharedPreferences prefs) async {
+  Tournament tournament;
+  if (prefs.getString("tournament-$tournamentID") == null) {
+    tournament = await getTournamentDetails(tournamentID);
+    prefs.setString(
+        "tournament-$tournamentID", jsonEncode(tournament.toJson()));
+    return tournament;
+  } else {
+    tournament = loadTournament(prefs.getString("tournament-$tournamentID")!);
+
+    DateTime? updateTime = DateTime.tryParse(
+        prefs.getString("tournament-$tournamentID-updateTime") ?? "");
+
+    print(DateTime.now().difference(updateTime!));
+
+    if (updateTime == null || DateTime.now().isAfter(updateTime)) {
+      await updateTournament(tournament);
+      prefs.setString("tournament-$tournamentID-updateTime",
+          DateTime.now().add(const Duration(minutes: 1)).toIso8601String());
+      // Update every minute
+    }
+
+    prefs.setString(
+        "tournament-$tournamentID", jsonEncode(tournament.toJson()));
+    return tournament;
   }
 }

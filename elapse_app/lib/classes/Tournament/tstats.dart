@@ -89,7 +89,7 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
     Uri.parse(
         "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/rankings?per_page=250"),
     headers: {
-      HttpHeaders.authorizationHeader: TOKEN,
+      HttpHeaders.authorizationHeader: getToken(),
     },
   ).then((rankingsResponse) {
     rankings = rankingsResponse;
@@ -131,7 +131,7 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
         Uri.parse(
             "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/rankings?page=$pg"),
         headers: {
-          HttpHeaders.authorizationHeader: TOKEN,
+          HttpHeaders.authorizationHeader: getToken(),
         }).then((pgResponse) {
       if (pgResponse.statusCode != 200) {
         throw Exception("Failed to get rankings page $pg");

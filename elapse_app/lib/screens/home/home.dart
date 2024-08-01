@@ -31,6 +31,14 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<List<TournamentPreview>>? tournaments;
   @override
   Widget build(BuildContext context) {
+    String welcomeMessage = "Good Afternoon";
+    if (DateTime.now().hour < 12) {
+      welcomeMessage = "Good Morning";
+    } else if (DateTime.now().hour < 18) {
+      welcomeMessage = "Good Afternoon";
+    } else {
+      welcomeMessage = "Good Evening";
+    }
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
@@ -48,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     Spacer(),
                     Text(
-                      "Good Afternoon",
+                      welcomeMessage,
                       style:
                           TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
                     ),

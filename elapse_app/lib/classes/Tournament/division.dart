@@ -38,17 +38,20 @@ Division loadDivision(division) {
     }
   }
 
-  Map<String, dynamic> stringedTeamStats = division["teamStats"];
+  Map<String, dynamic>? stringedTeamStats = division["teamStats"];
+  Map<int, TeamStats>? teamStats = null;
 
-  Map<int, TeamStats>? teamStats = stringedTeamStats.map((key, value) {
-    return MapEntry(int.parse(key), loadTeamStats(value));
-  });
+  if (stringedTeamStats != null) {
+    teamStats = stringedTeamStats.map((key, value) {
+      return MapEntry(int.parse(key), loadTeamStats(value));
+    });
+  }
 
   return Division(
     id: division["id"],
     name: division["name"],
     order: division["order"],
     games: games,
-    // teamStats: teamStats,
+    teamStats: teamStats,
   );
 }

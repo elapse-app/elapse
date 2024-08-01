@@ -43,7 +43,7 @@ Future<List<TeamPreview>> fetchTeamPreview(String searchQuery) async {
     Uri.parse(
         'https://www.robotevents.com/api/v2/teams?number%5B%5D=$searchQuery&program%5B%5D=1&program%5B%5D=4&myTeams=false'),
     headers: {
-      HttpHeaders.authorizationHeader: TOKEN,
+      HttpHeaders.authorizationHeader: getToken(),
     },
   ).then((response) {
     if (response.statusCode == 200) {

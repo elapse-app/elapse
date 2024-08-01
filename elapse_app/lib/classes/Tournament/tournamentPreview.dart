@@ -62,7 +62,7 @@ Future<List<TournamentPreview>> fetchTeamTournaments(
     Uri.parse(
         "https://www.robotevents.com/api/v2/teams/$teamId/events?season%5B%5D=$seasonID&per_page=250"),
     headers: {
-      HttpHeaders.authorizationHeader: TOKEN,
+      HttpHeaders.authorizationHeader: getToken(),
     },
   );
 
@@ -125,7 +125,7 @@ Future<TournamentPreview?> itemParse(String? item) async {
     Uri.parse(
         "https://www.robotevents.com/api/v2/events?sku%5B%5D=$eventCode&myEvents=false"),
     headers: {
-      HttpHeaders.authorizationHeader: TOKEN,
+      HttpHeaders.authorizationHeader: getToken(),
     },
   );
 

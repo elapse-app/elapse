@@ -155,7 +155,7 @@ Future<List<Game>> _fetchDivisionMatches(int eventId, divisionID) async {
     Uri.parse(
         "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionID/matches?per_page=250"),
     headers: {
-      HttpHeaders.authorizationHeader: TOKEN,
+      HttpHeaders.authorizationHeader: getToken(),
     },
   );
 
@@ -187,7 +187,7 @@ Future<void> _fetchAdditionalPage(
     Uri.parse(
         "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/matches?page=$page&per_page=250"),
     headers: {
-      HttpHeaders.authorizationHeader: TOKEN,
+      HttpHeaders.authorizationHeader: getToken(),
     },
   );
 
