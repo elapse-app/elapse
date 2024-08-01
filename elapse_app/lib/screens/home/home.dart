@@ -1,6 +1,7 @@
 import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/providers/tournament_mode_provider.dart';
+import 'package:elapse_app/screens/settings/settings.dart';
 import 'package:elapse_app/screens/tournament/tournament.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.teamID, required this.prefs});
@@ -72,9 +74,23 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Spacer(),
-                          SettingsButton(
-                            prefs: widget.prefs,
-                          ),
+                          IconButton(
+                            icon: const Icon(
+                              Icons.settings,
+                              weight: 0.1,
+                            ),
+                            iconSize: 30,
+                            color: Theme.of(context).colorScheme.onSurface,
+                            onPressed: () {
+                              Navigator.of(context, rootNavigator: true).push(
+                                MaterialPageRoute(
+                                  builder: (context) => SettingsScreen(
+                                    prefs: widget.prefs,
+                                  ),
+                                ),
+                              );
+                            },
+                          )
                         ],
                       ),
                     ],

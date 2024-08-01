@@ -22,10 +22,18 @@ class _ThemeSettingsState extends State<ThemeSettings> {
         child: SafeArea(
           child: Center(
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(
                   height: 50,
                 ),
+                IconButton(
+                    padding: EdgeInsets.only(right: 10, bottom: 10, top: 10),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    highlightColor: Colors.transparent,
+                    icon: Icon(Icons.arrow_back, size: 48)),
                 const Text(
                   "Set your Theme",
                   style: TextStyle(
@@ -165,17 +173,23 @@ class _ThemeSettingsState extends State<ThemeSettings> {
                 SizedBox(
                   height: 60,
                 ),
-                TextButton(
-                    style: ButtonStyle(
-                        foregroundColor: WidgetStateProperty.all(
-                            Theme.of(context).colorScheme.secondary)),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text(
-                      "Save theme",
-                      style: TextStyle(fontSize: 18),
-                    ))
+                Row(
+                  children: [
+                    Spacer(),
+                    TextButton(
+                        style: ButtonStyle(
+                            foregroundColor: WidgetStateProperty.all(
+                                Theme.of(context).colorScheme.secondary)),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Text(
+                          "Save theme",
+                          style: TextStyle(fontSize: 18),
+                        )),
+                    Spacer(),
+                  ],
+                )
               ],
             ),
           ),
