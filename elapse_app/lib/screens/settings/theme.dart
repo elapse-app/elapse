@@ -173,7 +173,7 @@ class _ThemeSettingsState extends State<ThemeSettings> {
                         foregroundColor: WidgetStateProperty.all(
                             Theme.of(context).colorScheme.secondary)),
                     onPressed: () {
-                      myAppKey.currentState!.reloadApp();
+                      Navigator.pop(context);
                     },
                     child: const Text(
                       "Save theme",

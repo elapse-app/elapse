@@ -80,9 +80,11 @@ class MyAppState extends State<MyApp> {
     if (widget.prefs.getBool("isTournamentMode") ?? false) {
       int? tournamentID = widget.prefs.getInt("tournamentID");
       if (tournamentID != null) {
-        tmTournament = getTournamentDetails(tournamentID);
+        tmTournament = TMTournamentDetails(tournamentID, widget.prefs);
         isTournamentMode = true;
       }
+    } else {
+      isTournamentMode = false;
     }
   }
 
@@ -103,6 +105,7 @@ class MyAppState extends State<MyApp> {
         ? screens = [
             TMHomePage(
               tournament: tmTournament,
+              tournamentID: widget.prefs.getInt("tournamentID"),
               teamID: teamID,
               teamNumber: teamNumber,
               prefs: widget.prefs,

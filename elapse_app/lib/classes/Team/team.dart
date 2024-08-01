@@ -69,7 +69,7 @@ Future<List<Team>> getTeams(int tournamentID) async {
     Uri.parse(
         "https://www.robotevents.com/api/v2/events/$tournamentID/teams?per_page=250"),
     headers: {
-      HttpHeaders.authorizationHeader: TOKEN,
+      HttpHeaders.authorizationHeader: getToken(),
     },
   );
 
@@ -98,7 +98,7 @@ Future<void> _fetchAdditionalTeams(
     Uri.parse(
         "https://www.robotevents.com/api/v2/events/$tournamentID/teams?page=$page&per_page=250"),
     headers: {
-      HttpHeaders.authorizationHeader: TOKEN,
+      HttpHeaders.authorizationHeader: getToken(),
     },
   );
 
@@ -115,7 +115,7 @@ Future<Team> fetchTeam(int teamId) async {
   final response = await http.get(
     Uri.parse("https://www.robotevents.com/api/v2/teams/$teamId"),
     headers: {
-      HttpHeaders.authorizationHeader: TOKEN,
+      HttpHeaders.authorizationHeader: getToken(),
     },
   );
 

@@ -55,7 +55,7 @@ Future<Map<int, TournamentSkills>> getSkillsRankings(
     Uri.parse(
         "https://www.robotevents.com/api/v2/events/$eventId/skills?per_page=250"),
     headers: {
-      HttpHeaders.authorizationHeader: TOKEN,
+      HttpHeaders.authorizationHeader: getToken(),
     },
   ).then((s) {
     skills = s;
@@ -94,7 +94,7 @@ Future<Map<int, TournamentSkills>> getSkillsRankings(
         Uri.parse(
             "https://www.robotevents.com/api/v2/events/$eventId/skills?page=$pg&per_page=250"),
         headers: {
-          HttpHeaders.authorizationHeader: TOKEN,
+          HttpHeaders.authorizationHeader: getToken(),
         }).then((pgResponse) {
       if (pgResponse.statusCode != 200) {
         throw Exception("Failed to get skills page $pg");

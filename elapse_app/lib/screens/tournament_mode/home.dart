@@ -2,6 +2,7 @@ import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
+import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/main/search_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:elapse_app/screens/tournament_mode/widgets/next_game.dart';
@@ -15,10 +16,12 @@ class TMHomePage extends StatefulWidget {
   const TMHomePage(
       {super.key,
       required this.tournament,
+      required this.tournamentID,
       required this.teamID,
       required this.teamNumber,
       required this.prefs});
   final Future<Tournament>? tournament;
+  final int tournamentID;
   final int teamID;
   final String teamNumber;
   final SharedPreferences prefs;
@@ -30,6 +33,14 @@ class TMHomePage extends StatefulWidget {
 class _TMHomePageState extends State<TMHomePage> {
   @override
   Widget build(BuildContext context) {
+    String welcomeMessage = "Good Afternoon";
+    if (DateTime.now().hour < 12) {
+      welcomeMessage = "Good Morning";
+    } else if (DateTime.now().hour < 18) {
+      welcomeMessage = "Good Afternoon";
+    } else {
+      welcomeMessage = "Good Evening";
+    }
     String imageString =
         Theme.of(context).colorScheme.brightness == Brightness.dark
             ? "assets/dg4x.png"
@@ -55,10 +66,27 @@ class _TMHomePageState extends State<TMHomePage> {
                     child: Column(
                       children: [
                         const Spacer(),
-                        const Text(
-                          "Good Afternoon",
-                          style: TextStyle(
-                              fontSize: 30, fontWeight: FontWeight.w600),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            const Text(
+                              "Good Afternoon",
+                              style: TextStyle(
+                                  fontSize: 30, fontWeight: FontWeight.w600),
+                            ),
+                            IconButton(
+                              padding: EdgeInsets.only(left: 10, top: 10),
+                              constraints: BoxConstraints(),
+                              icon: Icon(
+                                Icons.refresh_rounded,
+                                size: 30,
+                              ),
+                              onPressed: () {
+                                myAppKey.currentState!.reloadApp();
+                              },
+                            )
+                          ],
                         ),
                         SizedBox(
                           height: sizedBoxHeight,
@@ -386,6 +414,32 @@ class _TMHomePageState extends State<TMHomePage> {
               }
             },
           ),
+          SliverToBoxAdapter(
+            child: SizedBox(
+              height: 15,
+            ),
+          ),
+          SliverToBoxAdapter(
+              child: Row(
+            children: [
+              TextButton(
+                  style: ButtonStyle(
+                      padding: WidgetStateProperty.all(
+                          EdgeInsets.symmetric(horizontal: 23))),
+                  child: Text(
+                    "Exit Tournament Mode",
+                    style: TextStyle(
+                        fontSize: 16,
+                        color: Theme.of(context).colorScheme.secondary),
+                  ),
+                  onPressed: () {
+                    widget.prefs.setBool("isTournamentMode", false);
+                    widget.prefs.remove("tournament-${widget.tournamentID}");
+                    myAppKey.currentState!.reloadApp();
+                  }),
+              Spacer(),
+            ],
+          )),
         ],
       ),
     );
