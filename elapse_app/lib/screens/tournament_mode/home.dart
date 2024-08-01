@@ -76,7 +76,7 @@ class _TMHomePageState extends State<TMHomePage> {
                                   fontSize: 30, fontWeight: FontWeight.w600),
                             ),
                             IconButton(
-                              padding: EdgeInsets.only(left: 10, top: 10),
+                              padding: EdgeInsets.zero,
                               constraints: BoxConstraints(),
                               icon: Icon(
                                 Icons.refresh_rounded,
