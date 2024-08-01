@@ -17,8 +17,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 class TournamentLoadedScreen extends StatefulWidget {
   final Tournament tournament;
   final bool isPreview;
-  const TournamentLoadedScreen(
-      {super.key, required this.tournament, this.isPreview = false});
+  const TournamentLoadedScreen({
+    super.key,
+    required this.tournament,
+    this.isPreview = false,
+  });
 
   @override
   State<TournamentLoadedScreen> createState() => _TournamentLoadedScreenState();
@@ -221,7 +224,6 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                             },
                           ),
                           const Spacer(),
-                          const SettingsButton()
                         ],
                       ),
                     ],

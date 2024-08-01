@@ -92,10 +92,10 @@ class TMMyTeamsState extends State<TMMyTeams> {
             automaticallyImplyLeading: false,
             expandedHeight: 125,
             centerTitle: false,
-            flexibleSpace: const FlexibleSpaceBar(
+            flexibleSpace: FlexibleSpaceBar(
               expandedTitleScale: 1,
               collapseMode: CollapseMode.parallax,
-              title: Padding(
+              title: const Padding(
                 padding: EdgeInsets.only(left: 20, right: 12),
                 child: Text(
                   "My Teams",
@@ -103,7 +103,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                 ),
               ),
               centerTitle: false,
-              background: const SafeArea(
+              background: SafeArea(
                 child: Padding(
                   padding: EdgeInsets.only(left: 20, right: 12, bottom: 20),
                   child: Column(
@@ -114,7 +114,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Spacer(),
-                          SettingsButton(),
+                          SettingsButton(prefs: widget.prefs),
                         ],
                       ),
                     ],

@@ -4,14 +4,17 @@ import 'package:elapse_app/screens/tournament/pages/main/loaded.dart';
 import 'package:elapse_app/screens/tournament/pages/main/loading.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TMTournamentScreen extends StatefulWidget {
   final int tournamentID;
   final bool isPreview;
   final Future<Tournament>? tournamentFuture;
+  final SharedPreferences prefs;
   const TMTournamentScreen(
       {super.key,
       required this.tournamentID,
+      required this.prefs,
       this.isPreview = true,
       this.tournamentFuture});
 

@@ -28,7 +28,7 @@ void main() async {
   ]);
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.remove("savedTeam");
+  // prefs.remove("savedTeam");
 
   // Set android system navbar colour
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -105,10 +105,12 @@ class MyAppState extends State<MyApp> {
               tournament: tmTournament,
               teamID: teamID,
               teamNumber: teamNumber,
+              prefs: widget.prefs,
             ),
             TMTournamentScreen(
                 tournamentID: widget.prefs.getInt("tournamentID"),
                 isPreview: false,
+                prefs: widget.prefs,
                 tournamentFuture: tmTournament),
             TMMyTeams(prefs: widget.prefs, tournament: tmTournament),
             ExploreScreen(prefs: widget.prefs)

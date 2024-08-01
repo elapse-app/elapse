@@ -43,7 +43,7 @@ class TournamentLoadingScreen extends StatelessWidget {
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [Spacer(), SettingsButton()],
+                        children: [Spacer()],
                       ),
                     ],
                   ),

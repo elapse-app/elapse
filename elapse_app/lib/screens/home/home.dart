@@ -5,6 +5,7 @@ import 'package:elapse_app/providers/tournament_mode_provider.dart';
 import 'package:elapse_app/screens/tournament/tournament.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/settings/settings.dart';
+import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -38,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
             automaticallyImplyLeading: false,
             expandedHeight: 120,
             centerTitle: false,
-            flexibleSpace: const FlexibleSpaceBar(
+            flexibleSpace: FlexibleSpaceBar(
               expandedTitleScale: 1,
               collapseMode: CollapseMode.parallax,
               title: Padding(
@@ -52,6 +53,26 @@ class _HomeScreenState extends State<HomeScreen> {
                           TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
                     ),
                   ],
+                ),
+              ),
+              background: SafeArea(
+                child: Padding(
+                  padding: EdgeInsets.only(left: 20, right: 12, bottom: 20),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Spacer(),
+                          SettingsButton(
+                            prefs: widget.prefs,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
               centerTitle: false,
