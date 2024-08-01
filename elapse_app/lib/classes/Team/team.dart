@@ -120,7 +120,6 @@ Future<Team> fetchTeam(int teamId) async {
   );
 
   final parsed = (jsonDecode(response.body));
-  print(parsed);
   final parsedLocation = parsed["location"];
   String teamName = parsed["team_name"];
   String teamNumber = parsed["number"];

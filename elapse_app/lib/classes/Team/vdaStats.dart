@@ -104,7 +104,6 @@ Future<List<VDAStats>> getTrueSkillData() async {
   if (vdaData == null ||
       expiryDate == null ||
       DateTime.parse(expiryDate).isBefore(DateTime.now())) {
-    print("getting new data");
     final response = await http.get(
       Uri.parse("https://vrc-data-analysis.com/v1/allteams"),
     );
@@ -115,7 +114,6 @@ Future<List<VDAStats>> getTrueSkillData() async {
         "vdaExpiry", DateTime.now().add(const Duration(hours: 2)).toString());
     parsed = jsonDecode(response.body) as List;
   } else {
-    print("getting cached data");
     parsed = jsonDecode(vdaData) as List;
   }
 

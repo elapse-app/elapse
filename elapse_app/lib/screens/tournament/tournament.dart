@@ -50,7 +50,6 @@ class _TournamentScreenState extends State<TournamentScreen> {
             isPreview: widget.isPreview,
           );
         } else {
-          print(snapshot.error);
           return const Center(
             child: Text("Failed to load tournament details"),
           );

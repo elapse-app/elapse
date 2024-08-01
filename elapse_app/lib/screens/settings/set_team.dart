@@ -27,6 +27,7 @@ class _SetMainTeamState extends State<SetMainTeam> {
   void saveTeam(TeamPreview team) {
     widget.prefs.setString("savedTeam",
         '{"teamID": ${team.teamID}, "teamNumber": "${team.teamNumber}"}');
+    widget.prefs.setBool("isTournamentMode", false);
     myAppKey.currentState!.reloadApp();
     Navigator.pop(
       context,

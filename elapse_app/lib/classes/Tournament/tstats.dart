@@ -126,7 +126,6 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
   List<Future<void>> pgFutures = [];
   int teamsLastPage = jsonDecode(rankings.body)["meta"]["last_page"];
   for (int pg = 2; pg <= teamsLastPage; pg++) {
-    print("getting additional rankings");
     Future<void> pgResponse = http.get(
         Uri.parse(
             "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/rankings?page=$pg"),

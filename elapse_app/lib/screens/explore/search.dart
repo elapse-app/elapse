@@ -217,7 +217,6 @@ class _ExploreSearchState extends State<ExploreSearch>
                                                                     milliseconds:
                                                                         250),
                                                             context: context);
-                                                    print(result);
                                                     setState(() {
                                                       filters = result;
                                                       tournamentSearch =

@@ -163,7 +163,6 @@ Future<List<Game>> _fetchDivisionMatches(int eventId, divisionID) async {
     final parsed = jsonDecode(response.body)["data"] as List;
     divisionMatches = parsed.map<Game>((json) => Game.fromJson(json)).toList();
   } else {
-    print("status code was not 200");
     throw Exception("Failed to load schedule");
   }
 
@@ -208,8 +207,6 @@ Game loadGame(game) {
 
   List<TeamPreview> blueAlliancePreview =
       game["blueAlliancePreview"].map<TeamPreview>((e) {
-    print(e["teamNumber"]);
-    print(e["teamID"]);
     return TeamPreview(teamNumber: e["teamNumber"], teamID: e["teamID"]);
   }).toList() as List<TeamPreview>;
   return Game(
