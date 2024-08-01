@@ -318,11 +318,6 @@ class TMMyTeamsState extends State<TMMyTeams> {
               ),
             ),
           ),
-          const SliverToBoxAdapter(
-            child: SizedBox(
-              height: 25,
-            ),
-          ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 23),
             sliver: SliverToBoxAdapter(
@@ -342,52 +337,56 @@ class TMMyTeamsState extends State<TMMyTeams> {
                       if (tournament.divisions[0].games?.isEmpty ?? true) {
                         return Container();
                       }
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "This Tournament",
-                            style: TextStyle(fontSize: 24),
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          RankingOverviewWidget(
-                              teamStats: tournament.divisions[0]
-                                  .teamStats![selectedTeamPreview.teamID]!,
-                              skills: tournament.tournamentSkills!,
-                              teamID: selectedTeamPreview.teamID),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Column(
-                            children: getTeamGames(
-                                    tournament.divisions[0].games!,
-                                    selectedTeamPreview.teamNumber)
-                                .map(
-                              (e) {
-                                return Column(
-                                  children: [
-                                    GameWidget(
-                                      game: e,
-                                      rankings:
-                                          tournament.divisions[0].teamStats!,
-                                      games: tournament.divisions[0].games!,
-                                      skills: tournament.tournamentSkills!,
-                                      teamName: selectedTeamPreview.teamNumber,
-                                      isAllianceColoured: false,
-                                    ),
-                                    Divider(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .surfaceDim,
-                                    )
-                                  ],
-                                );
-                              },
-                            ).toList(),
-                          )
-                        ],
+                      return Container(
+                        margin: EdgeInsets.only(top: 25),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "This Tournament",
+                              style: TextStyle(fontSize: 24),
+                            ),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            RankingOverviewWidget(
+                                teamStats: tournament.divisions[0]
+                                    .teamStats![selectedTeamPreview.teamID]!,
+                                skills: tournament.tournamentSkills!,
+                                teamID: selectedTeamPreview.teamID),
+                            SizedBox(
+                              height: 10,
+                            ),
+                            Column(
+                              children: getTeamGames(
+                                      tournament.divisions[0].games!,
+                                      selectedTeamPreview.teamNumber)
+                                  .map(
+                                (e) {
+                                  return Column(
+                                    children: [
+                                      GameWidget(
+                                        game: e,
+                                        rankings:
+                                            tournament.divisions[0].teamStats!,
+                                        games: tournament.divisions[0].games!,
+                                        skills: tournament.tournamentSkills!,
+                                        teamName:
+                                            selectedTeamPreview.teamNumber,
+                                        isAllianceColoured: false,
+                                      ),
+                                      Divider(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surfaceDim,
+                                      )
+                                    ],
+                                  );
+                                },
+                              ).toList(),
+                            )
+                          ],
+                        ),
                       );
                     } else {
                       return Container();
