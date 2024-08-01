@@ -34,15 +34,15 @@ class GameWidget extends StatelessWidget {
     if (game.startedTime != null) {
       time = DateFormat.Hm().format(game.startedTime!.toLocal());
     }
-    if (game.scheduledTime != null || game.startedTime == null) {
+    if (game.scheduledTime != null && game.startedTime == null) {
       DateTime start;
       if (useLiveTiming == true) {
-        start = game.startedTime!
+        start = game.scheduledTime!
             .toLocal()
             .add(Duration(minutes: getCurrentDelay(games).toInt()));
         time = DateFormat.Hm().format(start);
       } else {
-        start = game.startedTime!.toLocal();
+        start = game.scheduledTime!.toLocal();
         time = DateFormat.Hm().format(start);
       }
     }

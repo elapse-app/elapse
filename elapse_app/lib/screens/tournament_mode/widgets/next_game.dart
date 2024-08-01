@@ -28,6 +28,14 @@ class NextGame extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String timeString;
+    if (game.startedTime != null) {
+      timeString = DateFormat.Hm().format(game.startedTime!.toLocal());
+    } else if (game.scheduledTime != null && game.startedTime == null) {
+      timeString = DateFormat.Hm().format(game.scheduledTime!.toLocal());
+    } else {
+      timeString = "No Time";
+    }
     Color backgroundColor = Theme.of(context).colorScheme.tertiary;
 
     ColorPallete colorPallete;
@@ -104,7 +112,7 @@ class NextGame extends StatelessWidget {
                       style: TextStyle(
                           fontSize: 24,
                           fontWeight: e.teamNumber == targetTeam?.teamNumber
-                              ? FontWeight.w500
+                              ? FontWeight.w600
                               : FontWeight.normal),
                     );
                   }).toList(),
@@ -117,7 +125,7 @@ class NextGame extends StatelessWidget {
                       style: TextStyle(
                           fontSize: 24,
                           fontWeight: e.teamNumber == targetTeam?.teamNumber
-                              ? FontWeight.w500
+                              ? FontWeight.w600
                               : FontWeight.normal),
                     );
                   }).toList(),
@@ -147,7 +155,7 @@ class NextGame extends StatelessWidget {
                 ),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(
-                    DateFormat("h:mm a").format(game.scheduledTime!.toLocal()),
+                    timeString,
                     style: TextStyle(
                       fontSize: 24,
                     ),

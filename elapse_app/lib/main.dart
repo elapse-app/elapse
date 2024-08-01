@@ -10,7 +10,10 @@ import 'package:elapse_app/screens/home/home.dart';
 import 'package:elapse_app/screens/my_team/my_team.dart';
 import 'package:elapse_app/screens/tournament/tournament.dart';
 import 'package:elapse_app/screens/tournament_mode/home.dart';
+import 'package:elapse_app/screens/tournament_mode/my_teams.dart';
 import 'package:elapse_app/screens/tournament_mode/tournament.dart';
+import 'package:elapse_app/setup/first_page.dart';
+import 'package:elapse_app/setup/setup.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
@@ -25,8 +28,7 @@ void main() async {
   ]);
 
   SharedPreferences prefs = await SharedPreferences.getInstance();
-  prefs.setString("savedTeam", '{"teamID": 161877, "teamNumber": "16868C"}');
-  prefs.remove("isTournamentMode");
+  prefs.remove("savedTeam");
 
   // Set android system navbar colour
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -43,7 +45,9 @@ void main() async {
         ),
         ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
       ],
-      child: MyApp(key: myAppKey, prefs: prefs),
+      child: prefs.getString("savedTeam") == null
+          ? SetupScreen(prefs: prefs)
+          : MyApp(key: myAppKey, prefs: prefs),
     ),
   );
 }
@@ -61,10 +65,12 @@ class MyAppState extends State<MyApp> {
   int selectedIndex = 0;
   bool isTournamentMode = false;
   late int teamID;
+  late String teamNumber;
 
   void initState() {
     super.initState();
     teamID = jsonDecode(widget.prefs.getString("savedTeam"))["teamID"];
+    teamNumber = jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"];
     initializeTournamentMode();
   }
 
@@ -74,7 +80,7 @@ class MyAppState extends State<MyApp> {
     if (widget.prefs.getBool("isTournamentMode") ?? false) {
       int? tournamentID = widget.prefs.getInt("tournamentID");
       if (tournamentID != null) {
-        tmTournament = getTournamentDetails(52543);
+        tmTournament = getTournamentDetails(tournamentID);
         isTournamentMode = true;
       }
     }
@@ -98,12 +104,13 @@ class MyAppState extends State<MyApp> {
             TMHomePage(
               tournament: tmTournament,
               teamID: teamID,
+              teamNumber: teamNumber,
             ),
             TMTournamentScreen(
                 tournamentID: widget.prefs.getInt("tournamentID"),
                 isPreview: false,
                 tournamentFuture: tmTournament),
-            MyTeams(prefs: widget.prefs),
+            TMMyTeams(prefs: widget.prefs, tournament: tmTournament),
             ExploreScreen(prefs: widget.prefs)
           ]
         : screens = [
