@@ -43,7 +43,7 @@ class _HomeScreenState extends State<HomeScreen> {
         slivers: [
           SliverAppBar.large(
             automaticallyImplyLeading: false,
-            expandedHeight: 120,
+            expandedHeight: 125,
             centerTitle: false,
             flexibleSpace: FlexibleSpaceBar(
               expandedTitleScale: 1,
@@ -215,7 +215,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                                     widget.prefs.setInt(
                                                         "tournamentID",
                                                         upcoming.id);
-
                                                     myAppKey.currentState!
                                                         .reloadApp();
 

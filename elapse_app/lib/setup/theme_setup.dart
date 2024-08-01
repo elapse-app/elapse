@@ -171,10 +171,12 @@ class _ThemeSetupState extends State<ThemeSetup> {
                         foregroundColor: WidgetStateProperty.all(
                             Theme.of(context).colorScheme.secondary)),
                     onPressed: () {
+                      widget.prefs.setBool("needsReload", true);
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                           builder: (context) => MyApp(
+                            key: myAppKey,
                             prefs: widget.prefs,
                           ),
                         ),

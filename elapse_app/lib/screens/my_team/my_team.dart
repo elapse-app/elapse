@@ -316,7 +316,7 @@ class _MyTeamsState extends State<MyTeams> {
             ),
           ),
           const SliverToBoxAdapter(
-            child: SizedBox(height: 28),
+            child: SizedBox(height: 25),
           ),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 23),
