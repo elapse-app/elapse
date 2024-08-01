@@ -3,6 +3,7 @@ import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/screens/tournament/pages/main/loaded.dart';
 import 'package:elapse_app/screens/tournament/pages/main/loading.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TournamentScreen extends StatefulWidget {
   final int tournamentID;

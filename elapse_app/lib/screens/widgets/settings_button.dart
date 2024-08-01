@@ -1,8 +1,10 @@
 import 'package:elapse_app/screens/settings/settings.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsButton extends StatelessWidget {
-  const SettingsButton({super.key});
+  const SettingsButton({super.key, required this.prefs});
+  final SharedPreferences prefs;
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +18,9 @@ class SettingsButton extends StatelessWidget {
       onPressed: () {
         Navigator.of(context, rootNavigator: true).push(
           MaterialPageRoute(
-            builder: (context) => const SettingsScreen(),
+            builder: (context) => SettingsScreen(
+              prefs: prefs,
+            ),
           ),
         );
       },

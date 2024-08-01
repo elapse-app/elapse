@@ -9,16 +9,19 @@ import 'package:elapse_app/screens/tournament_mode/widgets/ranking_overview_widg
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TMHomePage extends StatefulWidget {
   const TMHomePage(
       {super.key,
       required this.tournament,
       required this.teamID,
-      required this.teamNumber});
+      required this.teamNumber,
+      required this.prefs});
   final Future<Tournament>? tournament;
   final int teamID;
   final String teamNumber;
+  final SharedPreferences prefs;
 
   @override
   State<TMHomePage> createState() => _TMHomePageState();
@@ -66,8 +69,7 @@ class _TMHomePageState extends State<TMHomePage> {
                   centerTitle: false,
                   background: SafeArea(
                     child: Padding(
-                      padding: const EdgeInsets.only(
-                          left: 20, right: 12, bottom: 10),
+                      padding: EdgeInsets.only(left: 20, right: 12, bottom: 10),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,7 +82,9 @@ class _TMHomePageState extends State<TMHomePage> {
                               ),
                               Image(image: AssetImage(imageString), height: 25),
                               const Spacer(),
-                              const SettingsButton()
+                              SettingsButton(
+                                prefs: widget.prefs,
+                              )
                             ],
                           ),
                           Padding(

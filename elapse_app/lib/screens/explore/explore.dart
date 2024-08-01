@@ -19,10 +19,10 @@ class ExploreScreen extends StatelessWidget {
             automaticallyImplyLeading: false,
             expandedHeight: 125,
             centerTitle: false,
-            flexibleSpace: const FlexibleSpaceBar(
+            flexibleSpace: FlexibleSpaceBar(
               expandedTitleScale: 1,
               collapseMode: CollapseMode.parallax,
-              title: Padding(
+              title: const Padding(
                 padding: EdgeInsets.only(left: 20, right: 12),
                 child: Text(
                   "Explore",
@@ -41,7 +41,9 @@ class ExploreScreen extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Spacer(),
-                          SettingsButton(),
+                          SettingsButton(
+                            prefs: prefs,
+                          ),
                         ],
                       ),
                     ],
