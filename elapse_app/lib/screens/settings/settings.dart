@@ -1,7 +1,6 @@
 import 'package:elapse_app/screens/settings/theme.dart';
 import 'package:elapse_app/screens/settings/set_team.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
-import 'package:elapse_app/setup/theme_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 

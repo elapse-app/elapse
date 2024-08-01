@@ -1,4 +1,3 @@
-import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/setup/theme_setup.dart';
@@ -39,18 +38,6 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
   @override
   Widget build(BuildContext context) {
     return Consumer<ColorProvider>(builder: (context, colorProvider, snapshot) {
-      bool systemDefined = false;
-      ColorScheme systemTheme =
-          MediaQuery.of(context).platformBrightness == Brightness.dark
-              ? darkScheme
-              : lightScheme;
-
-      if (widget.prefs.getString("theme") == "system") {
-        systemDefined = true;
-      }
-
-      ColorScheme chosenTheme =
-          systemDefined ? systemTheme : colorProvider.colorScheme;
       return Scaffold(
         body: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 23.0),
