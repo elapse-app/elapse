@@ -1,6 +1,7 @@
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
+import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
 import 'package:elapse_app/screens/tournament/pages/main/search_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:elapse_app/screens/tournament_mode/widgets/next_game.dart';
@@ -10,9 +11,14 @@ import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
 
 class TMHomePage extends StatefulWidget {
-  const TMHomePage({super.key, required this.tournament, required this.teamID});
+  const TMHomePage(
+      {super.key,
+      required this.tournament,
+      required this.teamID,
+      required this.teamNumber});
   final Future<Tournament>? tournament;
   final int teamID;
+  final String teamNumber;
 
   @override
   State<TMHomePage> createState() => _TMHomePageState();
@@ -188,18 +194,60 @@ class _TMHomePageState extends State<TMHomePage> {
             future: widget.tournament,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
+                if (snapshot.data!.divisions[0].games!.isEmpty) {
+                  return SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 23),
+                      child: Container(
+                          padding: EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.tertiary,
+                              borderRadius: BorderRadius.circular(18)),
+                          child: Text(
+                            "No games currently available",
+                            style: TextStyle(fontSize: 16),
+                          )),
+                    ),
+                  );
+                }
+                List<Game> upcomingGames = getTeamGames(
+                        snapshot.data!.divisions[0].games!, widget.teamNumber)
+                    .where(
+                  (element) {
+                    return element.startedTime == null &&
+                        element.redScore == null;
+                  },
+                ).toList();
+                if (upcomingGames.isEmpty) {
+                  return SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 23),
+                      child: Container(
+                          padding: EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.tertiary,
+                              borderRadius: BorderRadius.circular(18)),
+                          child: Text(
+                            "No games currently available",
+                            style: TextStyle(fontSize: 16),
+                          )),
+                    ),
+                  );
+                }
+                Game game = upcomingGames[0];
                 return SliverPadding(
                   padding: EdgeInsets.symmetric(horizontal: 23),
                   sliver: SliverToBoxAdapter(
                     child: Column(
                       children: [
                         NextGame(
-                          game: snapshot.data!.divisions[0].games![0],
+                          game: game,
                           games: snapshot.data!.divisions[0].games!,
                           rankings: snapshot.data!.divisions[0].teamStats!,
                           skills: snapshot.data!.tournamentSkills!,
-                          targetTeam:
-                              TeamPreview(teamNumber: "7614A", teamID: 10101),
+                          targetTeam: TeamPreview(
+                              teamNumber: widget.teamNumber,
+                              teamID: widget.teamID),
                         ),
                         // SizedBox(height: 25),
                         // RankingOverviewWidget(
@@ -213,8 +261,11 @@ class _TMHomePageState extends State<TMHomePage> {
                   ),
                 );
               } else {
-                return SliverToBoxAdapter(
-                  child: const CircularProgressIndicator(),
+                return const SliverToBoxAdapter(
+                  child: SizedBox(
+                      height: 50,
+                      width: 50,
+                      child: Center(child: CircularProgressIndicator())),
                 );
               }
             },
@@ -231,17 +282,45 @@ class _TMHomePageState extends State<TMHomePage> {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
             ),
           ),
+          const SliverToBoxAdapter(
+            child: SizedBox(
+              height: 10,
+            ),
+          ),
           FutureBuilder(
             future: widget.tournament,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
+                List<Game> upcomingGames = getTeamGames(
+                        snapshot.data!.divisions[0].games!, widget.teamNumber)
+                    .where(
+                  (element) {
+                    return element.startedTime == null &&
+                        element.redScore == null;
+                  },
+                ).toList();
+                if (upcomingGames.length < 2) {
+                  return SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 23),
+                      child: Container(
+                          padding: EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.tertiary,
+                              borderRadius: BorderRadius.circular(18)),
+                          child: Text(
+                            "No upcoming Games",
+                            style: TextStyle(fontSize: 16),
+                          )),
+                    ),
+                  );
+                }
                 return SliverPadding(
                   padding: EdgeInsets.symmetric(horizontal: 23),
                   sliver: SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, index) {
-                        Game game =
-                            snapshot.data!.divisions[0].games![index + 1];
+                        Game game = upcomingGames[index + 1];
                         return Column(
                           children: [
                             GameWidget(
@@ -256,13 +335,16 @@ class _TMHomePageState extends State<TMHomePage> {
                           ],
                         );
                       },
-                      childCount: 5,
+                      childCount: upcomingGames.length - 1,
                     ),
                   ),
                 );
               } else {
-                return SliverToBoxAdapter(
-                  child: const CircularProgressIndicator(),
+                return const SliverToBoxAdapter(
+                  child: SizedBox(
+                      height: 50,
+                      width: 50,
+                      child: Center(child: CircularProgressIndicator())),
                 );
               }
             },
@@ -279,17 +361,23 @@ class _TMHomePageState extends State<TMHomePage> {
                 return SliverPadding(
                   padding: EdgeInsets.symmetric(horizontal: 23),
                   sliver: SliverToBoxAdapter(
-                    child: RankingOverviewWidget(
-                      teamStats: snapshot
-                          .data!.divisions[0].teamStats![widget.teamID]!,
-                      skills: snapshot.data!.tournamentSkills!,
-                      teamID: widget.teamID,
-                    ),
+                    child: snapshot.data!.divisions[0].teamStats!.isNotEmpty &&
+                            snapshot.data!.tournamentSkills!.isNotEmpty
+                        ? RankingOverviewWidget(
+                            teamStats: snapshot
+                                .data!.divisions[0].teamStats![widget.teamID]!,
+                            skills: snapshot.data!.tournamentSkills!,
+                            teamID: widget.teamID,
+                          )
+                        : Container(),
                   ),
                 );
               } else {
-                return SliverToBoxAdapter(
-                  child: const CircularProgressIndicator(),
+                return const SliverToBoxAdapter(
+                  child: SizedBox(
+                      height: 50,
+                      width: 50,
+                      child: Center(child: CircularProgressIndicator())),
                 );
               }
             },

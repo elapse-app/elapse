@@ -1,6 +1,6 @@
 import 'package:elapse_app/classes/Tournament/game.dart';
 
-List<Game> getTeamGames(List<Game> games, int teamID) {
+List<Game> getTeamGames(List<Game> games, String teamNumber) {
   bool isInGame(String teamNumber, Game game) {
     return game.blueAlliancePreview!
             .any((element) => element.teamNumber == teamNumber) ||
@@ -9,7 +9,7 @@ List<Game> getTeamGames(List<Game> games, int teamID) {
   }
 
   List<Game> upcomingGames = games.where((game) {
-    return isInGame(teamID.toString(), game);
+    return isInGame(teamNumber, game);
   }).toList();
 
   return upcomingGames;

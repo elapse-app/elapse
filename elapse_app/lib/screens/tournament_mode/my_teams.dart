@@ -7,7 +7,11 @@ import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Team/vdaStats.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
+import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
+import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
+import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
+import 'package:elapse_app/screens/tournament_mode/widgets/ranking_overview_widget.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
@@ -15,8 +19,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TMMyTeams extends StatefulWidget {
-  const TMMyTeams({super.key, required this.prefs});
+  const TMMyTeams({super.key, required this.prefs, required this.tournament});
   final SharedPreferences prefs;
+  final Future<Tournament>? tournament;
 
   @override
   State<TMMyTeams> createState() => TMMyTeamsState();
@@ -312,6 +317,83 @@ class TMMyTeamsState extends State<TMMyTeams> {
                   ],
                 ),
               ),
+            ),
+          ),
+          const SliverToBoxAdapter(
+            child: SizedBox(
+              height: 25,
+            ),
+          ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 23),
+            sliver: SliverToBoxAdapter(
+              child: FutureBuilder(
+                  future: widget.tournament,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      Tournament tournament = snapshot.data as Tournament;
+                      if (!tournament.teams.any(
+                        (element) {
+                          return element.teamNumber ==
+                              selectedTeamPreview.teamNumber;
+                        },
+                      )) {
+                        return Container();
+                      }
+                      if (tournament.divisions[0].games?.isEmpty ?? true) {
+                        return Container();
+                      }
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "This Tournament",
+                            style: TextStyle(fontSize: 24),
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          RankingOverviewWidget(
+                              teamStats: tournament.divisions[0]
+                                  .teamStats![selectedTeamPreview.teamID]!,
+                              skills: tournament.tournamentSkills!,
+                              teamID: selectedTeamPreview.teamID),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Column(
+                            children: getTeamGames(
+                                    tournament.divisions[0].games!,
+                                    selectedTeamPreview.teamNumber)
+                                .map(
+                              (e) {
+                                return Column(
+                                  children: [
+                                    GameWidget(
+                                      game: e,
+                                      rankings:
+                                          tournament.divisions[0].teamStats!,
+                                      games: tournament.divisions[0].games!,
+                                      skills: tournament.tournamentSkills!,
+                                      teamName: selectedTeamPreview.teamNumber,
+                                      isAllianceColoured: false,
+                                    ),
+                                    Divider(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .surfaceDim,
+                                    )
+                                  ],
+                                );
+                              },
+                            ).toList(),
+                          )
+                        ],
+                      );
+                    } else {
+                      return Container();
+                    }
+                  }),
             ),
           ),
           const SliverToBoxAdapter(
