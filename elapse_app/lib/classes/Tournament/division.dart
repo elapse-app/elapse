@@ -1,6 +1,3 @@
-import 'dart:convert';
-
-import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 

@@ -490,7 +490,7 @@ class _ExploreSearchState extends State<ExploreSearch>
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => TeamScreen(
-                                        teamID: e.teamID!,
+                                        teamID: e.teamID,
                                         teamName: e.searchTerm,
                                       ),
                                     ),
@@ -731,13 +731,6 @@ class _ExploreSearchState extends State<ExploreSearch>
   Widget FilterButton(buttonIndex, maxHeight, text) {
     Color selectedContainerColor = Theme.of(context).colorScheme.primary;
     Color unselectedContainerColor = Theme.of(context).colorScheme.surface;
-    Color disabledContainerColor =
-        Theme.of(context).brightness == Brightness.light
-            ? const Color.fromARGB(255, 221, 221, 221)
-            : const Color.fromARGB(255, 21, 21, 21);
-    Color disabledTextColor = Theme.of(context).brightness == Brightness.light
-        ? const Color.fromARGB(255, 91, 91, 91)
-        : const Color.fromARGB(255, 129, 129, 129);
 
     BorderRadius borderRadius;
 

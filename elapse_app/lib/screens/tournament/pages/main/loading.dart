@@ -1,5 +1,4 @@
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
-import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
 
 class TournamentLoadingScreen extends StatelessWidget {

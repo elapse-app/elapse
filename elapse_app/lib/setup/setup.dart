@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/setup/first_page.dart';

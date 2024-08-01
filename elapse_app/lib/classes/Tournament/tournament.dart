@@ -215,8 +215,6 @@ Future<Tournament> TMTournamentDetails(
     DateTime? updateTime = DateTime.tryParse(
         prefs.getString("tournament-$tournamentID-updateTime") ?? "");
 
-    print(DateTime.now().difference(updateTime!));
-
     if (updateTime == null || DateTime.now().isAfter(updateTime)) {
       await updateTournament(tournament);
       prefs.setString("tournament-$tournamentID-updateTime",

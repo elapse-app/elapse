@@ -39,7 +39,7 @@ Future<List<TeamPreview>> fetchTeamPreview(String searchQuery) async {
   Completer<void> robotEventsCompleter = Completer<void>();
   Completer<void> vdaStatsCompleter = Completer<void>();
 
-  Future<void> robotEventsResponse = http.get(
+  http.get(
     Uri.parse(
         'https://www.robotevents.com/api/v2/teams?number%5B%5D=$searchQuery&program%5B%5D=1&program%5B%5D=4&myTeams=false'),
     headers: {

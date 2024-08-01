@@ -70,8 +70,8 @@ class _TMHomePageState extends State<TMHomePage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            const Text(
-                              "Good Afternoon",
+                            Text(
+                              welcomeMessage,
                               style: TextStyle(
                                   fontSize: 30, fontWeight: FontWeight.w600),
                             ),

@@ -1,7 +1,6 @@
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/tskills.dart';
-import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/screens/tournament/pages/skills/skills_widget.dart';
 import 'package:flutter/material.dart';
 

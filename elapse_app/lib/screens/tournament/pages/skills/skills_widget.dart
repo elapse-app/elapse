@@ -1,7 +1,5 @@
 import 'package:elapse_app/classes/Team/team.dart';
-import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tskills.dart';
-import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:flutter/material.dart';
 
 class SkillsWidget extends StatelessWidget {
