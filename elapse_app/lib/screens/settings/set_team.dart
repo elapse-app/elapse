@@ -25,6 +25,10 @@ class _SetMainTeamState extends State<SetMainTeam> {
   }
 
   void saveTeam(TeamPreview team) {
+    List<String> savedTeams = widget.prefs.getStringList("savedTeams") ?? [];
+    savedTeams.remove(
+        '{"teamID": ${team.teamID}, "teamNumber": "${team.teamNumber}"}');
+    widget.prefs.setStringList("savedTeams", savedTeams);
     widget.prefs.setString("savedTeam",
         '{"teamID": ${team.teamID}, "teamNumber": "${team.teamNumber}"}');
     widget.prefs.setBool("isTournamentMode", false);
