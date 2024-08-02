@@ -55,26 +55,27 @@ class _TMHomePageState extends State<TMHomePage> {
             flexibleSpace: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
                 var top = constraints.biggest.height;
-                double sizedBoxHeight = (top - kToolbarHeight) * 0.65 -
+                double sizedBoxHeight = (top - kToolbarHeight) * 0.615 -
                     MediaQuery.of(context).viewPadding.top;
                 sizedBoxHeight = sizedBoxHeight < 0 ? 0 : sizedBoxHeight;
                 return FlexibleSpaceBar(
                   expandedTitleScale: 1,
                   collapseMode: CollapseMode.parallax,
                   title: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: const EdgeInsets.only(left: 20, right: 12),
                     child: Column(
                       children: [
                         const Spacer(),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
                               welcomeMessage,
                               style: TextStyle(
                                   fontSize: 30, fontWeight: FontWeight.w600),
                             ),
+                            Spacer(),
                             IconButton(
                               padding: EdgeInsets.zero,
                               constraints: BoxConstraints(),
@@ -106,7 +107,7 @@ class _TMHomePageState extends State<TMHomePage> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               const SizedBox(
-                                width: 10,
+                                width: 5,
                               ),
                               Image(image: AssetImage(imageString), height: 25),
                               const Spacer(),

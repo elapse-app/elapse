@@ -39,6 +39,10 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       welcomeMessage = "Good Evening";
     }
+    String imageString =
+        Theme.of(context).colorScheme.brightness == Brightness.dark
+            ? "assets/dg4x.png"
+            : "assets/lg4x.png";
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
@@ -73,6 +77,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          const SizedBox(
+                            width: 5,
+                          ),
+                          Image(image: AssetImage(imageString), height: 25),
                           Spacer(),
                           IconButton(
                             icon: const Icon(

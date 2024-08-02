@@ -8,6 +8,9 @@ String twelveHour(String time) {
       hour -= 12;
       suffix = "PM";
     }
+    if (hour == 12) {
+      suffix = "PM";
+    }
     String adjustedHour = hour == 0 ? "00" : hour.toString();
     String adjustedMinute = minute == 0 ? "00" : minute.toString();
     adjustedMinute = minute < 10 ? "0$minute" : minute.toString();
