@@ -274,25 +274,33 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             ),
           ),
           selectedIndex == 0 && division.teamStats?.isNotEmpty == true
-              ? SliverToBoxAdapter(
-                  child: Container(
-                    padding: EdgeInsets.symmetric(horizontal: 23),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          "Enable Live Timing",
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        Switch(
-                          value: useLiveTiming,
-                          onChanged: (bool value) {
-                            setState(() {
-                              useLiveTiming = value;
-                            });
-                          },
-                        )
-                      ],
+              ? SliverPersistentHeader(
+                  pinned: true,
+                  delegate: SliverHeaderDelegate(
+                    maxHeight: 40,
+                    minHeight: 40,
+                    child: Container(
+                      alignment: Alignment.topCenter,
+                      padding: EdgeInsets.only(
+                          left: 23, right: 23, bottom: 10, top: 5),
+                      color: Theme.of(context).colorScheme.surface,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Enable Live Timing",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          Switch(
+                            value: useLiveTiming,
+                            onChanged: (bool value) {
+                              setState(() {
+                                useLiveTiming = value;
+                              });
+                            },
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 )

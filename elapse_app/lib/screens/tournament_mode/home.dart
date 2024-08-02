@@ -386,6 +386,7 @@ class _TMHomePageState extends State<TMHomePage> {
               }
             },
           ),
+          SliverToBoxAdapter(),
           SliverToBoxAdapter(
             child: SizedBox(
               height: 25,
