@@ -449,8 +449,9 @@ class _ExploreSearchState extends State<ExploreSearch>
                 return const BigErrorMessage(
                     icon: Icons.search_off_outlined, message: "No Teams Found");
               }
+              final uniqueTeams = snapshot.data!.toSet().toList();
               return Column(
-                children: snapshot.data!
+                children: uniqueTeams
                     .map((team) => Column(
                           children: [
                             TeamWidget(

@@ -25,6 +25,15 @@ class TeamPreview {
       'teamID': teamID,
     };
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is TeamPreview && other.teamID == teamID;
+  }
+
+  @override
+  int get hashCode => teamNumber.hashCode;
 }
 
 TeamPreview loadTeamPreview(teamPreview) {
@@ -110,5 +119,10 @@ Future<List<TeamPreview>> fetchTeamPreview(String searchQuery) async {
   });
 
   await Future.any([robotEventsCompleter.future, vdaStatsCompleter.future]);
+  // remove duplicates from teams
+  // Remove duplicates based on teamNumber
+  final uniqueTeams = teams.toSet();
+  teams = uniqueTeams.toList();
+
   return teams;
 }
