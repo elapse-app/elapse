@@ -362,6 +362,8 @@ class _TMHomePageState extends State<TMHomePage> {
                                 game: game,
                                 rankings: snapshot.data!.divisions[0].teamStats,
                                 games: snapshot.data!.divisions[0].games!,
+                                teamName: widget.teamNumber,
+                                isAllianceColoured: true,
                                 skills: snapshot.data!.tournamentSkills),
                             Divider(
                               color: Theme.of(context).colorScheme.surfaceDim,

@@ -71,6 +71,13 @@ class GameWidget extends StatelessWidget {
 
     if (isAllianceColoured == false) {
       gameColor = Theme.of(context).colorScheme.onSurface;
+    } else {
+      if (game.redAlliancePreview!
+          .any((element) => element.teamNumber == teamName)) {
+        gameColor = colorPallete.redAllianceText;
+      } else {
+        gameColor = colorPallete.blueAllianceText;
+      }
     }
 
     if (winningAlliance == "red" &&
@@ -171,7 +178,9 @@ class GameWidget extends StatelessWidget {
                               fontSize: 16, height: 1, color: timeColor),
                           maxLines: 1,
                         ),
-                        game.redScore != null
+                        game.scheduledTime != null &&
+                                game.redScore != 0 &&
+                                game.blueScore != 0
                             ? Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -201,7 +210,8 @@ class GameWidget extends StatelessWidget {
                                 ],
                               )
                             : Text(game.fieldName!,
-                                style: const TextStyle(fontSize: 16, height: 1))
+                                style: TextStyle(
+                                    fontSize: 16, height: 1, color: timeColor))
                       ],
                     ),
                   ),
