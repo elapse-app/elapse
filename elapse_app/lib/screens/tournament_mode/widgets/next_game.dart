@@ -115,7 +115,7 @@ class NextGame extends StatelessWidget {
                       style: TextStyle(
                           fontSize: 24,
                           fontWeight: e.teamNumber == targetTeam?.teamNumber
-                              ? FontWeight.w600
+                              ? FontWeight.w500
                               : FontWeight.normal),
                     );
                   }).toList(),
