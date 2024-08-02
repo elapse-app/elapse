@@ -48,6 +48,8 @@ class _MyTeamsState extends State<MyTeams> {
         .toList());
 
     selectedTeamPreview = savedTeamPreview;
+
+    savedTeamPreviews = savedTeamPreviews.toSet().toList();
     super.initState();
     team = fetchTeam(savedTeamPreview.teamID);
     teamStats = getTrueSkillDataForTeam(savedTeamPreview.teamNumber);
