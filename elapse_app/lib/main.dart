@@ -32,8 +32,6 @@ void main() async {
     systemNavigationBarColor: Colors.transparent, // Navigation bar color
   ));
 
-  prefs.remove("savedTeam");
-
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
   runApp(
