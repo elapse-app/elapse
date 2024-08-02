@@ -4,6 +4,7 @@ import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tskills.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
+import 'package:elapse_app/extras/twelve_hour.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -30,9 +31,11 @@ class NextGame extends StatelessWidget {
   Widget build(BuildContext context) {
     String timeString;
     if (game.startedTime != null) {
-      timeString = DateFormat.Hm().format(game.startedTime!.toLocal());
+      timeString =
+          twelveHour(DateFormat.Hm().format(game.startedTime!.toLocal()));
     } else if (game.scheduledTime != null && game.startedTime == null) {
-      timeString = DateFormat.Hm().format(game.scheduledTime!.toLocal());
+      timeString =
+          twelveHour(DateFormat.Hm().format(game.scheduledTime!.toLocal()));
     } else {
       timeString = "No Time";
     }
