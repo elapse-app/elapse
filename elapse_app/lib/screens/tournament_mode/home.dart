@@ -227,6 +227,7 @@ class _TMHomePageState extends State<TMHomePage> {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 if (snapshot.data!.divisions[0].games!.isEmpty) {
+                  print("do this");
                   return SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 23),
@@ -247,7 +248,8 @@ class _TMHomePageState extends State<TMHomePage> {
                     .where(
                   (element) {
                     return element.startedTime == null &&
-                        element.redScore == null;
+                        element.redScore == 0 &&
+                        element.blueScore == 0;
                   },
                 ).toList();
                 if (upcomingGames.isEmpty) {
@@ -328,7 +330,8 @@ class _TMHomePageState extends State<TMHomePage> {
                     .where(
                   (element) {
                     return element.startedTime == null &&
-                        element.redScore == null;
+                        element.redScore == 0 &&
+                        element.blueScore == 0;
                   },
                 ).toList();
                 if (upcomingGames.length < 2) {

@@ -76,6 +76,9 @@ class MyAppState extends State<MyApp> {
   void initializeTournamentMode() {
     if (widget.prefs.getBool("isTournamentMode") ?? false) {
       int? tournamentID = widget.prefs.getInt("tournamentID");
+      teamID = jsonDecode(widget.prefs.getString("savedTeam"))["teamID"];
+      teamNumber =
+          jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"];
       if (tournamentID != null) {
         tmTournament = TMTournamentDetails(tournamentID, widget.prefs);
         isTournamentMode = true;
