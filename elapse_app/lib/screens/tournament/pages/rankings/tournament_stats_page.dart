@@ -32,6 +32,8 @@ Future<void> tournamentStatsPage(
     },
   ).toList();
 
+  final DraggableScrollableController dra = DraggableScrollableController();
+
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -41,8 +43,9 @@ Future<void> tournamentStatsPage(
         maxChildSize: 0.8,
         minChildSize: 0,
         expand: false,
-        snap: true,
+        shouldCloseOnMinExtent: true,
         snapAnimationDuration: const Duration(milliseconds: 250),
+        controller: dra,
         builder: (BuildContext context, ScrollController scrollController) {
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 23, vertical: 24),
