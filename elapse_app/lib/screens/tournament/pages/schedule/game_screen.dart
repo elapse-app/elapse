@@ -75,6 +75,13 @@ class GameScreen extends StatelessWidget {
           ));
     }
 
+    Color gameColor = Theme.of(context).colorScheme.tertiary;
+
+    if ((game.redScore ?? 0) > (game.blueScore ?? 0)) {
+      gameColor = colorPallete.redAllianceBackground;
+    } else if ((game.redScore ?? 0) < (game.blueScore ?? 0)) {
+      gameColor = colorPallete.blueAllianceBackground;
+    }
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -114,7 +121,7 @@ class GameScreen extends StatelessWidget {
                 Container(
                   height: 220,
                   decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.tertiary,
+                      color: gameColor,
                       borderRadius: BorderRadius.circular(18)),
                   child: Padding(
                     padding: const EdgeInsets.all(18.0),

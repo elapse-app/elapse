@@ -75,7 +75,8 @@ class GameWidget extends StatelessWidget {
       if (game.redAlliancePreview!
           .any((element) => element.teamNumber == teamName)) {
         gameColor = colorPallete.redAllianceText;
-      } else {
+      } else if (game.blueAlliancePreview!
+          .any((element) => element.teamNumber == teamName)) {
         gameColor = colorPallete.blueAllianceText;
       }
     }
