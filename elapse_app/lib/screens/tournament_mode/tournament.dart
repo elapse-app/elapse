@@ -8,14 +8,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 class TMTournamentScreen extends StatefulWidget {
   final int tournamentID;
   final bool isPreview;
-  final Future<Tournament>? tournamentFuture;
   final SharedPreferences prefs;
-  const TMTournamentScreen(
-      {super.key,
-      required this.tournamentID,
-      required this.prefs,
-      this.isPreview = true,
-      this.tournamentFuture});
+  const TMTournamentScreen({
+    super.key,
+    required this.tournamentID,
+    required this.prefs,
+    this.isPreview = true,
+  });
 
   @override
   State<TMTournamentScreen> createState() => _TMTournamentScreenState();
@@ -32,12 +31,7 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
   @override
   void initState() {
     super.initState();
-
-    if (widget.tournamentFuture != null) {
-      tournament = widget.tournamentFuture;
-    } else {
-      tournament = getTournamentDetails(widget.tournamentID);
-    }
+    tournament = TMTournamentDetails(widget.tournamentID, widget.prefs);
   }
 
   @override
@@ -56,7 +50,63 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
                   centerTitle: false,
                   backgroundColor: Theme.of(context).colorScheme.primary,
                 ),
-                RoundedTop()
+                SliverPersistentHeader(
+                    pinned: true,
+                    delegate: SliverHeaderDelegate(
+                      minHeight: 70.0,
+                      maxHeight: 70.0,
+                      child: Hero(
+                        tag: "top",
+                        child: Stack(
+                          children: [
+                            Container(
+                                height: 300,
+                                color: Theme.of(context).colorScheme.primary),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.surface,
+                                borderRadius: const BorderRadius.only(
+                                  topLeft: Radius.circular(30),
+                                  topRight: Radius.circular(30),
+                                ),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 25, vertical: 13),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    _buildIconButton(
+                                        context, Icons.schedule, 0),
+                                    _buildIconButton(context,
+                                        Icons.format_list_numbered_outlined, 1),
+                                    _buildIconButton(context,
+                                        Icons.sports_esports_outlined, 2),
+                                    _buildIconButton(
+                                        context, Icons.info_outlined, 3),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )),
+                SliverToBoxAdapter(
+                  child: Container(
+                    child: Column(
+                      children: const [
+                        SizedBox(
+                          height: 50,
+                        ),
+                        Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ],
             ),
           );
@@ -71,6 +121,26 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
           );
         }
       },
+    );
+  }
+
+  Widget _buildIconButton(BuildContext context, IconData icon, int index) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        Container(
+          width: 50,
+          height: 50,
+        ),
+        IconButton(
+          icon: Icon(
+            icon,
+            size: 24,
+            color: Theme.of(context).colorScheme.onSurface,
+          ),
+          onPressed: () async {},
+        ),
+      ],
     );
   }
 }

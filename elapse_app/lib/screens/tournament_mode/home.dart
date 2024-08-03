@@ -15,12 +15,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 class TMHomePage extends StatefulWidget {
   const TMHomePage(
       {super.key,
-      required this.tournament,
       required this.tournamentID,
       required this.teamID,
       required this.teamNumber,
       required this.prefs});
-  final Future<Tournament>? tournament;
   final int tournamentID;
   final int teamID;
   final String teamNumber;
@@ -31,6 +29,13 @@ class TMHomePage extends StatefulWidget {
 }
 
 class _TMHomePageState extends State<TMHomePage> {
+  @override
+  void initState() {
+    super.initState();
+    tournament = TMTournamentDetails(widget.tournamentID, widget.prefs);
+  }
+
+  Future<Tournament>? tournament;
   @override
   Widget build(BuildContext context) {
     String welcomeMessage = "Good Afternoon";
@@ -45,6 +50,7 @@ class _TMHomePageState extends State<TMHomePage> {
         Theme.of(context).colorScheme.brightness == Brightness.dark
             ? "assets/dg4x.png"
             : "assets/lg4x.png";
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
@@ -119,7 +125,7 @@ class _TMHomePageState extends State<TMHomePage> {
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
                             child: FutureBuilder(
-                              future: widget.tournament,
+                              future: tournament,
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
                                   return GestureDetector(
@@ -224,11 +230,10 @@ class _TMHomePageState extends State<TMHomePage> {
           ),
           const RoundedTop(),
           FutureBuilder(
-            future: widget.tournament,
+            future: tournament,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 if (snapshot.data!.divisions[0].games!.isEmpty) {
-                  print("do this");
                   return SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 23),
@@ -323,7 +328,7 @@ class _TMHomePageState extends State<TMHomePage> {
             ),
           ),
           FutureBuilder(
-            future: widget.tournament,
+            future: tournament,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 List<Game> upcomingGames = getTeamGames(
@@ -394,7 +399,7 @@ class _TMHomePageState extends State<TMHomePage> {
             ),
           ),
           FutureBuilder(
-            future: widget.tournament,
+            future: tournament,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return SliverPadding(

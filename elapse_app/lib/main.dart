@@ -71,8 +71,6 @@ class MyAppState extends State<MyApp> {
     initializeTournamentMode();
   }
 
-  Future<Tournament>? tmTournament;
-
   void initializeTournamentMode() {
     if (widget.prefs.getBool("isTournamentMode") ?? false) {
       int? tournamentID = widget.prefs.getInt("tournamentID");
@@ -80,7 +78,6 @@ class MyAppState extends State<MyApp> {
       teamNumber =
           jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"];
       if (tournamentID != null) {
-        tmTournament = TMTournamentDetails(tournamentID, widget.prefs);
         isTournamentMode = true;
       }
     } else {
@@ -104,18 +101,20 @@ class MyAppState extends State<MyApp> {
     isTournamentMode
         ? screens = [
             TMHomePage(
-              tournament: tmTournament,
               tournamentID: widget.prefs.getInt("tournamentID"),
               teamID: teamID,
               teamNumber: teamNumber,
               prefs: widget.prefs,
             ),
             TMTournamentScreen(
-                tournamentID: widget.prefs.getInt("tournamentID"),
-                isPreview: false,
-                prefs: widget.prefs,
-                tournamentFuture: tmTournament),
-            TMMyTeams(prefs: widget.prefs, tournament: tmTournament),
+              tournamentID: widget.prefs.getInt("tournamentID"),
+              isPreview: false,
+              prefs: widget.prefs,
+            ),
+            TMMyTeams(
+              prefs: widget.prefs,
+              tournamentID: widget.prefs.getInt("tournamentID"),
+            ),
             ExploreScreen(prefs: widget.prefs)
           ]
         : screens = [

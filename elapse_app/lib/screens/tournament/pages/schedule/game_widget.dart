@@ -179,9 +179,8 @@ class GameWidget extends StatelessWidget {
                               fontSize: 16, height: 1, color: timeColor),
                           maxLines: 1,
                         ),
-                        game.scheduledTime != null &&
-                                game.redScore != 0 &&
-                                game.blueScore != 0
+                        (game.redScore != 0 && game.blueScore != 0) ||
+                                game.startedTime != null
                             ? Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -210,7 +209,7 @@ class GameWidget extends StatelessWidget {
                                   ),
                                 ],
                               )
-                            : Text(game.fieldName!,
+                            : Text(game.fieldName ?? "",
                                 style: TextStyle(
                                     fontSize: 16, height: 1, color: timeColor))
                       ],

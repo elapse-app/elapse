@@ -10,6 +10,7 @@ import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
 import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
+import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:elapse_app/screens/tournament_mode/widgets/ranking_overview_widget.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
@@ -19,9 +20,9 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TMMyTeams extends StatefulWidget {
-  const TMMyTeams({super.key, required this.prefs, required this.tournament});
+  const TMMyTeams({super.key, required this.prefs, required this.tournamentID});
   final SharedPreferences prefs;
-  final Future<Tournament>? tournament;
+  final int tournamentID;
 
   @override
   State<TMMyTeams> createState() => TMMyTeamsState();
@@ -35,6 +36,8 @@ class TMMyTeamsState extends State<TMMyTeams> {
   List<String> savedTeamStrings = [];
 
   late TeamPreview selectedTeamPreview;
+
+  Future<Tournament>? tournament;
 
   int seasonID = 190;
   @override
@@ -58,6 +61,8 @@ class TMMyTeamsState extends State<TMMyTeams> {
     teamStats = getTrueSkillDataForTeam(savedTeamPreview.teamNumber);
     teamTournaments = fetchTeamTournaments(savedTeamPreview.teamID, seasonID);
     teamAwards = getAwards(savedTeamPreview.teamID, seasonID);
+
+    tournament = TMTournamentDetails(widget.tournamentID, widget.prefs);
   }
 
   void teamChange(TeamPreview? value) {
@@ -322,7 +327,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
             padding: const EdgeInsets.symmetric(horizontal: 23),
             sliver: SliverToBoxAdapter(
               child: FutureBuilder(
-                  future: widget.tournament,
+                  future: tournament,
                   builder: (context, snapshot) {
                     if (snapshot.hasData) {
                       Tournament tournament = snapshot.data as Tournament;
