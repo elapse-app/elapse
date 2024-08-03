@@ -51,6 +51,7 @@ class SettingsScreen extends StatelessWidget {
                 child: Column(
                   children: [
                     GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: () {
                         Navigator.pushReplacement(
                           context,
@@ -79,6 +80,7 @@ class SettingsScreen extends StatelessWidget {
                       color: Theme.of(context).colorScheme.surfaceDim,
                     ),
                     GestureDetector(
+                      behavior: HitTestBehavior.opaque,
                       onTap: () {
                         Navigator.pushReplacement(
                           context,

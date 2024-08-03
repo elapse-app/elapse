@@ -17,10 +17,11 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
   String teamName = "";
   Future<List<TeamPreview>>? teamSearch;
 
-  void _onSearchSubmitted(String value) {
+  String searchQuery = "";
+
+  void searchTeam() {
     setState(() {
-      teamName = value;
-      teamSearch = fetchTeamPreview(teamName);
+      teamSearch = fetchTeamPreview(searchQuery);
     });
   }
 
@@ -63,13 +64,37 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                   const SizedBox(
                     height: 30,
                   ),
-                  TextField(
-                    textInputAction: TextInputAction.search,
-                    onSubmitted: _onSearchSubmitted,
-                    cursorColor: Theme.of(context).colorScheme.secondary,
-                    style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500),
-                    decoration:
-                        const InputDecoration(hintText: "Enter your team"),
+                  Flex(
+                    direction: Axis.horizontal,
+                    children: [
+                      Flexible(
+                        flex: 3,
+                        child: TextField(
+                          textInputAction: TextInputAction.go,
+                          onChanged: ((value) {
+                            setState(() {
+                              searchQuery = value;
+                            });
+                          }),
+                          cursorColor: Theme.of(context).colorScheme.secondary,
+                          style: TextStyle(
+                              fontSize: 32, fontWeight: FontWeight.w500),
+                          decoration: const InputDecoration(
+                              hintText: "Enter your team"),
+                        ),
+                      ),
+                      Flexible(
+                        flex: 1,
+                        child: TextButton(
+                          child: Text("Search",
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary)),
+                          onPressed: searchTeam,
+                        ),
+                      )
+                    ],
                   ),
                   SizedBox(
                     height: 15,

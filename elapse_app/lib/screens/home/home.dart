@@ -115,6 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return Container();
                       }
                       TournamentPreview upcoming = teamTournaments[0];
+                      print(DateTime.now().compareTo(upcoming.endDate!));
                       return GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -181,7 +182,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                     : Container()
                               ],
                             ),
-                            DateTime.now().compareTo(upcoming.endDate!) <= 0 &&
+                            DateTime.now().compareTo(upcoming.endDate!
+                                            .add(const Duration(days: 1))) <=
+                                        0 &&
                                     DateTime.now()
                                             .difference(upcoming.startDate!)
                                             .inDays >
