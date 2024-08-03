@@ -23,13 +23,7 @@ class TournamentLoadingScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      "Loading Tournament",
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
-                    ),
-                  ],
+                  children: [],
                 ),
               ),
               centerTitle: false,
