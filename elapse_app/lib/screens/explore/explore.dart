@@ -1,4 +1,6 @@
 import 'package:elapse_app/screens/explore/search.dart';
+import 'package:elapse_app/screens/explore/worldRankings.dart';
+import 'package:elapse_app/screens/explore/worldRankings/worldSkills.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
@@ -229,21 +231,62 @@ class ExploreScreen extends StatelessWidget {
               decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.tertiary,
                   borderRadius: BorderRadius.circular(18)),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "World Rankings",
-                    style: TextStyle(fontSize: 16, height: 1),
-                  ),
-                  Icon(
-                    Icons.arrow_forward,
-                    size: 16,
-                  )
-                ],
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Flexible(
+                      fit: FlexFit.tight,
+                      flex: 65,
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => WorldRankingsScreen(initState: 0)
+                            ));
+                        },
+                        child: const Text(
+                          "World Skills",
+                          style: TextStyle(fontSize: 16, height: 1),
+                          textAlign: TextAlign.center,
+                        ),
+                      )
+                    ),
+                    const Flexible(
+                      fit: FlexFit.tight,
+                      flex: 10,
+                      child: VerticalDivider(
+                        width: 1,
+                        thickness: 1,
+                        indent: 10,
+                        endIndent: 10,
+                        color: Color(0xFFdedede),
+                      )
+                    ),
+                    Flexible(
+                        fit: FlexFit.tight,
+                        flex: 65,
+                        child: GestureDetector(
+                          behavior: HitTestBehavior.opaque,
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => WorldRankingsScreen(initState: 1)
+                                ));
+                          },
+                          child: const Text(
+                            "World TrueSkill",
+                            style: TextStyle(fontSize: 16, height: 1),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                    ),
+                  ],
+                ),
               ),
             ),
-          ),
           const SliverToBoxAdapter(
             child: SizedBox(
               height: 35,
