@@ -1,6 +1,6 @@
 import 'package:elapse_app/screens/explore/search.dart';
 import 'package:elapse_app/screens/explore/worldRankings.dart';
-import 'package:elapse_app/screens/explore/worldRankings/worldSkills.dart';
+import 'package:elapse_app/screens/explore/worldRankings/world_skills.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
