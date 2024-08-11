@@ -127,7 +127,6 @@ class MyAppState extends State<MyApp> {
             ),
             ExploreScreen(prefs: widget.prefs),
           ];
-    widget.prefs.setString("theme", "system");
     return Consumer2<ColorProvider, TournamentModeProvider>(
       builder: (context, colorProvider, tournamentModeProvider, child) {
         bool systemDefined = false;
@@ -138,6 +137,9 @@ class MyAppState extends State<MyApp> {
 
         if (widget.prefs.getString("theme") == "system") {
           systemDefined = true;
+          print("using system theme");
+        } else {
+          print("Not using system theme");
         }
 
         ColorScheme chosenTheme =
