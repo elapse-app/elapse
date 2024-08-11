@@ -41,9 +41,8 @@ class _ExploreSearchState extends State<ExploreSearch>
   EventSearchFilters filters = EventSearchFilters(
     seasonID: 190,
     eventName: "",
-    startDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-    endDate: DateFormat("yyyy-MM-dd")
-        .format(DateTime.now().add(Duration(days: 365))),
+    startDate: DateFormat("yyyy-MM-dd").format(DateTime(2024, 8, 1)),
+    endDate: DateFormat("yyyy-MM-dd").format(DateTime(2025, 8, 1)),
   );
 
   @override
