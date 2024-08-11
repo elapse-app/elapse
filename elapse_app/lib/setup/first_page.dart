@@ -1,145 +1,86 @@
-import 'package:elapse_app/classes/Team/teamPreview.dart';
-import 'package:elapse_app/providers/color_provider.dart';
-import 'package:elapse_app/setup/theme_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/painting.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/setup/theme_setup.dart';
+import 'package:elapse_app/classes/Team/teamPreview.dart';
+import 'package:elapse_app/providers/color_provider.dart';
+import 'package:elapse_app/setup/features_one.dart';
 
 class FirstSetupPage extends StatefulWidget {
-  const FirstSetupPage({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const FirstSetupPage({super.key});
 
   @override
   State<FirstSetupPage> createState() => _FirstSetupPageState();
 }
 
 class _FirstSetupPageState extends State<FirstSetupPage> {
-  String teamName = "";
-  Future<List<TeamPreview>>? teamSearch;
-
-  String searchQuery = "";
-
-  void searchTeam() {
-    setState(() {
-      teamSearch = fetchTeamPreview(searchQuery);
-    });
-  }
-
-  void saveTeam(TeamPreview team) {
-    widget.prefs.setString("savedTeam",
-        '{"teamID": ${team.teamID}, "teamNumber": "${team.teamNumber}"}');
-    Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ThemeSetup(
-                  prefs: widget.prefs,
-                )));
-  }
 
   @override
   Widget build(BuildContext context) {
     return Consumer<ColorProvider>(builder: (context, colorProvider, snapshot) {
       return Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 23.0),
-          child: SafeArea(
-            child: Center(
+        body: Column(
+          children: [
+            // Blue top section
+            Container(
+              height: MediaQuery.of(context).size.height * 0.64,
+              color: Colors.blue,
+              child: Center(
+                child: Text(
+                  'Welcome',
+                  style: TextStyle(
+                    color: const Color.fromRGBO(255, 255, 255, 1),
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 20), // Replace Spacer() with SizedBox for debugging
+            // White bottom section with Get Started button
+            Container(
+              height: MediaQuery.of(context).size.height * 0.36 - 20,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const SizedBox(
-                    height: 50,
-                  ),
-                  const Text(
-                    "Welcome to Elapse!",
-                    style: TextStyle(
-                        fontSize: 64, fontWeight: FontWeight.w500, height: 1),
-                  ),
-                  const SizedBox(
-                    height: 15,
-                  ),
-                  const Text(
-                    "Enter your team number below to get started",
-                    style: TextStyle(fontSize: 18),
-                  ),
-                  const SizedBox(
-                    height: 30,
-                  ),
-                  Flex(
-                    direction: Axis.horizontal,
-                    children: [
-                      Flexible(
-                        flex: 3,
-                        child: TextField(
-                          textInputAction: TextInputAction.go,
-                          onChanged: ((value) {
-                            setState(() {
-                              searchQuery = value;
-                            });
-                          }),
-                          cursorColor: Theme.of(context).colorScheme.secondary,
-                          style: TextStyle(
-                              fontSize: 32, fontWeight: FontWeight.w500),
-                          decoration: const InputDecoration(
-                              hintText: "Enter your team"),
-                        ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          // Navigate to the next page
+                          // Navigator.pushReplacement(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => ThemeSetup(
+                          //       prefs: widget.prefs,
+                          //     ),
+                          //   ),
+                          // );
+                          Navigator.pushReplacement( 
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => FirstFeature(),
+                            ),
+                          );
+                        },
+                        child: Text('Get Started'),
                       ),
-                      Flexible(
-                        flex: 1,
-                        child: TextButton(
-                          child: Text("Search",
-                              style: TextStyle(
-                                  fontSize: 18,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary)),
-                          onPressed: searchTeam,
-                        ),
-                      )
-                    ],
+                    ),
                   ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  FutureBuilder(
-                      future: teamSearch,
-                      builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return Container();
-                        }
-                        if (snapshot.hasData) {
-                          if (snapshot.data!.isEmpty) {
-                            return Text(
-                              "No teams found",
-                              style: TextStyle(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withOpacity(0.75),
-                                  fontSize: 18),
-                            );
-                          } else {
-                            return TextButton(
-                                style: ButtonStyle(
-                                    foregroundColor: WidgetStateProperty.all(
-                                        Theme.of(context)
-                                            .colorScheme
-                                            .secondary)),
-                                onPressed: () {
-                                  saveTeam(snapshot.data![0]);
-                                },
-                                child: const Text(
-                                  "Save and Continue",
-                                  style: TextStyle(fontSize: 18),
-                                ));
-                          }
-                        } else {
-                          return Container();
-                        }
-                      })
                 ],
               ),
             ),
-          ),
+          ],
         ),
       );
     });

@@ -4,6 +4,7 @@ import 'package:elapse_app/setup/first_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/setup/team_setup.dart';
 
 class SetupScreen extends StatelessWidget {
   const SetupScreen({super.key, required this.prefs});
@@ -32,7 +33,7 @@ class SetupScreen extends StatelessWidget {
           highlightColor: Colors.transparent,
           fontFamily: "Manrope",
         ),
-        home: FirstSetupPage(prefs: prefs),
+        home: TeamSetupPage(prefs: prefs),
       );
     });
   }
