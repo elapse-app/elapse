@@ -38,7 +38,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   late bool inSearch;
   late String searchQuery;
   late String savedQuery;
-  late double appBarHeight;
+  late ScrollController _scrollController;
 
   List<Team> rankingsTeams = [];
   List<TeamPreview> savedTeams = [];
@@ -79,6 +79,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
     inSearch = false;
     searchQuery = "";
     savedQuery = "";
+    _scrollController = ScrollController();
 
     if (widget.tournament.divisions[0].games == null ||
         widget.tournament.divisions[0].games!.isEmpty) {
@@ -91,6 +92,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   @override
   void dispose() {
     _focusNode.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -122,6 +124,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
+        controller: _scrollController,
         slivers: [
           SliverAppBar.large(
             automaticallyImplyLeading: false,
@@ -377,6 +380,11 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
           onPressed: () {
             setState(() {
               selectedIndex = index;
+              _scrollController.animateTo(
+                0.0,
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeInOutExpo,
+              );
             });
           },
         ),
