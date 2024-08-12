@@ -370,39 +370,36 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             delegate: SliverHeaderDelegate(
               minHeight: 70.0,
               maxHeight: 70.0,
-              child: Hero(
-                tag: "top",
-                child: Stack(
-                  children: [
-                    Container(
-                        height: 300,
-                        color: Theme.of(context).colorScheme.primary),
-                    Container(
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(25),
-                          topRight: Radius.circular(25),
-                        ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 25, vertical: 13),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            _buildIconButton(context, Icons.schedule, 0),
-                            _buildIconButton(context,
-                                Icons.format_list_numbered_outlined, 1),
-                            _buildIconButton(
-                                context, Icons.sports_esports_outlined, 2),
-                            _buildIconButton(context, Icons.info_outlined, 3),
-                          ],
-                        ),
+              child: Stack(
+                children: [
+                  Container(
+                      height: 300,
+                      color: Theme.of(context).colorScheme.primary),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(25),
+                        topRight: Radius.circular(25),
                       ),
                     ),
-                  ],
-                ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 25, vertical: 13),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildIconButton(context, Icons.schedule, 0),
+                          _buildIconButton(
+                              context, Icons.format_list_numbered_outlined, 1),
+                          _buildIconButton(
+                              context, Icons.sports_esports_outlined, 2),
+                          _buildIconButton(context, Icons.info_outlined, 3),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -512,7 +509,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
               selectedIndex = index;
               _scrollController.animateTo(
                 0.0,
-                duration: const Duration(milliseconds: 300),
+                duration: const Duration(milliseconds: 500),
                 curve: Curves.easeInOutExpo,
               );
             });
