@@ -27,7 +27,7 @@ class TeamWidget extends StatelessWidget {
         if (saveSearch) {
           saveState;
           List<String> recentSearches =
-              prefs!.getStringList("recentTeamSearches") ?? <String>[];
+              prefs.getStringList("recentTeamSearches") ?? <String>[];
 
           recentSearches
               .remove('{"searchTerm": "$teamNumber", "teamID": $teamID}');
@@ -37,7 +37,7 @@ class TeamWidget extends StatelessWidget {
             recentSearches.removeAt(0);
           }
 
-          prefs!.setStringList("recentTeamSearches", recentSearches);
+          prefs.setStringList("recentTeamSearches", recentSearches);
         }
         Navigator.push(
           context,
