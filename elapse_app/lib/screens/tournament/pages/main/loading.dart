@@ -18,30 +18,7 @@ class TournamentLoadingScreen extends StatelessWidget {
             flexibleSpace: const FlexibleSpaceBar(
               expandedTitleScale: 1,
               collapseMode: CollapseMode.parallax,
-              title: Padding(
-                padding: EdgeInsets.only(left: 20.0, right: 12.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [],
-                ),
-              ),
               centerTitle: false,
-              background: SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 20, right: 12, bottom: 20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [Spacer()],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ),
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),

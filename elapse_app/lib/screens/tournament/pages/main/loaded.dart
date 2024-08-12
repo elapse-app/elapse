@@ -9,17 +9,21 @@ import 'package:elapse_app/screens/tournament/pages/main/search_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/schedule.dart';
 import 'package:elapse_app/screens/tournament/pages/skills/skills.dart';
+import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
+import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class TournamentLoadedScreen extends StatefulWidget {
   final Tournament tournament;
   final bool isPreview;
+  final SharedPreferences? prefs;
   const TournamentLoadedScreen({
     super.key,
     required this.tournament,
     this.isPreview = false,
+    this.prefs,
   });
 
   @override
@@ -126,115 +130,241 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
       body: CustomScrollView(
         controller: _scrollController,
         slivers: [
-          SliverAppBar.large(
-            automaticallyImplyLeading: false,
-            expandedHeight: 125,
-            centerTitle: false,
-            flexibleSpace: FlexibleSpaceBar(
-              expandedTitleScale: 1,
-              collapseMode: CollapseMode.parallax,
-              title: Padding(
-                padding: const EdgeInsets.only(left: 20.0, right: 12.0),
-                child: Row(
+          ElapseAppBar(
+            title: Row(
+              children: [
+                Text(
+                  titles[selectedIndex],
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+                ),
+                Spacer(),
+                GestureDetector(
+                  child: const Icon(
+                    Icons.search,
+                  ),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      PageRouteBuilder(
+                        transitionDuration: Duration(milliseconds: 300),
+                        reverseTransitionDuration: Duration(milliseconds: 300),
+                        pageBuilder: (context, animation, secondaryAnimation) =>
+                            SearchScreen(
+                          tournament: widget.tournament,
+                          division: division,
+                        ),
+                        transitionsBuilder:
+                            (context, animation, secondaryAnimation, child) {
+                          // Create a Tween that transitions the new screen from fully transparent to fully opaque
+                          return FadeTransition(
+                            opacity: animation,
+                            child: child,
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+                SizedBox(width: 18),
+              ],
+            ),
+            backNavigation: widget.isPreview,
+            background: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.only(left: 23, right: 12, bottom: 20),
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     widget.isPreview
-                        ? IconButton(
-                            padding: const EdgeInsets.only(top: 10),
-                            constraints: BoxConstraints(),
-                            icon: const Icon(Icons.arrow_back),
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
+                        ? Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.pop(context);
+                                },
+                                child: Icon(Icons.arrow_back,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
+                              ),
+                              Spacer(),
+                              DropdownButton<Division>(
+                                value: division,
+                                borderRadius: BorderRadius.circular(20),
+                                items: widget.tournament.divisions
+                                    .map<DropdownMenuItem<Division>>(
+                                        (division) {
+                                  return DropdownMenuItem(
+                                      value: division,
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.groups_3_outlined,
+                                            size: 30,
+                                          ),
+                                          SizedBox(width: 10),
+                                          Text(division.name),
+                                        ],
+                                      ));
+                                }).toList(),
+                                onChanged: (Division? value) => {
+                                  setState(() {
+                                    division = value!;
+                                    selectedIndex = selectedIndex;
+                                  })
+                                },
+                              ),
+                            ],
                           )
-                        : Container(),
-                    Text(
-                      titles[selectedIndex],
-                      style: const TextStyle(
-                          fontSize: 30, fontWeight: FontWeight.w600),
-                    ),
-                    Spacer(),
-                    IconButton(
-                      icon: const Icon(
-                        Icons.search,
-                        size: 30,
-                      ),
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            transitionDuration: Duration(milliseconds: 300),
-                            reverseTransitionDuration:
-                                Duration(milliseconds: 300),
-                            pageBuilder:
-                                (context, animation, secondaryAnimation) =>
-                                    SearchScreen(
-                              tournament: widget.tournament,
-                              division: division,
-                            ),
-                            transitionsBuilder: (context, animation,
-                                secondaryAnimation, child) {
-                              // Create a Tween that transitions the new screen from fully transparent to fully opaque
-                              return FadeTransition(
-                                opacity: animation,
-                                child: child,
-                              );
-                            },
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              DropdownButton<Division>(
+                                value: division,
+                                borderRadius: BorderRadius.circular(20),
+                                items: widget.tournament.divisions
+                                    .map<DropdownMenuItem<Division>>(
+                                        (division) {
+                                  return DropdownMenuItem(
+                                      value: division,
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.groups_3_outlined,
+                                            size: 30,
+                                          ),
+                                          SizedBox(width: 10),
+                                          Text(division.name),
+                                        ],
+                                      ));
+                                }).toList(),
+                                onChanged: (Division? value) => {
+                                  setState(() {
+                                    division = value!;
+                                    selectedIndex = selectedIndex;
+                                  })
+                                },
+                              ),
+                              Spacer(),
+                              SettingsButton(prefs: widget.prefs!)
+                            ],
                           ),
-                        );
-                      },
-                    ),
                   ],
                 ),
               ),
-              centerTitle: false,
-              background: SafeArea(
-                child: Padding(
-                  padding:
-                      const EdgeInsets.only(left: 20, right: 12, bottom: 20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          DropdownButton<Division>(
-                            value: division,
-                            borderRadius: BorderRadius.circular(20),
-                            items: widget.tournament.divisions
-                                .map<DropdownMenuItem<Division>>((division) {
-                              return DropdownMenuItem(
-                                  value: division,
-                                  child: Row(
-                                    children: [
-                                      const Icon(
-                                        Icons.groups_3_outlined,
-                                        size: 30,
-                                      ),
-                                      SizedBox(width: 10),
-                                      Text(division.name),
-                                    ],
-                                  ));
-                            }).toList(),
-                            onChanged: (Division? value) => {
-                              setState(() {
-                                division = value!;
-                                selectedIndex = selectedIndex;
-                              })
-                            },
-                          ),
-                          const Spacer(),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
             ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
           ),
+          // SliverAppBar.large(
+          //   automaticallyImplyLeading: false,
+          //   expandedHeight: 125,
+          //   centerTitle: false,
+          //   flexibleSpace: FlexibleSpaceBar(
+          //     expandedTitleScale: 1,
+          //     collapseMode: CollapseMode.parallax,
+          //     title: Padding(
+          //       padding: const EdgeInsets.only(left: 20.0, right: 12.0),
+          //       child: Row(
+          //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //         crossAxisAlignment: CrossAxisAlignment.end,
+          //         children: [
+          //           widget.isPreview
+          //               ? IconButton(
+          //                   padding: const EdgeInsets.only(top: 10),
+          //                   constraints: BoxConstraints(),
+          //                   icon: const Icon(Icons.arrow_back),
+          //                   onPressed: () {
+          //                     Navigator.pop(context);
+          //                   },
+          //                 )
+          //               : Container(),
+          //           Text(
+          //             titles[selectedIndex],
+          //             style: const TextStyle(
+          //                 fontSize: 30, fontWeight: FontWeight.w600),
+          //           ),
+          //           Spacer(),
+          //           IconButton(
+          //             icon: const Icon(
+          //               Icons.search,
+          //               size: 30,
+          //             ),
+          //             onPressed: () {
+          //               Navigator.push(
+          //                 context,
+          //                 PageRouteBuilder(
+          //                   transitionDuration: Duration(milliseconds: 300),
+          //                   reverseTransitionDuration:
+          //                       Duration(milliseconds: 300),
+          //                   pageBuilder:
+          //                       (context, animation, secondaryAnimation) =>
+          //                           SearchScreen(
+          //                     tournament: widget.tournament,
+          //                     division: division,
+          //                   ),
+          //                   transitionsBuilder: (context, animation,
+          //                       secondaryAnimation, child) {
+          //                     // Create a Tween that transitions the new screen from fully transparent to fully opaque
+          //                     return FadeTransition(
+          //                       opacity: animation,
+          //                       child: child,
+          //                     );
+          //                   },
+          //                 ),
+          //               );
+          //             },
+          //           ),
+          //         ],
+          //       ),
+          //     ),
+          //     centerTitle: false,
+          //     background: SafeArea(
+          //       child: Padding(
+          //         padding:
+          //             const EdgeInsets.only(left: 20, right: 12, bottom: 20),
+          //         child: Column(
+          //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //           crossAxisAlignment: CrossAxisAlignment.start,
+          //           children: [
+          //             Row(
+          //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //               children: [
+          //                 DropdownButton<Division>(
+          //                   value: division,
+          //                   borderRadius: BorderRadius.circular(20),
+          //                   items: widget.tournament.divisions
+          //                       .map<DropdownMenuItem<Division>>((division) {
+          //                     return DropdownMenuItem(
+          //                         value: division,
+          //                         child: Row(
+          //                           children: [
+          //                             const Icon(
+          //                               Icons.groups_3_outlined,
+          //                               size: 30,
+          //                             ),
+          //                             SizedBox(width: 10),
+          //                             Text(division.name),
+          //                           ],
+          //                         ));
+          //                   }).toList(),
+          //                   onChanged: (Division? value) => {
+          //                     setState(() {
+          //                       division = value!;
+          //                       selectedIndex = selectedIndex;
+          //                     })
+          //                   },
+          //                 ),
+          //                 const Spacer(),
+          //               ],
+          //             ),
+          //           ],
+          //         ),
+          //       ),
+          //     ),
+          //   ),
+          //   backgroundColor: Theme.of(context).colorScheme.primary,
+          // ),
           SliverPersistentHeader(
             pinned: true,
             delegate: SliverHeaderDelegate(
