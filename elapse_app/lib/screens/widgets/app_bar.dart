@@ -78,7 +78,6 @@ class ElapseAppBar extends StatelessWidget {
       centerTitle: false,
       flexibleSpace: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
-          print(constraints.maxHeight - MediaQuery.of(context).padding.top);
           double leftPadding = backNavigation
               ? -0.5 *
                   (constraints.maxHeight -
