@@ -50,8 +50,8 @@ class _HomeScreenState extends State<HomeScreen> {
             expandedHeight: 125,
             centerTitle: false,
             flexibleSpace: FlexibleSpaceBar(
-              expandedTitleScale: 1,
-              collapseMode: CollapseMode.parallax,
+              expandedTitleScale: 1.25,
+              collapseMode: CollapseMode.pin,
               title: Padding(
                 padding: EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
@@ -60,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       welcomeMessage,
                       style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                     ),
                   ],
                 ),
