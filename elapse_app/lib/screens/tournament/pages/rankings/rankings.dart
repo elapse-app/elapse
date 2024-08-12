@@ -1,7 +1,7 @@
 import 'package:elapse_app/classes/Team/team.dart';
-import 'package:elapse_app/classes/Tournament/game.dart';
-import 'package:elapse_app/classes/Tournament/tskills.dart';
+import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
+import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dart';
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:flutter/material.dart';
@@ -9,20 +9,21 @@ import 'package:flutter/material.dart';
 class RankingsPage extends StatelessWidget {
   const RankingsPage(
       {super.key,
-      required this.rankings,
-      required this.teams,
-      required this.games,
       required this.searchQuery,
-      required this.skills,
-      required this.sort});
-  final Map<int, TeamStats> rankings;
-  final Map<int, TournamentSkills> skills;
-  final List<Team> teams;
-  final List<Game>? games;
+      required this.sort,
+      required this.divisionIndex});
   final String searchQuery;
+  final int divisionIndex;
   final String sort;
   @override
   Widget build(BuildContext context) {
+    Tournament tournament =
+        loadTournament(prefs.getString("recently-opened-tournament"));
+
+    List<Team> teams = tournament.teams;
+    Map<int, TeamStats> rankings =
+        tournament.divisions[divisionIndex].teamStats!;
+
     List<Team> divisionTeams =
         teams.where((e) => rankings[e.id] != null).toList();
     if (sort == "rank") {
@@ -81,14 +82,9 @@ class RankingsPage extends StatelessWidget {
             return Column(
               children: [
                 OPRRanking(
-                    teamName: team.teamNumber!,
+                    teamNumber: team.teamNumber!,
                     stat: sort.toUpperCase(),
-                    rankings: rankings,
-                    teamStats: teamStats,
-                    games: games,
                     teamID: team.id,
-                    skills: skills,
-                    team: team,
                     allianceColor: Theme.of(context).colorScheme.onSurface),
                 Divider(
                   color: Theme.of(context).colorScheme.surfaceDim,
@@ -100,13 +96,8 @@ class RankingsPage extends StatelessWidget {
             return Column(
               children: [
                 StandardRanking(
-                    teamName: team.teamNumber!,
-                    rankings: rankings,
-                    teamStats: teamStats,
-                    games: games,
                     teamID: team.id,
-                    skills: skills,
-                    team: team,
+                    teamNumber: team.teamNumber!,
                     allianceColor: Theme.of(context).colorScheme.onSurface),
                 Divider(
                   color: Theme.of(context).colorScheme.surfaceDim,

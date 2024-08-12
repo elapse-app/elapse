@@ -10,19 +10,17 @@ import 'package:elapse_app/screens/tournament_mode/widgets/ranking_overview_widg
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
 class TMHomePage extends StatefulWidget {
   const TMHomePage(
       {super.key,
       required this.tournamentID,
       required this.teamID,
-      required this.teamNumber,
-      required this.prefs});
+      required this.teamNumber});
   final int tournamentID;
   final int teamID;
   final String teamNumber;
-  final SharedPreferences prefs;
 
   @override
   State<TMHomePage> createState() => _TMHomePageState();
@@ -106,9 +104,7 @@ class _TMHomePageState extends State<TMHomePage> {
                               ),
                               Image(image: AssetImage(imageString), height: 25),
                               const Spacer(),
-                              SettingsButton(
-                                prefs: widget.prefs,
-                              )
+                              SettingsButton()
                             ],
                           ),
                           Padding(
@@ -354,12 +350,10 @@ class _TMHomePageState extends State<TMHomePage> {
                         return Column(
                           children: [
                             GameWidget(
-                                game: game,
-                                rankings: snapshot.data!.divisions[0].teamStats,
-                                games: snapshot.data!.divisions[0].games!,
-                                teamName: widget.teamNumber,
-                                isAllianceColoured: true,
-                                skills: snapshot.data!.tournamentSkills),
+                              game: game,
+                              teamName: widget.teamNumber,
+                              isAllianceColoured: true,
+                            ),
                             Divider(
                               color: Theme.of(context).colorScheme.surfaceDim,
                               height: 3,
@@ -434,8 +428,8 @@ class _TMHomePageState extends State<TMHomePage> {
                         color: Theme.of(context).colorScheme.secondary),
                   ),
                   onPressed: () {
-                    widget.prefs.setBool("isTournamentMode", false);
-                    widget.prefs.remove("tournament-${widget.tournamentID}");
+                    prefs.setBool("isTournamentMode", false);
+                    prefs.remove("tournament-${widget.tournamentID}");
                     myAppKey.currentState!.reloadApp();
                   }),
               Spacer(),

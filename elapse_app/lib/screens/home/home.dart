@@ -9,12 +9,11 @@ import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key, required this.teamID, required this.prefs});
+  const HomeScreen({super.key, required this.teamID});
   final int teamID;
-  final SharedPreferences prefs;
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -66,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         Image(image: AssetImage(imageString), height: 25),
                         Spacer(),
-                        SettingsButton(prefs: widget.prefs)
+                        SettingsButton()
                       ],
                     ),
                   ],
@@ -200,11 +199,10 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 ),
                                                 TextButton(
                                                   onPressed: () {
-                                                    widget.prefs.setBool(
+                                                    prefs.setBool(
                                                         "isTournamentMode",
                                                         true);
-                                                    widget.prefs.setInt(
-                                                        "tournamentID",
+                                                    prefs.setInt("tournamentID",
                                                         upcoming.id);
                                                     myAppKey.currentState!
                                                         .reloadApp();

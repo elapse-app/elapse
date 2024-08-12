@@ -2,12 +2,10 @@ import 'package:elapse_app/screens/explore/search.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
 class ExploreScreen extends StatelessWidget {
-  const ExploreScreen({super.key, required this.prefs});
-
-  final SharedPreferences prefs;
+  const ExploreScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +19,6 @@ class ExploreScreen extends StatelessWidget {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
             includeSettings: true,
-            prefs: prefs,
           ),
           SliverPersistentHeader(
             pinned: true,
@@ -62,7 +59,7 @@ class ExploreScreen extends StatelessWidget {
                               const Duration(milliseconds: 300),
                           pageBuilder:
                               (context, animation, secondaryAnimation) =>
-                                  ExploreSearch(prefs: prefs),
+                                  ExploreSearch(),
                           transitionsBuilder:
                               (context, animation, secondaryAnimation, child) {
                             // Create a Tween that transitions the new screen from fully transparent to fully opaque

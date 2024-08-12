@@ -13,17 +13,15 @@ import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
 class TournamentLoadedScreen extends StatefulWidget {
   final Tournament tournament;
   final bool isPreview;
-  final SharedPreferences? prefs;
   const TournamentLoadedScreen({
     super.key,
     required this.tournament,
     this.isPreview = false,
-    this.prefs,
   });
 
   @override
@@ -50,7 +48,6 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   bool useLiveTiming = true;
 
   void savedPress() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       useSavedTeams = !useSavedTeams;
       if (useSavedTeams) {
@@ -110,11 +107,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
       ),
       RankingsPage(
           searchQuery: searchQuery,
-          rankings: division.teamStats!,
-          teams: rankingsTeams,
           sort: filters[filterIndex],
-          skills: widget.tournament.tournamentSkills!,
-          games: division.games),
+          divisionIndex: division.order - 1),
       SkillsPage(
           skills: widget.tournament.tournamentSkills!,
           teams: widget.tournament.teams,
@@ -248,7 +242,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                                 },
                               ),
                               Spacer(),
-                              SettingsButton(prefs: widget.prefs!)
+                              SettingsButton()
                             ],
                           ),
                   ],
