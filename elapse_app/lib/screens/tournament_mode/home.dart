@@ -10,7 +10,6 @@ import 'package:elapse_app/screens/tournament_mode/widgets/ranking_overview_widg
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
-import 'package:elapse_app/main.dart';
 
 class TMHomePage extends StatefulWidget {
   const TMHomePage(

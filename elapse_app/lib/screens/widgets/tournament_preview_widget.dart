@@ -35,8 +35,7 @@ class TournamentPreviewWidget extends StatelessWidget {
             if (saveSearch) {
               saveState;
               List<String> recentSearches =
-                  prefs!.getStringList("recentTournamentSearches") ??
-                      <String>[];
+                  prefs.getStringList("recentTournamentSearches") ?? <String>[];
 
               recentSearches.remove(
                   '{"searchTerm": "${tournamentPreview.name}", "tournamentID": ${tournamentPreview.id}}');
@@ -46,7 +45,7 @@ class TournamentPreviewWidget extends StatelessWidget {
                 recentSearches.removeAt(0);
               }
 
-              prefs!.setStringList("recentTournamentSearches", recentSearches);
+              prefs.setStringList("recentTournamentSearches", recentSearches);
             }
             Navigator.push(
               context,

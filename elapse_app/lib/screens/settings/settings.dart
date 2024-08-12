@@ -3,8 +3,6 @@ import 'package:elapse_app/screens/settings/set_team.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:elapse_app/main.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
