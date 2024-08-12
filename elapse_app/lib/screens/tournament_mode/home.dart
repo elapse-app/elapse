@@ -32,7 +32,7 @@ class _TMHomePageState extends State<TMHomePage> {
   @override
   void initState() {
     super.initState();
-    tournament = TMTournamentDetails(widget.tournamentID, widget.prefs);
+    // tournament = TMTournamentDetails(widget.tournamentID, widget.prefs);
   }
 
   Future<Tournament>? tournament;
@@ -61,11 +61,11 @@ class _TMHomePageState extends State<TMHomePage> {
             flexibleSpace: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
                 var top = constraints.biggest.height;
-                double sizedBoxHeight = (top - kToolbarHeight) * 0.615 -
+                double sizedBoxHeight = (top - kToolbarHeight) * 0.58 -
                     MediaQuery.of(context).viewPadding.top;
                 sizedBoxHeight = sizedBoxHeight < 0 ? 0 : sizedBoxHeight;
                 return FlexibleSpaceBar(
-                  expandedTitleScale: 1,
+                  expandedTitleScale: 1.25,
                   collapseMode: CollapseMode.parallax,
                   title: Padding(
                     padding: const EdgeInsets.only(left: 20, right: 12),
@@ -79,20 +79,9 @@ class _TMHomePageState extends State<TMHomePage> {
                             Text(
                               welcomeMessage,
                               style: TextStyle(
-                                  fontSize: 30, fontWeight: FontWeight.w600),
+                                  fontSize: 24, fontWeight: FontWeight.w600),
                             ),
                             Spacer(),
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              constraints: BoxConstraints(),
-                              icon: Icon(
-                                Icons.refresh_rounded,
-                                size: 30,
-                              ),
-                              onPressed: () {
-                                myAppKey.currentState!.reloadApp();
-                              },
-                            )
                           ],
                         ),
                         SizedBox(
@@ -104,7 +93,7 @@ class _TMHomePageState extends State<TMHomePage> {
                   centerTitle: false,
                   background: SafeArea(
                     child: Padding(
-                      padding: EdgeInsets.only(left: 20, right: 12, bottom: 10),
+                      padding: EdgeInsets.only(left: 23, right: 12, bottom: 10),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,

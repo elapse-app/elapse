@@ -32,8 +32,6 @@ Future<void> tournamentStatsPage(
     },
   ).toList();
 
-  final DraggableScrollableController dra = DraggableScrollableController();
-
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,

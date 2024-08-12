@@ -3,6 +3,7 @@ import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/vdaStats.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
+import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
@@ -85,34 +86,12 @@ class _TeamScreenState extends State<TeamScreen> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            automaticallyImplyLeading: false,
-            expandedHeight: 125,
-            centerTitle: false,
-            flexibleSpace: FlexibleSpaceBar(
-              expandedTitleScale: 1,
-              collapseMode: CollapseMode.parallax,
-              title: Padding(
-                padding: EdgeInsets.only(left: 20, right: 12),
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: Icon(Icons.arrow_back),
-                    ),
-                    const Text(
-                      "Team Info",
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-              ),
-              centerTitle: false,
+          ElapseAppBar(
+            title: Text(
+              "Team Info",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
+            backNavigation: true,
           ),
           const RoundedTop(),
           SliverPadding(
