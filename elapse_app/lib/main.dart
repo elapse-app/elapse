@@ -92,7 +92,6 @@ class MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    isTournamentMode = true;
     TeamPreview savedTeam = TeamPreview(
         teamNumber:
             jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"],
