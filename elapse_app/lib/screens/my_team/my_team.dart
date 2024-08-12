@@ -89,14 +89,16 @@ class _MyTeamsState extends State<MyTeams> {
             automaticallyImplyLeading: false,
             expandedHeight: 125,
             centerTitle: false,
+            titleSpacing: 0,
             flexibleSpace: FlexibleSpaceBar(
-              expandedTitleScale: 1,
+              expandedTitleScale: 1.25,
               collapseMode: CollapseMode.parallax,
               title: const Padding(
                 padding: EdgeInsets.only(left: 20, right: 12),
                 child: Text(
                   "My Teams",
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
+                  textAlign: TextAlign.left,
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                 ),
               ),
               centerTitle: false,
