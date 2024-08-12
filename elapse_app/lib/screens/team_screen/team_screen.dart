@@ -7,7 +7,6 @@ import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/main.dart';
 
 class TeamScreen extends StatefulWidget {

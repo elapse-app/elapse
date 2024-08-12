@@ -9,7 +9,6 @@ import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-import 'package:elapse_app/main.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key, required this.teamID});

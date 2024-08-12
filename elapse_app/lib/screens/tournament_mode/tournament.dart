@@ -3,7 +3,6 @@ import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/screens/tournament/pages/main/loaded.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
-import 'package:elapse_app/main.dart';
 
 class TMTournamentScreen extends StatefulWidget {
   final int tournamentID;
