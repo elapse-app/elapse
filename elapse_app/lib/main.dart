@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
-import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/providers/tournament_mode_provider.dart';
 import 'package:elapse_app/screens/explore/explore.dart';
@@ -93,6 +92,7 @@ class MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    isTournamentMode = true;
     TeamPreview savedTeam = TeamPreview(
         teamNumber:
             jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"],
@@ -121,11 +121,16 @@ class MyAppState extends State<MyApp> {
             HomeScreen(
               teamID: savedTeam.teamID,
               prefs: widget.prefs,
+              key: PageStorageKey<String>("home"),
             ),
             MyTeams(
               prefs: widget.prefs,
+              key: PageStorageKey<String>("my-teams"),
             ),
-            ExploreScreen(prefs: widget.prefs),
+            ExploreScreen(
+              prefs: widget.prefs,
+              key: PageStorageKey<String>("explore"),
+            ),
           ];
     return Consumer2<ColorProvider, TournamentModeProvider>(
       builder: (context, colorProvider, tournamentModeProvider, child) {
@@ -163,6 +168,8 @@ class MyAppState extends State<MyApp> {
           ),
         ];
 
+        final PageStorageBucket _bucket = PageStorageBucket();
+
         // Add the tournament destination if tournament mode is enabled
         if (isTournamentMode) {
           destinations.insert(
@@ -185,7 +192,10 @@ class MyAppState extends State<MyApp> {
             fontFamily: "Manrope",
           ),
           home: Scaffold(
-            body: screens[selectedIndex],
+            body: PageStorage(
+              bucket: _bucket,
+              child: screens[selectedIndex],
+            ),
             bottomNavigationBar: NavigationBar(
               selectedIndex: selectedIndex,
               indicatorColor: chosenTheme.primary,

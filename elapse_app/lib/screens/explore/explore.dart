@@ -1,6 +1,6 @@
 import 'package:elapse_app/screens/explore/search.dart';
+import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
-import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -15,43 +15,13 @@ class ExploreScreen extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            automaticallyImplyLeading: false,
-            expandedHeight: 125,
-            centerTitle: false,
-            flexibleSpace: FlexibleSpaceBar(
-              expandedTitleScale: 1,
-              collapseMode: CollapseMode.parallax,
-              title: const Padding(
-                padding: EdgeInsets.only(left: 20, right: 12),
-                child: Text(
-                  "Explore",
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
-                ),
-              ),
-              centerTitle: false,
-              background: SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 20, right: 12, bottom: 20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Spacer(),
-                          SettingsButton(
-                            prefs: prefs,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+          ElapseAppBar(
+            title: Text(
+              "Explore",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
+            includeSettings: true,
+            prefs: prefs,
           ),
           SliverPersistentHeader(
             pinned: true,

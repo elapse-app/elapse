@@ -1,5 +1,6 @@
 import 'package:elapse_app/screens/settings/theme.dart';
 import 'package:elapse_app/screens/settings/set_team.dart';
+import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,34 +15,12 @@ class SettingsScreen extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            automaticallyImplyLeading: false,
-            expandedHeight: 125,
-            centerTitle: false,
-            flexibleSpace: FlexibleSpaceBar(
-              expandedTitleScale: 1,
-              collapseMode: CollapseMode.parallax,
-              title: Padding(
-                padding: const EdgeInsets.only(left: 20, right: 12),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(Icons.arrow_back)),
-                    const Text(
-                      "Settings",
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-              ),
-              centerTitle: false,
+          ElapseAppBar(
+            title: Text(
+              "Settings",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
+            backNavigation: true,
           ),
           const RoundedTop(),
           SliverPadding(

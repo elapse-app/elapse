@@ -8,11 +8,12 @@ class TournamentScreen extends StatefulWidget {
   final int tournamentID;
   final bool isPreview;
   final Future<Tournament>? tournamentFuture;
-  const TournamentScreen(
-      {super.key,
-      required this.tournamentID,
-      this.isPreview = true,
-      this.tournamentFuture});
+  const TournamentScreen({
+    super.key,
+    required this.tournamentID,
+    this.isPreview = true,
+    this.tournamentFuture,
+  });
 
   @override
   State<TournamentScreen> createState() => _TournamentScreenState();

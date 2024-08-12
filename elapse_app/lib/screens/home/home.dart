@@ -2,6 +2,7 @@ import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/providers/tournament_mode_provider.dart';
 import 'package:elapse_app/screens/tournament/tournament.dart';
+import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
@@ -45,51 +46,33 @@ class _HomeScreenState extends State<HomeScreen> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            automaticallyImplyLeading: false,
-            expandedHeight: 125,
-            centerTitle: false,
-            flexibleSpace: FlexibleSpaceBar(
-              expandedTitleScale: 1.25,
-              collapseMode: CollapseMode.pin,
-              title: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 20),
+          ElapseAppBar(
+            title: Text(
+              welcomeMessage,
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+            ),
+            background: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(left: 20, right: 12, bottom: 20),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Spacer(),
-                    Text(
-                      welcomeMessage,
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const SizedBox(
+                          width: 5,
+                        ),
+                        Image(image: AssetImage(imageString), height: 25),
+                        Spacer(),
+                        SettingsButton(prefs: widget.prefs)
+                      ],
                     ),
                   ],
                 ),
               ),
-              background: SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 20, right: 12, bottom: 20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const SizedBox(
-                            width: 5,
-                          ),
-                          Image(image: AssetImage(imageString), height: 25),
-                          Spacer(),
-                          SettingsButton(prefs: widget.prefs)
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              centerTitle: false,
             ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
           ),
           const RoundedTop(),
           SliverPadding(

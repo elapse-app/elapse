@@ -114,6 +114,7 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
           return TournamentLoadedScreen(
             tournament: snapshot.data as Tournament,
             isPreview: widget.isPreview,
+            prefs: widget.prefs,
           );
         } else {
           return const Center(
