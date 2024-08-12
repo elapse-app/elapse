@@ -84,9 +84,13 @@ class _MyTeamsState extends State<MyTeams> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
+        key: widget.key,
         slivers: [
           ElapseAppBar(
-            title: "My Team",
+            title: Text(
+              "My Team",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+            ),
             includeSettings: true,
             prefs: widget.prefs,
           ),

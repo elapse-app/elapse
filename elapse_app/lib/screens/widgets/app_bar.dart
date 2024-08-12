@@ -11,7 +11,7 @@ class ElapseAppBar extends StatelessWidget {
     this.prefs,
     this.background,
   });
-  final String title;
+  final Widget title;
   final Widget? background;
   final bool includeSettings;
   final bool backNavigation;
@@ -50,6 +50,27 @@ class ElapseAppBar extends StatelessWidget {
           ),
         ),
       );
+    } else if (backNavigation && background == null) {
+      appBarBackground = SafeArea(
+        child: Padding(
+          padding: EdgeInsets.only(left: 23),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              backNavigation
+                  ? GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Icon(Icons.arrow_back,
+                          color: Theme.of(context).colorScheme.onSurface),
+                    )
+                  : Container(),
+            ],
+          ),
+        ),
+      );
     }
     return SliverAppBar.large(
       automaticallyImplyLeading: false,
@@ -76,11 +97,7 @@ class ElapseAppBar extends StatelessWidget {
                 children: [
                   Padding(
                     padding: EdgeInsets.only(left: leftPadding),
-                    child: Text(
-                      title,
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
-                    ),
+                    child: title,
                   ),
                   backNavigation
                       ? GestureDetector(
