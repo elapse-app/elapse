@@ -8,9 +8,9 @@ import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Team/vdaStats.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
+import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
-import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -85,45 +85,10 @@ class _MyTeamsState extends State<MyTeams> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            automaticallyImplyLeading: false,
-            expandedHeight: 125,
-            centerTitle: false,
-            titleSpacing: 0,
-            flexibleSpace: FlexibleSpaceBar(
-              expandedTitleScale: 1.25,
-              collapseMode: CollapseMode.parallax,
-              title: const Padding(
-                padding: EdgeInsets.only(left: 20, right: 12),
-                child: Text(
-                  "My Teams",
-                  textAlign: TextAlign.left,
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
-                ),
-              ),
-              centerTitle: false,
-              background: SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 20, right: 12, bottom: 20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Spacer(),
-                          SettingsButton(
-                            prefs: widget.prefs,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
+          ElapseAppBar(
+            title: "My Team",
+            includeSettings: true,
+            prefs: widget.prefs,
           ),
           const RoundedTop(),
           SliverPadding(
