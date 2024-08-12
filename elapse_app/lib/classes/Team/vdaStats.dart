@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
+import 'package:elapse_app/main.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -95,7 +96,6 @@ class VDAStats {
 }
 
 Future<List<VDAStats>> getTrueSkillData() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
   final String? vdaData = prefs.getString("vdaData");
   final String? expiryDate = prefs.getString("vdaExpiry");
 

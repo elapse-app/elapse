@@ -1,19 +1,17 @@
 import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
 import 'package:elapse_app/screens/tournament/tournament.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
 class TournamentPreviewWidget extends StatelessWidget {
   const TournamentPreviewWidget(
       {super.key,
       required this.tournamentPreview,
       this.saveSearch = false,
-      this.prefs,
       this.saveState});
 
   final TournamentPreview tournamentPreview;
   final bool saveSearch;
-  final SharedPreferences? prefs;
   final Function? saveState;
 
   @override

@@ -17,14 +17,14 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
 final GlobalKey<MyAppState> myAppKey = GlobalKey<MyAppState>();
-
+late SharedPreferences prefs;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
 
-  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs = await SharedPreferences.getInstance();
 
   // Set android system navbar colour
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -37,12 +37,12 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => ColorProvider(prefs: prefs),
+          create: (context) => ColorProvider(),
         ),
         ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
       ],
       child: prefs.getString("savedTeam") == null
-          ? SetupScreen(prefs: prefs)
+          ? SetupScreen()
           : MyApp(key: myAppKey, prefs: prefs),
     ),
   );
@@ -103,31 +103,25 @@ class MyAppState extends State<MyApp> {
               tournamentID: widget.prefs.getInt("tournamentID"),
               teamID: teamID,
               teamNumber: teamNumber,
-              prefs: widget.prefs,
             ),
             TMTournamentScreen(
               tournamentID: widget.prefs.getInt("tournamentID"),
               isPreview: false,
-              prefs: widget.prefs,
             ),
             TMMyTeams(
-              prefs: widget.prefs,
               tournamentID: widget.prefs.getInt("tournamentID"),
             ),
-            ExploreScreen(prefs: widget.prefs)
+            ExploreScreen()
           ]
         : screens = [
             HomeScreen(
               teamID: savedTeam.teamID,
-              prefs: widget.prefs,
               key: PageStorageKey<String>("home"),
             ),
             MyTeams(
-              prefs: widget.prefs,
               key: PageStorageKey<String>("my-teams"),
             ),
             ExploreScreen(
-              prefs: widget.prefs,
               key: PageStorageKey<String>("explore"),
             ),
           ];

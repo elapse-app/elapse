@@ -1,20 +1,22 @@
-import 'package:elapse_app/classes/Team/team.dart';
+import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
-import 'package:elapse_app/classes/Tournament/tskills.dart';
+import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
+import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:flutter/material.dart';
 
 Future<void> tournamentStatsPage(
-    BuildContext context,
-    TeamStats teamStats,
-    List<Game>? games,
-    Map<int, TeamStats> rankings,
-    Map<int, TournamentSkills> skills,
-    String teamName,
-    int teamID,
-    {Team? team}) {
+    BuildContext context, int teamID, String teamNumber) {
+  Tournament tournament =
+      loadTournament(prefs.getString("recently-opened-tournament"));
+
+  int divisionIndex = getTeamDivisionIndex(tournament.divisions, teamID);
+
+  List<Game> games = tournament.divisions[divisionIndex].games!;
+  Map<int, TeamStats> rankings = tournament.divisions[divisionIndex].teamStats!;
+  TeamStats teamStats = rankings[teamID]!;
   int rank = teamStats.rank;
   int wins = teamStats.wins;
   int losses = teamStats.losses;
@@ -23,12 +25,12 @@ Future<void> tournamentStatsPage(
   double dpr = teamStats.dpr;
   double ccwm = teamStats.ccwm;
 
-  List<Game> teamGames = games!.where(
+  List<Game> teamGames = games.where(
     (element) {
-      return element.redAlliancePreview?[0].teamNumber == teamName ||
-          element.redAlliancePreview?[1].teamNumber == teamName ||
-          element.blueAlliancePreview?[0].teamNumber == teamName ||
-          element.blueAlliancePreview?[1].teamNumber == teamName;
+      return element.redAlliancePreview?[0].teamNumber == teamNumber ||
+          element.redAlliancePreview?[1].teamNumber == teamNumber ||
+          element.blueAlliancePreview?[0].teamNumber == teamNumber ||
+          element.blueAlliancePreview?[1].teamNumber == teamNumber;
     },
   ).toList();
 
@@ -59,7 +61,7 @@ Future<void> tournamentStatsPage(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "$teamName Stats",
+                      "$teamNumber Stats",
                       style: const TextStyle(
                           fontSize: 24, height: 1, fontWeight: FontWeight.w500),
                     ),
@@ -71,8 +73,7 @@ Future<void> tournamentStatsPage(
                           MaterialPageRoute(
                             builder: (context) => TeamScreen(
                               teamID: teamID,
-                              teamName: teamName,
-                              team: team,
+                              teamName: teamNumber,
                             ),
                           ),
                         );
@@ -207,7 +208,8 @@ Future<void> tournamentStatsPage(
                             "Skills Rank",
                             style: TextStyle(fontSize: 24),
                           ),
-                          Text("${skills[teamID]?.rank ?? "N/A"}",
+                          Text(
+                              "${tournament.tournamentSkills![teamID]?.rank ?? "N/A"}",
                               style: const TextStyle(
                                   fontSize: 24, fontWeight: FontWeight.w500))
                         ],
@@ -295,10 +297,7 @@ Future<void> tournamentStatsPage(
                           children: [
                             GameWidget(
                               game: game,
-                              games: games,
-                              rankings: rankings,
-                              teamName: teamName,
-                              skills: skills,
+                              teamName: teamNumber,
                               isAllianceColoured: false,
                             ),
                             Divider(
