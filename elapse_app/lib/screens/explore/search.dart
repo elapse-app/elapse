@@ -498,7 +498,7 @@ class _ExploreSearchState extends State<ExploreSearch>
                                 child: SizedBox(
                                   height: 60,
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Row(
                                         children: [
@@ -639,7 +639,7 @@ class _ExploreSearchState extends State<ExploreSearch>
                                 child: SizedBox(
                                   height: 60,
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Row(
                                         children: [
