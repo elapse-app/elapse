@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
-import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/providers/tournament_mode_provider.dart';
 import 'package:elapse_app/screens/explore/explore.dart';
