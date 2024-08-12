@@ -137,9 +137,6 @@ class MyAppState extends State<MyApp> {
 
         if (widget.prefs.getString("theme") == "system") {
           systemDefined = true;
-          print("using system theme");
-        } else {
-          print("Not using system theme");
         }
 
         ColorScheme chosenTheme =
