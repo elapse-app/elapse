@@ -12,37 +12,14 @@ class ExploreScreen extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
-          ElapseAppBar(
+          const ElapseAppBar(
             title: Text(
               "Explore",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
             includeSettings: true,
           ),
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: SliverHeaderDelegate(
-                minHeight: 25,
-                maxHeight: 25,
-                child: Stack(
-                  children: [
-                    Container(
-                      color: Theme.of(context).colorScheme.primary,
-                      height: 25,
-                    ),
-                    Container(
-                      height: 25,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(25),
-                          topRight: Radius.circular(25),
-                        ),
-                      ),
-                    ),
-                  ],
-                )),
-          ),
+          const RoundedTop(),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 23),
             sliver: SliverToBoxAdapter(
@@ -188,25 +165,28 @@ class ExploreScreen extends StatelessWidget {
             ),
           ),
           SliverToBoxAdapter(
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 23),
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              height: 64,
-              decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.tertiary,
-                  borderRadius: BorderRadius.circular(18)),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "World Rankings",
-                    style: TextStyle(fontSize: 16, height: 1),
-                  ),
-                  Icon(
-                    Icons.arrow_forward,
-                    size: 16,
-                  )
-                ],
+            child: GestureDetector(
+              onTap: () {},
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 23),
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                height: 64,
+                decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.tertiary,
+                    borderRadius: BorderRadius.circular(18)),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "World Rankings",
+                      style: TextStyle(fontSize: 16, height: 1),
+                    ),
+                    Icon(
+                      Icons.arrow_forward,
+                      size: 16,
+                    )
+                  ],
+                ),
               ),
             ),
           ),
