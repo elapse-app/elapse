@@ -1,7 +1,7 @@
-import 'package:elapse_app/classes/Team/team.dart';
-import 'package:elapse_app/classes/Tournament/game.dart';
-import 'package:elapse_app/classes/Tournament/tskills.dart';
+import 'package:elapse_app/classes/Tournament/division.dart';
+import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
+import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/tournament_stats_page.dart';
 import 'package:flutter/material.dart';
@@ -9,25 +9,23 @@ import 'package:flutter/material.dart';
 class StandardRanking extends StatelessWidget {
   const StandardRanking({
     super.key,
-    required this.teamStats,
-    required this.rankings,
-    required this.teamName,
-    required this.skills,
-    required this.games,
-    this.team,
     required this.teamID,
     required this.allianceColor,
+    required this.teamNumber,
   });
-  final Map<int, TeamStats> rankings;
-  final String teamName;
-  final TeamStats teamStats;
-  final List<Game>? games;
-  final Map<int, TournamentSkills> skills;
-  final Team? team;
+  final String teamNumber;
   final int teamID;
   final Color allianceColor;
   @override
   Widget build(BuildContext context) {
+    Tournament tournament =
+        loadTournament(prefs.getString("recently-opened-tournament"));
+
+    int divisionIndex = getTeamDivisionIndex(tournament.divisions, teamID);
+
+    Map<int, TeamStats> rankings =
+        tournament.divisions[divisionIndex].teamStats!;
+    TeamStats teamStats = rankings[teamID]!;
     int rank = teamStats.rank;
     int wins = teamStats.wins;
     int losses = teamStats.losses;
@@ -37,9 +35,7 @@ class StandardRanking extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        tournamentStatsPage(
-            context, teamStats, games, rankings, skills, teamName, teamID,
-            team: team);
+        tournamentStatsPage(context, teamID, teamNumber);
       },
       child: Container(
         height: 72,
@@ -51,7 +47,7 @@ class StandardRanking extends StatelessWidget {
             Flexible(
               flex: 120,
               fit: FlexFit.tight,
-              child: Text(teamName,
+              child: Text(teamNumber,
                   style: TextStyle(
                       fontSize: 40,
                       height: 1,
@@ -113,30 +109,27 @@ class StandardRanking extends StatelessWidget {
 }
 
 class OPRRanking extends StatelessWidget {
-  const OPRRanking(
-      {super.key,
-      required this.teamStats,
-      required this.rankings,
-      required this.skills,
-      required this.teamName,
-      required this.stat,
-      required this.games,
-      this.team,
-      required this.teamID,
-      required this.allianceColor});
-
-  final Map<int, TeamStats> rankings;
-  final Map<int, TournamentSkills> skills;
-  final String stat;
-  final String teamName;
-  final TeamStats teamStats;
-  final List<Game>? games;
-  final Team? team;
-  final Color allianceColor;
+  const OPRRanking({
+    super.key,
+    required this.teamID,
+    required this.allianceColor,
+    required this.teamNumber,
+    required this.stat,
+  });
+  final String teamNumber;
   final int teamID;
-
+  final Color allianceColor;
+  final String stat;
   @override
   Widget build(BuildContext context) {
+    Tournament tournament =
+        loadTournament(prefs.getString("recently-opened-tournament"));
+
+    int divisionIndex = getTeamDivisionIndex(tournament.divisions, teamID);
+
+    Map<int, TeamStats> rankings =
+        tournament.divisions[divisionIndex].teamStats!;
+    TeamStats teamStats = rankings[teamID]!;
     int rank = teamStats.rank;
     int wins = teamStats.wins;
     int losses = teamStats.losses;
@@ -156,16 +149,7 @@ class OPRRanking extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        tournamentStatsPage(
-          context,
-          teamStats,
-          games,
-          rankings,
-          skills,
-          teamName,
-          teamID,
-          team: team,
-        );
+        tournamentStatsPage(context, teamID, teamNumber);
       },
       child: Container(
         height: 72,
@@ -177,7 +161,7 @@ class OPRRanking extends StatelessWidget {
             Flexible(
               flex: 120,
               fit: FlexFit.tight,
-              child: Text(teamName,
+              child: Text(teamNumber,
                   style: TextStyle(
                       fontSize: 40,
                       height: 1,

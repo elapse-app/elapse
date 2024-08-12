@@ -35,9 +35,6 @@ class SchedulePage extends StatelessWidget {
                 children: [
                   GameWidget(
                     game: game,
-                    rankings: division.teamStats,
-                    games: division.games!,
-                    skills: tournament.tournamentSkills,
                     useLiveTiming: useLiveTiming,
                   ),
                   index != division.games!.length - 1

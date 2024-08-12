@@ -245,12 +245,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                     allianceColor:
                                         Theme.of(context).colorScheme.onSurface)
                                 : StandardRanking(
-                                    teamStats:
-                                        widget.division.teamStats![team.id]!,
-                                    rankings: widget.division.teamStats!,
-                                    teamName: team.teamNumber!,
-                                    skills: widget.tournament.tournamentSkills!,
-                                    games: widget.division.games!,
+                                    teamNumber: team.teamNumber!,
                                     teamID: team.id,
                                     allianceColor:
                                         Theme.of(context).colorScheme.onSurface,
@@ -307,9 +302,6 @@ class _SearchScreenState extends State<SearchScreen> {
                           children: [
                             GameWidget(
                               game: game,
-                              rankings: widget.division.teamStats,
-                              games: widget.division.games!,
-                              skills: widget.tournament.tournamentSkills,
                             ),
                             index != widget.division.games!.length - 1
                                 ? Divider(

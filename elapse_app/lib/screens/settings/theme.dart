@@ -2,10 +2,10 @@ import 'package:elapse_app/providers/color_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
 class ThemeSettings extends StatefulWidget {
-  const ThemeSettings({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const ThemeSettings({super.key});
 
   @override
   State<ThemeSettings> createState() => _ThemeSettingsState();

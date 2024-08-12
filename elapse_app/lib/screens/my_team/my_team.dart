@@ -12,11 +12,10 @@ import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
 class MyTeams extends StatefulWidget {
-  const MyTeams({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const MyTeams({super.key});
 
   @override
   State<MyTeams> createState() => _MyTeamsState();
@@ -34,12 +33,12 @@ class _MyTeamsState extends State<MyTeams> {
   int seasonID = 190;
   @override
   void initState() {
-    final String savedTeam = widget.prefs.getString("savedTeam") ?? "";
+    final String savedTeam = prefs.getString("savedTeam") ?? "";
     savedTeamPreview = TeamPreview(
         teamID: jsonDecode(savedTeam)["teamID"],
         teamNumber: jsonDecode(savedTeam)["teamNumber"]);
 
-    savedTeamStrings = widget.prefs.getStringList("savedTeams") ?? [];
+    savedTeamStrings = prefs.getStringList("savedTeams") ?? [];
     savedTeamPreviews.add(savedTeamPreview);
     savedTeamPreviews.addAll(savedTeamStrings
         .map((e) => TeamPreview(
@@ -92,7 +91,6 @@ class _MyTeamsState extends State<MyTeams> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
             includeSettings: true,
-            prefs: widget.prefs,
           ),
           const RoundedTop(),
           SliverPadding(
@@ -825,8 +823,7 @@ class _MyTeamsState extends State<MyTeams> {
                           savedTeamPreviews.remove(selectedTeamPreview);
                           savedTeamStrings.remove(
                               '{"teamID": ${selectedTeamPreview.teamID}, "teamNumber": "${selectedTeamPreview.teamNumber}"}');
-                          widget.prefs
-                              .setStringList("savedTeams", savedTeamStrings);
+                          prefs.setStringList("savedTeams", savedTeamStrings);
                           selectedTeamPreview = savedTeamPreviews[0];
                           teamChange(selectedTeamPreview);
                         },
