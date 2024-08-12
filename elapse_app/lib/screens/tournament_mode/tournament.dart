@@ -3,16 +3,14 @@ import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/screens/tournament/pages/main/loaded.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
 class TMTournamentScreen extends StatefulWidget {
   final int tournamentID;
   final bool isPreview;
-  final SharedPreferences prefs;
   const TMTournamentScreen({
     super.key,
     required this.tournamentID,
-    required this.prefs,
     this.isPreview = true,
   });
 
@@ -31,7 +29,7 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
   @override
   void initState() {
     super.initState();
-    tournament = TMTournamentDetails(widget.tournamentID, widget.prefs);
+    tournament = TMTournamentDetails(widget.tournamentID);
   }
 
   @override
@@ -114,7 +112,6 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
           return TournamentLoadedScreen(
             tournament: snapshot.data as Tournament,
             isPreview: widget.isPreview,
-            prefs: widget.prefs,
           );
         } else {
           return const Center(

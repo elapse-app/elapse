@@ -16,11 +16,10 @@ import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
 class TMMyTeams extends StatefulWidget {
-  const TMMyTeams({super.key, required this.prefs, required this.tournamentID});
-  final SharedPreferences prefs;
+  const TMMyTeams({super.key, required this.tournamentID});
   final int tournamentID;
 
   @override
@@ -41,12 +40,12 @@ class TMMyTeamsState extends State<TMMyTeams> {
   int seasonID = 190;
   @override
   void initState() {
-    final String savedTeam = widget.prefs.getString("savedTeam") ?? "";
+    final String savedTeam = prefs.getString("savedTeam") ?? "";
     savedTeamPreview = TeamPreview(
         teamID: jsonDecode(savedTeam)["teamID"],
         teamNumber: jsonDecode(savedTeam)["teamNumber"]);
 
-    savedTeamStrings = widget.prefs.getStringList("savedTeams") ?? [];
+    savedTeamStrings = prefs.getStringList("savedTeams") ?? [];
     savedTeamPreviews.add(savedTeamPreview);
     savedTeamPreviews.addAll(savedTeamStrings
         .map((e) => TeamPreview(
@@ -61,7 +60,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
     teamTournaments = fetchTeamTournaments(savedTeamPreview.teamID, seasonID);
     teamAwards = getAwards(savedTeamPreview.teamID, seasonID);
 
-    tournament = TMTournamentDetails(widget.tournamentID, widget.prefs);
+    tournament = TMTournamentDetails(widget.tournamentID);
   }
 
   void teamChange(TeamPreview? value) {
@@ -93,10 +92,10 @@ class TMMyTeamsState extends State<TMMyTeams> {
       body: CustomScrollView(
         slivers: [
           ElapseAppBar(
-              title: Text("My Team",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
-              includeSettings: true,
-              prefs: widget.prefs),
+            title: Text("My Team",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+            includeSettings: true,
+          ),
           const RoundedTop(),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 23),
@@ -340,10 +339,6 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                     children: [
                                       GameWidget(
                                         game: e,
-                                        rankings:
-                                            tournament.divisions[0].teamStats!,
-                                        games: tournament.divisions[0].games!,
-                                        skills: tournament.tournamentSkills!,
                                         teamName:
                                             selectedTeamPreview.teamNumber,
                                         isAllianceColoured: false,
@@ -904,8 +899,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                           savedTeamPreviews.remove(selectedTeamPreview);
                           savedTeamStrings.remove(
                               '{"teamID": ${selectedTeamPreview.teamID}, "teamNumber": "${selectedTeamPreview.teamNumber}"}');
-                          widget.prefs
-                              .setStringList("savedTeams", savedTeamStrings);
+                          prefs.setStringList("savedTeams", savedTeamStrings);
                           selectedTeamPreview = savedTeamPreviews[0];
                           teamChange(selectedTeamPreview);
                         },

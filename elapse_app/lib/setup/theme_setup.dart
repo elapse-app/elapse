@@ -2,11 +2,12 @@ import 'package:elapse_app/main.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
 class ThemeSetup extends StatefulWidget {
-  const ThemeSetup({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const ThemeSetup({
+    super.key,
+  });
 
   @override
   State<ThemeSetup> createState() => _ThemeSetupState();
@@ -171,13 +172,13 @@ class _ThemeSetupState extends State<ThemeSetup> {
                         foregroundColor: WidgetStateProperty.all(
                             Theme.of(context).colorScheme.secondary)),
                     onPressed: () {
-                      widget.prefs.setBool("needsReload", true);
+                      prefs.setBool("needsReload", true);
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
                           builder: (context) => MyApp(
                             key: myAppKey,
-                            prefs: widget.prefs,
+                            prefs: prefs,
                           ),
                         ),
                       );

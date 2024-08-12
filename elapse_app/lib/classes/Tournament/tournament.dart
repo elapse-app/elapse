@@ -8,10 +8,9 @@ import 'dart:convert';
 
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/extras/token.dart';
+import 'package:elapse_app/main.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
-
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Tournament {
   int id;
@@ -191,8 +190,7 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
   }
 }
 
-Future<Tournament> TMTournamentDetails(
-    int tournamentID, SharedPreferences prefs) async {
+Future<Tournament> TMTournamentDetails(int tournamentID) async {
   Tournament tournament;
   if (prefs.getString("savedTournament") == null) {
     tournament = await getTournamentDetails(tournamentID);

@@ -4,10 +4,10 @@ import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -35,9 +35,7 @@ class SettingsScreen extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ThemeSettings(
-                              prefs: prefs,
-                            ),
+                            builder: (context) => ThemeSettings(),
                           ),
                         );
                       },
@@ -64,9 +62,7 @@ class SettingsScreen extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SetMainTeam(
-                              prefs: prefs,
-                            ),
+                            builder: (context) => SetMainTeam(),
                           ),
                         );
                       },
