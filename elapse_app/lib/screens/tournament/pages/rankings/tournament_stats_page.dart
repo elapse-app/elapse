@@ -37,15 +37,13 @@ Future<void> tournamentStatsPage(
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
+    useSafeArea: true,
     builder: (BuildContext context) {
       return DraggableScrollableSheet(
         initialChildSize: 0.8,
         maxChildSize: 0.8,
-        minChildSize: 0,
+        minChildSize: 0.5,
         expand: false,
-        shouldCloseOnMinExtent: true,
-        snapAnimationDuration: const Duration(milliseconds: 250),
-        controller: dra,
         builder: (BuildContext context, ScrollController scrollController) {
           return Container(
             padding: const EdgeInsets.symmetric(horizontal: 23, vertical: 24),
