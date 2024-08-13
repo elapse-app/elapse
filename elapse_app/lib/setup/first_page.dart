@@ -37,7 +37,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                 ),
               ),
             ),
-            SizedBox(height: 20), // Replace Spacer() with SizedBox for debugging
+            SizedBox(height: 0), // Replace Spacer() with SizedBox for debugging
             // White bottom section with Get Started button
             Container(
               height: MediaQuery.of(context).size.height * 0.36 - 20,
@@ -54,6 +54,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: SizedBox(
+                      height: 55.0,
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
@@ -76,6 +77,38 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                         child: Text('Get Started'),
                       ),
                     ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      // Navigate to the next page
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => FirstFeature(),
+                        ),
+                      );
+                    },
+                    child: RichText(
+                    text: TextSpan(
+                      text: 'Existing user?',
+                          style: TextStyle(
+                            fontFamily: "Manrope",
+                            fontSize: 16,
+                            color: Colors.grey[350],
+                          ),
+                      children: <TextSpan>[
+                        TextSpan(
+                          text: ' Sign in',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontFamily: "Manrope", 
+                            fontSize: 16,
+                            color: Colors.grey[350],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   ),
                 ],
               ),
