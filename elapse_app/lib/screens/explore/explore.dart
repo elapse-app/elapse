@@ -1,6 +1,6 @@
 import 'package:elapse_app/screens/explore/search.dart';
 import 'package:elapse_app/screens/explore/worldRankings.dart';
-import 'package:elapse_app/screens/explore/worldRankings/world_skills.dart';
+import 'package:elapse_app/screens/explore/worldRankings/skills/world_skills.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
@@ -232,28 +232,27 @@ class ExploreScreen extends StatelessWidget {
                   color: Theme.of(context).colorScheme.tertiary,
                   borderRadius: BorderRadius.circular(18)),
               child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Flexible(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Flexible(
                       fit: FlexFit.tight,
                       flex: 65,
                       child: GestureDetector(
                         behavior: HitTestBehavior.opaque,
                         onTap: () {
                           Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => WorldRankingsScreen(initState: 0)
-                            ));
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const WorldRankingsScreen(initState: 0)));
                         },
                         child: const Text(
                           "World Skills",
                           style: TextStyle(fontSize: 16, height: 1),
                           textAlign: TextAlign.center,
                         ),
-                      )
-                    ),
-                    const Flexible(
+                      )),
+                  Flexible(
                       fit: FlexFit.tight,
                       flex: 10,
                       child: VerticalDivider(
@@ -261,32 +260,31 @@ class ExploreScreen extends StatelessWidget {
                         thickness: 1,
                         indent: 10,
                         endIndent: 10,
-                        color: Color(0xFFdedede),
-                      )
+                        color: Theme.of(context).colorScheme.surfaceDim,
+                      )),
+                  Flexible(
+                    fit: FlexFit.tight,
+                    flex: 65,
+                    child: GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const WorldRankingsScreen(initState: 1)));
+                      },
+                      child: const Text(
+                        "World TrueSkill",
+                        style: TextStyle(fontSize: 16, height: 1),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
-                    Flexible(
-                        fit: FlexFit.tight,
-                        flex: 65,
-                        child: GestureDetector(
-                          behavior: HitTestBehavior.opaque,
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => WorldRankingsScreen(initState: 1)
-                                ));
-                          },
-                          child: const Text(
-                            "World TrueSkill",
-                            style: TextStyle(fontSize: 16, height: 1),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
+          ),
           const SliverToBoxAdapter(
             child: SizedBox(
               height: 35,

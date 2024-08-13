@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
+import 'package:elapse_app/classes/Team/team.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
