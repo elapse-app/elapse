@@ -1,5 +1,10 @@
+import 'package:elapse_app/aesthetics/color_schemes.dart';
+import 'package:elapse_app/providers/color_provider.dart';
+import 'package:elapse_app/setup/first_page.dart';
 import 'package:flutter/material.dart';
-import 'package:elapse_app/setup/first_page.dart'; // Import the FirstSetupPage
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/setup/team_setup.dart';
 
 class FirstFeature extends StatelessWidget {
   @override
@@ -24,9 +29,8 @@ class FirstFeature extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => FirstSetupPage()),
               );
             },
-            child: Row(
+            child: const Row(
               children: [
-                Icon(Icons.arrow_back),
                 SizedBox(width: 8),
                 Text('Welcome'),
               ],
@@ -35,29 +39,56 @@ class FirstFeature extends StatelessWidget {
         ),
       ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text(
-            'Centered Title',
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+          const Text(
+            'At a glance',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
           ),
-          SizedBox(height: 8),
-          Text(
-            'Centered Subtitle',
+          SizedBox(height: 5),
+          const Text(
+            'Upcoming matches & info',
             style: TextStyle(fontSize: 16),
           ),
           SizedBox(height: 20),
-          Container(
-            height: 200,
-            width: 100,
-            color: Colors.grey,
-            child: Center(child: Text('Demo Phone')),
+          Center(
+            child: Container(
+              height: 400, // Fixed height
+              width: 225, // Fixed width (9:16 aspect ratio)
+              color: Colors.grey,
+              child: Center(child: Text('Demo Phone')),
+            ),
           ),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: () {},
-            child: Text('Next'),
+         Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SizedBox(
+            height: 55.0,
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                // Navigate to the next page
+                // Navigator.pushReplacement(
+                //   context,
+                //   MaterialPageRoute(
+                //     builder: (context) => ThemeSetup(
+                //       prefs: widget.prefs,
+                //     ),
+                //   ),
+                // );
+                Navigator.pushReplacement( 
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FirstFeature(),
+                  ),
+                );
+              },
+              child: Text('Get Started'),
+            ),
           ),
+        ),
         ],
       ),
     );

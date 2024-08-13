@@ -11,6 +11,7 @@ import 'package:elapse_app/screens/my_team/my_team.dart';
 import 'package:elapse_app/screens/tournament_mode/home.dart';
 import 'package:elapse_app/screens/tournament_mode/my_teams.dart';
 import 'package:elapse_app/screens/tournament_mode/tournament.dart';
+import 'package:elapse_app/setup/first_page.dart';
 import 'package:elapse_app/setup/setup.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -61,6 +62,7 @@ class MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   int selectedIndex = 0;
   bool isTournamentMode = false;
+  bool isLoggedIn = false;
   late int teamID;
   late String teamNumber;
 
@@ -93,11 +95,15 @@ class MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    if(!isLoggedIn) {
+      return FirstSetupPage();
+    }
     TeamPreview savedTeam = TeamPreview(
         teamNumber:
             jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"],
         teamID: jsonDecode(widget.prefs.getString("savedTeam"))["teamID"]);
     List<Widget> screens;
+    
     isTournamentMode
         ? screens = [
             TMHomePage(
