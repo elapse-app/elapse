@@ -1,19 +1,17 @@
 import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
 import 'package:elapse_app/screens/tournament/tournament.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
 class TournamentPreviewWidget extends StatelessWidget {
   const TournamentPreviewWidget(
       {super.key,
       required this.tournamentPreview,
       this.saveSearch = false,
-      this.prefs,
       this.saveState});
 
   final TournamentPreview tournamentPreview;
   final bool saveSearch;
-  final SharedPreferences? prefs;
   final Function? saveState;
 
   @override
@@ -37,8 +35,7 @@ class TournamentPreviewWidget extends StatelessWidget {
             if (saveSearch) {
               saveState;
               List<String> recentSearches =
-                  prefs!.getStringList("recentTournamentSearches") ??
-                      <String>[];
+                  prefs.getStringList("recentTournamentSearches") ?? <String>[];
 
               recentSearches.remove(
                   '{"searchTerm": "${tournamentPreview.name}", "tournamentID": ${tournamentPreview.id}}');
@@ -48,7 +45,7 @@ class TournamentPreviewWidget extends StatelessWidget {
                 recentSearches.removeAt(0);
               }
 
-              prefs!.setStringList("recentTournamentSearches", recentSearches);
+              prefs.setStringList("recentTournamentSearches", recentSearches);
             }
             Navigator.push(
               context,
