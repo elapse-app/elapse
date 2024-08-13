@@ -1,7 +1,7 @@
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:elapse_app/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TeamWidget extends StatelessWidget {
   const TeamWidget({
@@ -11,6 +11,7 @@ class TeamWidget extends StatelessWidget {
     this.teamName,
     this.location,
     this.saveSearch = false,
+    this.prefs,
     this.saveState,
   });
   final String teamNumber;
@@ -18,6 +19,7 @@ class TeamWidget extends StatelessWidget {
   final String? teamName;
   final Location? location;
   final bool saveSearch;
+  final SharedPreferences? prefs;
   final Function? saveState;
   @override
   Widget build(BuildContext context) {
@@ -27,7 +29,7 @@ class TeamWidget extends StatelessWidget {
         if (saveSearch) {
           saveState;
           List<String> recentSearches =
-              prefs.getStringList("recentTeamSearches") ?? <String>[];
+              prefs!.getStringList("recentTeamSearches") ?? <String>[];
 
           recentSearches
               .remove('{"searchTerm": "$teamNumber", "teamID": $teamID}');
@@ -37,7 +39,7 @@ class TeamWidget extends StatelessWidget {
             recentSearches.removeAt(0);
           }
 
-          prefs.setStringList("recentTeamSearches", recentSearches);
+          prefs!.setStringList("recentTeamSearches", recentSearches);
         }
         Navigator.push(
           context,
