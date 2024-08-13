@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/setup/team_setup.dart';
-import 'package:elapse_app/lib/screens/widgets/app_bar.dart';
 
 class FirstFeature extends StatelessWidget {
   @override
@@ -13,9 +12,30 @@ class FirstFeature extends StatelessWidget {
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.2),
-        child: ElapseAppbar(
-          title: 'First Feature',
-          showBackButton: false,
+        child: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => FirstSetupPage()),
+              );
+            },
+          ),
+          title: GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => FirstSetupPage()),
+              );
+            },
+            child: const Row(
+              children: [
+                SizedBox(width: 8),
+                Text('Welcome'),
+              ],
+            ),
+          ),
         ),
       ),
       body: Column(
