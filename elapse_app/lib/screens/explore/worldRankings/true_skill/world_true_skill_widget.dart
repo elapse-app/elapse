@@ -7,7 +7,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
   const WorldTrueSkillWidget({
     super.key,
     required this.stats,
-    required this.sort,
+    this.sort = 0,
   });
 
   final VDAStats stats;
