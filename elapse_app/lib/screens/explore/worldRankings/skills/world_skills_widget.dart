@@ -7,7 +7,7 @@ class WorldSkillsWidget extends StatelessWidget {
   const WorldSkillsWidget({
     super.key,
     required this.stats,
-    required this.sort,
+    this.sort = 0,
   });
 
   final WorldSkillsStats stats;

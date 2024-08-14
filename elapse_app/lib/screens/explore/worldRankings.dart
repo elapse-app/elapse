@@ -65,7 +65,22 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                     child: const Icon(
                       Icons.search,
                     ),
-                    onTap: () {})
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          transitionDuration: const Duration(milliseconds: 300),
+                          reverseTransitionDuration: const Duration(milliseconds: 300),
+                          pageBuilder: (context, animation, secondaryAnimation) => {},
+                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                            return FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            );
+                          },
+                        ),
+                      );
+                    })
               ],
             ),
             backNavigation: true,
