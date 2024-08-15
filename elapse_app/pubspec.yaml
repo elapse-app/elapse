@@ -45,6 +45,7 @@ dependencies:
   firebase_auth: ^4.16.0
   cloud_firestore: ^4.14.0
   firebase_core: ^2.24.2
+  random_string_generator: ^2.0.0
 
 dev_dependencies:
   flutter_test:
