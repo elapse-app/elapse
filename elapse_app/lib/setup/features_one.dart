@@ -5,13 +5,14 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/setup/team_setup.dart';
+import 'package:elapse_app/screens/home/home.dart';
 
 class FirstFeature extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(MediaQuery.of(context).size.height * 0.2),
+        preferredSize: Size.fromHeight(50),
         child: AppBar(
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
@@ -56,10 +57,13 @@ class FirstFeature extends StatelessWidget {
           SizedBox(height: 20),
           Center(
             child: Container(
-              height: 400, // Fixed height
+              height: 450, // Fixed height
               width: 225, // Fixed width (9:16 aspect ratio)
+              decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
               color: Colors.grey,
-              child: Center(child: Text('Demo Phone')),
+              //HomeScreen(teamID: 1, prefs: prefs),
+              ),
             ),
           ),
          Padding(
