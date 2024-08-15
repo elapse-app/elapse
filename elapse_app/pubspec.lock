@@ -368,6 +368,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "3.2.1"
+  random_string_generator:
+    dependency: "direct main"
+    description:
+      name: random_string_generator
+      sha256: "3d2d866b48fc4cf568cb335ecb96a299bce1d00e165a688ba04d31724b2c10e2"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.0.0"
   shared_preferences:
     dependency: "direct main"
     description:
