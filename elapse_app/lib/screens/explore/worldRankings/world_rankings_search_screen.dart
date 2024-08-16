@@ -8,7 +8,43 @@ import '../../../classes/Team/world_skills.dart';
 import '../../widgets/custom_tab_bar.dart';
 
 class WorldRankingsSearchScreen extends StatefulWidget {
-  const WorldRankingsSearchScreen({
+  WorldRankingsSearchScreen({
+    super.key,
+    required this.skills,
+    required this.vda,
+  });
+
+  Future<List<WorldSkillsStats>> skills;
+  Future<List<VDAStats>> vda;
+
+  @override
+  State<WorldRankingsSearchScreen> createState() =>
+      _WorldRankingsSearchScreenState();
+}
+
+class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: Future.wait([widget.skills, widget.vda]),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const LinearProgressIndicator();
+          } else if (snapshot.hasData) {
+            return LoadedWorldRankingsSearchScreen(
+                skills: snapshot.data?[0] as List<WorldSkillsStats>,
+                vda: snapshot.data?[1] as List<VDAStats>);
+          } else {
+            return const Center(
+              child: Text("Failed to load the search screen"),
+            );
+          }
+        });
+  }
+}
+
+class LoadedWorldRankingsSearchScreen extends StatefulWidget {
+  const LoadedWorldRankingsSearchScreen({
     super.key,
     required this.skills,
     required this.vda,
@@ -18,10 +54,12 @@ class WorldRankingsSearchScreen extends StatefulWidget {
   final List<VDAStats> vda;
 
   @override
-  State<WorldRankingsSearchScreen> createState() => _WorldRankingsSearchScreenState();
+  State<LoadedWorldRankingsSearchScreen> createState() =>
+      _LoadedWorldRankingsSearchScreenState();
 }
 
-class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
+class _LoadedWorldRankingsSearchScreenState
+    extends State<LoadedWorldRankingsSearchScreen> {
   final FocusNode _focusNode = FocusNode();
   int selectedIndex = 0;
   String searchQuery = "";
@@ -43,13 +81,15 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<WorldSkillsStats> filteredSkills = widget.skills!.where((e) {
+    List<WorldSkillsStats> filteredSkills = widget.skills.where((e) {
       return (e.teamName.toLowerCase().contains(searchQuery.toLowerCase()) ||
           e.teamNum.toLowerCase().contains(searchQuery.toLowerCase()));
     }).toList();
-    List<VDAStats> filteredVDA = widget.vda!.where((e) {
-      return (e.teamName!.toLowerCase().contains(searchQuery.toLowerCase()) ||
-          e.teamName!.toLowerCase().contains(searchQuery.toLowerCase()));
+    List<VDAStats> filteredVDA = widget.vda.where((e) {
+      return ((e.teamName ?? "")
+              .toLowerCase()
+              .contains(searchQuery.toLowerCase()) ||
+          e.teamNum.toLowerCase().contains(searchQuery.toLowerCase()));
     }).toList();
 
     return Scaffold(
@@ -261,7 +301,7 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                         child: Column(
                           children: [
                             WorldTrueSkillWidget(stats: stats),
-                            index != filteredSkills.length - 1
+                            index != filteredVDA.length - 1
                                 ? Divider(
                                     height: 3,
                                     color: Theme.of(context)
@@ -273,7 +313,7 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                         ),
                       );
                     },
-                    childCount: filteredSkills.length,
+                    childCount: filteredVDA.length,
                   ),
                 )
               : const SliverToBoxAdapter(),
