@@ -1,17 +1,26 @@
+import 'dart:convert';
+
 import 'package:elapse_app/screens/explore/worldRankings/skills/world_skills_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../../classes/Team/teamPreview.dart';
 import '../../../../classes/Team/world_skills.dart';
 import '../../../widgets/big_error_message.dart';
+import '../world_rankings_filter.dart';
 
 class WorldSkillsPage extends StatefulWidget {
-  Future<List<WorldSkillsStats>>? skillsStats;
-  int sort;
+  final Future<List<WorldSkillsStats>> skillsStats;
+  final int sort;
+  final WorldRankingsFilter filter;
+  final Future<List<TeamPreview>> savedTeams;
 
-  WorldSkillsPage({
+  const WorldSkillsPage({
     super.key,
     required this.skillsStats,
     required this.sort,
+    required this.filter,
+    required this.savedTeams,
   });
 
   @override
@@ -19,19 +28,15 @@ class WorldSkillsPage extends StatefulWidget {
 }
 
 class _WorldSkillsState extends State<WorldSkillsPage> {
-  int seasonID = 190;
-
   @override
   void initState() {
     super.initState();
-
-    widget.skillsStats = getWorldSkillsRankings(seasonID);
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: widget.skillsStats,
+      future: Future.wait([widget.skillsStats, widget.savedTeams]),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const SliverToBoxAdapter(
@@ -39,8 +44,11 @@ class _WorldSkillsState extends State<WorldSkillsPage> {
           );
         } else if (snapshot.hasData) {
           return WorldSkillsLoadedPage(
-              rankings: snapshot.data as List<WorldSkillsStats>,
-              sort: widget.sort);
+            rankings: snapshot.data?[0] as List<WorldSkillsStats>,
+            sort: widget.sort,
+            filter: widget.filter,
+            savedTeams: snapshot.data?[1] as List<TeamPreview>,
+          );
         } else {
           return const SliverToBoxAdapter(
               child: Center(
@@ -57,14 +65,31 @@ class WorldSkillsLoadedPage extends StatelessWidget {
     super.key,
     required this.rankings,
     required this.sort,
+    required this.filter,
+    required this.savedTeams,
   });
 
   final List<WorldSkillsStats> rankings;
   final int sort;
+  final WorldRankingsFilter filter;
+  final List<TeamPreview> savedTeams;
 
   @override
   Widget build(BuildContext context) {
     List<WorldSkillsStats> teams = rankings.toList();
+
+    if (filter.region != "All Regions") {
+      teams = teams
+          .where((e) => (e.location?.region ?? "") == filter.region)
+          .toList();
+    }
+
+    if (filter.saved) {
+      teams = teams
+          .where((e) => savedTeams.any((e2) => e2.teamID == e.teamId))
+          .toList();
+    }
+
     if (sort == 0) {
       teams.sort((a, b) {
         return a.rank.compareTo(b.rank);
@@ -87,7 +112,7 @@ class WorldSkillsLoadedPage extends StatelessWidget {
       });
     }
 
-    if (rankings.isEmpty) {
+    if (teams.isEmpty) {
       return const SliverToBoxAdapter(
         child: BigErrorMessage(
             icon: Icons.sports_esports_outlined,
@@ -113,7 +138,7 @@ class WorldSkillsLoadedPage extends StatelessWidget {
               ],
             ));
       },
-      childCount: rankings.length,
+      childCount: teams.length,
     ));
   }
 }

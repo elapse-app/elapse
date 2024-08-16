@@ -1,8 +1,14 @@
+import 'dart:convert';
+
 import 'package:elapse_app/classes/Team/vdaStats.dart';
 import 'package:elapse_app/screens/explore/worldRankings/skills/world_skills.dart';
 import 'package:elapse_app/screens/explore/worldRankings/true_skill/world_true_skill.dart';
+import 'package:elapse_app/screens/explore/worldRankings/world_rankings_filter.dart';
+import 'package:elapse_app/screens/explore/worldRankings/world_rankings_search_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../classes/Team/teamPreview.dart';
 import '../../classes/Team/world_skills.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/custom_tab_bar.dart';
@@ -18,8 +24,9 @@ class WorldRankingsScreen extends StatefulWidget {
 }
 
 class _WorldRankingsState extends State<WorldRankingsScreen> {
-  Future<List<VDAStats>>? vdaStats;
-  Future<List<WorldSkillsStats>>? skillsStats;
+  late Future<List<WorldSkillsStats>> skillsStats;
+  late Future<List<VDAStats>> vdaStats;
+  late Future<List<TeamPreview>> savedTeams;
 
   int selectedIndex = 0;
   List<String> pageTitles = ["Skills", "TrueSkill"];
@@ -34,19 +41,33 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
   ];
   List<String> tsSort = ["Score", "OPR", "DPR", "CCWM", "Win %"];
 
+  WorldRankingsFilter filter = WorldRankingsFilter();
+
   int seasonID = 190;
 
   @override
   void initState() {
     super.initState();
     selectedIndex = widget.initState;
+
+    skillsStats = getWorldSkillsRankings(seasonID);
+    vdaStats = getTrueSkillData();
+    savedTeams = _getSavedTeams();
   }
 
   @override
   Widget build(BuildContext context) {
     List<Widget> pages = [
-      WorldSkillsPage(skillsStats: skillsStats, sort: sortIndex),
-      WorldTrueSkillPage(vdaStats: vdaStats, sort: sortIndex),
+      WorldSkillsPage(
+          skillsStats: skillsStats,
+          sort: sortIndex,
+          filter: filter,
+          savedTeams: savedTeams),
+      WorldTrueSkillPage(
+          vdaStats: vdaStats,
+          sort: sortIndex,
+          filter: filter,
+          savedTeams: savedTeams),
     ];
 
     return Scaffold(
@@ -70,9 +91,14 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                         context,
                         PageRouteBuilder(
                           transitionDuration: const Duration(milliseconds: 300),
-                          reverseTransitionDuration: const Duration(milliseconds: 300),
-                          pageBuilder: (context, animation, secondaryAnimation) => {},
-                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                          reverseTransitionDuration:
+                              const Duration(milliseconds: 300),
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) =>
+                                  WorldRankingsSearchScreen(
+                                      skills: skillsStats!, vda: vdaStats!),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
                             return FadeTransition(
                               opacity: animation,
                               child: child,
@@ -133,7 +159,14 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                         Icons.filter_list,
                                         size: 30,
                                       ),
-                                      onPressed: () {})
+                                      onPressed: () async {
+                                        WorldRankingsFilter updatedFilter =
+                                            await worldRankingsFilter(
+                                                context, filter);
+                                        setState(() {
+                                          filter = updatedFilter;
+                                        });
+                                      })
                                 ]))
                       ],
                     ),
@@ -180,7 +213,14 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                             Icons.filter_list,
                                             size: 30,
                                           ),
-                                          onPressed: () {})
+                                          onPressed: () async {
+                                            WorldRankingsFilter updatedFilter =
+                                                await worldRankingsFilter(
+                                                    context, filter);
+                                            setState(() {
+                                              filter = updatedFilter;
+                                            });
+                                          })
                                     ]))
                           ],
                         ),
@@ -191,5 +231,23 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
         ],
       ),
     );
+  }
+
+  Future<List<TeamPreview>> _getSavedTeams() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String savedTeam = prefs.getString("savedTeam") ?? "";
+    TeamPreview savedTeamPreview = TeamPreview(
+        teamID: jsonDecode(savedTeam)["teamID"],
+        teamNumber: jsonDecode(savedTeam)["teamNumber"]);
+    List<String> savedTeamsString = prefs.getStringList("savedTeams") ?? [];
+
+    List<TeamPreview> savedTeams = [];
+    savedTeams.add(savedTeamPreview);
+    savedTeams.addAll(savedTeamsString
+        .map((e) => TeamPreview(
+            teamID: jsonDecode(e)["teamID"],
+            teamNumber: jsonDecode(e)["teamNumber"]))
+        .toList());
+    return savedTeams;
   }
 }
