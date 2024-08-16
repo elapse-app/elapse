@@ -58,10 +58,11 @@ class FirstFeature extends StatelessWidget {
           Center(
             child: Container(
               height: 450, // Fixed height
-              width: 225, // Fixed width (9:16 aspect ratio)
+              width: 225, // Fixed width (9:18 aspect ratio)
               decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(10),
               color: Colors.grey,
+              child: Image.asset('assets/OnboardingHome.png'),
               //HomeScreen(teamID: 1, prefs: prefs),
               ),
             ),

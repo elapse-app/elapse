@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/setup/theme_setup.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/providers/color_provider.dart';
-import 'package:elapse_app/setup/features_one.dart'; 
+import 'package:elapse_app/setup/features_one.dart';
 
 class FirstSetupPage extends StatefulWidget {
   const FirstSetupPage({super.key});
@@ -85,7 +85,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                           builder: (BuildContext context) {
                             return ElevatedButton(
                               onPressed: () {
-                                print('Get Started button pressed');
+                                //print('Get Started button pressed');
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
@@ -105,7 +105,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                         builder: (BuildContext context) {
                           return TextButton(
                             onPressed: () {
-                              print('Sign in button pressed');
+                              //print('Sign in button pressed');
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
