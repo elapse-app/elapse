@@ -96,7 +96,9 @@ class MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     if(!isLoggedIn) {
-      return FirstSetupPage();
+          return MaterialApp(
+      home:FirstSetupPage(),
+    );
     }
     TeamPreview savedTeam = TeamPreview(
         teamNumber:

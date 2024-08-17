@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/setup/theme_setup.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/providers/color_provider.dart';
-import 'package:elapse_app/setup/features_one.dart'; // Ensure this import is correct
+import 'package:elapse_app/setup/features_one.dart'; 
 
 class FirstSetupPage extends StatefulWidget {
   const FirstSetupPage({Key? key}) : super(key: key);

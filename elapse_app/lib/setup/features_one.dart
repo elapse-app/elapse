@@ -64,7 +64,7 @@ class FirstFeature extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
                 color: Colors.grey,
               ),
-              child: Image.asset('assets/OnboardingHome.png'),
+              child: Image.asset('assets/onboardingHome.png'),
             ),
           ),
          Padding(
