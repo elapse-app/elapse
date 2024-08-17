@@ -5,10 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/setup/theme_setup.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/providers/color_provider.dart';
-import 'package:elapse_app/setup/features_one.dart';
+import 'package:elapse_app/setup/features_one.dart'; // Ensure this import is correct
 
 class FirstSetupPage extends StatefulWidget {
-  const FirstSetupPage({super.key});
+  const FirstSetupPage({Key? key}) : super(key: key);
 
   @override
   State<FirstSetupPage> createState() => _FirstSetupPageState();
@@ -81,63 +81,65 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                       child: SizedBox(
                         height: 55.0,
                         width: double.infinity,
-                        child: Builder(
-                          builder: (BuildContext context) {
-                            return ElevatedButton(
-                              onPressed: () {
-                                //print('Get Started button pressed');
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => FirstFeature(),
-                                  ),
-                                );
-                              },
-                              child: Text('Get Started'),
+                        child: TextButton(
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FirstFeature(),
+                              ),
                             );
                           },
+                          child: Builder(
+                            builder: (BuildContext context) {
+                              return Text('Get Started');
+                            },
+                          ),
                         ),
                       ),
                     ),
                     Padding(
                       padding: const EdgeInsets.all(16.0),
-                      child: Builder(
-                        builder: (BuildContext context) {
-                          return TextButton(
-                            onPressed: () {
-                              //print('Sign in button pressed');
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => FirstFeature(),
+                        child: SizedBox(
+                          height: 55,
+                          width: double.infinity,
+                          child: TextButton(
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => FirstFeature(),
+                              ),
+                            );
+                          },
+                          child: Builder(
+                            builder: (BuildContext context) {
+                              return RichText(
+                                text: TextSpan(
+                                  text: 'Existing user?',
+                                  style: TextStyle(
+                                    fontFamily: "Manrope",
+                                    fontSize: 16,
+                                    color: Colors.grey[350],
+                                  ),
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      text: ' Sign in',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontFamily: "Manrope",
+                                        fontSize: 16,
+                                        color: Colors.grey[350],
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               );
                             },
-                            child: RichText(
-                              text: TextSpan(
-                                text: 'Existing user?',
-                                style: TextStyle(
-                                  fontFamily: "Manrope",
-                                  fontSize: 16,
-                                  color: Colors.grey[350],
-                                ),
-                                children: <TextSpan>[
-                                  TextSpan(
-                                    text: ' Sign in',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontFamily: "Manrope",
-                                      fontSize: 16,
-                                      color: Colors.grey[350],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
+                          ),
+                        ),
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),

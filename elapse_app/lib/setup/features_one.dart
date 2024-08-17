@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/setup/team_setup.dart';
 import 'package:elapse_app/screens/home/home.dart';
+import 'package:elapse_app/main.dart';
 
 class FirstFeature extends StatelessWidget {
   @override
@@ -60,11 +61,10 @@ class FirstFeature extends StatelessWidget {
               height: 450, // Fixed height
               width: 225, // Fixed width (9:18 aspect ratio)
               decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color: Colors.grey,
-              child: Image.asset('assets/OnboardingHome.png'),
-              //HomeScreen(teamID: 1, prefs: prefs),
+                borderRadius: BorderRadius.circular(10),
+                color: Colors.grey,
               ),
+              child: Image.asset('assets/OnboardingHome.png'),
             ),
           ),
          Padding(
@@ -86,7 +86,9 @@ class FirstFeature extends StatelessWidget {
                 Navigator.pushReplacement( 
                   context,
                   MaterialPageRoute(
-                    builder: (context) => FirstFeature(),
+                    builder: (context) => FirstFeature(
+
+                    ),
                   ),
                 );
               },
