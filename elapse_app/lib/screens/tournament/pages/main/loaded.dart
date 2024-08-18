@@ -3,17 +3,19 @@ import 'dart:convert';
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Tournament/division.dart';
+import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/screens/tournament/pages/info/info.dart';
 import 'package:elapse_app/screens/tournament/pages/main/search_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings.dart';
-import 'package:elapse_app/screens/tournament/pages/schedule/schedule.dart';
+import 'package:elapse_app/screens/tournament/pages/schedule/qualification_matches.dart';
 import 'package:elapse_app/screens/tournament/pages/skills/skills.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
+import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 
 class TournamentLoadedScreen extends StatefulWidget {
   final Tournament tournament;
@@ -28,11 +30,16 @@ class TournamentLoadedScreen extends StatefulWidget {
   State<TournamentLoadedScreen> createState() => _TournamentLoadedScreenState();
 }
 
-class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
+class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
+    with TickerProviderStateMixin {
   late int selectedIndex;
   int filterIndex = 0;
   List<String> titles = ["Schedule", "Rankings", "Skills", "Info"];
   List<String> filters = ["rank", "opr", "dpr", "ccwm", "ap", "sp"];
+
+  bool showPractice = true;
+  bool showQualification = true;
+  bool showElimination = true;
 
   final FocusNode _focusNode = FocusNode();
 
@@ -47,7 +54,13 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   bool useSavedTeams = false;
   bool useLiveTiming = true;
 
-  void savedPress() async {
+  List<Game> practice = [];
+  List<Game> qualifications = [];
+  List<Game> eliminations = [];
+
+  List<Widget> widgets = [SliverToBoxAdapter(), SliverToBoxAdapter()];
+
+  void savedPress() {
     setState(() {
       useSavedTeams = !useSavedTeams;
       if (useSavedTeams) {
@@ -99,16 +112,22 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (division.games != null && division.games!.isNotEmpty) {
+      practice = division.games!.where((game) => game.roundNum == 1).toList();
+      qualifications =
+          division.games!.where((game) => game.roundNum == 2).toList();
+      eliminations =
+          division.games!.where((game) => game.roundNum > 2).toList();
+    }
+
     List<Widget> pages = [
-      SchedulePage(
-        division: division,
-        tournament: widget.tournament,
-        useLiveTiming: useLiveTiming,
-      ),
+      SliverToBoxAdapter(),
       RankingsPage(
-          searchQuery: searchQuery,
-          sort: filters[filterIndex],
-          divisionIndex: division.order - 1),
+        searchQuery: searchQuery,
+        sort: filters[filterIndex],
+        divisionIndex: division.order - 1,
+        useSavedTeams: useSavedTeams,
+      ),
       SkillsPage(
           skills: widget.tournament.tournamentSkills!,
           teams: widget.tournament.teams,
@@ -119,6 +138,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
         awards: widget.tournament.awards,
       ),
     ];
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
@@ -397,38 +417,38 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
               ),
             ),
           ),
-          selectedIndex == 0 && division.teamStats?.isNotEmpty == true
-              ? SliverPersistentHeader(
-                  pinned: true,
-                  delegate: SliverHeaderDelegate(
-                    maxHeight: 40,
-                    minHeight: 40,
-                    child: Container(
-                      alignment: Alignment.topCenter,
-                      padding: EdgeInsets.only(
-                          left: 23, right: 23, bottom: 10, top: 5),
-                      color: Theme.of(context).colorScheme.surface,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Enable Live Timing",
-                            style: TextStyle(fontSize: 16),
-                          ),
-                          Switch(
-                            value: useLiveTiming,
-                            onChanged: (bool value) {
-                              setState(() {
-                                useLiveTiming = value;
-                              });
-                            },
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-              : SliverToBoxAdapter(),
+          // selectedIndex == 0 && division.teamStats?.isNotEmpty == true
+          //     ? SliverPersistentHeader(
+          //         pinned: true,
+          //         delegate: SliverHeaderDelegate(
+          //           maxHeight: 40,
+          //           minHeight: 40,
+          //           child: Container(
+          //             alignment: Alignment.topCenter,
+          //             padding: EdgeInsets.only(
+          //                 left: 23, right: 23, bottom: 10, top: 5),
+          //             color: Theme.of(context).colorScheme.surface,
+          //             child: Row(
+          //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //               children: [
+          //                 Text(
+          //                   "Enable Live Timing",
+          //                   style: TextStyle(fontSize: 16),
+          //                 ),
+          //                 Switch(
+          //                   value: useLiveTiming,
+          //                   onChanged: (bool value) {
+          //                     setState(() {
+          //                       useLiveTiming = value;
+          //                     });
+          //                   },
+          //                 )
+          //               ],
+          //             ),
+          //           ),
+          //         ),
+          //       )
+          //     : SliverToBoxAdapter(),
           selectedIndex == 1 && division.teamStats?.isNotEmpty == true
               ? SliverToBoxAdapter(
                   child: Container(
@@ -471,7 +491,165 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                   ),
                 )
               : const SliverToBoxAdapter(),
+          // selectedIndex == 0 &&
+          //         division.games != null &&
+          //         division.games!.isNotEmpty &&
+          //         division.games!.any(
+          //           (element) {
+          //             return element.roundNum == 1;
+          //           },
+          //         )
+          //     ? SliverPersistentHeader(
+          //         pinned: true,
+          //         delegate: SliverHeaderDelegate(
+          //           child: Container(
+          //             color: Theme.of(context).colorScheme.surface,
+          //             padding:
+          //                 EdgeInsets.symmetric(horizontal: 23, vertical: 5),
+          //             child: Row(
+          //               crossAxisAlignment: CrossAxisAlignment.center,
+          //               children: [
+          //                 Text(
+          //                   "Practice",
+          //                   style: TextStyle(fontSize: 24),
+          //                 ),
+          //                 IconButton(
+          //                   focusColor: Colors.transparent,
+          //                   splashColor: Colors.transparent,
+          //                   highlightColor: Colors.transparent,
+          //                   onPressed: () {
+          //                     setState(() {
+          //                       showPractice = !showPractice;
+          //                     });
+          //                   },
+          //                   icon: Icon(showPractice
+          //                       ? Icons.keyboard_arrow_down
+          //                       : Icons.keyboard_arrow_right),
+          //                 ),
+          //               ],
+          //             ),
+          //           ),
+          //           maxHeight: 40,
+          //           minHeight: 40,
+          //         ),
+          //       )
+          //     : SliverToBoxAdapter(),
+          // selectedIndex == 0 &&
+          //         division.games != null &&
+          //         division.games!.isNotEmpty
+          //     ? SliverPersistentHeader(
+          //         pinned: true,
+          //         delegate: SliverHeaderDelegate(
+          //           child: Container(
+          //             color: Theme.of(context).colorScheme.surface,
+          //             padding:
+          //                 EdgeInsets.symmetric(horizontal: 23, vertical: 5),
+          //             child: Row(
+          //               crossAxisAlignment: CrossAxisAlignment.center,
+          //               children: [
+          //                 Text(
+          //                   "Qualification",
+          //                   style: TextStyle(fontSize: 24),
+          //                 ),
+          //                 IconButton(
+          //                   focusColor: Colors.transparent,
+          //                   splashColor: Colors.transparent,
+          //                   highlightColor: Colors.transparent,
+          //                   onPressed: () {
+          //                     setState(() {
+          //                       showQualification = !showQualification;
+          //                     });
+          //                   },
+          //                   icon: Icon(showQualification
+          //                       ? Icons.keyboard_arrow_down
+          //                       : Icons.keyboard_arrow_right),
+          //                 ),
+          //               ],
+          //             ),
+          //           ),
+          //           maxHeight: 40,
+          //           minHeight: 40,
+          //         ),
+          //       )
+          //     : SliverToBoxAdapter(),
+
+          // showQualification ? pages[selectedIndex] : SliverToBoxAdapter(),
+          selectedIndex == 0 && practice.isNotEmpty
+              ? SliverStickyHeader(
+                  header: ScheduleTab(
+                      Theme.of(context).colorScheme.surface, "Practice", () {
+                    setState(() {
+                      showPractice = !showPractice;
+                    });
+                  }, showPractice),
+                  sliver: showPractice
+                      ? MatchesView(games: practice, useLiveTiming: true)
+                      : SliverToBoxAdapter(),
+                )
+              : SliverToBoxAdapter(),
+
+          selectedIndex == 0 && qualifications.isNotEmpty
+              ? SliverStickyHeader(
+                  header: ScheduleTab(
+                      Theme.of(context).colorScheme.surface, "Qualifications",
+                      () {
+                    setState(() {
+                      showQualification = !showQualification;
+                    });
+                  }, showQualification),
+                  sliver: showQualification
+                      ? MatchesView(games: qualifications, useLiveTiming: true)
+                      : SliverToBoxAdapter(),
+                )
+              : SliverToBoxAdapter(),
+
+          selectedIndex == 0 && eliminations.isNotEmpty
+              ? SliverStickyHeader(
+                  header: ScheduleTab(
+                      Theme.of(context).colorScheme.surface, "Eliminations",
+                      () {
+                    setState(() {
+                      showElimination = !showElimination;
+                    });
+                  }, showElimination),
+                  sliver: showElimination
+                      ? MatchesView(games: eliminations, useLiveTiming: true)
+                      : SliverToBoxAdapter(),
+                )
+              : SliverToBoxAdapter(),
+
           pages[selectedIndex],
+          const SliverToBoxAdapter(
+            child: SizedBox(
+              height: 50,
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Widget ScheduleTab(Color backgroundColor, String title, void Function() onTap,
+      bool variable) {
+    return Container(
+      color: backgroundColor,
+      padding: EdgeInsets.symmetric(horizontal: 23, vertical: 5),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Text(
+            title,
+            style: TextStyle(fontSize: 24),
+          ),
+          IconButton(
+            focusColor: Colors.transparent,
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            onPressed: onTap,
+            icon: Icon(variable
+                ? Icons.keyboard_arrow_down
+                : Icons.keyboard_arrow_right),
+          ),
         ],
       ),
     );
