@@ -3,11 +3,10 @@ import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/setup/theme_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
 class FirstSetupPage extends StatefulWidget {
-  const FirstSetupPage({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const FirstSetupPage({super.key});
 
   @override
   State<FirstSetupPage> createState() => _FirstSetupPageState();
@@ -26,14 +25,10 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
   }
 
   void saveTeam(TeamPreview team) {
-    widget.prefs.setString("savedTeam",
+    prefs.setString("savedTeam",
         '{"teamID": ${team.teamID}, "teamNumber": "${team.teamNumber}"}');
     Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ThemeSetup(
-                  prefs: widget.prefs,
-                )));
+        context, MaterialPageRoute(builder: (context) => ThemeSetup()));
   }
 
   @override

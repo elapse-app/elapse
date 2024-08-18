@@ -52,3 +52,13 @@ Division loadDivision(division) {
     teamStats: teamStats,
   );
 }
+
+int getTeamDivisionIndex(List<Division> divisions, int teamID) {
+  for (int i = 0; i < divisions.length; i++) {
+    if (divisions[i].teamStats != null &&
+        divisions[i].teamStats!.containsKey(teamID)) {
+      return i;
+    }
+  }
+  return -1;
+}

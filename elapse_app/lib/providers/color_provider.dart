@@ -1,14 +1,12 @@
 import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
 class ColorProvider extends ChangeNotifier {
-  ColorProvider({required this.prefs}) {
+  ColorProvider() {
     getScheme();
   }
-
-  final SharedPreferences prefs;
   ColorScheme get colorScheme => _colorScheme;
   ColorScheme _colorScheme = lightScheme;
   ColorPallete alliancePallete = lightPallete;

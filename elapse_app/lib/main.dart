@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
-import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/providers/tournament_mode_provider.dart';
 import 'package:elapse_app/screens/explore/explore.dart';
@@ -18,14 +17,14 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
 final GlobalKey<MyAppState> myAppKey = GlobalKey<MyAppState>();
-
+late SharedPreferences prefs;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
 
-  SharedPreferences prefs = await SharedPreferences.getInstance();
+  prefs = await SharedPreferences.getInstance();
 
   // Set android system navbar colour
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -38,12 +37,12 @@ void main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (context) => ColorProvider(prefs: prefs),
+          create: (context) => ColorProvider(),
         ),
         ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
       ],
       child: prefs.getString("savedTeam") == null
-          ? SetupScreen(prefs: prefs)
+          ? SetupScreen()
           : MyApp(key: myAppKey, prefs: prefs),
     ),
   );
@@ -104,30 +103,28 @@ class MyAppState extends State<MyApp> {
               tournamentID: widget.prefs.getInt("tournamentID"),
               teamID: teamID,
               teamNumber: teamNumber,
-              prefs: widget.prefs,
             ),
             TMTournamentScreen(
               tournamentID: widget.prefs.getInt("tournamentID"),
               isPreview: false,
-              prefs: widget.prefs,
             ),
             TMMyTeams(
-              prefs: widget.prefs,
               tournamentID: widget.prefs.getInt("tournamentID"),
             ),
-            ExploreScreen(prefs: widget.prefs)
+            ExploreScreen()
           ]
         : screens = [
             HomeScreen(
               teamID: savedTeam.teamID,
-              prefs: widget.prefs,
+              key: PageStorageKey<String>("home"),
             ),
             MyTeams(
-              prefs: widget.prefs,
+              key: PageStorageKey<String>("my-teams"),
             ),
-            ExploreScreen(prefs: widget.prefs),
+            ExploreScreen(
+              key: PageStorageKey<String>("explore"),
+            ),
           ];
-    widget.prefs.setString("theme", "system");
     return Consumer2<ColorProvider, TournamentModeProvider>(
       builder: (context, colorProvider, tournamentModeProvider, child) {
         bool systemDefined = false;
@@ -164,6 +161,8 @@ class MyAppState extends State<MyApp> {
           ),
         ];
 
+        final PageStorageBucket _bucket = PageStorageBucket();
+
         // Add the tournament destination if tournament mode is enabled
         if (isTournamentMode) {
           destinations.insert(
@@ -186,7 +185,10 @@ class MyAppState extends State<MyApp> {
             fontFamily: "Manrope",
           ),
           home: Scaffold(
-            body: screens[selectedIndex],
+            body: PageStorage(
+              bucket: _bucket,
+              child: screens[selectedIndex],
+            ),
             bottomNavigationBar: NavigationBar(
               selectedIndex: selectedIndex,
               indicatorColor: chosenTheme.primary,
