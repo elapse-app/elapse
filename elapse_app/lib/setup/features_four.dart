@@ -13,6 +13,8 @@ import 'package:elapse_app/setup/features_three.dart';
 import 'package:elapse_app/setup/signup.dart';
 
 class FourthFeature extends StatelessWidget {
+  const FourthFeature({super.key, required this.prefs});
+  final SharedPreferences prefs;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +28,7 @@ class FourthFeature extends StatelessWidget {
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => FirstSetupPage()),
+                MaterialPageRoute(builder: (context) => FirstSetupPage(prefs: prefs)),
               );
             },
           ),
@@ -34,7 +36,7 @@ class FourthFeature extends StatelessWidget {
             onTap: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => FirstSetupPage()),
+                MaterialPageRoute(builder: (context) => FirstSetupPage(prefs: prefs)),
               );
             },
             child: const Row(
@@ -74,8 +76,8 @@ class FourthFeature extends StatelessWidget {
           SizedBox(height: 20),
           Center(
             child: Container(
-              height: 486, // Fixed height
-              width: 246, // Fixed width (9:18 aspect ratio)
+              height: MediaQuery.of(context).size.height * 0.6, // Fixed height
+              width: MediaQuery.of(context).size.height * 0.3,
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(0),
                 color: Colors.black,
@@ -128,7 +130,7 @@ class FourthFeature extends StatelessWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => SignUpPage(
-
+                      prefs: prefs
                     ),
                   ),
                 );
@@ -138,7 +140,7 @@ class FourthFeature extends StatelessWidget {
           ),
         ),
         SizedBox(
-            height:16,
+            height:12,
           ),
         ],
       ),

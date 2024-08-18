@@ -1,3 +1,4 @@
+import 'package:elapse_app/setup/signup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/painting.dart';
@@ -8,14 +9,16 @@ import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/setup/features_one.dart'; 
 
 class FirstSetupPage extends StatefulWidget {
-  const FirstSetupPage({Key? key}) : super(key: key);
+  const FirstSetupPage({super.key, required this.prefs});
+  final SharedPreferences prefs;
 
   @override
-  State<FirstSetupPage> createState() => _FirstSetupPageState();
+  State<FirstSetupPage> createState() => _FirstSetupPageState(prefs: prefs);
 }
 
 class _FirstSetupPageState extends State<FirstSetupPage> {
-
+  _FirstSetupPageState({required this.prefs});
+  final SharedPreferences prefs;
   @override
   Widget build(BuildContext context) {
     return Consumer<ColorProvider>(builder: (context, colorProvider, snapshot) {
@@ -27,7 +30,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
             children: [
               // Blue top section
               Container(
-                height: MediaQuery.of(context).size.height * 0.64,
+                height: MediaQuery.of(context).size.height * 0.66,
                 color: Colors.blue,
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -69,7 +72,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
               SizedBox(height: 0), // Replace Spacer() with SizedBox for debugging
               // White bottom section with Get Started button
               Container(
-                height: MediaQuery.of(context).size.height * 0.36,
+                height: MediaQuery.of(context).size.height * 0.34,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -80,6 +83,47 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: RichText(
+                            textAlign: TextAlign.right,
+                            text: TextSpan(
+                              
+                              text: 'Welcome to Elapse',
+                              style: TextStyle(
+                                fontFamily: "Manrope",
+                                fontSize: 24,
+                                fontWeight: FontWeight.normal,
+                                color: const Color.fromARGB(255, 67, 129, 192),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                        child: Padding(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                          child: RichText(
+                            text: TextSpan(
+                              text: 'The smart VRC App.',
+                              style: TextStyle(
+                                fontFamily: "Manrope",
+                                fontSize: 16,
+                                fontWeight: FontWeight.normal,
+                                color: const Color.fromARGB(255, 67, 129, 192),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Spacer(),
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: SizedBox(
@@ -98,7 +142,9 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => FirstFeature(),
+                                builder: (context) => FirstFeature(
+                                  prefs: prefs,
+                                ),
                               ),
                             );
                           },
@@ -128,7 +174,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => FirstFeature(),
+                                builder: (context) => SignUpPage(prefs: prefs),
                               ),
                             );
                           },
@@ -161,7 +207,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                       ),
                     ),
                     SizedBox(
-                      height:16,
+                      height:12,
                     ),
                   ],
                 ),

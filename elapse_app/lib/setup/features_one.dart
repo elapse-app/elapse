@@ -10,7 +10,10 @@ import 'package:elapse_app/screens/home/home.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/setup/features_two.dart';
 
+
 class FirstFeature extends StatelessWidget {
+  const FirstFeature({super.key, required this.prefs});
+  final SharedPreferences prefs;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,7 +27,7 @@ class FirstFeature extends StatelessWidget {
             onPressed: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => FirstSetupPage()),
+                MaterialPageRoute(builder: (context) => FirstSetupPage(prefs: prefs)),
               );
             },
           ),
@@ -32,7 +35,7 @@ class FirstFeature extends StatelessWidget {
             onTap: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => FirstSetupPage()),
+                MaterialPageRoute(builder: (context) => FirstSetupPage(prefs: prefs)),
               );
             },
             child: const Row(
@@ -71,8 +74,8 @@ class FirstFeature extends StatelessWidget {
           SizedBox(height: 20),
           Center(
             child: Container(
-              height: 486, // Fixed height
-              width: 246, // Fixed width (9:18 aspect ratio)
+              height: MediaQuery.of(context).size.height * 0.6, // Fixed height
+              width: MediaQuery.of(context).size.height * 0.3, // Fixed width (9:18 aspect ratio)
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(0),
                 color: Colors.black,
@@ -127,7 +130,7 @@ class FirstFeature extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => SecondFeature(
-
+                          prefs: prefs
                         ),
                       ),
                     );
@@ -138,7 +141,7 @@ class FirstFeature extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height:16,
+            height:12,
           ),
         ],
       ),

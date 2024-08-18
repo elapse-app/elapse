@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:elapse_app/setup/first_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUpPage extends StatelessWidget {
+  const SignUpPage({super.key, required this.prefs});
+  final SharedPreferences prefs;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -122,7 +125,7 @@ class SignUpPage extends StatelessWidget {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => FirstSetupPage(),
+                          builder: (context) => FirstSetupPage(prefs: prefs),
                         ),
                       );
                     },
@@ -170,7 +173,7 @@ class SignUpPage extends StatelessWidget {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => FirstSetupPage(),
+                          builder: (context) => FirstSetupPage(prefs: prefs),
                         ),
                       );
                     },
@@ -201,7 +204,7 @@ class SignUpPage extends StatelessWidget {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => FirstSetupPage(),
+                          builder: (context) => FirstSetupPage(prefs: prefs),
                         ),
                       );
                     },
@@ -236,7 +239,7 @@ class SignUpPage extends StatelessWidget {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => FirstSetupPage(),
+                          builder: (context) => FirstSetupPage(prefs: prefs),
                         ),
                       );
                     },
@@ -279,7 +282,7 @@ class SignUpPage extends StatelessWidget {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 12),
             ],
           ),
         ]

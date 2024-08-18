@@ -97,7 +97,7 @@ class MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     if(!isLoggedIn) {
       return MaterialApp(
-        home:FirstSetupPage(),
+        home:FirstSetupPage(prefs: prefs),
       );
     }
     TeamPreview savedTeam = TeamPreview(
