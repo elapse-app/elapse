@@ -1,5 +1,6 @@
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ElapseAppBar extends StatelessWidget {
   const ElapseAppBar({
@@ -7,12 +8,14 @@ class ElapseAppBar extends StatelessWidget {
     required this.title,
     this.includeSettings = false,
     this.backNavigation = false,
+    this.prefs,
     this.background,
   });
   final Widget title;
   final Widget? background;
   final bool includeSettings;
   final bool backNavigation;
+  final SharedPreferences? prefs;
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +41,9 @@ class ElapseAppBar extends StatelessWidget {
                         )
                       : Container(),
                   Spacer(),
-                  SettingsButton(),
+                  SettingsButton(
+                    prefs: prefs!,
+                  ),
                 ],
               ),
             ],
