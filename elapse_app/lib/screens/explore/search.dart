@@ -687,7 +687,7 @@ class _ExploreSearchState extends State<ExploreSearch>
                       onPressed: () {
                         setState(() {
                           recentTournamentSearches = [];
-                          prefs.setStringList("recentTournamentSearch", []);
+                          prefs.setStringList("recentTournamentSearches", []);
                         });
                       },
                       child: Text(
