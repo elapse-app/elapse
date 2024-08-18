@@ -14,9 +14,11 @@ class FirstFeature extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blue,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(75),
         child: AppBar(
+          backgroundColor: Colors.blue,
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
             onPressed: () {
@@ -42,7 +44,17 @@ class FirstFeature extends StatelessWidget {
           ),
         ),
       ),
-      body: Column(
+      body: Container(
+        height: double.infinity,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Column(
         children: [
           const Text(
             'At a glance',
@@ -129,6 +141,8 @@ class FirstFeature extends StatelessWidget {
             height:16,
           ),
         ],
+      ),
+
       ),
     );
   }

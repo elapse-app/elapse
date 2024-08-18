@@ -34,24 +34,13 @@ class WelcomePage extends StatelessWidget {
           // White bottom section with Get Started button
           Container(
             height: MediaQuery.of(context).size.height * 0.4,
-            color: Colors.white,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Handle button press
-                      },
-                      child: Text('Get Started'),
-                    ),
+            decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20),
                   ),
                 ),
-              ],
-            ),
           ),
         ],
       ),
