@@ -8,7 +8,7 @@ import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Team/vdaStats.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
-import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
+import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
 import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:elapse_app/screens/tournament_mode/widgets/ranking_overview_widget.dart';

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:elapse_app/classes/Filters/eventSearchFilters.dart';
 import 'package:elapse_app/classes/Miscellaneous/recent_search.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
-import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
+import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
 import 'package:elapse_app/screens/explore/filters.dart';
 import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:elapse_app/screens/tournament/tournament.dart';
