@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:elapse_app/classes/Filters/eventSearchFilters.dart';
 import 'package:elapse_app/classes/Miscellaneous/recent_search.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
-import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
+import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
 import 'package:elapse_app/screens/explore/filters.dart';
 import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:elapse_app/screens/tournament/tournament.dart';
@@ -13,12 +13,11 @@ import 'package:elapse_app/screens/widgets/team_widget.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:side_sheet/side_sheet.dart';
+import 'package:elapse_app/main.dart';
 
 class ExploreSearch extends StatefulWidget {
-  const ExploreSearch({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const ExploreSearch({super.key});
   @override
   State<ExploreSearch> createState() => _ExploreSearchState();
 }
@@ -41,9 +40,8 @@ class _ExploreSearchState extends State<ExploreSearch>
   EventSearchFilters filters = EventSearchFilters(
     seasonID: 190,
     eventName: "",
-    startDate: DateFormat("yyyy-MM-dd").format(DateTime.now()),
-    endDate: DateFormat("yyyy-MM-dd")
-        .format(DateTime.now().add(Duration(days: 365))),
+    startDate: DateFormat("yyyy-MM-dd").format(DateTime(2024, 8, 1)),
+    endDate: DateFormat("yyyy-MM-dd").format(DateTime(2025, 8, 1)),
   );
 
   @override
@@ -54,7 +52,7 @@ class _ExploreSearchState extends State<ExploreSearch>
     });
 
     List<String> recentTeamStrings =
-        widget.prefs.getStringList("recentTeamSearches") ?? <String>[];
+        prefs.getStringList("recentTeamSearches") ?? <String>[];
 
     for (int i = recentTeamStrings.length - 1; i >= 0; i--) {
       var json = jsonDecode(recentTeamStrings[i]);
@@ -65,7 +63,7 @@ class _ExploreSearchState extends State<ExploreSearch>
     }
 
     List<String> recentTournamentStrings =
-        widget.prefs.getStringList("recentTournamentSearches") ?? <String>[];
+        prefs.getStringList("recentTournamentSearches") ?? <String>[];
 
     for (int i = recentTournamentStrings.length - 1; i >= 0; i--) {
       var json = jsonDecode(recentTournamentStrings[i]);
@@ -460,7 +458,6 @@ class _ExploreSearchState extends State<ExploreSearch>
                               teamName: team.teamName,
                               location: team.location,
                               saveSearch: true,
-                              prefs: widget.prefs,
                               saveState: () {
                                 setState(() {
                                   recentTeamSearches.add(RecentTeamSearch(
@@ -499,7 +496,7 @@ class _ExploreSearchState extends State<ExploreSearch>
                                 child: SizedBox(
                                   height: 60,
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Row(
                                         children: [
@@ -546,7 +543,7 @@ class _ExploreSearchState extends State<ExploreSearch>
                       onPressed: () {
                         setState(() {
                           recentTeamSearches = [];
-                          widget.prefs.setStringList("recentTeamSearches", []);
+                          prefs.setStringList("recentTeamSearches", []);
                         });
                       },
                       child: Text(
@@ -605,7 +602,6 @@ class _ExploreSearchState extends State<ExploreSearch>
                       .map((e) => TournamentPreviewWidget(
                             tournamentPreview: e,
                             saveSearch: true,
-                            prefs: widget.prefs,
                             saveState: () {
                               setState(() {
                                 recentTournamentSearches.add(
@@ -640,7 +636,7 @@ class _ExploreSearchState extends State<ExploreSearch>
                                 child: SizedBox(
                                   height: 60,
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Row(
                                         children: [
@@ -691,8 +687,7 @@ class _ExploreSearchState extends State<ExploreSearch>
                       onPressed: () {
                         setState(() {
                           recentTournamentSearches = [];
-                          widget.prefs
-                              .setStringList("recentTournamentSearch", []);
+                          prefs.setStringList("recentTournamentSearches", []);
                         });
                       },
                       child: Text(

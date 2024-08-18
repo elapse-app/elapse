@@ -7,16 +7,15 @@ import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Team/vdaStats.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
-import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
+import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
+import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
-import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
 class MyTeams extends StatefulWidget {
-  const MyTeams({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const MyTeams({super.key});
 
   @override
   State<MyTeams> createState() => _MyTeamsState();
@@ -34,12 +33,12 @@ class _MyTeamsState extends State<MyTeams> {
   int seasonID = 190;
   @override
   void initState() {
-    final String savedTeam = widget.prefs.getString("savedTeam") ?? "";
+    final String savedTeam = prefs.getString("savedTeam") ?? "";
     savedTeamPreview = TeamPreview(
         teamID: jsonDecode(savedTeam)["teamID"],
         teamNumber: jsonDecode(savedTeam)["teamNumber"]);
 
-    savedTeamStrings = widget.prefs.getStringList("savedTeams") ?? [];
+    savedTeamStrings = prefs.getStringList("savedTeams") ?? [];
     savedTeamPreviews.add(savedTeamPreview);
     savedTeamPreviews.addAll(savedTeamStrings
         .map((e) => TeamPreview(
@@ -84,44 +83,14 @@ class _MyTeamsState extends State<MyTeams> {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
+        key: widget.key,
         slivers: [
-          SliverAppBar.large(
-            automaticallyImplyLeading: false,
-            expandedHeight: 125,
-            centerTitle: false,
-            flexibleSpace: FlexibleSpaceBar(
-              expandedTitleScale: 1,
-              collapseMode: CollapseMode.parallax,
-              title: const Padding(
-                padding: EdgeInsets.only(left: 20, right: 12),
-                child: Text(
-                  "My Teams",
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
-                ),
-              ),
-              centerTitle: false,
-              background: SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 20, right: 12, bottom: 20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Spacer(),
-                          SettingsButton(
-                            prefs: widget.prefs,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+          ElapseAppBar(
+            title: Text(
+              "My Team",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
+            includeSettings: true,
           ),
           const RoundedTop(),
           SliverPadding(
@@ -854,8 +823,7 @@ class _MyTeamsState extends State<MyTeams> {
                           savedTeamPreviews.remove(selectedTeamPreview);
                           savedTeamStrings.remove(
                               '{"teamID": ${selectedTeamPreview.teamID}, "teamNumber": "${selectedTeamPreview.teamNumber}"}');
-                          widget.prefs
-                              .setStringList("savedTeams", savedTeamStrings);
+                          prefs.setStringList("savedTeams", savedTeamStrings);
                           selectedTeamPreview = savedTeamPreviews[0];
                           teamChange(selectedTeamPreview);
                         },
