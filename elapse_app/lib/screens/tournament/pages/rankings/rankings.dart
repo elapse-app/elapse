@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:elapse_app/classes/Team/team.dart';
+import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/main.dart';
@@ -11,16 +14,38 @@ class RankingsPage extends StatelessWidget {
       {super.key,
       required this.searchQuery,
       required this.sort,
-      required this.divisionIndex});
+      required this.divisionIndex,
+      required this.useSavedTeams});
   final String searchQuery;
   final int divisionIndex;
   final String sort;
+  final bool useSavedTeams;
   @override
   Widget build(BuildContext context) {
     Tournament tournament =
         loadTournament(prefs.getString("recently-opened-tournament"));
 
     List<Team> teams = tournament.teams;
+    List<TeamPreview> savedTeams = [];
+    if (useSavedTeams) {
+      final String savedTeam = prefs.getString("savedTeam") ?? "";
+      TeamPreview savedTeamPreview = TeamPreview(
+          teamID: jsonDecode(savedTeam)["teamID"],
+          teamNumber: jsonDecode(savedTeam)["teamNumber"]);
+      List<String> savedTeamsString = prefs.getStringList("savedTeams") ?? [];
+      savedTeams.add(savedTeamPreview);
+      savedTeams.addAll(savedTeamsString
+          .map((e) => TeamPreview(
+              teamID: jsonDecode(e)["teamID"],
+              teamNumber: jsonDecode(e)["teamNumber"]))
+          .toList());
+      teams = tournament.teams
+          .where((element) =>
+              savedTeams.any((element2) => element2.teamID == element.id))
+          .toList();
+    } else {
+      teams = tournament.teams;
+    }
     Map<int, TeamStats> rankings =
         tournament.divisions[divisionIndex].teamStats!;
 

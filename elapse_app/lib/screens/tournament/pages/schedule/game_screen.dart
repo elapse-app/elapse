@@ -3,6 +3,7 @@ import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/extras/twelve_hour.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dart';
+import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -79,33 +80,11 @@ class GameScreen extends StatelessWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            automaticallyImplyLeading: false,
-            expandedHeight: 125,
-            centerTitle: false,
-            flexibleSpace: FlexibleSpaceBar(
-              expandedTitleScale: 1,
-              collapseMode: CollapseMode.parallax,
-              title: Padding(
-                padding: EdgeInsets.only(left: 20, right: 12),
-                child: Row(
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(Icons.arrow_back)),
-                    const Text(
-                      "Match Info",
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-              ),
-              centerTitle: false,
-            ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
+          ElapseAppBar(
+            title: Text("Game Info",
+                style: const TextStyle(
+                    fontSize: 24, height: 1, fontWeight: FontWeight.w600)),
+            backNavigation: true,
           ),
           const RoundedTop(),
           SliverPadding(
