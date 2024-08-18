@@ -1,4 +1,4 @@
-import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
+import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/providers/tournament_mode_provider.dart';
 import 'package:elapse_app/screens/tournament/tournament.dart';
