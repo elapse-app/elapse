@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Filters/region.dart';
 import '../Miscellaneous/location.dart';
 import "package:http/http.dart" as http;
 
@@ -20,6 +21,7 @@ class WorldSkillsStats {
   int maxDriver;
 
   Location? location;
+  Region? eventRegion;
 
   WorldSkillsStats({
     required this.teamId,
@@ -32,6 +34,7 @@ class WorldSkillsStats {
     this.maxAuton = 0,
     this.maxDriver = 0,
     this.location,
+    this.eventRegion,
   });
 
   factory WorldSkillsStats.fromJson(Map<String, dynamic> json) {
@@ -49,7 +52,12 @@ class WorldSkillsStats {
           city: json["team"]["city"],
           region: json["team"]["region"],
           country: json["team"]["country"],
-        ));
+        ),
+      eventRegion: Region(
+        name: json["team"]["eventRegion"] == "British Columbia" ? "British Columbia (BC)" : json["team"]["eventRegion"],
+        id: json["team"]["eventRegionId"],
+      )
+    );
   }
 }
 

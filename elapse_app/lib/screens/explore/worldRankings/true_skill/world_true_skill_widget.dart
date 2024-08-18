@@ -53,11 +53,11 @@ class WorldTrueSkillWidget extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Rank ${stats.trueSkillGlobalRank}",
+                            Text("Rank ${stats.trueSkillGlobalRank ?? "N/A"}",
                                 style: const TextStyle(
                                   fontSize: 16,
                                 )),
-                            Text("Score ${stats.trueSkill}",
+                            Text("Score ${stats.trueSkill ?? "N/A"}",
                                 style: const TextStyle(
                                   fontSize: 16,
                                 )),
@@ -76,11 +76,11 @@ class WorldTrueSkillWidget extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   sort == 0 || sort >= 3
-                                      ? Text("CCWM ${stats.ccwm}",
+                                      ? Text("CCWM ${stats.ccwm ?? "N/A"}",
                                           style: const TextStyle(
                                             fontSize: 16,
                                           ))
-                                      : Text("OPR ${stats.opr}",
+                                      : Text("OPR ${stats.opr ?? "N/A"}",
                                           style: const TextStyle(
                                             fontSize: 16,
                                           )),
@@ -92,11 +92,11 @@ class WorldTrueSkillWidget extends StatelessWidget {
                                 children: [
                                   sort == 0 || sort >= 3
                                       ? Text(
-                                          "Winrate ${stats.winPercent!.toInt()} %",
+                                          "Winrate ${stats.winPercent?.toInt() ?? 0} %",
                                           style: const TextStyle(
                                             fontSize: 16,
                                           ))
-                                      : Text("DPR ${stats.dpr}",
+                                      : Text("DPR ${stats.dpr ?? "N/A"}",
                                           style: const TextStyle(
                                             fontSize: 16,
                                           )),

@@ -226,35 +226,46 @@ class ExploreScreen extends StatelessWidget {
           SliverToBoxAdapter(
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 23),
-              padding: const EdgeInsets.symmetric(horizontal: 25),
               height: 64,
               decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.tertiary,
                   borderRadius: BorderRadius.circular(18)),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Flexible(
-                      fit: FlexFit.tight,
-                      flex: 65,
-                      child: GestureDetector(
-                        behavior: HitTestBehavior.opaque,
-                        onTap: () {
+                    flex: 10,
+                  fit: FlexFit.tight,
+                  child: Container(
+                    padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minHeight: 50,
+                        minWidth: 150,
+                      ),
+                      child: TextButton(
+                        style: TextButton.styleFrom(overlayColor: Colors.transparent),
+                        onPressed: () {
                           Navigator.push(
                               context,
                               MaterialPageRoute(
                                   builder: (context) =>
-                                      const WorldRankingsScreen(initState: 0)));
+                                      const WorldRankingsScreen(initIndex: 0)));
                         },
-                        child: const Text(
-                          "World Skills",
-                          style: TextStyle(fontSize: 16, height: 1),
-                          textAlign: TextAlign.center,
+                        child: Text(
+                            "World Skills",
+                            style: TextStyle(
+                                fontSize: 16,
+                                height: 1,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                         ),
-                      )),
+                      ),
+                  ),
                   Flexible(
+                      flex: 1,
                       fit: FlexFit.tight,
-                      flex: 10,
                       child: VerticalDivider(
                         width: 1,
                         thickness: 1,
@@ -263,23 +274,34 @@ class ExploreScreen extends StatelessWidget {
                         color: Theme.of(context).colorScheme.surfaceDim,
                       )),
                   Flexible(
-                    fit: FlexFit.tight,
-                    flex: 65,
-                    child: GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
+                    flex: 10,
+                  fit: FlexFit.tight,
+                  child: Container(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minHeight: 50,
+                      minWidth: 150,
+                    ),
+                    child: TextButton(
+                      style: TextButton.styleFrom(overlayColor: Colors.transparent),
+                      onPressed: () {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    const WorldRankingsScreen(initState: 1)));
+                                const WorldRankingsScreen(initIndex: 1)));
                       },
-                      child: const Text(
+                      child: Text(
                         "World TrueSkill",
-                        style: TextStyle(fontSize: 16, height: 1),
+                        style: TextStyle(
+                          fontSize: 16,
+                          height: 1,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
                         textAlign: TextAlign.center,
                       ),
                     ),
+                  ),
                   ),
                 ],
               ),

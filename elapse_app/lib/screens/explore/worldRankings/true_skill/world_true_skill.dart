@@ -69,9 +69,9 @@ class WorldTrueSkillLoadedPage extends StatelessWidget {
   Widget build(BuildContext context) {
     List<VDAStats> teams = stats.where((e) => e.trueSkill != null).toList();
 
-    if (filter.region != "" && filter.region != "All Regions") {
+    if (filter.regions!.isNotEmpty) {
       teams = teams
-          .where((e) => (e.location?.region ?? "") == filter.region)
+          .where((e) => filter.regions!.any((e2) => e2 == (e.eventRegion ?? "")))
           .toList();
     }
 

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:elapse_app/screens/explore/worldRankings/skills/world_skills_widget.dart';
 import 'package:flutter/material.dart';
@@ -78,9 +79,9 @@ class WorldSkillsLoadedPage extends StatelessWidget {
   Widget build(BuildContext context) {
     List<WorldSkillsStats> teams = rankings.toList();
 
-    if (filter.region != "All Regions") {
+    if (filter.regions!.isNotEmpty) {
       teams = teams
-          .where((e) => (e.location?.region ?? "") == filter.region)
+          .where((e) => filter.regions!.any((e2) => e2 == (e.eventRegion?.name ?? "")))
           .toList();
     }
 

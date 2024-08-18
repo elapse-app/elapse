@@ -14,10 +14,10 @@ import '../widgets/app_bar.dart';
 import '../widgets/custom_tab_bar.dart';
 
 class WorldRankingsScreen extends StatefulWidget {
-  final int initState;
+  final int initIndex;
   final Future<List<VDAStats>>? stats;
 
-  const WorldRankingsScreen({super.key, this.initState = 0, this.stats});
+  const WorldRankingsScreen({super.key, this.initIndex = 0, this.stats});
 
   @override
   State<WorldRankingsScreen> createState() => _WorldRankingsState();
@@ -27,6 +27,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
   late Future<List<WorldSkillsStats>> skillsStats;
   late Future<List<VDAStats>> vdaStats;
   late Future<List<TeamPreview>> savedTeams;
+  late Future<bool> inTM;
 
   int selectedIndex = 0;
   List<String> pageTitles = ["Skills", "TrueSkill"];
@@ -48,11 +49,12 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
   @override
   void initState() {
     super.initState();
-    selectedIndex = widget.initState;
+    selectedIndex = widget.initIndex;
 
     skillsStats = getWorldSkillsRankings(seasonID);
     vdaStats = getTrueSkillData();
     savedTeams = _getSavedTeams();
+    inTM = _isInTM();
   }
 
   @override
@@ -75,7 +77,9 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
       body: CustomScrollView(
         slivers: [
           ElapseAppBar(
-            title: Row(
+            title: Padding(
+              padding: const EdgeInsets.only(right: 10),
+      child: Row(
               children: [
                 const Text(
                   "World Rankings",
@@ -96,7 +100,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                           pageBuilder:
                               (context, animation, secondaryAnimation) =>
                                   WorldRankingsSearchScreen(
-                                      skills: skillsStats!, vda: vdaStats!),
+                                      skills: skillsStats, vda: vdaStats),
                           transitionsBuilder:
                               (context, animation, secondaryAnimation, child) {
                             return FadeTransition(
@@ -109,6 +113,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                     })
               ],
             ),
+            ),
             backNavigation: true,
           ),
           CustomTabBar(
@@ -117,7 +122,9 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                 setState(() {
                   selectedIndex = v;
                 });
-              }),
+              },
+            initIndex: widget.initIndex,
+          ),
           selectedIndex == 0
               ? SliverToBoxAdapter(
                   child: Container(
@@ -162,7 +169,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                       onPressed: () async {
                                         WorldRankingsFilter updatedFilter =
                                             await worldRankingsFilter(
-                                                context, filter);
+                                                context, filter, inTM, skillsStats, vdaStats);
                                         setState(() {
                                           filter = updatedFilter;
                                         });
@@ -216,7 +223,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                           onPressed: () async {
                                             WorldRankingsFilter updatedFilter =
                                                 await worldRankingsFilter(
-                                                    context, filter);
+                                                    context, filter, inTM, skillsStats, vdaStats);
                                             setState(() {
                                               filter = updatedFilter;
                                             });
@@ -249,5 +256,10 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
             teamNumber: jsonDecode(e)["teamNumber"]))
         .toList());
     return savedTeams;
+  }
+
+  Future<bool> _isInTM() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool("isTournamentMode") ?? false;
   }
 }

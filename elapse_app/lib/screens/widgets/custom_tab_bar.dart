@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
 
 class CustomTabBar extends StatefulWidget {
-  const CustomTabBar({super.key, required this.tabs, required this.onPressed});
+  const CustomTabBar({super.key, required this.tabs, required this.onPressed, this.initIndex = 0});
   final List<String> tabs;
   final void Function(int value) onPressed;
+  final int initIndex;
 
   @override
   State<CustomTabBar> createState() => _CustomTabBarState();
 }
 
 class _CustomTabBarState extends State<CustomTabBar> {
-  int selectedItem = 0;
+  late int selectedItem;
+
+  @override
+  void initState() {
+    super.initState();
+    selectedItem = widget.initIndex;
+  }
+
   @override
   Widget build(BuildContext context) {
     return SliverPersistentHeader(
