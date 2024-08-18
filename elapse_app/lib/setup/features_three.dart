@@ -8,8 +8,9 @@ import 'package:elapse_app/setup/team_setup.dart';
 import 'package:elapse_app/screens/home/home.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/setup/features_two.dart';
+import 'package:elapse_app/setup/features_four.dart';
 
-class FirstFeature extends StatelessWidget {
+class ThirdFeature extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -45,7 +46,7 @@ class FirstFeature extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const Text(
-            'At a glance',
+            'Check rankings',
             style: TextStyle(
               fontSize: 36,
               fontWeight: FontWeight.bold,
@@ -53,7 +54,7 @@ class FirstFeature extends StatelessWidget {
           ),
           SizedBox(height: 5),
           const Text(
-            'Upcoming matches & info',
+            'Find teams and stats',
             style: TextStyle(fontSize: 24),
           ),
           SizedBox(height: 20),
@@ -69,7 +70,7 @@ class FirstFeature extends StatelessWidget {
                 alignment: Alignment.center,
                 height: 480,
                 width: 240,
-                child: Image.asset('assets/onboardingHome.png'),
+                child: Image.asset('assets/onboardingRankings.png'),
               ),
             ),
           ),
@@ -92,7 +93,7 @@ class FirstFeature extends StatelessWidget {
                 Navigator.pushReplacement( 
                   context,
                   MaterialPageRoute(
-                    builder: (context) => SecondFeature(
+                    builder: (context) => FourthFeature(
 
                     ),
                   ),
