@@ -28,39 +28,42 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
               Container(
                 height: MediaQuery.of(context).size.height * 0.64,
                 color: Colors.blue,
-                child: Center(
-                  child: RichText(
-                    text: TextSpan(
-                      text: 'Your new tournament companion. ',
-                      style: TextStyle(
-                        fontFamily: "Manrope",
-                        fontSize: 24,
-                        fontWeight: FontWeight.normal,
-                        color: const Color.fromARGB(255, 67, 129, 192),
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Center(
+                    child: RichText(
+                      text: TextSpan(
+                        text: 'Your new tournament companion. ',
+                        style: TextStyle(
+                          fontFamily: "Manrope",
+                          fontSize: 32,
+                          fontWeight: FontWeight.normal,
+                          color: const Color.fromARGB(255, 67, 129, 192),
+                        ),
+                        children: <TextSpan>[
+                          TextSpan(
+                            text: 'Matches, Rankings, Scouting.',
+                            style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontFamily: "Manrope",
+                              fontSize: 32,
+                              color: Colors.grey[350],
+                            ),
+                          ),
+                          TextSpan(
+                            text: '\nAll in one place.',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontFamily: "Manrope",
+                              fontSize: 32,
+                              color: const Color.fromARGB(255, 67, 129, 192),
+                            ),
+                          ),
+                        ],
                       ),
-                      children: <TextSpan>[
-                        TextSpan(
-                          text: 'Matches, Rankings, Scouting.',
-                          style: TextStyle(
-                            fontWeight: FontWeight.normal,
-                            fontFamily: "Manrope",
-                            fontSize: 24,
-                            color: Colors.grey[350],
-                          ),
-                        ),
-                        TextSpan(
-                          text: '\n All in one place.',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontFamily: "Manrope",
-                            fontSize: 24,
-                            color: const Color.fromARGB(255, 67, 129, 192),
-                          ),
-                        ),
-                      ],
                     ),
                   ),
-                ),
+                )
               ),
               SizedBox(height: 0), // Replace Spacer() with SizedBox for debugging
               // White bottom section with Get Started button

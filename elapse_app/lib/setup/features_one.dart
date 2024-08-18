@@ -13,7 +13,7 @@ class FirstFeature extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(50),
+        preferredSize: Size.fromHeight(75),
         child: AppBar(
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
@@ -46,25 +46,30 @@ class FirstFeature extends StatelessWidget {
           const Text(
             'At a glance',
             style: TextStyle(
-              fontSize: 24,
+              fontSize: 36,
               fontWeight: FontWeight.bold,
             ),
           ),
           SizedBox(height: 5),
           const Text(
             'Upcoming matches & info',
-            style: TextStyle(fontSize: 16),
+            style: TextStyle(fontSize: 24),
           ),
           SizedBox(height: 20),
           Center(
             child: Container(
-              height: 450, // Fixed height
-              width: 225, // Fixed width (9:18 aspect ratio)
+              height: 486, // Fixed height
+              width: 246, // Fixed width (9:18 aspect ratio)
               decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                color: Colors.grey,
+                borderRadius: BorderRadius.circular(0),
+                color: Colors.black,
               ),
-              child: Image.asset('assets/onboardingHome.png'),
+              child: Container(
+                alignment: Alignment.center,
+                height: 480,
+                width: 240,
+                child: Image.asset('assets/onboardingHome.png'),
+              ),
             ),
           ),
          Padding(
