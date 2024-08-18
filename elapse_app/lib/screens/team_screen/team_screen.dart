@@ -47,7 +47,7 @@ class _TeamScreenState extends State<TeamScreen> {
         '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}';
   }
 
-  void toggleSaveTeam() async {
+  void toggleSaveTeam() {
     List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
     if (isSaved) {
       savedTeams.remove(
