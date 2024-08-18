@@ -5,10 +5,22 @@ class SignUpPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.blue,
       appBar: AppBar(
         title: Text('Sign Up'),
+        backgroundColor: Colors.blue,
       ),
-      body: Column(
+      body: Container(
+        height: double.infinity,
+        width: double.infinity,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
@@ -97,6 +109,7 @@ class SignUpPage extends StatelessWidget {
                   height: 55.0,
                   width: double.infinity,
                   child: TextButton(
+                    
                     style: TextButton.styleFrom(
                       foregroundColor: const Color.fromARGB(255, 76, 81, 175),
                       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
@@ -271,6 +284,7 @@ class SignUpPage extends StatelessWidget {
           ),
         ]
       )
+      ),
     );
   }
 }
