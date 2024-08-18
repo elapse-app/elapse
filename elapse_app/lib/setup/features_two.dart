@@ -1,3 +1,4 @@
+import 'package:dots_indicator/dots_indicator.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/setup/first_page.dart';
@@ -74,12 +75,32 @@ class SecondFeature extends StatelessWidget {
               ),
             ),
           ),
-         Padding(
+          SizedBox(
+            height:16,
+          ),
+        DotsIndicator(
+          dotsCount: 4,
+          position: 1,
+          decorator: DotsDecorator(
+            color: Colors.black87, // Inactive color
+            activeColor: const Color.fromARGB(255, 151, 35, 35),
+          ),
+        ),
+        Spacer(),
+        Padding(
           padding: const EdgeInsets.all(16.0),
           child: SizedBox(
             height: 55.0,
             width: double.infinity,
-            child: ElevatedButton(
+            child: TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                side: BorderSide(
+                  color: const Color.fromARGB(255, 76, 81, 175),
+                  width: 2.0,
+                  )
+                ),
               onPressed: () {
                 // Navigate to the next page
                 // Navigator.pushReplacement(
@@ -99,10 +120,13 @@ class SecondFeature extends StatelessWidget {
                   ),
                 );
               },
-              child: Text('Get Started'),
+              child: Text('Next'),
             ),
           ),
         ),
+        SizedBox(
+            height:16,
+          ),
         ],
       ),
     );

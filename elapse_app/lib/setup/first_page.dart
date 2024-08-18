@@ -22,6 +22,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
       return Directionality(
         textDirection: TextDirection.ltr,
         child: Scaffold(
+          backgroundColor: Colors.blue,
           body: Column(
             children: [
               // Blue top section
@@ -68,7 +69,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
               SizedBox(height: 0), // Replace Spacer() with SizedBox for debugging
               // White bottom section with Get Started button
               Container(
-                height: MediaQuery.of(context).size.height * 0.36 - 20,
+                height: MediaQuery.of(context).size.height * 0.36,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
@@ -85,6 +86,14 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                         height: 55.0,
                         width: double.infinity,
                         child: TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                            side: BorderSide(
+                              color: const Color.fromARGB(255, 76, 81, 175),
+                              width: 2.0,
+                              )
+                            ),
                           onPressed: () {
                             Navigator.pushReplacement(
                               context,
@@ -103,10 +112,18 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                     ),
                     Padding(
                       padding: const EdgeInsets.all(16.0),
-                        child: SizedBox(
+                      child: SizedBox(
                           height: 55,
                           width: double.infinity,
-                          child: TextButton(
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                            backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                            side: BorderSide(
+                              color: const Color.fromARGB(255, 76, 81, 175),
+                              width: 2.0,
+                              )
+                            ),
                           onPressed: () {
                             Navigator.pushReplacement(
                               context,
@@ -142,7 +159,10 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                           ),
                         ),
                       ),
-                    )
+                    ),
+                    SizedBox(
+                      height:16,
+                    ),
                   ],
                 ),
               ),
