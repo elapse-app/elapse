@@ -1,22 +1,31 @@
 import 'package:flutter/material.dart';
 
+import '../../../classes/Filters/region.dart';
+import '../../../classes/Team/vdaStats.dart';
+import '../../../classes/Team/world_skills.dart';
+
 class WorldRankingsFilter {
-  String region;
+  List<String>? regions;
   bool saved;
   bool onPickList;
+  bool atTournament;
   bool scouted;
 
   WorldRankingsFilter({
-    this.region = "All Regions",
+    List<String>? regions,
     this.saved = false,
     this.onPickList = false,
+    this.atTournament = false,
     this.scouted = false,
-  });
+  }) : this.regions = regions ?? [];
 }
 
 Future<WorldRankingsFilter> worldRankingsFilter(
-    BuildContext context, WorldRankingsFilter filter) async {
+    BuildContext context, WorldRankingsFilter filter, Future<bool> isInTM,
+    Future<List<WorldSkillsStats>> skills, Future<List<VDAStats>> vda) async {
   final DraggableScrollableController dra = DraggableScrollableController();
+
+  bool inTM  = await isInTM;
 
   List<String> regions = [
     "All Regions",
@@ -33,8 +42,8 @@ Future<WorldRankingsFilter> worldRankingsFilter(
         return StatefulBuilder(
           builder: (context, setModalState) {
             return DraggableScrollableSheet(
-                initialChildSize: 0.5,
-                maxChildSize: 0.5,
+                initialChildSize: inTM ? 0.6 : 0.45,
+                maxChildSize: inTM ? 0.6 : 0.45,
                 minChildSize: 0,
                 expand: false,
                 shouldCloseOnMinExtent: true,
@@ -65,7 +74,7 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              filter.region != "All Regions" ||
+                              filter.regions!.isNotEmpty ||
                                       filter.saved ||
                                       filter.onPickList ||
                                       filter.scouted
@@ -97,7 +106,7 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                           height: 50,
                           padding: const EdgeInsets.only(left: 20, right: 20),
                           decoration: BoxDecoration(
-                            color: filter.region != "All Regions"
+                            color: filter.regions!.isNotEmpty
                                 ? Theme.of(context).colorScheme.primary
                                 : Theme.of(context).colorScheme.surface,
                             border: Border.all(
@@ -107,23 +116,32 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                           ),
                           child: InkWell(
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       const Icon(Icons.language),
-                                      const SizedBox(width: 5),
-                                      Text(filter.region,
-                                          style: const TextStyle(fontSize: 16)),
+                                      const SizedBox(width: 10),
+                                      filter.regions!.isEmpty
+                                            ? const Text("All Regions",
+                                            style: TextStyle(fontSize: 16))
+                                            : Expanded(
+                                        flex: 5,
+                                          child:Text(filter.regions!.join(", "),
+                                            style: const TextStyle(fontSize: 16),
+                                        overflow: TextOverflow.fade,
+                                        softWrap: false,
+                                        maxLines: 1,
+                                      )),
+                                      const Spacer(),
+                                      const Icon(Icons.arrow_right),
                                     ]),
-                                const Row(children: [
-                                  Icon(Icons.arrow_right),
-                                ])
-                              ],
-                            ),
-                            onTap: () {
-                              setModalState(() {});
+                            onTap: () async {
+                                await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => RegionFilterPage(filter: filter.regions!, skills: skills, vda: vda),
+                                    ),
+                                );
+                                setModalState(() {});
                             },
                           ),
                         ),
@@ -148,7 +166,7 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Icon(Icons.bookmark_border),
-                                      SizedBox(width: 5),
+                                      SizedBox(width: 10),
                                       Text("Saved",
                                           style: TextStyle(fontSize: 16)),
                                     ]),
@@ -166,8 +184,8 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                             },
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        Container(
+                        inTM ? const SizedBox(height: 12) : const SizedBox(),
+                        inTM ? Container(
                           height: 50,
                           padding: const EdgeInsets.only(left: 20, right: 20),
                           decoration: BoxDecoration(
@@ -187,7 +205,7 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Icon(Icons.person_add_alt),
-                                      SizedBox(width: 5),
+                                      SizedBox(width: 10),
                                       Text("On Pick list",
                                           style: TextStyle(fontSize: 16)),
                                     ]),
@@ -204,13 +222,15 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                               });
                             },
                           ),
-                        ),
-                        const SizedBox(height: 12),
-                        Container(
+                        )
+                        : const SizedBox(),
+                        inTM ? const SizedBox(height: 12) : const SizedBox(),
+                        inTM
+                        ? Container(
                           height: 50,
                           padding: const EdgeInsets.only(left: 20, right: 20),
                           decoration: BoxDecoration(
-                            color: filter.scouted
+                            color: filter.atTournament
                                 ? Theme.of(context).colorScheme.primary
                                 : Theme.of(context).colorScheme.surface,
                             border: Border.all(
@@ -225,15 +245,55 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                                 const Row(
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
+                                      Icon(Icons.people_alt_outlined),
+                                      SizedBox(width: 10),
+                                      Text("At This Tournament",
+                                          style: TextStyle(fontSize: 16)),
+                                    ]),
+                                filter.atTournament
+                                    ? const Row(children: [
+                                        Icon(Icons.check),
+                                      ])
+                                    : const SizedBox(),
+                              ],
+                            ),
+                            onTap: () {
+                              setModalState(() {
+                                filter.atTournament = !filter.atTournament;
+                              });
+                            },
+                          ),
+                        )
+                            : const SizedBox(),
+                        const SizedBox(height: 12),
+                        Container(
+                          height: 50,
+                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          decoration: BoxDecoration(
+                            color: filter.scouted
+                                ? Theme.of(context).colorScheme.primary
+                                : Theme.of(context).colorScheme.surface,
+                            border: Border.all(
+                                color: Theme.of(context).colorScheme.primary),
+                            borderRadius:
+                            const BorderRadius.all(Radius.circular(100)),
+                          ),
+                          child: InkWell(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                const Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
                                       Icon(Icons.manage_search),
-                                      SizedBox(width: 5),
+                                      SizedBox(width: 10),
                                       Text("Scouted",
                                           style: TextStyle(fontSize: 16)),
                                     ]),
                                 filter.scouted
                                     ? const Row(children: [
-                                        Icon(Icons.check),
-                                      ])
+                                  Icon(Icons.check),
+                                ])
                                     : const SizedBox(),
                               ],
                             ),
@@ -243,7 +303,7 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                               });
                             },
                           ),
-                        ),
+                        )
                       ]));
                 });
           },
