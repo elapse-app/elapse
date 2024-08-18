@@ -1,13 +1,10 @@
 import 'package:elapse_app/screens/explore/search.dart';
+import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
-import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ExploreScreen extends StatelessWidget {
-  const ExploreScreen({super.key, required this.prefs});
-
-  final SharedPreferences prefs;
+  const ExploreScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -15,68 +12,14 @@ class ExploreScreen extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            automaticallyImplyLeading: false,
-            expandedHeight: 125,
-            centerTitle: false,
-            flexibleSpace: FlexibleSpaceBar(
-              expandedTitleScale: 1,
-              collapseMode: CollapseMode.parallax,
-              title: const Padding(
-                padding: EdgeInsets.only(left: 20, right: 12),
-                child: Text(
-                  "Explore",
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
-                ),
-              ),
-              centerTitle: false,
-              background: SafeArea(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 20, right: 12, bottom: 20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Spacer(),
-                          SettingsButton(
-                            prefs: prefs,
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+          const ElapseAppBar(
+            title: Text(
+              "Explore",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
+            includeSettings: true,
           ),
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: SliverHeaderDelegate(
-                minHeight: 25,
-                maxHeight: 25,
-                child: Stack(
-                  children: [
-                    Container(
-                      color: Theme.of(context).colorScheme.primary,
-                      height: 25,
-                    ),
-                    Container(
-                      height: 25,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(25),
-                          topRight: Radius.circular(25),
-                        ),
-                      ),
-                    ),
-                  ],
-                )),
-          ),
+          const RoundedTop(),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 23),
             sliver: SliverToBoxAdapter(
@@ -92,7 +35,7 @@ class ExploreScreen extends StatelessWidget {
                               const Duration(milliseconds: 300),
                           pageBuilder:
                               (context, animation, secondaryAnimation) =>
-                                  ExploreSearch(prefs: prefs),
+                                  ExploreSearch(),
                           transitionsBuilder:
                               (context, animation, secondaryAnimation, child) {
                             // Create a Tween that transitions the new screen from fully transparent to fully opaque
@@ -222,25 +165,28 @@ class ExploreScreen extends StatelessWidget {
             ),
           ),
           SliverToBoxAdapter(
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 23),
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              height: 64,
-              decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.tertiary,
-                  borderRadius: BorderRadius.circular(18)),
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "World Rankings",
-                    style: TextStyle(fontSize: 16, height: 1),
-                  ),
-                  Icon(
-                    Icons.arrow_forward,
-                    size: 16,
-                  )
-                ],
+            child: GestureDetector(
+              onTap: () {},
+              child: Container(
+                margin: const EdgeInsets.symmetric(horizontal: 23),
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                height: 64,
+                decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.tertiary,
+                    borderRadius: BorderRadius.circular(18)),
+                child: const Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "World Rankings",
+                      style: TextStyle(fontSize: 16, height: 1),
+                    ),
+                    Icon(
+                      Icons.arrow_forward,
+                      size: 16,
+                    )
+                  ],
+                ),
               ),
             ),
           ),

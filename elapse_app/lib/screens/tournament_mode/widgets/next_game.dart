@@ -70,7 +70,8 @@ class NextGame extends StatelessWidget {
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return GameScreen(
-              game: game, rankings: rankings, skills: skills, games: games);
+            game: game,
+          );
         }));
       },
       child: Container(

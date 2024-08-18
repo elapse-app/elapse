@@ -43,8 +43,8 @@ class _FiltersPageState extends State<FiltersPage> {
     levelClassID = 1;
     season = seasons[0];
     returnFilters = widget.filters;
-    startDate = DateTime.now();
-    endDate = DateTime.now().add(const Duration(days: 31));
+    startDate = DateTime.parse(widget.filters.startDate);
+    endDate = DateTime.parse(widget.filters.endDate);
   }
 
   @override
