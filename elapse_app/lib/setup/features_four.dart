@@ -10,6 +10,7 @@ import 'package:elapse_app/screens/home/home.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/setup/features_one.dart';
 import 'package:elapse_app/setup/features_three.dart';
+import 'package:elapse_app/setup/signup.dart';
 
 class FourthFeature extends StatelessWidget {
   @override
@@ -114,7 +115,7 @@ class FourthFeature extends StatelessWidget {
                 Navigator.pushReplacement( 
                   context,
                   MaterialPageRoute(
-                    builder: (context) => FirstFeature(
+                    builder: (context) => SignUpPage(
 
                     ),
                   ),
