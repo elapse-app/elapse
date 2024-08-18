@@ -96,7 +96,6 @@ class VDAStats {
 }
 
 Future<List<VDAStats>> getTrueSkillData() async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
   final String? vdaData = prefs.getString("vdaData");
   final String? expiryDate = prefs.getString("vdaExpiry");
 

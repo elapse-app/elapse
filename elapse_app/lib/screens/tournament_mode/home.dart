@@ -10,19 +10,16 @@ import 'package:elapse_app/screens/tournament_mode/widgets/ranking_overview_widg
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class TMHomePage extends StatefulWidget {
   const TMHomePage(
       {super.key,
       required this.tournamentID,
       required this.teamID,
-      required this.teamNumber,
-      required this.prefs});
+      required this.teamNumber});
   final int tournamentID;
   final int teamID;
   final String teamNumber;
-  final SharedPreferences prefs;
 
   @override
   State<TMHomePage> createState() => _TMHomePageState();
@@ -32,7 +29,7 @@ class _TMHomePageState extends State<TMHomePage> {
   @override
   void initState() {
     super.initState();
-    tournament = TMTournamentDetails(widget.tournamentID, widget.prefs);
+    // tournament = TMTournamentDetails(widget.tournamentID, widget.prefs);
   }
 
   Future<Tournament>? tournament;
@@ -61,11 +58,11 @@ class _TMHomePageState extends State<TMHomePage> {
             flexibleSpace: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
                 var top = constraints.biggest.height;
-                double sizedBoxHeight = (top - kToolbarHeight) * 0.615 -
+                double sizedBoxHeight = (top - kToolbarHeight) * 0.58 -
                     MediaQuery.of(context).viewPadding.top;
                 sizedBoxHeight = sizedBoxHeight < 0 ? 0 : sizedBoxHeight;
                 return FlexibleSpaceBar(
-                  expandedTitleScale: 1,
+                  expandedTitleScale: 1.25,
                   collapseMode: CollapseMode.parallax,
                   title: Padding(
                     padding: const EdgeInsets.only(left: 20, right: 12),
@@ -79,20 +76,9 @@ class _TMHomePageState extends State<TMHomePage> {
                             Text(
                               welcomeMessage,
                               style: TextStyle(
-                                  fontSize: 30, fontWeight: FontWeight.w600),
+                                  fontSize: 24, fontWeight: FontWeight.w600),
                             ),
                             Spacer(),
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              constraints: BoxConstraints(),
-                              icon: Icon(
-                                Icons.refresh_rounded,
-                                size: 30,
-                              ),
-                              onPressed: () {
-                                myAppKey.currentState!.reloadApp();
-                              },
-                            )
                           ],
                         ),
                         SizedBox(
@@ -104,7 +90,7 @@ class _TMHomePageState extends State<TMHomePage> {
                   centerTitle: false,
                   background: SafeArea(
                     child: Padding(
-                      padding: EdgeInsets.only(left: 20, right: 12, bottom: 10),
+                      padding: EdgeInsets.only(left: 23, right: 12, bottom: 10),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,9 +103,7 @@ class _TMHomePageState extends State<TMHomePage> {
                               ),
                               Image(image: AssetImage(imageString), height: 25),
                               const Spacer(),
-                              SettingsButton(
-                                prefs: widget.prefs,
-                              )
+                              SettingsButton()
                             ],
                           ),
                           Padding(
@@ -365,12 +349,10 @@ class _TMHomePageState extends State<TMHomePage> {
                         return Column(
                           children: [
                             GameWidget(
-                                game: game,
-                                rankings: snapshot.data!.divisions[0].teamStats,
-                                games: snapshot.data!.divisions[0].games!,
-                                teamName: widget.teamNumber,
-                                isAllianceColoured: true,
-                                skills: snapshot.data!.tournamentSkills),
+                              game: game,
+                              teamName: widget.teamNumber,
+                              isAllianceColoured: true,
+                            ),
                             Divider(
                               color: Theme.of(context).colorScheme.surfaceDim,
                               height: 3,
@@ -445,8 +427,8 @@ class _TMHomePageState extends State<TMHomePage> {
                         color: Theme.of(context).colorScheme.secondary),
                   ),
                   onPressed: () {
-                    widget.prefs.setBool("isTournamentMode", false);
-                    widget.prefs.remove("tournament-${widget.tournamentID}");
+                    prefs.setBool("isTournamentMode", false);
+                    prefs.remove("tournament-${widget.tournamentID}");
                     myAppKey.currentState!.reloadApp();
                   }),
               Spacer(),
