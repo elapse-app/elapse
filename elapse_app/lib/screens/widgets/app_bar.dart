@@ -41,9 +41,7 @@ class ElapseAppBar extends StatelessWidget {
                         )
                       : Container(),
                   Spacer(),
-                  SettingsButton(
-                    prefs: prefs!,
-                  ),
+                  SettingsButton(),
                 ],
               ),
             ],

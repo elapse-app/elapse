@@ -93,9 +93,7 @@ class SettingsScreen extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => AuthSignIn(
-                              prefs: prefs,
-                            ),
+                            builder: (context) => AuthSignIn(),
                           ),
                         );
                       },
@@ -122,9 +120,7 @@ class SettingsScreen extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => AuthEmail(
-                              prefs: prefs,
-                            ),
+                            builder: (context) => AuthEmail(),
                           ),
                         );
                       },
@@ -151,9 +147,7 @@ class SettingsScreen extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => AuthPass(
-                              prefs: prefs,
-                            ),
+                            builder: (context) => AuthPass(),
                           ),
                         );
                       },
@@ -180,7 +174,10 @@ class SettingsScreen extends StatelessWidget {
                         FirebaseAuth.instance.signOut();
                         print('authSucc - signed out user');
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: const Text('Success! You have been signed out.'),),
+                          SnackBar(
+                            content: const Text(
+                                'Success! You have been signed out.'),
+                          ),
                         );
                       },
                       child: Padding(
@@ -206,9 +203,7 @@ class SettingsScreen extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => AuthDel(
-                              prefs: prefs,
-                            ),
+                            builder: (context) => AuthDel(),
                           ),
                         );
                       },
