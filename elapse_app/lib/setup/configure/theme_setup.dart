@@ -1,5 +1,6 @@
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/providers/color_provider.dart';
+import 'package:elapse_app/setup/configure/tournament_mode_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -9,184 +10,289 @@ class ThemeSetup extends StatefulWidget {
   final SharedPreferences prefs;
 
   @override
-  State<ThemeSetup> createState() => _ThemeSetupState();
+  State<ThemeSetup> createState() => _ThemeSetupState(prefs: prefs);
 }
 
 String theme = "system";
 
 class _ThemeSetupState extends State<ThemeSetup> {
+  _ThemeSetupState({required this.prefs});
+  SharedPreferences prefs;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 23.0),
-        child: SafeArea(
-          child: Center(
-            child: Column(
-              children: [
-                const SizedBox(
-                  height: 50,
+      backgroundColor: Colors.blue,
+      appBar: AppBar(
+        title: Text('Join Team'),
+        backgroundColor: Colors.blue,
+      ),
+      body: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 23.0),
+          child: SafeArea(
+            child: Center(
+              child: Column(
+                children: [
+                  const SizedBox(
+                    height: 50,
+                  ),
+                  Padding(
+                padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
+                child: Center(
+                  child: RichText(
+                    text: TextSpan(
+                      text: 'Personalize Elapse',
+                      style: TextStyle(
+                        fontFamily: "Manrope",
+                        fontSize: 32,
+                        fontWeight: FontWeight.normal,
+                        color: const Color.fromARGB(255, 67, 129, 192),
+                      ),
+                    ),
+                  ),
                 ),
-                const Text(
-                  "Set your Theme",
-                  style: TextStyle(
-                      fontSize: 64, fontWeight: FontWeight.w500, height: 1),
+              ),
+              SizedBox(height: 20),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                child: Center(
+                  child: RichText(
+                    text: TextSpan(
+                      text: 'Choose a theme you want to use',
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontFamily: "Manrope",
+                        fontSize: 18,
+                        color: Colors.grey[350],
+                      ),
+                    ),
+                  ),
                 ),
-                const SizedBox(
-                  height: 64,
-                ),
-                Consumer<ColorProvider>(builder: (
-                  context,
-                  colorProvider,
-                  snapshot,
-                ) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Column(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                  width: 5),
+              ),
+              SizedBox(height: 20),
+                  Consumer<ColorProvider>(builder: (
+                    context,
+                    colorProvider,
+                    snapshot,
+                  ) {
+                    return Column(
+                      children: [
+                        SizedBox(
+                          height: 55.0,
+                          width: double.infinity,
+                          child: TextButton(
+                            style: TextButton.styleFrom(
+                              foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                              side: BorderSide(
+                                color: const Color.fromARGB(255, 76, 81, 175),
+                                width: 2.0,
+                              ),
                             ),
-                            child: Row(
+                            onPressed: () {
+                              colorProvider.setSystem();
+                              setState(() {
+                                theme = "system";
+                              });
+                            },
+                            child: Stack(
                               children: [
-                                Container(
-                                  height: 50,
-                                  width: 25,
-                                  decoration: const BoxDecoration(
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(25),
-                                        bottomLeft: Radius.circular(25),
-                                      )),
+                                Center(
+                                  child: Text(
+                                    'System',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.normal,
+                                      fontFamily: "Manrope",
+                                      fontSize: 19,
+                                    ),
+                                  ),
                                 ),
-                                Container(
-                                  height: 50,
-                                  width: 25,
-                                  decoration: const BoxDecoration(
-                                      color: Colors.black,
-                                      borderRadius: BorderRadius.only(
-                                        topRight: Radius.circular(25),
-                                        bottomRight: Radius.circular(25),
-                                      )),
+                                Positioned(
+                                  right: 16,
+                                  top: 0,
+                                  bottom: 0,
+                                  child: Icon(
+                                    Icons.settings,
+                                    color: Theme.of(context).colorScheme.secondary,
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 16,
+                                  top: 0,
+                                  bottom: 0,
+                                  child: CircleAvatar(
+                                    radius: 5,
+                                    backgroundColor: theme == "system"
+                                        ? Theme.of(context).colorScheme.secondary
+                                        : Colors.transparent,
+                                  ),
                                 ),
                               ],
                             ),
                           ),
-                          SizedBox(height: 15),
-                          Radio<String>(
-                              activeColor:
-                                  Theme.of(context).colorScheme.secondary,
-                              value: "system",
-                              groupValue: theme,
-                              onChanged: (value) {
-                                colorProvider.setSystem();
-                                setState(() {
-                                  theme = value!;
-                                });
-                              }),
-                          Text(
-                            "System",
-                            style: TextStyle(fontSize: 18),
-                          )
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Container(
-                            height: 60,
-                            width: 60,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.black,
-                              border: Border.all(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                  width: 5),
+                        ),
+                        SizedBox(height: 15),
+                        SizedBox(
+                          height: 55.0,
+                          width: double.infinity,
+                          child: TextButton(
+                            style: TextButton.styleFrom(
+                              foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                              side: BorderSide(
+                                color: const Color.fromARGB(255, 76, 81, 175),
+                                width: 2.0,
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 15),
-                          Radio<String>(
-                              activeColor:
-                                  Theme.of(context).colorScheme.secondary,
-                              value: "dark",
-                              groupValue: theme,
-                              onChanged: (value) {
-                                colorProvider.setDark();
-                                setState(() {
-                                  theme = value!;
-                                });
-                              }),
-                          Text(
-                            "Dark",
-                            style: TextStyle(fontSize: 18),
-                          )
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Container(
-                            height: 60,
-                            width: 60,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white,
-                              border: Border.all(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                  width: 5),
+                            onPressed: () {
+                              colorProvider.setLight();
+                              setState(() {
+                                theme = "light";
+                              });
+                            },
+                            child: Stack(
+                              children: [
+                                Center(
+                                  child: Text(
+                                    'Light',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.normal,
+                                      fontFamily: "Manrope",
+                                      fontSize: 19,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  right: 16,
+                                  top: 0,
+                                  bottom: 0,
+                                  child: Icon(
+                                    Icons.light_mode,
+                                    color: Theme.of(context).colorScheme.secondary,
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 16,
+                                  top: 0,
+                                  bottom: 0,
+                                  child: CircleAvatar(
+                                    radius: 5,
+                                    backgroundColor: theme == "light"
+                                        ? Theme.of(context).colorScheme.secondary
+                                        : Colors.transparent,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          SizedBox(height: 15),
-                          Radio<String>(
-                              activeColor:
-                                  Theme.of(context).colorScheme.secondary,
-                              value: "light",
-                              groupValue: theme,
-                              onChanged: (value) {
-                                colorProvider.setLight();
-                                setState(() {
-                                  theme = value!;
-                                });
-                              }),
-                          Text(
-                            "Light",
-                            style: TextStyle(fontSize: 18),
-                          )
-                        ],
-                      ),
-                    ],
-                  );
-                }),
-                SizedBox(
-                  height: 60,
-                ),
-                TextButton(
-                    style: ButtonStyle(
-                        foregroundColor: WidgetStateProperty.all(
-                            Theme.of(context).colorScheme.secondary)),
-                    onPressed: () {
-                      widget.prefs.setBool("needsReload", true);
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => MyApp(
-                            key: myAppKey,
-                            prefs: widget.prefs,
                           ),
                         ),
-                      );
-                    },
-                    child: const Text(
-                      "Finish Setup",
-                      style: TextStyle(fontSize: 18),
-                    ))
-              ],
+                        SizedBox(height: 15),
+                        SizedBox(
+                          height: 55.0,
+                          width: double.infinity,
+                          child: TextButton(
+                            style: TextButton.styleFrom(
+                              foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                              side: BorderSide(
+                                color: const Color.fromARGB(255, 76, 81, 175),
+                                width: 2.0,
+                              ),
+                            ),
+                            onPressed: () {
+                              colorProvider.setDark();
+                              setState(() {
+                                theme = "dark";
+                              });
+                            },
+                            child: Stack(
+                              children: [
+                                Center(
+                                  child: Text(
+                                    'Dark',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.normal,
+                                      fontFamily: "Manrope",
+                                      fontSize: 19,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  right: 16,
+                                  top: 0,
+                                  bottom: 0,
+                                  child: Icon(
+                                    Icons.dark_mode,
+                                    color: Theme.of(context).colorScheme.secondary,
+                                  ),
+                                ),
+                                Positioned(
+                                  left: 16,
+                                  top: 0,
+                                  bottom: 0,
+                                  child: CircleAvatar(
+                                    radius: 5,
+                                    backgroundColor: theme == "dark"
+                                        ? Theme.of(context).colorScheme.secondary
+                                        : Colors.transparent,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                  SizedBox(
+                    height: 60,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(0.0),
+                    child: SizedBox(
+                      height: 55.0,
+                      width: double.infinity,
+                      child: TextButton(
+                        style: TextButton.styleFrom(
+                          foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                          side: BorderSide(
+                            color: const Color.fromARGB(255, 76, 81, 175),
+                            width: 2.0,
+                            )
+                          ),
+                        onPressed: () {
+                          // Navigate to the next page
+                          // Navigator.pushReplacement(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => ThemeSetup(
+                          //       prefs: widget.prefs,
+                          //     ),
+                          //   ),
+                          // );
+                          Navigator.pushReplacement( 
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => TournamentModeSetupPage(
+                                prefs: prefs,
+                              ),
+                            ),
+                          );
+                        },
+                        child: Text('Next'),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

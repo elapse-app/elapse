@@ -37,7 +37,7 @@ class SignUpPage extends StatelessWidget {
                     text: 'Create an account',
                     style: TextStyle(
                       fontFamily: "Manrope",
-                      fontSize: 30,
+                      fontSize: 32,
                       fontWeight: FontWeight.normal,
                       color: const Color.fromARGB(255, 67, 129, 192),
                     ),
@@ -55,7 +55,7 @@ class SignUpPage extends StatelessWidget {
                       style: TextStyle(
                         fontWeight: FontWeight.normal,
                         fontFamily: "Manrope",
-                        fontSize: 19,
+                        fontSize: 18,
                         color: Colors.grey[350],
                       ),
                   )
@@ -73,7 +73,7 @@ class SignUpPage extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.normal,
                             fontFamily: "Manrope",
-                            fontSize: 19,
+                            fontSize: 18,
                             color: Colors.grey[350],
                           ),
                         ),
@@ -82,7 +82,7 @@ class SignUpPage extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontFamily: "Manrope",
-                            fontSize: 19,
+                            fontSize: 18,
                             color: const Color.fromARGB(255, 67, 129, 192),
                           ),
                         ),
@@ -91,7 +91,7 @@ class SignUpPage extends StatelessWidget {
                           style: TextStyle(
                             fontWeight: FontWeight.normal,
                             fontFamily: "Manrope",
-                            fontSize: 19,
+                            fontSize: 18,
                             color: Colors.grey[350],
                           ),
                         ),

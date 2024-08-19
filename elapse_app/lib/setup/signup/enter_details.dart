@@ -1,5 +1,5 @@
 import 'package:elapse_app/setup/configure/join_team.dart';
-import 'package:elapse_app/setup/configure/team_setup.dart';
+import 'package:elapse_app/setup/deprecated/team_setup.dart';
 import 'package:elapse_app/setup/signup/verify_account.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/setup/features/first_page.dart';
@@ -43,7 +43,7 @@ class EnterDetailsPage extends StatelessWidget {
                     text: 'Enter your details',
                     style: TextStyle(
                       fontFamily: "Manrope",
-                      fontSize: 30,
+                      fontSize: 32,
                       fontWeight: FontWeight.normal,
                       color: const Color.fromARGB(255, 67, 129, 192),
                     ),
@@ -61,7 +61,7 @@ class EnterDetailsPage extends StatelessWidget {
                     style: TextStyle(
                       fontWeight: FontWeight.normal,
                       fontFamily: "Manrope",
-                      fontSize: 19,
+                      fontSize: 18,
                       color: Colors.grey[350],
                     ),
                   ),
