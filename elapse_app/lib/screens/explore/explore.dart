@@ -1,4 +1,6 @@
 import 'package:elapse_app/screens/explore/search.dart';
+import 'package:elapse_app/screens/explore/worldRankings.dart';
+import 'package:elapse_app/screens/explore/worldRankings/skills/world_skills.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
@@ -165,28 +167,86 @@ class ExploreScreen extends StatelessWidget {
             ),
           ),
           SliverToBoxAdapter(
-            child: GestureDetector(
-              onTap: () {},
-              child: Container(
-                margin: const EdgeInsets.symmetric(horizontal: 23),
-                padding: const EdgeInsets.symmetric(horizontal: 25),
-                height: 64,
-                decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.tertiary,
-                    borderRadius: BorderRadius.circular(18)),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "World Rankings",
-                      style: TextStyle(fontSize: 16, height: 1),
+            child: Container(
+              margin: const EdgeInsets.symmetric(horizontal: 23),
+              height: 64,
+              decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.tertiary,
+                  borderRadius: BorderRadius.circular(18)),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Flexible(
+                    flex: 10,
+                  fit: FlexFit.tight,
+                  child: Container(
+                    padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(
+                        minHeight: 50,
+                        minWidth: 150,
+                      ),
+                      child: TextButton(
+                        style: TextButton.styleFrom(overlayColor: Colors.transparent),
+                        onPressed: () {
+                          Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const WorldRankingsScreen(initIndex: 0)));
+                        },
+                        child: Text(
+                            "World Skills",
+                            style: TextStyle(
+                                fontSize: 16,
+                                height: 1,
+                                color: Theme.of(context).colorScheme.onPrimary,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      ),
+                  ),
+                  Flexible(
+                      flex: 1,
+                      fit: FlexFit.tight,
+                      child: VerticalDivider(
+                        width: 1,
+                        thickness: 1,
+                        indent: 10,
+                        endIndent: 10,
+                        color: Theme.of(context).colorScheme.surfaceDim,
+                      )),
+                  Flexible(
+                    flex: 10,
+                  fit: FlexFit.tight,
+                  child: Container(
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(
+                      minHeight: 50,
+                      minWidth: 150,
                     ),
-                    Icon(
-                      Icons.arrow_forward,
-                      size: 16,
-                    )
-                  ],
-                ),
+                    child: TextButton(
+                      style: TextButton.styleFrom(overlayColor: Colors.transparent),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                const WorldRankingsScreen(initIndex: 1)));
+                      },
+                      child: Text(
+                        "World TrueSkill",
+                        style: TextStyle(
+                          fontSize: 16,
+                          height: 1,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  ),
+                  ),
+                ],
               ),
             ),
           ),
