@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
-import 'package:elapse_app/main.dart';
+import 'package:elapse_app/classes/Team/team.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -26,7 +26,7 @@ class VDAStats {
   num? regionalQual;
   num? worldsQual;
 
-  String? region;
+  String? eventRegion;
 
   Location? location;
 
@@ -54,7 +54,7 @@ class VDAStats {
     required this.trueSkillRegionRank,
     required this.regionalQual,
     required this.worldsQual,
-    required this.region,
+    required this.eventRegion,
     this.location,
     this.skillsScore,
     this.maxAuto,
@@ -81,7 +81,7 @@ class VDAStats {
       trueSkillRegionRank: json["ts_ranking_region"],
       regionalQual: json["qualified_for_regionals"],
       worldsQual: json["qualified_for_worlds"],
-      region: json["loc_region"],
+      eventRegion: json["event_region"] == "British Columbia" ? "British Columbia (BC)" : json["event_region"],
       location: Location(
         region: json["loc_region"],
         country: json["loc_country"],
