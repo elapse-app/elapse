@@ -4,10 +4,14 @@ import 'package:elapse_app/setup/signup/enter_details.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/screens/home/home.dart';
 
 class CompleteSetupPage extends StatefulWidget {
   const CompleteSetupPage({super.key, required this.prefs});
   final SharedPreferences prefs;
+  
+  final int teamID = 0;
+  //change later
 
   @override
   State<CompleteSetupPage> createState() => _CompleteSetupPageState(prefs: prefs);
@@ -134,9 +138,10 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
                     Navigator.pushReplacement( 
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CloudScoutSetupPage(
-                          prefs: prefs
-                        ),
+                        builder: (context) => HomeScreen(
+                        teamID: widget.teamID, // Pass the necessary parameters
+                        prefs: widget.prefs,
+                      ),
                       ),
                     );
                   },

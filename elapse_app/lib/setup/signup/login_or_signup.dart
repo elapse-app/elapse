@@ -1,3 +1,4 @@
+import 'package:elapse_app/setup/signup/enter_details.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/setup/features/first_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -174,7 +175,7 @@ class SignUpPage extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => FirstSetupPage(prefs: prefs),
+                            builder: (context) => EnterDetailsPage(prefs: prefs),
                           ),
                         );
                       },
@@ -205,7 +206,7 @@ class SignUpPage extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => FirstSetupPage(prefs: prefs),
+                            builder: (context) => EnterDetailsPage(prefs: prefs),
                           ),
                         );
                       },
