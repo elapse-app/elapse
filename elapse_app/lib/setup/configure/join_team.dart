@@ -1,3 +1,4 @@
+import 'package:elapse_app/setup/configure/theme_setup.dart';
 import 'package:elapse_app/setup/signup/enter_details.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
@@ -8,10 +9,12 @@ class JoinTeamPage extends StatefulWidget {
   final SharedPreferences prefs;
 
   @override
-  State<JoinTeamPage> createState() => _JoinTeamPageState();
+  State<JoinTeamPage> createState() => _JoinTeamPageState(prefs: prefs);
 }
 
 class _JoinTeamPageState extends State<JoinTeamPage> {
+  _JoinTeamPageState({required this.prefs});
+  final SharedPreferences prefs;
   final TextEditingController _teamController = TextEditingController();
   Future<List<TeamPreview>>? teamSearch;
   String searchQuery = "";
@@ -75,7 +78,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                       text: 'Team details',
                       style: TextStyle(
                         fontFamily: "Manrope",
-                        fontSize: 30,
+                        fontSize: 32,
                         fontWeight: FontWeight.normal,
                         color: const Color.fromARGB(255, 67, 129, 192),
                       ),
@@ -85,7 +88,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
               ),
               SizedBox(height: 20),
               Padding(
-                padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                 child: Center(
                   child: RichText(
                     text: TextSpan(
@@ -93,7 +96,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                       style: TextStyle(
                         fontWeight: FontWeight.normal,
                         fontFamily: "Manrope",
-                        fontSize: 19,
+                        fontSize: 18,
                         color: Colors.grey[350],
                       ),
                     ),
@@ -145,6 +148,12 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                       searchTeam();
                     } else if (buttonLabel == "Confirm" && selectedTeam != null) {
                       saveTeam(selectedTeam!);
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ThemeSetup(prefs: prefs),
+                          ),
+                        );
                     }
                   },
                   child: Text(

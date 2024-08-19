@@ -49,7 +49,7 @@ class _CreateAccountState extends State<CreateAccount> {
                       text: 'Use your email',
                       style: TextStyle(
                         fontFamily: "Manrope",
-                        fontSize: 30,
+                        fontSize: 32,
                         fontWeight: FontWeight.normal,
                         color: const Color.fromARGB(255, 67, 129, 192),
                       ),
@@ -67,7 +67,7 @@ class _CreateAccountState extends State<CreateAccount> {
                       style: TextStyle(
                         fontWeight: FontWeight.normal,
                         fontFamily: "Manrope",
-                        fontSize: 19,
+                        fontSize: 18,
                         color: Colors.grey[350],
                       ),
                     ),

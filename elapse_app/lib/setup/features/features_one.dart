@@ -5,7 +5,7 @@ import 'package:elapse_app/setup/features/first_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:elapse_app/setup/configure/team_setup.dart';
+import 'package:elapse_app/setup/deprecated/team_setup.dart';
 import 'package:elapse_app/screens/home/home.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/setup/features/features_two.dart';
@@ -62,14 +62,14 @@ class FirstFeature extends StatelessWidget {
           const Text(
             'At a glance',
             style: TextStyle(
-              fontSize: 36,
-              fontWeight: FontWeight.bold,
+              fontSize: 32,
+              fontWeight: FontWeight.normal,
             ),
           ),
           SizedBox(height: 5),
           const Text(
             'Upcoming matches & info',
-            style: TextStyle(fontSize: 24),
+            style: TextStyle(fontSize: 18),
           ),
           SizedBox(height: 20),
           Center(
