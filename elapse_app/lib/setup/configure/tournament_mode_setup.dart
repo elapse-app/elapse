@@ -1,6 +1,7 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/providers/color_provider.dart';
+import 'package:elapse_app/setup/configure/cloudscout_setup.dart';
 import 'package:elapse_app/setup/features/first_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -67,7 +68,8 @@ class TournamentModeSetupPage extends StatelessWidget {
                 'Tournament Mode',
                 style: TextStyle(
                   fontSize: 32,
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.normal,
+                  fontFamily: "Manrope",
                 ),
               ),
               SizedBox(height: 5),
@@ -75,7 +77,11 @@ class TournamentModeSetupPage extends StatelessWidget {
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 child: const Text(
                   'Get a streamlined view of matches, rankings, and more',
-                  style: TextStyle(fontSize: 18),
+                  style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.normal,
+                  fontFamily: "Manrope",
+                ),
                   textAlign: TextAlign.center,
                 ),
               ),
@@ -93,7 +99,11 @@ class TournamentModeSetupPage extends StatelessWidget {
               ),
               const Text(
                 'Tournament mode enables the Events tab, where you can find matches and live stats.',
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                  fontFamily: "Manrope",
+                ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(
@@ -101,15 +111,22 @@ class TournamentModeSetupPage extends StatelessWidget {
               ),
               const Text(
                 'Tournament mode can be activated the day of the event, and will be automatically deactivated afterwards.',
-                style: TextStyle(fontSize: 14),
-                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                  fontFamily: "Manrope",
+                ),                textAlign: TextAlign.center,
               ),
               SizedBox(
                 height: 28,
               ),
               const Text(
                 'Live Timing helps you stay in sync',
-                style: TextStyle(fontSize: 18),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                  fontFamily: "Manrope",
+                ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(
@@ -117,7 +134,11 @@ class TournamentModeSetupPage extends StatelessWidget {
               ),
               const Text(
                 'Live timing detects if matches are delayed or early and updates the in app schedule automatically.',
-                style: TextStyle(fontSize: 14),
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                  fontFamily: "Manrope",
+                ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(
@@ -143,7 +164,7 @@ class TournamentModeSetupPage extends StatelessWidget {
                 Navigator.pushReplacement( 
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ThirdFeature(
+                    builder: (context) => CloudScoutSetupPage(
                       prefs: prefs
                     ),
                   ),

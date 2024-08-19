@@ -254,6 +254,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                   SizedBox(
                     height: 60,
                   ),
+                  Spacer(),
                   Padding(
                     padding: const EdgeInsets.all(0.0),
                     child: SizedBox(

@@ -1,20 +1,20 @@
-import 'package:elapse_app/setup/configure/complete_setup.dart';
+import 'package:elapse_app/setup/configure/cloudscout_setup.dart';
 import 'package:elapse_app/setup/configure/theme_setup.dart';
 import 'package:elapse_app/setup/signup/enter_details.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class CloudScoutSetupPage extends StatefulWidget {
-  const CloudScoutSetupPage({super.key, required this.prefs});
+class CompleteSetupPage extends StatefulWidget {
+  const CompleteSetupPage({super.key, required this.prefs});
   final SharedPreferences prefs;
 
   @override
-  State<CloudScoutSetupPage> createState() => _CloudScoutSetupPageState(prefs: prefs);
+  State<CompleteSetupPage> createState() => _CompleteSetupPageState(prefs: prefs);
 }
 
-class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
-  _CloudScoutSetupPageState({required this.prefs});
+class _CompleteSetupPageState extends State<CompleteSetupPage> {
+  _CompleteSetupPageState({required this.prefs});
   final SharedPreferences prefs;
 
   @override
@@ -43,7 +43,7 @@ class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
                   child: RichText(
                     textAlign: TextAlign.center,
                     text: TextSpan(
-                      text: 'You’ve got CloudScout',
+                      text: 'You\'re ready to go',
                       style: TextStyle(
                         fontFamily: "Manrope",
                         fontSize: 32,
@@ -61,7 +61,7 @@ class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
                   child: RichText(
                     textAlign: TextAlign.center,
                     text: TextSpan(
-                      text: 'Thanks for signing in! Enjoy CloudScout Picklist, Scoutsheets, and Saved Teams',
+                      text: 'All set up!',
                       style: TextStyle(
                         fontWeight: FontWeight.normal,
                         fontFamily: "Manrope",
@@ -73,33 +73,40 @@ class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
                 ),
               ),
               SizedBox(height: 20),
-              Padding(
-                padding: const EdgeInsets.all(24),
+              Center(
                 child: Container(
-                  height: 120,
-                  width: double.infinity,
-                  color: Colors.grey[200],
+                  height: MediaQuery.of(context).size.height * 0.56, // Fixed height
+                  width: MediaQuery.of(context).size.height * 0.28, // Fixed width (9:18 aspect ratio)
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(0),
+                    color: Colors.black,
+                  ),
+                  child: Container(
+                alignment: Alignment.center,
+                height: 480,
+                width: 240,
+                color: Colors.grey[200],
+                child: Container(
+                  alignment: Alignment.center,
+                  height: 130,
+                  width: 130,
+                  decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(65),
+                  ),
+                  child: Container(
+                    alignment: Alignment.center,
+                    height: 80,
+                    width: 80,
+                    child: Icon(
+                      Icons.checklist,
+                      color: Colors.white,
+                      size: 40,
+                    ),
+                  )
                 ),
               ),
-              SizedBox(height: 20),
-              const Text(
-                'CloudScout allows you to sync scouting data with other devices and share seamlessly with your teammates and coaches.',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.normal,
-                  fontFamily: "Manrope",
                 ),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 40),
-              const Text(
-                'Try it out in the Scout tab',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.normal,
-                  fontFamily: "Manrope",
-                ),
-                textAlign: TextAlign.center,
               ),
               Spacer(),
               SizedBox(
@@ -127,13 +134,13 @@ class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
                     Navigator.pushReplacement( 
                       context,
                       MaterialPageRoute(
-                        builder: (context) => CompleteSetupPage(
+                        builder: (context) => CloudScoutSetupPage(
                           prefs: prefs
                         ),
                       ),
                     );
                   },
-                  child: Text('Next'),
+                  child: Text('Take me to the app'),
                 ),
               ),
             ],
