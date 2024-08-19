@@ -1,19 +1,18 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/providers/color_provider.dart';
-import 'package:elapse_app/setup/first_page.dart';
+import 'package:elapse_app/setup/features/first_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/setup/team_setup.dart';
 import 'package:elapse_app/screens/home/home.dart';
 import 'package:elapse_app/main.dart';
-import 'package:elapse_app/setup/features_one.dart';
-import 'package:elapse_app/setup/features_three.dart';
-import 'package:elapse_app/setup/signup.dart';
+import 'package:elapse_app/setup/features/features_two.dart';
 
-class FourthFeature extends StatelessWidget {
-  const FourthFeature({super.key, required this.prefs});
+
+class FirstFeature extends StatelessWidget {
+  const FirstFeature({super.key, required this.prefs});
   final SharedPreferences prefs;
   @override
   Widget build(BuildContext context) {
@@ -59,10 +58,9 @@ class FourthFeature extends StatelessWidget {
           ),
         ),
         child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const Text(
-            'Dive deeper',
+            'At a glance',
             style: TextStyle(
               fontSize: 36,
               fontWeight: FontWeight.bold,
@@ -70,14 +68,14 @@ class FourthFeature extends StatelessWidget {
           ),
           SizedBox(height: 5),
           const Text(
-            'Get stats about your own team',
+            'Upcoming matches & info',
             style: TextStyle(fontSize: 24),
           ),
           SizedBox(height: 20),
           Center(
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.6, // Fixed height
-              width: MediaQuery.of(context).size.height * 0.3,
+              height: MediaQuery.of(context).size.height * 0.56, // Fixed height
+              width: MediaQuery.of(context).size.height * 0.28, // Fixed width (9:18 aspect ratio)
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(0),
                 color: Colors.black,
@@ -86,64 +84,68 @@ class FourthFeature extends StatelessWidget {
                 alignment: Alignment.center,
                 height: 480,
                 width: 240,
-                child: Image.asset('assets/onboardingMyTeam.png'),
+                child: Image.asset('assets/onboardingHome.png'),
               ),
             ),
           ),
           SizedBox(
             height:16,
           ),
-        DotsIndicator(
-          dotsCount: 4,
-          position: 3,
-          decorator: DotsDecorator(
-            color: Colors.black87, // Inactive color
-            activeColor: const Color.fromARGB(255, 151, 35, 35),
-          ),
-        ),
-        Spacer(),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SizedBox(
-            height: 55.0,
-            width: double.infinity,
-            child: TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: const Color.fromARGB(255, 76, 81, 175),
-                backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                side: BorderSide(
-                  color: const Color.fromARGB(255, 76, 81, 175),
-                  width: 2.0,
-                  )
-                ),
-              onPressed: () {
-                // Navigate to the next page
-                // Navigator.pushReplacement(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => ThemeSetup(
-                //       prefs: widget.prefs,
-                //     ),
-                //   ),
-                // );
-                Navigator.pushReplacement( 
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => SignUpPage(
-                      prefs: prefs
-                    ),
-                  ),
-                );
-              },
-              child: Text('Next'),
+          DotsIndicator(
+            dotsCount: 4,
+            position: 0,
+            decorator: DotsDecorator(
+              color: Colors.black87, // Inactive color
+              activeColor: const Color.fromARGB(255, 151, 35, 35),
             ),
           ),
-        ),
-        SizedBox(
+          Spacer(),
+          Container(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SizedBox(
+                height: 55.0,
+                width: double.infinity,
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    side: BorderSide(
+                      color: const Color.fromARGB(255, 76, 81, 175),
+                      width: 2.0,
+                      )
+                    ),
+                  onPressed: () {
+                    // Navigate to the next page
+                    // Navigator.pushReplacement(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => ThemeSetup(
+                    //       prefs: widget.prefs,
+                    //     ),
+                    //   ),
+                    // );
+                    Navigator.pushReplacement( 
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => SecondFeature(
+                          prefs: prefs
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text('Next'),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
             height:12,
           ),
         ],
       ),
+
       ),
     );
   }

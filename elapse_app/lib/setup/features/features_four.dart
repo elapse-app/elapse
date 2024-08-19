@@ -1,18 +1,19 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/providers/color_provider.dart';
-import 'package:elapse_app/setup/first_page.dart';
+import 'package:elapse_app/setup/features/first_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/setup/team_setup.dart';
 import 'package:elapse_app/screens/home/home.dart';
 import 'package:elapse_app/main.dart';
-import 'package:elapse_app/setup/features_one.dart';
-import 'package:elapse_app/setup/features_three.dart';
+import 'package:elapse_app/setup/features/features_one.dart';
+import 'package:elapse_app/setup/features/features_three.dart';
+import 'package:elapse_app/setup/signup/login_or_signup.dart';
 
-class SecondFeature extends StatelessWidget {
-  const SecondFeature({super.key, required this.prefs});
+class FourthFeature extends StatelessWidget {
+  const FourthFeature({super.key, required this.prefs});
   final SharedPreferences prefs;
   @override
   Widget build(BuildContext context) {
@@ -61,7 +62,7 @@ class SecondFeature extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const Text(
-            'Find matches',
+            'Dive deeper',
             style: TextStyle(
               fontSize: 36,
               fontWeight: FontWeight.bold,
@@ -69,14 +70,14 @@ class SecondFeature extends StatelessWidget {
           ),
           SizedBox(height: 5),
           const Text(
-            'See scores and live timing',
+            'Get stats about your own team',
             style: TextStyle(fontSize: 24),
           ),
           SizedBox(height: 20),
           Center(
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.6, // Fixed height
-              width: MediaQuery.of(context).size.height * 0.3,
+              height: MediaQuery.of(context).size.height * 0.56, // Fixed height
+              width: MediaQuery.of(context).size.height * 0.28, // Fixed width (9:18 aspect ratio)
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(0),
                 color: Colors.black,
@@ -85,7 +86,7 @@ class SecondFeature extends StatelessWidget {
                 alignment: Alignment.center,
                 height: 480,
                 width: 240,
-                child: Image.asset('assets/onboardingSchedule.png'),
+                child: Image.asset('assets/onboardingMyTeam.png'),
               ),
             ),
           ),
@@ -94,7 +95,7 @@ class SecondFeature extends StatelessWidget {
           ),
         DotsIndicator(
           dotsCount: 4,
-          position: 1,
+          position: 3,
           decorator: DotsDecorator(
             color: Colors.black87, // Inactive color
             activeColor: const Color.fromARGB(255, 151, 35, 35),
@@ -128,7 +129,7 @@ class SecondFeature extends StatelessWidget {
                 Navigator.pushReplacement( 
                   context,
                   MaterialPageRoute(
-                    builder: (context) => ThirdFeature(
+                    builder: (context) => SignUpPage(
                       prefs: prefs
                     ),
                   ),

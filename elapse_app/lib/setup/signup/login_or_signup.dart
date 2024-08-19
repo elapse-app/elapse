@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:elapse_app/setup/first_page.dart';
+import 'package:elapse_app/setup/features/first_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/setup/signup/create_account.dart';
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({super.key, required this.prefs});
@@ -125,7 +126,7 @@ class SignUpPage extends StatelessWidget {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => FirstSetupPage(prefs: prefs),
+                          builder: (context) => CreateAccount(prefs: prefs),
                         ),
                       );
                     },
@@ -179,7 +180,7 @@ class SignUpPage extends StatelessWidget {
                     },
                     child: Builder(
                       builder: (BuildContext context) {
-                        return Text('Sign in with Google');
+                        return Text('Sign up with Google');
                       },
                     ),
                   ),
@@ -210,7 +211,7 @@ class SignUpPage extends StatelessWidget {
                     },
                     child: Builder(
                       builder: (BuildContext context) {
-                        return Text('Sign in with Apple');
+                        return Text('Sign up with Apple');
                       },
                     ),
                   ),
