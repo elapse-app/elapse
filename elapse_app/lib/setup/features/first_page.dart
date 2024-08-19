@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/painting.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:elapse_app/setup/theme_setup.dart';
+import 'package:elapse_app/setup/configure/theme_setup.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/setup/features/features_one.dart'; 
