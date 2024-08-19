@@ -11,7 +11,7 @@ import 'package:elapse_app/screens/my_team/my_team.dart';
 import 'package:elapse_app/screens/tournament_mode/home.dart';
 import 'package:elapse_app/screens/tournament_mode/my_teams.dart';
 import 'package:elapse_app/screens/tournament_mode/tournament.dart';
-import 'package:elapse_app/setup/first_page.dart';
+import 'package:elapse_app/setup/features/first_page.dart';
 import 'package:elapse_app/setup/setup.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';

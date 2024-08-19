@@ -1,15 +1,15 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/providers/color_provider.dart';
-import 'package:elapse_app/setup/first_page.dart';
+import 'package:elapse_app/setup/features/first_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/setup/team_setup.dart';
 import 'package:elapse_app/screens/home/home.dart';
 import 'package:elapse_app/main.dart';
-import 'package:elapse_app/setup/features_two.dart';
-import 'package:elapse_app/setup/features_four.dart';
+import 'package:elapse_app/setup/features/features_two.dart';
+import 'package:elapse_app/setup/features/features_four.dart';
 
 class ThirdFeature extends StatelessWidget {
   const ThirdFeature({super.key, required this.prefs});
@@ -75,8 +75,8 @@ class ThirdFeature extends StatelessWidget {
           SizedBox(height: 20),
           Center(
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.6, // Fixed height
-              width: MediaQuery.of(context).size.height * 0.3,
+              height: MediaQuery.of(context).size.height * 0.56, // Fixed height
+              width: MediaQuery.of(context).size.height * 0.28, // Fixed width (9:18 aspect ratio)
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(0),
                 color: Colors.black,
