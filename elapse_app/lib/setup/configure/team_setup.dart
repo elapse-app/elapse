@@ -1,6 +1,6 @@
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/providers/color_provider.dart';
-import 'package:elapse_app/setup/theme_setup.dart';
+import 'package:elapse_app/setup/configure/theme_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,7 +41,7 @@ class _TeamSetupPageState extends State<TeamSetupPage> {
     return Consumer<ColorProvider>(builder: (context, colorProvider, snapshot) {
       return Scaffold(
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 23.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
           child: SafeArea(
             child: Center(
               child: Column(
