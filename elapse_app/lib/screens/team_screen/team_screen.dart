@@ -4,6 +4,7 @@ import 'package:elapse_app/classes/Team/vdaStats.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
+import 'package:elapse_app/screens/widgets/custom_tab_bar.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
@@ -82,7 +83,7 @@ class _TeamScreenState extends State<TeamScreen> {
             ),
             backNavigation: true,
           ),
-          const RoundedTop(),
+          CustomTabBar(tabs: ["Details, Scoutsheet"], onPressed: (value){})
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 23),
             sliver: SliverToBoxAdapter(
