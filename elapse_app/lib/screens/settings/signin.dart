@@ -168,6 +168,10 @@ class _AuthSignInState extends State<AuthSignIn> {
     final User? user = credential.user;
     // Add to the Database
     await Database().createUser(user);
+    await Database().joinTeamGroup('L4RI-RFD0', user!.uid);
+    // await Database().createTeamGroup(user!.uid, "Funny name");
+    // await Database().createUser(user);
+
     
     print('authSucc - signed up user with uuid: ${user?.uid}');
     ScaffoldMessenger.of(context).showSnackBar(
