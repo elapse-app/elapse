@@ -65,7 +65,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
         slivers: [
           ElapseAppBar(
             title: Padding(
-              padding: const EdgeInsets.only(right: 10),
+              padding: const EdgeInsets.only(right: 16.5),
               child: Row(
                 children: [
                   const Text(
@@ -73,32 +73,41 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                     style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                   ),
                   const Spacer(),
-                  GestureDetector(
-                      child: const Icon(
-                        Icons.search,
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          PageRouteBuilder(
-                            transitionDuration:
-                                const Duration(milliseconds: 300),
-                            reverseTransitionDuration:
-                                const Duration(milliseconds: 300),
-                            pageBuilder: (context, animation,
-                                    secondaryAnimation) =>
-                                WorldRankingsSearchScreen(
-                                    skills: futureSkillsStats,
-                                    vda: futureVDAStats),
-                            transitionsBuilder: (context, animation,
-                                secondaryAnimation, child) {
-                              return FadeTransition(
-                                opacity: animation,
-                                child: child,
-                              );
-                            },
-                          ),
-                        );
+                  FutureBuilder(
+                      future: Future.wait([futureSkillsStats, futureVDAStats]),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return GestureDetector(
+                              child: const Icon(
+                                Icons.search,
+                              ),
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  PageRouteBuilder(
+                                    transitionDuration:
+                                        const Duration(milliseconds: 300),
+                                    reverseTransitionDuration:
+                                        const Duration(milliseconds: 300),
+                                    pageBuilder: (context, animation,
+                                            secondaryAnimation) =>
+                                        WorldRankingsSearchScreen(
+                                            skills: snapshot.data![0]
+                                                as List<WorldSkillsStats>,
+                                            vda: snapshot.data![1]
+                                                as List<VDAStats>),
+                                    transitionsBuilder: (context, animation,
+                                        secondaryAnimation, child) {
+                                      return FadeTransition(
+                                        opacity: animation,
+                                        child: child,
+                                      );
+                                    },
+                                  ),
+                                );
+                              });
+                        }
+                        return Icon(Icons.search);
                       })
                 ],
               ),
@@ -159,29 +168,46 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                           ),
                         ),
                         Flexible(
-                            flex: 1,
-                            child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  IconButton(
+                          flex: 1,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              FutureBuilder(
+                                future: Future.wait(
+                                    [futureSkillsStats, futureVDAStats]),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData) {
+                                    return IconButton(
+                                        icon: const Icon(
+                                          Icons.filter_list,
+                                          size: 30,
+                                        ),
+                                        onPressed: () async {
+                                          WorldRankingsFilter updatedFilter =
+                                              await worldRankingsFilter(
+                                                  context,
+                                                  filter,
+                                                  inTM,
+                                                  snapshot.data![0]
+                                                      as List<WorldSkillsStats>,
+                                                  snapshot.data![1]
+                                                      as List<VDAStats>);
+                                          setState(() {
+                                            filter = updatedFilter;
+                                          });
+                                        });
+                                  }
+                                  return IconButton(
                                       icon: const Icon(
                                         Icons.filter_list,
                                         size: 30,
                                       ),
-                                      onPressed: () async {
-                                        WorldRankingsFilter updatedFilter =
-                                            await worldRankingsFilter(
-                                                context,
-                                                filter,
-                                                inTM,
-                                                futureSkillsStats,
-                                                futureVDAStats);
-                                        setState(() {
-                                          filter = updatedFilter;
-                                        });
-                                      })
-                                ]))
+                                      onPressed: () {});
+                                },
+                              )
+                            ],
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -237,23 +263,43 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceEvenly,
                                     children: [
-                                      IconButton(
-                                          icon: const Icon(
-                                            Icons.filter_list,
-                                            size: 30,
-                                          ),
-                                          onPressed: () async {
-                                            WorldRankingsFilter updatedFilter =
-                                                await worldRankingsFilter(
-                                                    context,
-                                                    filter,
-                                                    inTM,
-                                                    futureSkillsStats,
-                                                    futureVDAStats);
-                                            setState(() {
-                                              filter = updatedFilter;
-                                            });
-                                          })
+                                      FutureBuilder(
+                                        future: Future.wait([
+                                          futureSkillsStats,
+                                          futureVDAStats
+                                        ]),
+                                        builder: (context, snapshot) {
+                                          if (snapshot.hasData) {
+                                            return IconButton(
+                                                icon: const Icon(
+                                                  Icons.filter_list,
+                                                  size: 30,
+                                                ),
+                                                onPressed: () async {
+                                                  WorldRankingsFilter
+                                                      updatedFilter =
+                                                      await worldRankingsFilter(
+                                                          context,
+                                                          filter,
+                                                          inTM,
+                                                          snapshot.data![0] as List<
+                                                              WorldSkillsStats>,
+                                                          snapshot.data![1]
+                                                              as List<
+                                                                  VDAStats>);
+                                                  setState(() {
+                                                    filter = updatedFilter;
+                                                  });
+                                                });
+                                          }
+                                          return IconButton(
+                                              icon: const Icon(
+                                                Icons.filter_list,
+                                                size: 30,
+                                              ),
+                                              onPressed: () {});
+                                        },
+                                      )
                                     ]))
                           ],
                         ),

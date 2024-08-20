@@ -37,22 +37,26 @@ class _RegionFilterPageState extends State<RegionFilterPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: Future.wait([widget.skills, widget.vda]),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const LinearProgressIndicator();
-        } else if (snapshot.hasData) {
-          List<String> regions = (snapshot.data?[0] as List<WorldSkillsStats>).map((e) => e.eventRegion!.name).toList();
-          regions.addAll((snapshot.data?[1] as List<VDAStats>).map((e) => e.eventRegion!));
-          regions = regions.toSet().toList();
-          regions.sort();
-          return LoadedRegionFilterPage(regions: regions, filter: widget.filter);
-        } else {
-          return const BigErrorMessage(icon: Icons.filter_list_outlined,
-              message: "Unable to load regions");
-        }
-      }
-    );
+        future: Future.wait([widget.skills, widget.vda]),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const LinearProgressIndicator();
+          } else if (snapshot.hasData) {
+            List<String> regions = (snapshot.data?[0] as List<WorldSkillsStats>)
+                .map((e) => e.eventRegion!.name)
+                .toList();
+            regions.addAll((snapshot.data?[1] as List<VDAStats>)
+                .map((e) => e.eventRegion!));
+            regions = regions.toSet().toList();
+            regions.sort();
+            return LoadedRegionFilterPage(
+                regions: regions, filter: widget.filter);
+          } else {
+            return const BigErrorMessage(
+                icon: Icons.filter_list_outlined,
+                message: "Unable to load regions");
+          }
+        });
   }
 }
 
@@ -71,21 +75,15 @@ class LoadedRegionFilterPage extends StatefulWidget {
 }
 
 class _LoadedRegionFilterPageState extends State<LoadedRegionFilterPage> {
-  final FocusNode _focusNode = FocusNode();
   String searchQuery = "";
 
   @override
   void initState() {
     super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _focusNode.requestFocus();
-    });
   }
 
   @override
   void dispose() {
-    _focusNode.dispose();
     super.dispose();
   }
 
@@ -93,128 +91,121 @@ class _LoadedRegionFilterPageState extends State<LoadedRegionFilterPage> {
   Widget build(BuildContext context) {
     List<String> regions = widget.regions;
     if (searchQuery.isNotEmpty) {
-      regions = widget.regions.where((e) => e.toLowerCase().contains(searchQuery.toLowerCase())).toList();
+      regions = widget.regions
+          .where((e) => e.toLowerCase().contains(searchQuery.toLowerCase()))
+          .toList();
     }
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: CustomScrollView(
-        slivers: [
-          const ElapseAppBar(
-            title: Row(
-              children: [
-                Text(
-                  "Filter by Region",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
-                ),
-              ]
+      body: CustomScrollView(slivers: [
+        const ElapseAppBar(
+          title: Row(children: [
+            Text(
+              "Filter by Region",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
-            backNavigation: true,
-          ),
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: SliverHeaderDelegate(
-              maxHeight: 60,
-              minHeight: 60,
-              child: Hero(
-                tag: "top",
-                child: Stack(
-                  children: [
-                    Container(
-                      color: Theme.of(context).colorScheme.primary,
-                      height: 60,
-                    ),
-                    Container(
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(25),
-                          topRight: Radius.circular(25),
-                        ),
+          ]),
+          backNavigation: true,
+        ),
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: SliverHeaderDelegate(
+            maxHeight: 60,
+            minHeight: 60,
+            child: Hero(
+              tag: "top",
+              child: Stack(
+                children: [
+                  Container(
+                    color: Theme.of(context).colorScheme.primary,
+                    height: 60,
+                  ),
+                  Container(
+                    height: 60,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(25),
+                        topRight: Radius.circular(25),
                       ),
                     ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                  ),
+                  Padding(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 10),
                       child: TextField(
-                        focusNode: _focusNode,
                         onChanged: (value) {
                           setState(() {
                             searchQuery = value;
                           });
                         },
-                        cursorColor: Theme.of(context)
-                            .colorScheme
-                            .secondary,
+                        cursorColor: Theme.of(context).colorScheme.secondary,
                         decoration: const InputDecoration(
                           icon: Icon(Icons.search),
                           hintText: "Filter regions",
                           border: InputBorder.none,
                         ),
-                      )
-                    )
-                  ],
-                ),
+                      ))
+                ],
               ),
             ),
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  final region = regions[index];
-                  bool selected = widget.filter.contains(region);
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 23),
-                    child: Column(
-                      children: [
-                        GestureDetector(
-                          child: Container(
-                            height: 50,
-                            alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(Radius.circular(10)),
-                                  color: selected
-                                      ? Theme.of(context).colorScheme.primary
-                                      : Theme.of(context).colorScheme.surface,
-                                ),
-                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                                margin: const EdgeInsets.all(10),
-                                child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        region,
-                                        style: const TextStyle(fontSize: 16),
-                                      ),
-                                      selected
-                                          ? const Icon(Icons.check)
-                                          : const SizedBox(),
-                                    ]
-                                ),
+        ),
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              final region = regions[index];
+              bool selected = widget.filter.contains(region);
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 23),
+                child: Column(children: [
+                  GestureDetector(
+                      child: Container(
+                        height: 50,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(10)),
+                          color: selected
+                              ? Theme.of(context).colorScheme.primary
+                              : Theme.of(context).colorScheme.surface,
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        margin: const EdgeInsets.all(10),
+                        child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                region,
+                                style: const TextStyle(fontSize: 16),
                               ),
-                          onTap: () {
-                            setState(() {
                               selected
+                                  ? const Icon(Icons.check)
+                                  : const SizedBox(),
+                            ]),
+                      ),
+                      onTap: () {
+                        setState(() {
+                          selected
                               ? widget.filter.remove(region)
                               : widget.filter.add(region);
-                            });
-                          }
-                        ),
-                        index != regions.length - 1
-                        ? Divider(
+                        });
+                      }),
+                  index != regions.length - 1
+                      ? Divider(
                           height: 3,
                           color: Theme.of(context).colorScheme.surfaceDim,
                         )
-                            : Container(),
-                      ]
-                    ),
-                  );
-                },
-              childCount: regions.length,
-            ),
+                      : Container(),
+                ]),
+              );
+            },
+            childCount: regions.length,
           ),
-        ]
-      ),
+        ),
+      ]),
     );
   }
 }

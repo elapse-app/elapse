@@ -1,6 +1,5 @@
 import 'package:elapse_app/screens/explore/worldRankings/skills/world_skills_widget.dart';
 import 'package:elapse_app/screens/explore/worldRankings/true_skill/world_true_skill_widget.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../classes/Team/vdaStats.dart';
@@ -8,43 +7,7 @@ import '../../../classes/Team/world_skills.dart';
 import '../../widgets/custom_tab_bar.dart';
 
 class WorldRankingsSearchScreen extends StatefulWidget {
-  WorldRankingsSearchScreen({
-    super.key,
-    required this.skills,
-    required this.vda,
-  });
-
-  final Future<List<WorldSkillsStats>> skills;
-  final Future<List<VDAStats>> vda;
-
-  @override
-  State<WorldRankingsSearchScreen> createState() =>
-      _WorldRankingsSearchScreenState();
-}
-
-class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: Future.wait([widget.skills, widget.vda]),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const LinearProgressIndicator();
-          } else if (snapshot.hasData) {
-            return LoadedWorldRankingsSearchScreen(
-                skills: snapshot.data?[0] as List<WorldSkillsStats>,
-                vda: snapshot.data?[1] as List<VDAStats>);
-          } else {
-            return const Center(
-              child: Text("Failed to load the search screen"),
-            );
-          }
-        });
-  }
-}
-
-class LoadedWorldRankingsSearchScreen extends StatefulWidget {
-  const LoadedWorldRankingsSearchScreen({
+  const WorldRankingsSearchScreen({
     super.key,
     required this.skills,
     required this.vda,
@@ -54,12 +17,11 @@ class LoadedWorldRankingsSearchScreen extends StatefulWidget {
   final List<VDAStats> vda;
 
   @override
-  State<LoadedWorldRankingsSearchScreen> createState() =>
-      _LoadedWorldRankingsSearchScreenState();
+  State<WorldRankingsSearchScreen> createState() =>
+      _WorldRankingsSearchScreenState();
 }
 
-class _LoadedWorldRankingsSearchScreenState
-    extends State<LoadedWorldRankingsSearchScreen> {
+class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
   final FocusNode _focusNode = FocusNode();
   int selectedIndex = 0;
   String searchQuery = "";
