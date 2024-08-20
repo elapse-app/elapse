@@ -51,7 +51,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
       ],
       child: prefs.getString("savedTeam") == null
-          ? SetupScreen()
+          ? SetupScreen(prefs: prefs)
           : MyApp(key: myAppKey, prefs: prefs),
     ),
   );
