@@ -24,8 +24,8 @@ Future<WorldRankingsFilter> worldRankingsFilter(
     BuildContext context,
     WorldRankingsFilter filter,
     bool isInTM,
-    Future<List<WorldSkillsStats>> skills,
-    Future<List<VDAStats>> vda) async {
+    List<WorldSkillsStats> skills,
+    List<VDAStats> vda) async {
   final DraggableScrollableController dra = DraggableScrollableController();
 
   bool inTM = isInTM;
@@ -132,13 +132,19 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                                   const Icon(Icons.arrow_right),
                                 ]),
                             onTap: () async {
+                              List<String> regions = skills
+                                  .map((e) => e.eventRegion!.name)
+                                  .toList();
+                              regions.addAll(vda.map((e) => e.eventRegion!));
+                              regions = regions.toSet().toList();
+                              regions.sort();
                               await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => RegionFilterPage(
-                                      filter: filter.regions!,
-                                      skills: skills,
-                                      vda: vda),
+                                  builder: (context) => LoadedRegionFilterPage(
+                                    filter: filter.regions!,
+                                    regions: regions,
+                                  ),
                                 ),
                               );
                               setModalState(() {});
