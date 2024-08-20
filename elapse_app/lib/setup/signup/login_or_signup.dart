@@ -21,15 +21,15 @@ class SignUpPage extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
           ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 20),
+            SizedBox(height: 46),
             Padding(
               padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
               child: Center(
@@ -39,8 +39,8 @@ class SignUpPage extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: "Manrope",
                       fontSize: 32,
-                      fontWeight: FontWeight.normal,
-                      color: const Color.fromARGB(255, 67, 129, 192),
+                      fontWeight: FontWeight.w300,
+                      color: const Color.fromARGB(255, 12, 77, 86),
                     ),
                   ),
                 ),
@@ -54,10 +54,10 @@ class SignUpPage extends StatelessWidget {
                   text: TextSpan(
                     text: 'An Elapse account gives you',
                       style: TextStyle(
-                        fontWeight: FontWeight.normal,
+                        fontWeight: FontWeight.w400,
                         fontFamily: "Manrope",
-                        fontSize: 18,
-                        color: Colors.grey[350],
+                        fontSize: 16,
+                        color: Color.fromARGB(255, 117, 117, 117),
                       ),
                   )
                 )
@@ -72,28 +72,28 @@ class SignUpPage extends StatelessWidget {
                         TextSpan(
                           text: ' access to ',
                           style: TextStyle(
-                            fontWeight: FontWeight.normal,
+                            fontWeight: FontWeight.w400,
                             fontFamily: "Manrope",
-                            fontSize: 18,
-                            color: Colors.grey[350],
+                            fontSize: 16,
+                            color: Color.fromARGB(255, 117, 117, 117),
                           ),
                         ),
                         TextSpan(
                           text: 'CloudScout ',
                           style: TextStyle(
-                            fontWeight: FontWeight.bold,
+                            fontWeight: FontWeight.w500,
                             fontFamily: "Manrope",
-                            fontSize: 18,
-                            color: const Color.fromARGB(255, 67, 129, 192),
+                            fontSize: 16,
+                            color: const Color.fromARGB(255, 12, 77, 86),
                           ),
                         ),
                         TextSpan(
                           text: 'and more',
                           style: TextStyle(
-                            fontWeight: FontWeight.normal,
+                            fontWeight: FontWeight.w400,
                             fontFamily: "Manrope",
-                            fontSize: 18,
-                            color: Colors.grey[350],
+                            fontSize: 16,
+                            color: Color.fromARGB(255, 117, 117, 117),
                           ),
                         ),
                       ],
@@ -109,9 +109,9 @@ class SignUpPage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 23.0, vertical: 6.0,),
                   child: SizedBox(
-                    height: 55.0,
+                    height: 59.0,
                     width: double.infinity,
                     child: TextButton(
                       
@@ -139,9 +139,10 @@ class SignUpPage extends StatelessWidget {
                     ),
                   ),
                 ),
+                SizedBox(height:20),
                 Center(
                   child: SizedBox(
-                    height: 20.0,
+                    height: 18.0,
                     width: double.infinity,
                     child: RichText(
                       textAlign: TextAlign.center,
@@ -150,17 +151,18 @@ class SignUpPage extends StatelessWidget {
                         style: TextStyle(
                           fontFamily: "Manrope",
                           fontSize: 16,
-                          color: Colors.grey[350],
+                          fontWeight: FontWeight.w400,
+                          color: Color.fromARGB(255, 117, 117, 117),
                         ),
                       ),
                     ),
                   ),
                 ),
-
+                SizedBox(height:20),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 23.0, vertical: 6.0,),
                   child: SizedBox(
-                    height: 55.0,
+                    height: 59.0,
                     width: double.infinity,
                     child: TextButton(
                       style: TextButton.styleFrom(
@@ -189,9 +191,9 @@ class SignUpPage extends StatelessWidget {
                 ),
 
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 23.0, vertical: 6.0,),
                   child: SizedBox(
-                    height: 55.0,
+                    height: 59.0,
                     width: double.infinity,
                     child: TextButton(
                       style: TextButton.styleFrom(
@@ -224,9 +226,9 @@ class SignUpPage extends StatelessWidget {
             Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 23.0, vertical: 6.0,),
                   child: SizedBox(
-                    height: 55.0,
+                    height: 59.0,
                     width: double.infinity,
                     child: TextButton(
                       style: TextButton.styleFrom(
@@ -255,9 +257,9 @@ class SignUpPage extends StatelessWidget {
                 ),
 
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 23.0, vertical: 6.0,),
                   child: SizedBox(
-                    height: 55.0,
+                    height: 59.0,
                     width: double.infinity,
                     child: TextButton(
                       style: TextButton.styleFrom(

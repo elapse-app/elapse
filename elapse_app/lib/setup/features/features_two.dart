@@ -53,30 +53,35 @@ class SecondFeature extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
           ),
         ),
         child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          SizedBox(height: 46),
           const Text(
             'Find matches',
             style: TextStyle(
               fontSize: 32,
-              fontWeight: FontWeight.normal,
+              fontWeight: FontWeight.w300,
+              color: Color.fromARGB(255, 12, 77, 86),
             ),
           ),
-          SizedBox(height: 5),
+          SizedBox(height: 2),
           const Text(
             'See scores and live timing',
-            style: TextStyle(fontSize: 18),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: Color.fromARGB(255, 117, 117, 117),
+            ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 30),
           Center(
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.56, // Fixed height
-              width: MediaQuery.of(context).size.height * 0.28, // Fixed width (9:18 aspect ratio)
+              height: MediaQuery.of(context).size.height * 0.5, // Fixed height
+              width: MediaQuery.of(context).size.height * 0.25, // Fixed width (9:18 aspect ratio)
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(0),
                 color: Colors.black,
@@ -90,55 +95,61 @@ class SecondFeature extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height:16,
+            height:23.0,
           ),
-        DotsIndicator(
-          dotsCount: 4,
-          position: 1,
-          decorator: DotsDecorator(
-            color: Colors.black87, // Inactive color
-            activeColor: const Color.fromARGB(255, 151, 35, 35),
-          ),
-        ),
-        Spacer(),
-        Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: SizedBox(
-            height: 55.0,
-            width: double.infinity,
-            child: TextButton(
-              style: TextButton.styleFrom(
-                foregroundColor: const Color.fromARGB(255, 76, 81, 175),
-                backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                side: BorderSide(
-                  color: const Color.fromARGB(255, 76, 81, 175),
-                  width: 2.0,
-                  )
-                ),
-              onPressed: () {
-                // Navigate to the next page
-                // Navigator.pushReplacement(
-                //   context,
-                //   MaterialPageRoute(
-                //     builder: (context) => ThemeSetup(
-                //       prefs: widget.prefs,
-                //     ),
-                //   ),
-                // );
-                Navigator.pushReplacement( 
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ThirdFeature(
-                      prefs: prefs
-                    ),
-                  ),
-                );
-              },
-              child: Text('Next'),
+          DotsIndicator(
+            dotsCount: 4,
+            position: 1,
+            mainAxisSize: MainAxisSize.min,
+            decorator: DotsDecorator(
+              color: Color.fromARGB(255, 224, 224, 224), // Inactive color
+              size: const Size.fromRadius(3.0),
+              activeSize: const Size.fromRadius(3.0),
+              activeColor: const Color.fromARGB(255, 148, 151, 151),
             ),
           ),
-        ),
-        SizedBox(
+          Spacer(),
+          Container(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.all(23.0),
+              child: SizedBox(
+                height: 59.0,
+                width: double.infinity,
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    side: BorderSide(
+                      color: const Color.fromARGB(255, 76, 81, 175),
+                      width: 1.0,
+                      )
+                    ),
+                  onPressed: () {
+                    // Navigate to the next page
+                    // Navigator.pushReplacement(
+                    //   context,
+                    //   MaterialPageRoute(
+                    //     builder: (context) => ThemeSetup(
+                    //       prefs: widget.prefs,
+                    //     ),
+                    //   ),
+                    // );
+                    Navigator.pushReplacement( 
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ThirdFeature(
+                          prefs: prefs
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text('Next'),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
             height:12,
           ),
         ],
