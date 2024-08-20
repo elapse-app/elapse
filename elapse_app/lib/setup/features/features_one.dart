@@ -53,29 +53,35 @@ class FirstFeature extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
           ),
         ),
         child: Column(
         children: [
+          SizedBox(height: 46),
           const Text(
             'At a glance',
             style: TextStyle(
               fontSize: 32,
-              fontWeight: FontWeight.normal,
+              fontWeight: FontWeight.w300,
+              color: Color.fromARGB(255, 12, 77, 86),
             ),
           ),
-          SizedBox(height: 5),
+          SizedBox(height: 2),
           const Text(
             'Upcoming matches & info',
-            style: TextStyle(fontSize: 18),
+            style: TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.w400,
+              color: Color.fromARGB(255, 117, 117, 117),
+            ),
           ),
-          SizedBox(height: 20),
+          SizedBox(height: 30),
           Center(
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.56, // Fixed height
-              width: MediaQuery.of(context).size.height * 0.28, // Fixed width (9:18 aspect ratio)
+              height: MediaQuery.of(context).size.height * 0.5, // Fixed height
+              width: MediaQuery.of(context).size.height * 0.25, // Fixed width (9:18 aspect ratio)
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(0),
                 color: Colors.black,
@@ -89,21 +95,24 @@ class FirstFeature extends StatelessWidget {
             ),
           ),
           SizedBox(
-            height:16,
+            height:23.0,
           ),
           DotsIndicator(
             dotsCount: 4,
             position: 0,
+            mainAxisSize: MainAxisSize.min,
             decorator: DotsDecorator(
-              color: Colors.black87, // Inactive color
-              activeColor: const Color.fromARGB(255, 151, 35, 35),
+              color: Color.fromARGB(255, 224, 224, 224), // Inactive color
+              size: const Size.fromRadius(3.0),
+              activeSize: const Size.fromRadius(3.0),
+              activeColor: const Color.fromARGB(255, 148, 151, 151),
             ),
           ),
           Spacer(),
           Container(
             alignment: Alignment.bottomCenter,
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(23.0),
               child: SizedBox(
                 height: 55.0,
                 width: double.infinity,

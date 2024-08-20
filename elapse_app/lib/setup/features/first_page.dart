@@ -25,13 +25,15 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
       return Directionality(
         textDirection: TextDirection.ltr,
         child: Scaffold(
-          backgroundColor: Colors.blue,
+          backgroundColor: Color.fromARGB(255, 191, 231, 237),
           body: Column(
             children: [
               // Blue top section
+              SizedBox(
+                height: MediaQuery.of(context).size.height * 0.18,
+              ),
               Container(
-                height: MediaQuery.of(context).size.height * 0.66,
-                color: Colors.blue,
+                color: Color.fromARGB(255, 191, 231, 237),
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Center(
@@ -40,27 +42,27 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                         text: 'Your new tournament companion. ',
                         style: TextStyle(
                           fontFamily: "Manrope",
-                          fontSize: 32,
-                          fontWeight: FontWeight.normal,
-                          color: const Color.fromARGB(255, 67, 129, 192),
+                          fontSize: 33,
+                          fontWeight: FontWeight.w300,
+                          color: const Color.fromARGB(255, 12, 77, 86),
                         ),
                         children: <TextSpan>[
                           TextSpan(
                             text: 'Matches, Rankings, Scouting.',
                             style: TextStyle(
-                              fontWeight: FontWeight.normal,
+                              fontWeight: FontWeight.w300,
                               fontFamily: "Manrope",
-                              fontSize: 32,
-                              color: Colors.grey[350],
+                              fontSize: 33,
+                              color: Color.fromARGB(255, 35, 35, 35),
                             ),
                           ),
                           TextSpan(
                             text: '\nAll in one place.',
                             style: TextStyle(
-                              fontWeight: FontWeight.bold,
+                              fontWeight: FontWeight.w500,
                               fontFamily: "Manrope",
-                              fontSize: 32,
-                              color: const Color.fromARGB(255, 67, 129, 192),
+                              fontSize: 33,
+                              color: const Color.fromARGB(255, 22, 98, 128),
                             ),
                           ),
                         ],
@@ -69,15 +71,14 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                   ),
                 )
               ),
-              SizedBox(height: 0), // Replace Spacer() with SizedBox for debugging
-              // White bottom section with Get Started button
+              Spacer(),
               Container(
-                height: MediaQuery.of(context).size.height * 0.34,
+                height: 300,
                 decoration: BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    topRight: Radius.circular(20),
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
                   ),
                 ),
                 child: Column(
@@ -87,7 +88,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                       alignment: Alignment.centerLeft,
                       child: Container(
                         child: Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(23.0),
                           child: RichText(
                             textAlign: TextAlign.right,
                             text: TextSpan(
@@ -96,8 +97,8 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                               style: TextStyle(
                                 fontFamily: "Manrope",
                                 fontSize: 24,
-                                fontWeight: FontWeight.normal,
-                                color: const Color.fromARGB(255, 67, 129, 192),
+                                fontWeight: FontWeight.w400,
+                                color: const Color.fromARGB(255, 12, 77, 86),
                               ),
                             ),
                           ),
@@ -108,15 +109,15 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                       alignment: Alignment.centerLeft,
                       child: Container(
                         child: Padding(
-                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                          padding: const EdgeInsets.fromLTRB(23.0, 0, 23.0, 0),
                           child: RichText(
                             text: TextSpan(
                               text: 'The smart VRC App.',
                               style: TextStyle(
                                 fontFamily: "Manrope",
                                 fontSize: 16,
-                                fontWeight: FontWeight.normal,
-                                color: const Color.fromARGB(255, 67, 129, 192),
+                                fontWeight: FontWeight.w400,
+                                color: const Color.fromARGB(255, 0, 0, 0),
                               ),
                             ),
                           ),
@@ -125,7 +126,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                     ),
                     Spacer(),
                     Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.fromLTRB(23.0,23.0,23.0, 0),
                       child: SizedBox(
                         height: 55.0,
                         width: double.infinity,
@@ -157,16 +158,16 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                       ),
                     ),
                     Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.fromLTRB(23.0,12,23.0,0),
                       child: SizedBox(
                           height: 55,
                           width: double.infinity,
                         child: TextButton(
                           style: TextButton.styleFrom(
-                            foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                            foregroundColor: const Color.fromARGB(255, 255, 255, 255),
                             backgroundColor: const Color.fromARGB(255, 255, 255, 255),
                             side: BorderSide(
-                              color: const Color.fromARGB(255, 76, 81, 175),
+                              color: const Color.fromARGB(255, 255, 255, 255),
                               width: 2.0,
                               )
                             ),
@@ -185,17 +186,18 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                                   text: 'Existing user?',
                                   style: TextStyle(
                                     fontFamily: "Manrope",
+                                    fontWeight: FontWeight.w200,
                                     fontSize: 16,
-                                    color: Colors.grey[350],
+                                    color: Color.fromARGB(255, 148, 151, 151),
                                   ),
                                   children: <TextSpan>[
                                     TextSpan(
                                       text: ' Sign in',
                                       style: TextStyle(
-                                        fontWeight: FontWeight.bold,
+                                        fontWeight: FontWeight.w400,
                                         fontFamily: "Manrope",
                                         fontSize: 16,
-                                        color: Colors.grey[350],
+                                        color: Color.fromARGB(255, 117, 117, 117),
                                       ),
                                     ),
                                   ],
@@ -207,7 +209,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                       ),
                     ),
                     SizedBox(
-                      height:12,
+                      height:23.0,
                     ),
                   ],
                 ),
