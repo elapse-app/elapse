@@ -21,19 +21,14 @@ class WorldRankingsFilter {
 }
 
 Future<WorldRankingsFilter> worldRankingsFilter(
-    BuildContext context, WorldRankingsFilter filter, Future<bool> isInTM,
-    Future<List<WorldSkillsStats>> skills, Future<List<VDAStats>> vda) async {
+    BuildContext context,
+    WorldRankingsFilter filter,
+    bool isInTM,
+    List<WorldSkillsStats> skills,
+    List<VDAStats> vda) async {
   final DraggableScrollableController dra = DraggableScrollableController();
 
-  bool inTM  = await isInTM;
-
-  List<String> regions = [
-    "All Regions",
-    "Ontario",
-    "British Columbia",
-    "Texas - Region 1",
-    "Texas - Region 2"
-  ];
+  bool inTM = isInTM;
 
   return await showModalBottomSheet<WorldRankingsFilter>(
       context: context,
@@ -79,13 +74,13 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                                       filter.onPickList ||
                                       filter.scouted
                                   ? TextButton(
-                                      child: Text("clear",
+                                      child: Text("Clear",
                                           style: TextStyle(
                                             fontSize: 16,
                                             height: 1,
                                             color: Theme.of(context)
                                                 .colorScheme
-                                                .primary,
+                                                .secondary,
                                             fontWeight: FontWeight.w400,
                                           )),
                                       onPressed: () {
@@ -116,32 +111,43 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                           ),
                           child: InkWell(
                             child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    children: [
-                                      const Icon(Icons.language),
-                                      const SizedBox(width: 10),
-                                      filter.regions!.isEmpty
-                                            ? const Text("All Regions",
-                                            style: TextStyle(fontSize: 16))
-                                            : Expanded(
-                                        flex: 5,
-                                          child:Text(filter.regions!.join(", "),
-                                            style: const TextStyle(fontSize: 16),
-                                        overflow: TextOverflow.fade,
-                                        softWrap: false,
-                                        maxLines: 1,
-                                      )),
-                                      const Spacer(),
-                                      const Icon(Icons.arrow_right),
-                                    ]),
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.language),
+                                  const SizedBox(width: 10),
+                                  filter.regions!.isEmpty
+                                      ? const Text("All Regions",
+                                          style: TextStyle(fontSize: 16))
+                                      : Expanded(
+                                          flex: 5,
+                                          child: Text(
+                                            filter.regions!.join(", "),
+                                            style:
+                                                const TextStyle(fontSize: 16),
+                                            overflow: TextOverflow.fade,
+                                            softWrap: false,
+                                            maxLines: 1,
+                                          )),
+                                  const Spacer(),
+                                  const Icon(Icons.arrow_right),
+                                ]),
                             onTap: () async {
-                                await Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => RegionFilterPage(filter: filter.regions!, skills: skills, vda: vda),
-                                    ),
-                                );
-                                setModalState(() {});
+                              List<String> regions = skills
+                                  .map((e) => e.eventRegion!.name)
+                                  .toList();
+                              regions.addAll(vda.map((e) => e.eventRegion!));
+                              regions = regions.toSet().toList();
+                              regions.sort();
+                              await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LoadedRegionFilterPage(
+                                    filter: filter.regions!,
+                                    regions: regions,
+                                  ),
+                                ),
+                              );
+                              setModalState(() {});
                             },
                           ),
                         ),
@@ -185,85 +191,97 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                           ),
                         ),
                         inTM ? const SizedBox(height: 12) : const SizedBox(),
-                        inTM ? Container(
-                          height: 50,
-                          padding: const EdgeInsets.only(left: 20, right: 20),
-                          decoration: BoxDecoration(
-                            color: filter.onPickList
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.surface,
-                            border: Border.all(
-                                color: Theme.of(context).colorScheme.primary),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(100)),
-                          ),
-                          child: InkWell(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                        inTM
+                            ? Container(
+                                height: 50,
+                                padding:
+                                    const EdgeInsets.only(left: 20, right: 20),
+                                decoration: BoxDecoration(
+                                  color: filter.onPickList
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context).colorScheme.surface,
+                                  border: Border.all(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(100)),
+                                ),
+                                child: InkWell(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Icon(Icons.person_add_alt),
-                                      SizedBox(width: 10),
-                                      Text("On Pick list",
-                                          style: TextStyle(fontSize: 16)),
-                                    ]),
-                                filter.onPickList
-                                    ? const Row(children: [
-                                        Icon(Icons.check),
-                                      ])
-                                    : const SizedBox(),
-                              ],
-                            ),
-                            onTap: () {
-                              setModalState(() {
-                                filter.onPickList = !filter.onPickList;
-                              });
-                            },
-                          ),
-                        )
-                        : const SizedBox(),
+                                      const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Icon(Icons.person_add_alt),
+                                            SizedBox(width: 10),
+                                            Text("On Pick list",
+                                                style: TextStyle(fontSize: 16)),
+                                          ]),
+                                      filter.onPickList
+                                          ? const Row(children: [
+                                              Icon(Icons.check),
+                                            ])
+                                          : const SizedBox(),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    setModalState(() {
+                                      filter.onPickList = !filter.onPickList;
+                                    });
+                                  },
+                                ),
+                              )
+                            : const SizedBox(),
                         inTM ? const SizedBox(height: 12) : const SizedBox(),
                         inTM
-                        ? Container(
-                          height: 50,
-                          padding: const EdgeInsets.only(left: 20, right: 20),
-                          decoration: BoxDecoration(
-                            color: filter.atTournament
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.surface,
-                            border: Border.all(
-                                color: Theme.of(context).colorScheme.primary),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(100)),
-                          ),
-                          child: InkWell(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                            ? Container(
+                                height: 50,
+                                padding:
+                                    const EdgeInsets.only(left: 20, right: 20),
+                                decoration: BoxDecoration(
+                                  color: filter.atTournament
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context).colorScheme.surface,
+                                  border: Border.all(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(100)),
+                                ),
+                                child: InkWell(
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Icon(Icons.people_alt_outlined),
-                                      SizedBox(width: 10),
-                                      Text("At This Tournament",
-                                          style: TextStyle(fontSize: 16)),
-                                    ]),
-                                filter.atTournament
-                                    ? const Row(children: [
-                                        Icon(Icons.check),
-                                      ])
-                                    : const SizedBox(),
-                              ],
-                            ),
-                            onTap: () {
-                              setModalState(() {
-                                filter.atTournament = !filter.atTournament;
-                              });
-                            },
-                          ),
-                        )
+                                      const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Icon(Icons.people_alt_outlined),
+                                            SizedBox(width: 10),
+                                            Text("At This Tournament",
+                                                style: TextStyle(fontSize: 16)),
+                                          ]),
+                                      filter.atTournament
+                                          ? const Row(children: [
+                                              Icon(Icons.check),
+                                            ])
+                                          : const SizedBox(),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    setModalState(() {
+                                      filter.atTournament =
+                                          !filter.atTournament;
+                                    });
+                                  },
+                                ),
+                              )
                             : const SizedBox(),
                         const SizedBox(height: 12),
                         Container(
@@ -276,7 +294,7 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                             border: Border.all(
                                 color: Theme.of(context).colorScheme.primary),
                             borderRadius:
-                            const BorderRadius.all(Radius.circular(100)),
+                                const BorderRadius.all(Radius.circular(100)),
                           ),
                           child: InkWell(
                             child: Row(
@@ -292,8 +310,8 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                                     ]),
                                 filter.scouted
                                     ? const Row(children: [
-                                  Icon(Icons.check),
-                                ])
+                                        Icon(Icons.check),
+                                      ])
                                     : const SizedBox(),
                               ],
                             ),
