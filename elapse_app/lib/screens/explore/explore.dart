@@ -169,84 +169,38 @@ class ExploreScreen extends StatelessWidget {
           SliverToBoxAdapter(
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 23),
+              padding: EdgeInsets.symmetric(horizontal: 10),
               height: 64,
               decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.tertiary,
                   borderRadius: BorderRadius.circular(18)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Flexible(
-                    flex: 10,
-                  fit: FlexFit.tight,
-                  child: Container(
-                    padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(
-                        minHeight: 50,
-                        minWidth: 150,
+              child: TextButton(
+                style: TextButton.styleFrom(overlayColor: Colors.transparent),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const WorldRankingsScreen(initIndex: 0)));
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "World Rankings",
+                      style: TextStyle(
+                        fontSize: 16,
+                        height: 1,
+                        color: Theme.of(context).colorScheme.onPrimary,
                       ),
-                      child: TextButton(
-                        style: TextButton.styleFrom(overlayColor: Colors.transparent),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const WorldRankingsScreen(initIndex: 0)));
-                        },
-                        child: Text(
-                            "World Skills",
-                            style: TextStyle(
-                                fontSize: 16,
-                                height: 1,
-                                color: Theme.of(context).colorScheme.onPrimary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
-                      ),
-                  ),
-                  Flexible(
-                      flex: 1,
-                      fit: FlexFit.tight,
-                      child: VerticalDivider(
-                        width: 1,
-                        thickness: 1,
-                        indent: 10,
-                        endIndent: 10,
-                        color: Theme.of(context).colorScheme.surfaceDim,
-                      )),
-                  Flexible(
-                    flex: 10,
-                  fit: FlexFit.tight,
-                  child: Container(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minHeight: 50,
-                      minWidth: 150,
+                      textAlign: TextAlign.center,
                     ),
-                    child: TextButton(
-                      style: TextButton.styleFrom(overlayColor: Colors.transparent),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                const WorldRankingsScreen(initIndex: 1)));
-                      },
-                      child: Text(
-                        "World TrueSkill",
-                        style: TextStyle(
-                          fontSize: 16,
-                          height: 1,
-                          color: Theme.of(context).colorScheme.onPrimary,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                  ),
-                ],
+                    Icon(
+                      Icons.arrow_forward,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    )
+                  ],
+                ),
               ),
             ),
           ),
