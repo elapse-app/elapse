@@ -135,12 +135,12 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
                     //     ),
                     //   ),
                     // );
+                    
                     Navigator.pushReplacement( 
                       context,
                       MaterialPageRoute(
                         builder: (context) => HomeScreen(
                         teamID: widget.teamID, // Pass the necessary parameters
-                        prefs: widget.prefs,
                       ),
                       ),
                     );

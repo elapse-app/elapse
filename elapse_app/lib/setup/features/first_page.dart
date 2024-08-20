@@ -160,7 +160,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                     Padding(
                       padding: const EdgeInsets.fromLTRB(23.0,12,23.0,0),
                       child: SizedBox(
-                          height: 55,
+                          height: 59,
                           width: double.infinity,
                         child: TextButton(
                           style: TextButton.styleFrom(

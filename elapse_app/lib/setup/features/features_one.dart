@@ -114,7 +114,7 @@ class FirstFeature extends StatelessWidget {
             child: Padding(
               padding: const EdgeInsets.all(23.0),
               child: SizedBox(
-                height: 55.0,
+                height: 59.0,
                 width: double.infinity,
                 child: TextButton(
                   style: TextButton.styleFrom(
@@ -122,7 +122,7 @@ class FirstFeature extends StatelessWidget {
                     backgroundColor: const Color.fromARGB(255, 255, 255, 255),
                     side: BorderSide(
                       color: const Color.fromARGB(255, 76, 81, 175),
-                      width: 2.0,
+                      width: 1.0,
                       )
                     ),
                   onPressed: () {

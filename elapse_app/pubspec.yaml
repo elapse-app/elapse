@@ -75,6 +75,10 @@ flutter:
   assets:
     - assets/lg4x.png
     - assets/dg4x.png
+    - assets/onboardingHome.png
+    - assets/onboardingMyTeam.png
+    - assets/onboardingRankings.png
+    - assets/onboardingSchedule.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
