@@ -47,6 +47,7 @@ dependencies:
   firebase_core: ^2.24.2
   random_string_generator: ^2.0.0
   flutter_sticky_header: ^0.6.5
+  dots_indicator: ^2.1.1
 
 dev_dependencies:
   flutter_test:
