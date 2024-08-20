@@ -2,11 +2,12 @@ import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/vdaStats.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
-import 'package:elapse_app/classes/Tournament/tournamentPreview.dart';
+import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
+import 'package:elapse_app/screens/widgets/app_bar.dart';
+import 'package:elapse_app/screens/widgets/custom_tab_bar.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
-import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
 class TeamScreen extends StatefulWidget {
   const TeamScreen(
@@ -29,16 +30,11 @@ class _TeamScreenState extends State<TeamScreen> {
     teamStats = getTrueSkillDataForTeam(widget.teamName);
     teamTournaments = fetchTeamTournaments(widget.teamID, 181);
     teamAwards = getAwards(widget.teamID, 181);
-    prefsFuture = getPrefs();
-    prefsFuture!.then((prefs) {
-      setState(() {
-        isSaved = alreadySaved(prefs);
-        displaySave = !isMainTeam(prefs);
-      });
-    });
+    isSaved = alreadySaved();
+    displaySave = !isMainTeam();
   }
 
-  bool alreadySaved(SharedPreferences prefs) {
+  bool alreadySaved() {
     List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
     return savedTeams.contains(
             '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}') ||
@@ -46,17 +42,12 @@ class _TeamScreenState extends State<TeamScreen> {
             '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}';
   }
 
-  bool isMainTeam(SharedPreferences prefs) {
+  bool isMainTeam() {
     return prefs.getString("savedTeam") ==
         '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}';
   }
 
-  Future<SharedPreferences> getPrefs() async {
-    return await SharedPreferences.getInstance();
-  }
-
-  void toggleSaveTeam() async {
-    final SharedPreferences prefs = await getPrefs();
+  void toggleSaveTeam() {
     List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
     if (isSaved) {
       savedTeams.remove(
@@ -76,7 +67,6 @@ class _TeamScreenState extends State<TeamScreen> {
   Future<List<TournamentPreview>>? teamTournaments;
   Future<List<Award>>? teamAwards;
 
-  Future<SharedPreferences>? prefsFuture;
   late bool isSaved;
   late bool displaySave;
   @override
@@ -85,36 +75,14 @@ class _TeamScreenState extends State<TeamScreen> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            automaticallyImplyLeading: false,
-            expandedHeight: 125,
-            centerTitle: false,
-            flexibleSpace: FlexibleSpaceBar(
-              expandedTitleScale: 1,
-              collapseMode: CollapseMode.parallax,
-              title: Padding(
-                padding: EdgeInsets.only(left: 20, right: 12),
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: Icon(Icons.arrow_back),
-                    ),
-                    const Text(
-                      "Team Info",
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-              ),
-              centerTitle: false,
+          ElapseAppBar(
+            title: Text(
+              "Team Info",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
+            backNavigation: true,
           ),
-          const RoundedTop(),
+          CustomTabBar(tabs: ["Details, Scoutsheet"], onPressed: (value) {}),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 23),
             sliver: SliverToBoxAdapter(
