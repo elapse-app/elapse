@@ -23,7 +23,7 @@ class ElapseAppBar extends StatelessWidget {
     if (includeSettings) {
       appBarBackground = SafeArea(
         child: Padding(
-          padding: EdgeInsets.only(left: 23, right: 12, bottom: 20),
+          padding: EdgeInsets.only(left: 23, right: 12, bottom: 20, top: 10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -51,7 +51,7 @@ class ElapseAppBar extends StatelessWidget {
     } else if (backNavigation && background == null) {
       appBarBackground = SafeArea(
         child: Padding(
-          padding: EdgeInsets.only(left: 23),
+          padding: EdgeInsets.only(left: 23, top: 10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
