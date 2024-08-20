@@ -3,11 +3,9 @@ import 'package:elapse_app/main.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SetMainTeam extends StatefulWidget {
-  const SetMainTeam({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const SetMainTeam({super.key});
 
   @override
   State<SetMainTeam> createState() => _SetMainTeamState();
@@ -26,13 +24,13 @@ class _SetMainTeamState extends State<SetMainTeam> {
   }
 
   void saveTeam(TeamPreview team) {
-    List<String> savedTeams = widget.prefs.getStringList("savedTeams") ?? [];
+    List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
     savedTeams.remove(
         '{"teamID": ${team.teamID}, "teamNumber": "${team.teamNumber}"}');
-    widget.prefs.setStringList("savedTeams", savedTeams);
-    widget.prefs.setString("savedTeam",
+    prefs.setStringList("savedTeams", savedTeams);
+    prefs.setString("savedTeam",
         '{"teamID": ${team.teamID}, "teamNumber": "${team.teamNumber}"}');
-    widget.prefs.setBool("isTournamentMode", false);
+    prefs.setBool("isTournamentMode", false);
     myAppKey.currentState!.reloadApp();
     Navigator.pop(
       context,

@@ -1,12 +1,17 @@
 import 'package:elapse_app/screens/settings/theme.dart';
 import 'package:elapse_app/screens/settings/set_team.dart';
+import 'package:elapse_app/screens/settings/signin.dart';
+import 'package:elapse_app/screens/settings/authemail.dart';
+import 'package:elapse_app/screens/settings/authpass.dart';
+import 'package:elapse_app/screens/settings/authdel.dart';
+import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:firebase_auth/firebase_auth.dart';
 
 class SettingsScreen extends StatelessWidget {
-  const SettingsScreen({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -14,34 +19,12 @@ class SettingsScreen extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            automaticallyImplyLeading: false,
-            expandedHeight: 125,
-            centerTitle: false,
-            flexibleSpace: FlexibleSpaceBar(
-              expandedTitleScale: 1,
-              collapseMode: CollapseMode.parallax,
-              title: Padding(
-                padding: const EdgeInsets.only(left: 20, right: 12),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    IconButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(Icons.arrow_back)),
-                    const Text(
-                      "Settings",
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-              ),
-              centerTitle: false,
+          ElapseAppBar(
+            title: Text(
+              "Settings",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
+            backNavigation: true,
           ),
           const RoundedTop(),
           SliverPadding(
@@ -56,9 +39,7 @@ class SettingsScreen extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => ThemeSettings(
-                              prefs: prefs,
-                            ),
+                            builder: (context) => ThemeSettings(),
                           ),
                         );
                       },
@@ -85,9 +66,7 @@ class SettingsScreen extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SetMainTeam(
-                              prefs: prefs,
-                            ),
+                            builder: (context) => SetMainTeam(),
                           ),
                         );
                       },
@@ -98,6 +77,143 @@ class SettingsScreen extends StatelessWidget {
                           children: [
                             Text(
                               "Set Main Team",
+                              style: TextStyle(fontSize: 24),
+                            ),
+                            Icon(Icons.arrow_forward)
+                          ],
+                        ),
+                      ),
+                    ),
+                    Divider(
+                      color: Theme.of(context).colorScheme.surfaceDim,
+                    ),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AuthSignIn(),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 9.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Sign In / Sign Up",
+                              style: TextStyle(fontSize: 24),
+                            ),
+                            Icon(Icons.arrow_forward)
+                          ],
+                        ),
+                      ),
+                    ),
+                    Divider(
+                      color: Theme.of(context).colorScheme.surfaceDim,
+                    ),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AuthEmail(),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 9.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Update Email",
+                              style: TextStyle(fontSize: 24),
+                            ),
+                            Icon(Icons.arrow_forward)
+                          ],
+                        ),
+                      ),
+                    ),
+                    Divider(
+                      color: Theme.of(context).colorScheme.surfaceDim,
+                    ),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AuthPass(),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 9.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Update Password",
+                              style: TextStyle(fontSize: 24),
+                            ),
+                            Icon(Icons.arrow_forward)
+                          ],
+                        ),
+                      ),
+                    ),
+                    Divider(
+                      color: Theme.of(context).colorScheme.surfaceDim,
+                    ),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        FirebaseAuth.instance.signOut();
+                        print('authSucc - signed out user');
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text(
+                                'Success! You have been signed out.'),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 9.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Sign Out",
+                              style: TextStyle(fontSize: 24),
+                            ),
+                            Icon(Icons.arrow_forward)
+                          ],
+                        ),
+                      ),
+                    ),
+                    Divider(
+                      color: Theme.of(context).colorScheme.surfaceDim,
+                    ),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AuthDel(),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 9.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Delete Account",
                               style: TextStyle(fontSize: 24),
                             ),
                             Icon(Icons.arrow_forward)
