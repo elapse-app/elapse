@@ -14,8 +14,8 @@ class WorldRankingsSearchScreen extends StatefulWidget {
     required this.vda,
   });
 
-  Future<List<WorldSkillsStats>> skills;
-  Future<List<VDAStats>> vda;
+  final Future<List<WorldSkillsStats>> skills;
+  final Future<List<VDAStats>> vda;
 
   @override
   State<WorldRankingsSearchScreen> createState() =>

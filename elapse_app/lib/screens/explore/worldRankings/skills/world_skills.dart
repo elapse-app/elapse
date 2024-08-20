@@ -1,68 +1,13 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:elapse_app/screens/explore/worldRankings/skills/world_skills_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../../classes/Team/teamPreview.dart';
 import '../../../../classes/Team/world_skills.dart';
 import '../../../widgets/big_error_message.dart';
 import '../world_rankings_filter.dart';
 
-class WorldSkillsPage extends StatefulWidget {
-  final Future<List<WorldSkillsStats>> skillsStats;
-  final int sort;
-  final WorldRankingsFilter filter;
-  final Future<List<TeamPreview>> savedTeams;
-
+class WorldSkillsPage extends StatelessWidget {
   const WorldSkillsPage({
-    super.key,
-    required this.skillsStats,
-    required this.sort,
-    required this.filter,
-    required this.savedTeams,
-  });
-
-  @override
-  State<WorldSkillsPage> createState() => _WorldSkillsState();
-}
-
-class _WorldSkillsState extends State<WorldSkillsPage> {
-  @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: Future.wait([widget.skillsStats, widget.savedTeams]),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SliverToBoxAdapter(
-            child: LinearProgressIndicator(),
-          );
-        } else if (snapshot.hasData) {
-          return WorldSkillsLoadedPage(
-            rankings: snapshot.data?[0] as List<WorldSkillsStats>,
-            sort: widget.sort,
-            filter: widget.filter,
-            savedTeams: snapshot.data?[1] as List<TeamPreview>,
-          );
-        } else {
-          return const SliverToBoxAdapter(
-              child: Center(
-            child: Text("Failed to load world rankings"),
-          ));
-        }
-      },
-    );
-  }
-}
-
-class WorldSkillsLoadedPage extends StatelessWidget {
-  const WorldSkillsLoadedPage({
     super.key,
     required this.rankings,
     required this.sort,
@@ -81,7 +26,8 @@ class WorldSkillsLoadedPage extends StatelessWidget {
 
     if (filter.regions!.isNotEmpty) {
       teams = teams
-          .where((e) => filter.regions!.any((e2) => e2 == (e.eventRegion?.name ?? "")))
+          .where((e) =>
+              filter.regions!.any((e2) => e2 == (e.eventRegion?.name ?? "")))
           .toList();
     }
 

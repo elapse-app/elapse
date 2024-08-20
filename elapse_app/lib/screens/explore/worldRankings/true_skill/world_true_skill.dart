@@ -6,53 +6,8 @@ import '../../../../classes/Team/vdaStats.dart';
 import '../../../widgets/big_error_message.dart';
 import '../world_rankings_filter.dart';
 
-class WorldTrueSkillPage extends StatefulWidget {
-  final Future<List<VDAStats>> vdaStats;
-  final int sort;
-  final WorldRankingsFilter filter;
-  final Future<List<TeamPreview>> savedTeams;
-
+class WorldTrueSkillPage extends StatelessWidget {
   const WorldTrueSkillPage({
-    super.key,
-    required this.vdaStats,
-    required this.sort,
-    required this.filter,
-    required this.savedTeams,
-  });
-
-  @override
-  State<WorldTrueSkillPage> createState() => _WorldTrueSkillState();
-}
-
-class _WorldTrueSkillState extends State<WorldTrueSkillPage> {
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: Future.wait([widget.vdaStats, widget.savedTeams]),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SliverToBoxAdapter(
-              child: LinearProgressIndicator(),
-            );
-          } else if (snapshot.hasData) {
-            return WorldTrueSkillLoadedPage(
-              stats: snapshot.data?[0] as List<VDAStats>,
-              sort: widget.sort,
-              filter: widget.filter,
-              savedTeams: snapshot.data?[1] as List<TeamPreview>,
-            );
-          } else {
-            return const SliverToBoxAdapter(
-                child: Center(
-              child: Text("Failed to load world rankings"),
-            ));
-          }
-        });
-  }
-}
-
-class WorldTrueSkillLoadedPage extends StatelessWidget {
-  const WorldTrueSkillLoadedPage({
     super.key,
     required this.stats,
     required this.sort,
@@ -71,7 +26,8 @@ class WorldTrueSkillLoadedPage extends StatelessWidget {
 
     if (filter.regions!.isNotEmpty) {
       teams = teams
-          .where((e) => filter.regions!.any((e2) => e2 == (e.eventRegion ?? "")))
+          .where(
+              (e) => filter.regions!.any((e2) => e2 == (e.eventRegion ?? "")))
           .toList();
     }
 
