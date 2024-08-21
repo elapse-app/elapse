@@ -40,7 +40,7 @@ class _CreateAccountState extends State<CreateAccount> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              SizedBox(height: 20),
+              SizedBox(height: 46),
               Padding(
                 padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
                 child: Center(
@@ -50,8 +50,8 @@ class _CreateAccountState extends State<CreateAccount> {
                       style: TextStyle(
                         fontFamily: "Manrope",
                         fontSize: 32,
-                        fontWeight: FontWeight.normal,
-                        color: const Color.fromARGB(255, 67, 129, 192),
+                        fontWeight: FontWeight.w300,
+                        color: const Color.fromARGB(255, 12, 77, 86),
                       ),
                     ),
                   ),
@@ -65,10 +65,10 @@ class _CreateAccountState extends State<CreateAccount> {
                     text: TextSpan(
                       text: 'We\'ll send you a verification code',
                       style: TextStyle(
-                        fontWeight: FontWeight.normal,
+                        fontWeight: FontWeight.w400,
                         fontFamily: "Manrope",
-                        fontSize: 18,
-                        color: Colors.grey[350],
+                        fontSize: 16,
+                        color: Color.fromARGB(255, 117, 117, 117),
                       ),
                     ),
                   ),
@@ -76,17 +76,17 @@ class _CreateAccountState extends State<CreateAccount> {
               ),
               SizedBox(height: 20),
               Padding(
-                padding: EdgeInsets.fromLTRB(16, 16, 16, 1),
+                padding: EdgeInsets.fromLTRB(23, 16, 23, 1),
                 child: TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
                     border: OutlineInputBorder(),
                     labelText: 'Email',
                     labelStyle: TextStyle(
-                      color: Colors.grey[350],
-                      fontWeight: FontWeight.normal,
+                      color: Color.fromARGB(255, 35, 35, 35),
+                      fontWeight: FontWeight.w400,
                       fontFamily: "Manrope",
-                      fontSize: 19,
+                      fontSize: 16,
                     ),
                   ),
                   validator: (value) {
@@ -98,7 +98,7 @@ class _CreateAccountState extends State<CreateAccount> {
                 ),
               ),
               Padding(
-                padding: EdgeInsets.fromLTRB(16, 8, 16, 16),
+                padding: EdgeInsets.fromLTRB(23, 8, 23, 16),
                 child: TextFormField(
                   controller: _passwordController,
                   obscureText: true,
@@ -106,10 +106,10 @@ class _CreateAccountState extends State<CreateAccount> {
                     border: OutlineInputBorder(),
                     labelText: 'Password',
                     labelStyle: TextStyle(
-                      color: Colors.grey[350],
-                      fontWeight: FontWeight.normal,
+                      color: Color.fromARGB(255, 35, 35, 35),
+                      fontWeight: FontWeight.w400,
                       fontFamily: "Manrope",
-                      fontSize: 19,
+                      fontSize: 16,
                     ),
                   ),
                   validator: (value) {
@@ -126,22 +126,22 @@ class _CreateAccountState extends State<CreateAccount> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(16, 4, 16, 2),
+                  padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
                   child: RichText(
                     text: TextSpan(
                       text: '6-12 characters',
                       style: TextStyle(
-                        fontWeight: FontWeight.normal,
+                        fontWeight: FontWeight.w300,
                         fontFamily: "Manrope",
                         fontSize: 10,
-                        color: Colors.grey[350],
+                        color: Color.fromARGB(255, 35, 35, 35),
                       ),
                     ),
                   ),
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: const EdgeInsets.all(23.0),
                 child: SizedBox(
                   height: 55.0,
                   width: double.infinity,
