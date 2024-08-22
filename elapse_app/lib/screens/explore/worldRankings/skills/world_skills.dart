@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../classes/Team/teamPreview.dart';
 import '../../../../classes/Team/world_skills.dart';
+import '../../../../classes/Tournament/tournament.dart';
 import '../../../widgets/big_error_message.dart';
 import '../world_rankings_filter.dart';
 
@@ -13,12 +14,14 @@ class WorldSkillsPage extends StatelessWidget {
     required this.sort,
     required this.filter,
     required this.savedTeams,
+    required this.tournament,
   });
 
   final List<WorldSkillsStats> rankings;
   final int sort;
   final WorldRankingsFilter filter;
   final List<TeamPreview> savedTeams;
+  final Tournament? tournament;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +37,12 @@ class WorldSkillsPage extends StatelessWidget {
     if (filter.saved) {
       teams = teams
           .where((e) => savedTeams.any((e2) => e2.teamID == e.teamId))
+          .toList();
+    }
+
+    if (filter.atTournament && tournament != null) {
+      teams = teams
+          .where((e) => tournament!.teams.any((e2) => e2.id == e.teamId))
           .toList();
     }
 

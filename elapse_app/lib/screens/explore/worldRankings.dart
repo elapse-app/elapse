@@ -10,6 +10,7 @@ import 'package:elapse_app/main.dart';
 
 import '../../classes/Team/teamPreview.dart';
 import '../../classes/Team/world_skills.dart';
+import '../../classes/Tournament/tournament.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/custom_tab_bar.dart';
 
@@ -28,6 +29,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
   late Future<List<VDAStats>> futureVDAStats;
   late List<TeamPreview> savedTeams;
   late bool inTM;
+  late Future<Tournament?> futureTournament;
 
   int selectedIndex = 0;
   List<String> pageTitles = ["Skills", "TrueSkill"];
@@ -54,7 +56,12 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
     futureSkillsStats = getWorldSkillsRankings(seasonID);
     futureVDAStats = getTrueSkillData();
     savedTeams = _getSavedTeams();
-    inTM = _isInTM();
+    inTM = prefs.getBool("isTournamentMode") ?? false;
+
+    int? tournamentId = prefs.getInt("tournamentID");
+    if (inTM && tournamentId != null) {
+      futureTournament = TMTournamentDetails(tournamentId);
+    }
   }
 
   @override
@@ -107,7 +114,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                 );
                               });
                         }
-                        return Icon(Icons.search);
+                        return const Icon(Icons.search);
                       })
                 ],
               ),
@@ -119,9 +126,9 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
             onPressed: (int v) {
               setState(() {
                 selectedIndex = v;
+                sortIndex = 0;
               });
             },
-            initIndex: widget.initIndex,
           ),
           selectedIndex == 0
               ? SliverToBoxAdapter(
@@ -133,38 +140,65 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                       children: [
                         Flexible(
                           flex: 6,
-                          child: ListView(
-                            scrollDirection: Axis.horizontal,
-                            children: List<Widget>.generate(5, (int index) {
-                              return Container(
-                                padding: const EdgeInsets.only(right: 5),
-                                child: ChoiceChip(
-                                  padding:
-                                      const EdgeInsets.symmetric(horizontal: 5),
-                                  label: Text(skillsSort[index]),
-                                  selected: sortIndex == index,
-                                  shape: RoundedRectangleBorder(
-                                      side: BorderSide(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary,
-                                          width: 1.5),
-                                      borderRadius: BorderRadius.circular(10)),
-                                  selectedColor:
-                                      Theme.of(context).colorScheme.primary,
-                                  chipAnimationStyle: ChipAnimationStyle(
-                                      enableAnimation: AnimationStyle(
-                                          duration: Duration.zero),
-                                      selectAnimation: AnimationStyle(
-                                          duration: Duration.zero)),
-                                  onSelected: (bool selected) {
-                                    setState(() {
-                                      sortIndex = index;
-                                    });
-                                  },
+                          child: Stack(
+                            children: [
+                              ListView(
+                                scrollDirection: Axis.horizontal,
+                                children: List<Widget>.generate(5, (int index) {
+                                  return Container(
+                                    padding: const EdgeInsets.only(right: 5),
+                                    child: ChoiceChip(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 5),
+                                      label: Text(skillsSort[index],
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface,
+                                          )),
+                                      selected: sortIndex == index,
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                              width: 1.5),
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      selectedColor:
+                                          Theme.of(context).colorScheme.primary,
+                                      chipAnimationStyle: ChipAnimationStyle(
+                                          enableAnimation: AnimationStyle(
+                                              duration: Duration.zero),
+                                          selectAnimation: AnimationStyle(
+                                              duration: Duration.zero)),
+                                      onSelected: (bool selected) {
+                                        setState(() {
+                                          sortIndex = index;
+                                        });
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                              IgnorePointer(
+                                ignoring: true,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Theme.of(context)
+                                            .colorScheme
+                                            .surface
+                                            .withOpacity(0),
+                                        Theme.of(context).colorScheme.surface,
+                                      ],
+                                      stops: const [0.9, 1.0],
+                                    ),
+                                  ),
                                 ),
-                              );
-                            }).toList(),
+                              ),
+                            ],
                           ),
                         ),
                         Flexible(
@@ -222,39 +256,78 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                           children: [
                             Flexible(
                               flex: 6,
-                              child: ListView(
-                                scrollDirection: Axis.horizontal,
-                                children: List<Widget>.generate(5, (int index) {
-                                  return Container(
-                                    padding: const EdgeInsets.only(right: 5),
-                                    child: ChoiceChip(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 5),
-                                      label: Text(tsSort[index]),
-                                      shape: RoundedRectangleBorder(
-                                          side: BorderSide(
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .primary,
-                                              width: 1.5),
-                                          borderRadius:
-                                              BorderRadius.circular(10)),
-                                      selected: sortIndex == index,
-                                      selectedColor:
-                                          Theme.of(context).colorScheme.primary,
-                                      chipAnimationStyle: ChipAnimationStyle(
-                                          enableAnimation: AnimationStyle(
-                                              duration: Duration.zero),
-                                          selectAnimation: AnimationStyle(
-                                              duration: Duration.zero)),
-                                      onSelected: (bool selected) {
-                                        setState(() {
-                                          sortIndex = index;
-                                        });
-                                      },
+                              child: Stack(
+                                children: [
+                                  ListView(
+                                    scrollDirection: Axis.horizontal,
+                                    children:
+                                        List<Widget>.generate(5, (int index) {
+                                      return Container(
+                                        padding:
+                                            const EdgeInsets.only(right: 5),
+                                        child: ChoiceChip(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 5),
+                                          label: Text(tsSort[index],
+                                              style: TextStyle(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurface,
+                                              )),
+                                          shape: RoundedRectangleBorder(
+                                              side: BorderSide(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary,
+                                                  width: 1.5),
+                                              borderRadius:
+                                                  BorderRadius.circular(10)),
+                                          selected: sortIndex == index,
+                                          selectedColor: Theme.of(context)
+                                              .colorScheme
+                                              .primary,
+                                          chipAnimationStyle:
+                                              ChipAnimationStyle(
+                                                  enableAnimation:
+                                                      AnimationStyle(
+                                                          duration:
+                                                              Duration.zero),
+                                                  selectAnimation:
+                                                      AnimationStyle(
+                                                          duration:
+                                                              Duration.zero)),
+                                          onSelected: (bool selected) {
+                                            setState(() {
+                                              sortIndex = index;
+                                            });
+                                          },
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                  IgnorePointer(
+                                    ignoring: true,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Theme.of(context)
+                                                .colorScheme
+                                                .surface
+                                                .withOpacity(0),
+                                            Theme.of(context)
+                                                .colorScheme
+                                                .surface,
+                                          ],
+                                          stops: const [
+                                            0.9,
+                                            1.0,
+                                          ],
+                                        ),
+                                      ),
                                     ),
-                                  );
-                                }).toList(),
+                                  ),
+                                ],
                               ),
                             ),
                             Flexible(
@@ -307,20 +380,25 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                     )
                   : const SliverToBoxAdapter(),
           FutureBuilder(
-              future: Future.wait([futureSkillsStats, futureVDAStats]),
+              future: Future.wait(
+                  [futureSkillsStats, futureVDAStats, futureTournament]),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   List<Widget> pages = [
                     WorldSkillsPage(
-                        rankings: snapshot.data![0] as List<WorldSkillsStats>,
-                        sort: sortIndex,
-                        filter: filter,
-                        savedTeams: savedTeams),
+                      rankings: snapshot.data![0] as List<WorldSkillsStats>,
+                      sort: sortIndex,
+                      filter: filter,
+                      savedTeams: savedTeams,
+                      tournament: snapshot.data![2] as Tournament,
+                    ),
                     WorldTrueSkillPage(
-                        stats: snapshot.data![1] as List<VDAStats>,
-                        sort: sortIndex,
-                        filter: filter,
-                        savedTeams: savedTeams),
+                      stats: snapshot.data![1] as List<VDAStats>,
+                      sort: sortIndex,
+                      filter: filter,
+                      savedTeams: savedTeams,
+                      tournament: snapshot.data![2] as Tournament,
+                    ),
                   ];
                   return pages[selectedIndex];
                 }
@@ -355,9 +433,5 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
             teamNumber: jsonDecode(e)["teamNumber"]))
         .toList());
     return savedTeams;
-  }
-
-  bool _isInTM() {
-    return prefs.getBool("isTournamentMode") ?? false;
   }
 }
