@@ -80,7 +80,11 @@ class _CreateAccountState extends State<CreateAccount> {
                 child: TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(255, 211, 211, 211),
+                      ),
+                    ),
                     labelText: 'Email',
                     labelStyle: TextStyle(
                       color: Color.fromARGB(255, 35, 35, 35),
@@ -103,7 +107,11 @@ class _CreateAccountState extends State<CreateAccount> {
                   controller: _passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(),
+                    border: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(255, 211, 211, 211),
+                      ),
+                    ),
                     labelText: 'Password',
                     labelStyle: TextStyle(
                       color: Color.fromARGB(255, 35, 35, 35),

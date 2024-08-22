@@ -74,7 +74,11 @@ class EnterDetailsPage extends StatelessWidget {
               child: TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color.fromARGB(255, 211, 211, 211),
+                    ),
+                  ),
                   labelText: 'Name',
                   labelStyle: TextStyle(
                     color: Colors.grey[350],
@@ -91,7 +95,11 @@ class EnterDetailsPage extends StatelessWidget {
                 controller: _ageController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(),
+                  border: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color.fromARGB(255, 211, 211, 211),
+                    ),
+                  ),
                   labelText: 'Age',
                   labelStyle: TextStyle(
                     color: Colors.grey[350],

@@ -31,7 +31,7 @@ class VerifyAccount extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 20),
+            SizedBox(height: 46),
             Padding(
               padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
               child: Center(
@@ -41,14 +41,14 @@ class VerifyAccount extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: "Manrope",
                       fontSize: 32,
-                      fontWeight: FontWeight.normal,
-                      color: const Color.fromARGB(255, 67, 129, 192),
+                      fontWeight: FontWeight.w300,
+                      color: const Color.fromARGB(255, 12, 77, 86),
                     ),
                   ),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 2),
             Padding(
               padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
               child: Center(
@@ -56,27 +56,31 @@ class VerifyAccount extends StatelessWidget {
                   text: TextSpan(
                     text: 'Check your inbox or spam folder',
                     style: TextStyle(
-                      fontWeight: FontWeight.normal,
+                      fontWeight: FontWeight.w400,
                       fontFamily: "Manrope",
-                      fontSize: 18,
-                      color: Colors.grey[350],
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 117, 117, 117),
                     ),
                   ),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 30),
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Padding(
-                  padding: EdgeInsets.fromLTRB(16, 8, 16, 16),
+                  padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
                   child: TextFormField(
                     controller: _codeController,
                     keyboardType: TextInputType.number,
                     decoration: InputDecoration(
-                      border: OutlineInputBorder(),
+                      border: OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color.fromARGB(255, 211, 211, 211),
+                        ),
+                      ),
                       labelText: 'XXXXXX',
                       labelStyle: TextStyle(
                         color: Colors.grey[350],
@@ -88,14 +92,14 @@ class VerifyAccount extends StatelessWidget {
                   ),
                 ),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(23.0),
                   child: SizedBox(
                     height: 55.0,
                     width: double.infinity,
                     child: TextButton(
                       style: TextButton.styleFrom(
                         foregroundColor: const Color.fromARGB(255, 76, 81, 175),
-                        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                        backgroundColor: const Color.fromARGB(255, 211, 211, 211),
                         side: BorderSide(
                           color: const Color.fromARGB(255, 76, 81, 175),
                           width: 2.0,
