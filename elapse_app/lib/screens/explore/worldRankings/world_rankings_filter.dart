@@ -72,6 +72,7 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                               filter.regions!.isNotEmpty ||
                                       filter.saved ||
                                       filter.onPickList ||
+                                      filter.atTournament ||
                                       filter.scouted
                                   ? TextButton(
                                       child: Text("Clear",

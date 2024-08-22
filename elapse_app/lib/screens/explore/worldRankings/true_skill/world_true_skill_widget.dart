@@ -57,7 +57,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
                                 style: const TextStyle(
                                   fontSize: 16,
                                 )),
-                            Text("Score ${stats.trueSkill ?? "N/A"}",
+                            Text("${stats.trueSkill ?? "N/A"}",
                                 style: const TextStyle(
                                   fontSize: 16,
                                 )),
@@ -92,7 +92,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
                                 children: [
                                   sort == 0 || sort >= 3
                                       ? Text(
-                                          "Winrate ${stats.winPercent?.toInt() ?? 0} %",
+                                          "WR ${stats.winPercent?.toInt() ?? 0} %",
                                           style: const TextStyle(
                                             fontSize: 16,
                                           ))
