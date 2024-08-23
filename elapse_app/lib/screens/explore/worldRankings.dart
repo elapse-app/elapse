@@ -30,6 +30,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
   late List<TeamPreview> savedTeams;
   late bool inTM;
   late Future<Tournament?> futureTournament;
+  List<Future<dynamic>> futures = [];
 
   int selectedIndex = 0;
   List<String> pageTitles = ["Skills", "TrueSkill"];
@@ -54,13 +55,16 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
     selectedIndex = widget.initIndex;
 
     futureSkillsStats = getWorldSkillsRankings(seasonID);
+    futures.add(futureSkillsStats);
     futureVDAStats = getTrueSkillData();
+    futures.add(futureVDAStats);
     savedTeams = _getSavedTeams();
     inTM = prefs.getBool("isTournamentMode") ?? false;
 
     int? tournamentId = prefs.getInt("tournamentID");
     if (inTM && tournamentId != null) {
       futureTournament = TMTournamentDetails(tournamentId);
+      futures.add(futureTournament);
     }
   }
 
@@ -217,15 +221,21 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                           size: 30,
                                         ),
                                         onPressed: () async {
+                                          var skills = snapshot.data![0]
+                                              as List<WorldSkillsStats>;
+                                          var vda = snapshot.data![1]
+                                              as List<VDAStats>;
+                                          List<String> regions = skills
+                                              .map((e) => e.eventRegion!.name)
+                                              .toList();
+                                          regions.addAll(
+                                              vda.map((e) => e.eventRegion!));
+                                          regions = regions.toSet().toList();
+                                          regions.sort();
+
                                           WorldRankingsFilter updatedFilter =
-                                              await worldRankingsFilter(
-                                                  context,
-                                                  filter,
-                                                  inTM,
-                                                  snapshot.data![0]
-                                                      as List<WorldSkillsStats>,
-                                                  snapshot.data![1]
-                                                      as List<VDAStats>);
+                                              await worldRankingsFilter(context,
+                                                  filter, inTM, regions);
                                           setState(() {
                                             filter = updatedFilter;
                                           });
@@ -349,17 +359,27 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                                   size: 30,
                                                 ),
                                                 onPressed: () async {
+                                                  var skills = snapshot.data![0]
+                                                      as List<WorldSkillsStats>;
+                                                  var vda = snapshot.data![1]
+                                                      as List<VDAStats>;
+                                                  List<String> regions = skills
+                                                      .map((e) =>
+                                                          e.eventRegion!.name)
+                                                      .toList();
+                                                  regions.addAll(vda.map(
+                                                      (e) => e.eventRegion!));
+                                                  regions =
+                                                      regions.toSet().toList();
+                                                  regions.sort();
+
                                                   WorldRankingsFilter
                                                       updatedFilter =
                                                       await worldRankingsFilter(
                                                           context,
                                                           filter,
                                                           inTM,
-                                                          snapshot.data![0] as List<
-                                                              WorldSkillsStats>,
-                                                          snapshot.data![1]
-                                                              as List<
-                                                                  VDAStats>);
+                                                          regions);
                                                   setState(() {
                                                     filter = updatedFilter;
                                                   });
@@ -380,39 +400,40 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                     )
                   : const SliverToBoxAdapter(),
           FutureBuilder(
-              future: Future.wait(
-                  [futureSkillsStats, futureVDAStats, futureTournament]),
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  List<Widget> pages = [
-                    WorldSkillsPage(
-                      rankings: snapshot.data![0] as List<WorldSkillsStats>,
-                      sort: sortIndex,
-                      filter: filter,
-                      savedTeams: savedTeams,
-                      tournament: snapshot.data![2] as Tournament,
-                    ),
-                    WorldTrueSkillPage(
-                      stats: snapshot.data![1] as List<VDAStats>,
-                      sort: sortIndex,
-                      filter: filter,
-                      savedTeams: savedTeams,
-                      tournament: snapshot.data![2] as Tournament,
-                    ),
-                  ];
-                  return pages[selectedIndex];
-                }
-                if (snapshot.hasError) {
-                  return const SliverToBoxAdapter(
-                      child: Center(
-                    child: Text("Failed to load world rankings"),
-                  ));
-                } else {
-                  return const SliverToBoxAdapter(
-                    child: LinearProgressIndicator(),
-                  );
-                }
-              })
+                  future: Future.wait(futures),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      List<Widget> pages = [
+                        WorldSkillsPage(
+                          rankings: snapshot.data![0] as List<WorldSkillsStats>,
+                          sort: sortIndex,
+                          filter: filter,
+                          savedTeams: savedTeams,
+                          pickListTeams: const [],
+                          tournament: inTM ? snapshot.data![2] as Tournament? : null,
+                          scoutedTeams: const [],
+                        ),
+                        WorldTrueSkillPage(
+                          stats: snapshot.data![1] as List<VDAStats>,
+                          sort: sortIndex,
+                          filter: filter,
+                          savedTeams: savedTeams,
+                          tournament: inTM ? snapshot.data![2] as Tournament? : null,
+                        ),
+                      ];
+                      return pages[selectedIndex];
+                    }
+                    if (snapshot.hasError) {
+                      return const SliverToBoxAdapter(
+                          child: Center(
+                        child: Text("Failed to load world rankings"),
+                      ));
+                    } else {
+                      return const SliverToBoxAdapter(
+                        child: LinearProgressIndicator(),
+                      );
+                    }
+                  })
         ],
       ),
     );
