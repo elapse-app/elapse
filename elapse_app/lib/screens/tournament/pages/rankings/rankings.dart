@@ -77,6 +77,10 @@ class RankingsPage extends StatelessWidget {
       divisionTeams.sort((a, b) {
         return rankings[b.id]!.sp.compareTo(rankings[a.id]!.sp);
       });
+    } else if (sort == "AWP") {
+      divisionTeams.sort((a, b) {
+        return rankings[b.id]!.awp.compareTo(rankings[a.id]!.awp);
+      });
     } else if (sort == "OPR") {
       divisionTeams.sort((a, b) {
         return rankings[b.id]!.opr.compareTo(rankings[a.id]!.opr);

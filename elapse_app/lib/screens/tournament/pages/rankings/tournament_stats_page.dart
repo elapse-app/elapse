@@ -21,6 +21,8 @@ Future<void> tournamentStatsPage(
   int wins = teamStats.wins;
   int losses = teamStats.losses;
   int ties = teamStats.ties;
+  int awp = teamStats.awp;
+  double awpRate = teamStats.awpRate;
   double opr = teamStats.opr;
   double dpr = teamStats.dpr;
   double ccwm = teamStats.ccwm;
@@ -225,6 +227,40 @@ Future<void> tournamentStatsPage(
                       ),
                       Row(
                         children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "$awp",
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500),
+                              ),
+                              const Text(
+                                "AWP",
+                                style: TextStyle(fontSize: 16),
+                              )
+                            ],
+                          ),
+                          const SizedBox(
+                            width: 18,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "${awpRate * 100} %",
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500),
+                              ),
+                              const Text(
+                                "AWP %",
+                                style: TextStyle(fontSize: 16),
+                              )
+                            ],
+                          ),
+                          const SizedBox(
+                            width: 18,
+                          ),
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
