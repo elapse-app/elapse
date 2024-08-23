@@ -84,7 +84,7 @@ class VerifyAccount extends StatelessWidget {
                       labelText: 'XXXXXX',
                       labelStyle: TextStyle(
                         color: Color.fromARGB(255, 73, 69, 79),
-                        fontWeight: FontWeight.normal,
+                        fontWeight: FontWeight.w400,
                         fontFamily: "Manrope",
                         fontSize: 16,
                       ),
@@ -127,9 +127,10 @@ class VerifyAccount extends StatelessWidget {
                           return Text(
                             'Next',
                             style: TextStyle(
-                              fontWeight: FontWeight.normal,
+                              fontWeight: FontWeight.w400,
                               fontFamily: "Manrope",
-                              fontSize: 19,
+                              fontSize: 16,
+                              color: Color.fromARGB(255, 12, 77, 86),
                             ),
                           );
                         },

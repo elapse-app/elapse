@@ -70,7 +70,7 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
                     text: TextSpan(
                       text: 'All set up!',
                       style: TextStyle(
-                    fontWeight: FontWeight.normal,
+                    fontWeight: FontWeight.w400,
                     fontFamily: "Manrope",
                     fontSize: 16,
                   color: Color.fromARGB(255, 117, 117, 117),
