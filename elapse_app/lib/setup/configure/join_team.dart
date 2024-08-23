@@ -95,7 +95,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                     text: TextSpan(
                       text: 'Get personalized info for your team',
                       style: TextStyle(
-                        fontWeight: FontWeight.normal,
+                        fontWeight: FontWeight.w400,
                         fontFamily: "Manrope",
                         fontSize: 16,
                       color: Color.fromARGB(255, 117, 117, 117),
@@ -165,7 +165,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                     child: Text(
                       buttonLabel,
                       style: TextStyle(
-                        fontWeight: FontWeight.normal,
+                        fontWeight: FontWeight.w400,
                         fontFamily: "Manrope",
                         fontSize: 16,
                         color: Color.fromARGB(255, 12, 77, 86),

@@ -64,7 +64,7 @@ class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
                     text: TextSpan(
                       text: 'Thanks for signing in! Enjoy CloudScout Picklist, Scoutsheets, and Saved Teams',
                       style: TextStyle(
-                        fontWeight: FontWeight.normal,
+                        fontWeight: FontWeight.w400,
                         fontFamily: "Manrope",
                         fontSize: 16,
                       color: Color.fromARGB(255, 117, 117, 117),

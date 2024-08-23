@@ -81,10 +81,10 @@ class TournamentModeSetupPage extends StatelessWidget {
                 child: const Text(
                   'Get a streamlined view of matches, rankings, and more',
                   style: TextStyle(
-                    fontWeight: FontWeight.normal,
+                    fontWeight: FontWeight.w400,
                     fontFamily: "Manrope",
                     fontSize: 16,
-                  color: Color.fromARGB(255, 117, 117, 117),
+                    color: Color.fromARGB(255, 35, 35, 35),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -240,9 +240,9 @@ class _ToggleableButtonState extends State<ToggleableButton> {
             Text(
               ' Use Live Timing',
               style: TextStyle(
-                fontWeight: FontWeight.normal,
+                fontWeight: FontWeight.w400,
                 fontFamily: "Manrope",
-                fontSize: 19,
+                fontSize: 16,
               ),
             ),
             Spacer(),

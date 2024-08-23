@@ -67,7 +67,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                     text: TextSpan(
                       text: 'Choose a theme you want to use',
                       style: TextStyle(
-                        fontWeight: FontWeight.normal,
+                        fontWeight: FontWeight.w400,
                         fontFamily: "Manrope",
                         fontSize: 16,
                       color: Color.fromARGB(255, 117, 117, 117),
@@ -114,7 +114,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                   child: Text(
                                     'Follow System',
                                     style: TextStyle(
-                                      fontWeight: FontWeight.normal,
+                                      fontWeight: FontWeight.w400,
                                       fontFamily: "Manrope",
                                       fontSize: 19,
                                     ),
@@ -175,7 +175,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                   child: Text(
                                     'Light',
                                     style: TextStyle(
-                                      fontWeight: FontWeight.normal,
+                                      fontWeight: FontWeight.w400,
                                       fontFamily: "Manrope",
                                       fontSize: 19,
                                     ),
@@ -236,7 +236,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                   child: Text(
                                     'Dark',
                                     style: TextStyle(
-                                      fontWeight: FontWeight.normal,
+                                      fontWeight: FontWeight.w400,
                                       fontFamily: "Manrope",
                                       fontSize: 19,
                                     ),
