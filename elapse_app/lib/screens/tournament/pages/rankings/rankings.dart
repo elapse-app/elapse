@@ -5,6 +5,7 @@ import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/main.dart';
+import 'package:elapse_app/screens/tournament/pages/rankings/rankings_filter.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dart';
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:flutter/material.dart';
@@ -15,11 +16,13 @@ class RankingsPage extends StatelessWidget {
       required this.searchQuery,
       required this.sort,
       required this.divisionIndex,
-      required this.useSavedTeams});
+      required this.filter});
+
   final String searchQuery;
   final int divisionIndex;
   final String sort;
-  final bool useSavedTeams;
+  final TournamentRankingsFilter filter;
+
   @override
   Widget build(BuildContext context) {
     Tournament tournament =
@@ -27,7 +30,7 @@ class RankingsPage extends StatelessWidget {
 
     List<Team> teams = tournament.teams;
     List<TeamPreview> savedTeams = [];
-    if (useSavedTeams) {
+    if (filter.saved) {
       final String savedTeam = prefs.getString("savedTeam") ?? "";
       TeamPreview savedTeamPreview = TeamPreview(
           teamID: jsonDecode(savedTeam)["teamID"],
@@ -46,32 +49,43 @@ class RankingsPage extends StatelessWidget {
     } else {
       teams = tournament.teams;
     }
+
+    List<TeamPreview> scoutedTeams = [];
+    if (filter.scouted) {
+      teams = tournament.teams.where((e) => scoutedTeams.any((e2) => e2.teamID == e.id)).toList();
+    }
+
+    List<TeamPreview> pickListTeams = [];
+    if (filter.onPickList) {
+      teams = tournament.teams.where((e) => pickListTeams.any((e2) => e2.teamID == e.id)).toList();
+    }
+
     Map<int, TeamStats> rankings =
         tournament.divisions[divisionIndex].teamStats!;
 
     List<Team> divisionTeams =
         teams.where((e) => rankings[e.id] != null).toList();
-    if (sort == "rank") {
+    if (sort == "Rank") {
       divisionTeams.sort((a, b) {
         return rankings[a.id]!.rank.compareTo(rankings[b.id]!.rank);
       });
-    } else if (sort == "ap") {
+    } else if (sort == "AP") {
       divisionTeams.sort((a, b) {
         return rankings[b.id]!.ap.compareTo(rankings[a.id]!.ap);
       });
-    } else if (sort == "opr") {
-      divisionTeams.sort((a, b) {
-        return rankings[b.id]!.opr.compareTo(rankings[a.id]!.opr);
-      });
-    } else if (sort == "dpr") {
-      divisionTeams.sort((a, b) {
-        return rankings[b.id]!.dpr.compareTo(rankings[a.id]!.dpr) * -1;
-      });
-    } else if (sort == "sp") {
+    } else if (sort == "SP") {
       divisionTeams.sort((a, b) {
         return rankings[b.id]!.sp.compareTo(rankings[a.id]!.sp);
       });
-    } else if (sort == "ccwm") {
+    } else if (sort == "OPR") {
+      divisionTeams.sort((a, b) {
+        return rankings[b.id]!.opr.compareTo(rankings[a.id]!.opr);
+      });
+    } else if (sort == "DPR") {
+      divisionTeams.sort((a, b) {
+        return rankings[b.id]!.dpr.compareTo(rankings[a.id]!.dpr) * -1;
+      });
+    } else if (sort == "CCWM") {
       divisionTeams.sort((a, b) {
         return rankings[b.id]!.ccwm.compareTo(rankings[a.id]!.ccwm);
       });
@@ -103,7 +117,7 @@ class RankingsPage extends StatelessWidget {
           if (teamStats == null) {
             return const SizedBox();
           }
-          if (sort == "opr" || sort == "dpr" || sort == "ccwm") {
+          if (sort == "OPR" || sort == "DPR" || sort == "CCWM") {
             return Column(
               children: [
                 OPRRanking(
