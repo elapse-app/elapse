@@ -67,9 +67,10 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(0.0),
           child: Column(
             children: [
+              SizedBox(height: 46),
               Padding(
                 padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
                 child: Center(
@@ -79,14 +80,14 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                       style: TextStyle(
                         fontFamily: "Manrope",
                         fontSize: 32,
-                        fontWeight: FontWeight.normal,
-                        color: const Color.fromARGB(255, 67, 129, 192),
+                        fontWeight: FontWeight.w300,
+                        color: const Color.fromARGB(255, 12, 77, 86),
                       ),
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 8),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                 child: Center(
@@ -96,27 +97,30 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                       style: TextStyle(
                         fontWeight: FontWeight.normal,
                         fontFamily: "Manrope",
-                        fontSize: 18,
-                        color: Colors.grey[350],
+                        fontSize: 16,
+                      color: Color.fromARGB(255, 117, 117, 117),
                       ),
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
-              TextFormField(
-                      controller: _teamController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: 'Team Number',
-                        labelStyle: TextStyle(
-                          color: Colors.grey[350],
-                          fontWeight: FontWeight.normal,
-                          fontFamily: "Manrope",
-                          fontSize: 19,
-                        ),
-                      ),
-                    ),
+              SizedBox(height: 32),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(23, 0, 23, 0),
+                  child: TextFormField(
+                  controller: _teamController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    labelText: 'Team Number',
+                    labelStyle: TextStyle(
+                    color: Color.fromARGB(255, 73, 69, 79),
+                    fontWeight: FontWeight.w400,
+                    fontFamily: "Manrope",
+                    fontSize: 16,
+                  ),
+                  ),
+                ),
+              ),
               SizedBox(height: 16.0),
               FutureBuilder<List<TeamPreview>>(
                 future: teamSearch,
@@ -131,40 +135,47 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                 },
               ),
               SizedBox(height: 16.0),
-              SizedBox(
-                height: 55.0,
-                width: double.infinity,
-                child: TextButton(
-                  style: TextButton.styleFrom(
-                    foregroundColor: const Color.fromARGB(255, 76, 81, 175),
-                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                    side: BorderSide(
-                      color: const Color.fromARGB(255, 76, 81, 175),
-                      width: 2.0,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(23, 0, 23, 0),
+                child: SizedBox(
+                  height: 59.0,
+                  width: double.infinity,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                      side: BorderSide(
+                        color: const Color.fromARGB(255, 191, 231, 237),
+                        width: 1.0,
+                      ),
                     ),
-                  ),
-                  onPressed: () {
-                    if (buttonLabel == "Search") {
-                      searchTeam();
-                    } else if (buttonLabel == "Confirm" && selectedTeam != null) {
-                      saveTeam(selectedTeam!);
-                      Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ThemeSetup(prefs: prefs),
-                          ),
-                        );
-                    }
-                  },
-                  child: Text(
-                    buttonLabel,
-                    style: TextStyle(
-                      fontWeight: FontWeight.normal,
-                      fontFamily: "Manrope",
-                      fontSize: 19,
+                    onPressed: () {
+                      if (buttonLabel == "Search") {
+                        searchTeam();
+                      } else if (buttonLabel == "Confirm" && selectedTeam != null) {
+                        saveTeam(selectedTeam!);
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => ThemeSetup(prefs: prefs),
+                            ),
+                          );
+                      }
+                    },
+                    child: Text(
+                      buttonLabel,
+                      style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontFamily: "Manrope",
+                        fontSize: 16,
+                        color: Color.fromARGB(255, 12, 77, 86),
+                      ),
                     ),
                   ),
                 ),
+              ),
+              SizedBox(
+                height:38,
               ),
             ],
           ),

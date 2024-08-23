@@ -48,7 +48,7 @@ class VerifyAccount extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 2),
+            SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
               child: Center(
@@ -65,7 +65,7 @@ class VerifyAccount extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 32),
             Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -83,28 +83,35 @@ class VerifyAccount extends StatelessWidget {
                       ),
                       labelText: 'XXXXXX',
                       labelStyle: TextStyle(
-                        color: Colors.grey[350],
+                        color: Color.fromARGB(255, 73, 69, 79),
                         fontWeight: FontWeight.normal,
                         fontFamily: "Manrope",
-                        fontSize: 19,
+                        fontSize: 16,
                       ),
                     ),
                   ),
                 ),
+                SizedBox(height: 32),
                 Padding(
-                  padding: const EdgeInsets.all(23.0),
+                  padding: const EdgeInsets.symmetric(horizontal: 23, vertical: 0),
                   child: SizedBox(
-                    height: 55.0,
+                    height: 59.0,
                     width: double.infinity,
                     child: TextButton(
                       style: TextButton.styleFrom(
-                        foregroundColor: const Color.fromARGB(255, 76, 81, 175),
-                        backgroundColor: const Color.fromARGB(255, 211, 211, 211),
-                        side: BorderSide(
-                          color: const Color.fromARGB(255, 76, 81, 175),
-                          width: 2.0,
-                        ),
-                      ),
+                    foregroundColor: const Color.fromARGB(255, 12, 77, 86),
+                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 117, 117, 117),
+                      fontFamily: "Manrope",
+                      fontWeight: FontWeight.w400,
+                    ),
+                    side: BorderSide(
+                      color: const Color.fromARGB(255, 191, 231, 237),
+                      width: 1.0,
+                      )
+                    ),
                       onPressed: () {
                         final code = _codeController.text;
                         // Use the collected code here

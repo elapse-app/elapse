@@ -38,9 +38,12 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 23.0),
           child: Column(
             children: [
+              SizedBox(
+                height:46,
+              ),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                 child: Center(
@@ -51,14 +54,14 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
                       style: TextStyle(
                         fontFamily: "Manrope",
                         fontSize: 32,
-                        fontWeight: FontWeight.normal,
-                        color: const Color.fromARGB(255, 67, 129, 192),
+                        fontWeight: FontWeight.w300,
+                        color: const Color.fromARGB(255, 12, 77, 86),
                       ),
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 8),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                 child: Center(
@@ -67,16 +70,16 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
                     text: TextSpan(
                       text: 'All set up!',
                       style: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontFamily: "Manrope",
-                        fontSize: 18,
-                        color: Colors.grey[350],
-                      ),
+                    fontWeight: FontWeight.normal,
+                    fontFamily: "Manrope",
+                    fontSize: 16,
+                  color: Color.fromARGB(255, 117, 117, 117),
+                  ),
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 24),
               Center(
                 child: Container(
                   height: MediaQuery.of(context).size.height * 0.56, // Fixed height
@@ -114,15 +117,21 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
               ),
               Spacer(),
               SizedBox(
-                height: 55.0,
+                height: 59.0,
                 width: double.infinity,
                 child: TextButton(
                   style: TextButton.styleFrom(
-                    foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                    foregroundColor: const Color.fromARGB(255, 12, 77, 86),
                     backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 117, 117, 117),
+                      fontFamily: "Manrope",
+                      fontWeight: FontWeight.w400,
+                    ),
                     side: BorderSide(
-                      color: const Color.fromARGB(255, 76, 81, 175),
-                      width: 2.0,
+                      color: const Color.fromARGB(255, 191, 231, 237),
+                      width: 1.0,
                       )
                     ),
                   onPressed: () {
@@ -147,6 +156,9 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
                   },
                   child: Text('Take me to the app'),
                 ),
+              ),
+              SizedBox(
+                height:38,
               ),
             ],
           ),

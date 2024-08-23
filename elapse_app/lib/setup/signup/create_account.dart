@@ -57,7 +57,7 @@ class _CreateAccountState extends State<CreateAccount> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 8),
               Padding(
                 padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
                 child: Center(
@@ -74,9 +74,9 @@ class _CreateAccountState extends State<CreateAccount> {
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 32),
               Padding(
-                padding: EdgeInsets.fromLTRB(23, 16, 23, 1),
+                padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
                 child: TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -101,8 +101,9 @@ class _CreateAccountState extends State<CreateAccount> {
                   },
                 ),
               ),
+              SizedBox(height: 12),
               Padding(
-                padding: EdgeInsets.fromLTRB(23, 8, 23, 16),
+                padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
                 child: TextFormField(
                   controller: _passwordController,
                   obscureText: true,
@@ -110,6 +111,7 @@ class _CreateAccountState extends State<CreateAccount> {
                     border: OutlineInputBorder(
                       borderSide: BorderSide(
                         color: Color.fromARGB(255, 211, 211, 211),
+                        
                       ),
                     ),
                     labelText: 'Password',
@@ -148,19 +150,26 @@ class _CreateAccountState extends State<CreateAccount> {
                   ),
                 ),
               ),
+              SizedBox(height: 38),
               Padding(
-                padding: const EdgeInsets.all(23.0),
+                padding: const EdgeInsets.fromLTRB(23, 0, 23, 0),
                 child: SizedBox(
-                  height: 55.0,
+                  height: 59.0,
                   width: double.infinity,
                   child: TextButton(
                     style: TextButton.styleFrom(
-                      foregroundColor: const Color.fromARGB(255, 76, 81, 175),
-                      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                      side: BorderSide(
-                        color: const Color.fromARGB(255, 76, 81, 175),
-                        width: 2.0,
-                      ),
+                    foregroundColor: const Color.fromARGB(255, 19, 19, 19),
+                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 19, 19, 19),
+                      fontFamily: "Manrope",
+                      fontWeight: FontWeight.w400,
+                    ),
+                    side: BorderSide(
+                      color: const Color.fromARGB(255, 191, 231, 237),
+                      width: 1.0,
+                      )
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
@@ -178,11 +187,6 @@ class _CreateAccountState extends State<CreateAccount> {
                     },
                     child: Text(
                       'Create with email',
-                      style: TextStyle(
-                        fontWeight: FontWeight.normal,
-                        fontFamily: "Manrope",
-                        fontSize: 19,
-                      ),
                     ),
                   ),
                 ),

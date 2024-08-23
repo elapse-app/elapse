@@ -34,9 +34,10 @@ class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
           ),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 23.0),
           child: Column(
             children: [
+              SizedBox(height: 46),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                 child: Center(
@@ -47,8 +48,8 @@ class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
                       style: TextStyle(
                         fontFamily: "Manrope",
                         fontSize: 32,
-                        fontWeight: FontWeight.normal,
-                        color: const Color.fromARGB(255, 67, 129, 192),
+                        fontWeight: FontWeight.w300,
+                        color: const Color.fromARGB(255, 12, 77, 86),
                       ),
                     ),
                   ),
@@ -65,28 +66,28 @@ class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
                       style: TextStyle(
                         fontWeight: FontWeight.normal,
                         fontFamily: "Manrope",
-                        fontSize: 18,
-                        color: Colors.grey[350],
+                        fontSize: 16,
+                      color: Color.fromARGB(255, 117, 117, 117),
                       ),
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 24),
               Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Container(
                   height: 120,
                   width: double.infinity,
                   color: Colors.grey[200],
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 24),
               const Text(
                 'CloudScout allows you to sync scouting data with other devices and share seamlessly with your teammates and coaches.',
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.normal,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w400,
                   fontFamily: "Manrope",
                 ),
                 textAlign: TextAlign.center,
@@ -95,8 +96,8 @@ class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
               const Text(
                 'Try it out in the Scout tab',
                 style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.normal,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
                   fontFamily: "Manrope",
                 ),
                 textAlign: TextAlign.center,
@@ -107,11 +108,17 @@ class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
                 width: double.infinity,
                 child: TextButton(
                   style: TextButton.styleFrom(
-                    foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                    foregroundColor: const Color.fromARGB(255, 12, 77, 86),
                     backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 117, 117, 117),
+                      fontFamily: "Manrope",
+                      fontWeight: FontWeight.w400,
+                    ),
                     side: BorderSide(
-                      color: const Color.fromARGB(255, 76, 81, 175),
-                      width: 2.0,
+                      color: const Color.fromARGB(255, 191, 231, 237),
+                      width: 1.0,
                       )
                     ),
                   onPressed: () {
@@ -135,6 +142,9 @@ class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
                   },
                   child: Text('Next'),
                 ),
+              ),
+              SizedBox(
+                height:38,
               ),
             ],
           ),

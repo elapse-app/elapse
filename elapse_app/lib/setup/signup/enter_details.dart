@@ -34,7 +34,7 @@ class EnterDetailsPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 20),
+            SizedBox(height: 46),
             Padding(
               padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
               child: Center(
@@ -44,14 +44,14 @@ class EnterDetailsPage extends StatelessWidget {
                     style: TextStyle(
                       fontFamily: "Manrope",
                       fontSize: 32,
-                      fontWeight: FontWeight.normal,
-                      color: const Color.fromARGB(255, 67, 129, 192),
+                      fontWeight: FontWeight.w300,
+                      color: const Color.fromARGB(255, 12, 77, 86),
                     ),
                   ),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 8),
             Padding(
               padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
               child: Center(
@@ -59,18 +59,18 @@ class EnterDetailsPage extends StatelessWidget {
                   text: TextSpan(
                     text: 'Please fill in the fields below',
                     style: TextStyle(
-                      fontWeight: FontWeight.normal,
+                      fontWeight: FontWeight.w400,
                       fontFamily: "Manrope",
-                      fontSize: 18,
-                      color: Colors.grey[350],
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 117, 117, 117),
                     ),
                   ),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: 32),
             Padding(
-              padding: EdgeInsets.fromLTRB(16, 8, 16, 16),
+              padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
               child: TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
@@ -81,16 +81,17 @@ class EnterDetailsPage extends StatelessWidget {
                   ),
                   labelText: 'Name',
                   labelStyle: TextStyle(
-                    color: Colors.grey[350],
-                    fontWeight: FontWeight.normal,
+                    color: Color.fromARGB(255, 73, 69, 79),
+                    fontWeight: FontWeight.w400,
                     fontFamily: "Manrope",
-                    fontSize: 19,
+                    fontSize: 16,
                   ),
                 ),
               ),
             ),
+            SizedBox(height: 12),
             Padding(
-              padding: EdgeInsets.fromLTRB(16, 8, 16, 16),
+              padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
               child: TextFormField(
                 controller: _ageController,
                 keyboardType: TextInputType.number,
@@ -102,28 +103,35 @@ class EnterDetailsPage extends StatelessWidget {
                   ),
                   labelText: 'Age',
                   labelStyle: TextStyle(
-                    color: Colors.grey[350],
-                    fontWeight: FontWeight.normal,
+                    color: Color.fromARGB(255, 73, 69, 79),
+                    fontWeight: FontWeight.w400,
                     fontFamily: "Manrope",
-                    fontSize: 19,
+                    fontSize: 16,
                   ),
                 ),
               ),
             ),
+            SizedBox(height: 32),
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.symmetric(horizontal: 23.0, vertical: 0),
               child: SizedBox(
-                height: 55.0,
+                height: 59.0,
                 width: double.infinity,
                 child: TextButton(
                   style: TextButton.styleFrom(
-                    foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                    foregroundColor: const Color.fromARGB(255, 19, 19, 19),
                     backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                    side: BorderSide(
-                      color: const Color.fromARGB(255, 76, 81, 175),
-                      width: 2.0,
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 12, 77, 86),
+                      fontFamily: "Manrope",
+                      fontWeight: FontWeight.w400,
                     ),
-                  ),
+                    side: BorderSide(
+                      color: const Color.fromARGB(255, 191, 231, 237),
+                      width: 1.0,
+                      )
+                    ),
                   onPressed: () {
                     final name = _nameController.text;
                     final age = _ageController.text;
