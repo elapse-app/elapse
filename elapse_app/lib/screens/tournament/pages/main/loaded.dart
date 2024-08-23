@@ -36,7 +36,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
   late int selectedIndex;
   int sortIndex = 0;
   List<String> titles = ["Schedule", "Rankings", "Skills", "Info"];
-  List<String> sorts = ["Rank", "AP", "SP", "OPR", "DPR", "CCWM"];
+  List<String> sorts = ["Rank", "AP", "SP", "AWP", "OPR", "DPR", "CCWM"];
   TournamentRankingsFilter filter = TournamentRankingsFilter();
 
   bool showPractice = true;
