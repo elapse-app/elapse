@@ -41,7 +41,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
               child: Column(
                 children: [
                   const SizedBox(
-                    height: 50,
+                    height: 46,
                   ),
                   Padding(
                 padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
@@ -52,14 +52,14 @@ class _ThemeSetupState extends State<ThemeSetup> {
                       style: TextStyle(
                         fontFamily: "Manrope",
                         fontSize: 32,
-                        fontWeight: FontWeight.normal,
-                        color: const Color.fromARGB(255, 67, 129, 192),
+                        fontWeight: FontWeight.w300,
+                        color: const Color.fromARGB(255, 12, 77, 86),
                       ),
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 8),
               Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
                 child: Center(
@@ -69,14 +69,14 @@ class _ThemeSetupState extends State<ThemeSetup> {
                       style: TextStyle(
                         fontWeight: FontWeight.normal,
                         fontFamily: "Manrope",
-                        fontSize: 18,
-                        color: Colors.grey[350],
+                        fontSize: 16,
+                      color: Color.fromARGB(255, 117, 117, 117),
                       ),
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 32),
                   Consumer<ColorProvider>(builder: (
                     context,
                     colorProvider,
@@ -89,13 +89,19 @@ class _ThemeSetupState extends State<ThemeSetup> {
                           width: double.infinity,
                           child: TextButton(
                             style: TextButton.styleFrom(
-                              foregroundColor: const Color.fromARGB(255, 76, 81, 175),
-                              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                              side: BorderSide(
-                                color: const Color.fromARGB(255, 76, 81, 175),
-                                width: 2.0,
-                              ),
-                            ),
+                    foregroundColor: const Color.fromARGB(255, 12, 77, 86),
+                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 117, 117, 117),
+                      fontFamily: "Manrope",
+                      fontWeight: FontWeight.w400,
+                    ),
+                    side: BorderSide(
+                      color: const Color.fromARGB(255, 191, 231, 237),
+                      width: 1.0,
+                      )
+                    ),
                             onPressed: () {
                               colorProvider.setSystem();
                               setState(() {
@@ -106,7 +112,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                               children: [
                                 Center(
                                   child: Text(
-                                    'System',
+                                    'Follow System',
                                     style: TextStyle(
                                       fontWeight: FontWeight.normal,
                                       fontFamily: "Manrope",
@@ -120,7 +126,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                   bottom: 0,
                                   child: Icon(
                                     Icons.settings,
-                                    color: Theme.of(context).colorScheme.secondary,
+                                    color: const Color.fromARGB(255, 12, 77, 86),
                                   ),
                                 ),
                                 Positioned(
@@ -130,7 +136,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                   child: CircleAvatar(
                                     radius: 5,
                                     backgroundColor: theme == "system"
-                                        ? Theme.of(context).colorScheme.secondary
+                                        ? const Color.fromARGB(255, 12, 77, 86)
                                         : Colors.transparent,
                                   ),
                                 ),
@@ -138,19 +144,25 @@ class _ThemeSetupState extends State<ThemeSetup> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 15),
+                        SizedBox(height: 12),
                         SizedBox(
                           height: 55.0,
                           width: double.infinity,
                           child: TextButton(
                             style: TextButton.styleFrom(
-                              foregroundColor: const Color.fromARGB(255, 76, 81, 175),
-                              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                              side: BorderSide(
-                                color: const Color.fromARGB(255, 76, 81, 175),
-                                width: 2.0,
-                              ),
-                            ),
+                    foregroundColor: const Color.fromARGB(255, 12, 77, 86),
+                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 117, 117, 117),
+                      fontFamily: "Manrope",
+                      fontWeight: FontWeight.w400,
+                    ),
+                    side: BorderSide(
+                      color: const Color.fromARGB(255, 191, 231, 237),
+                      width: 1.0,
+                      )
+                    ),
                             onPressed: () {
                               colorProvider.setLight();
                               setState(() {
@@ -175,7 +187,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                   bottom: 0,
                                   child: Icon(
                                     Icons.light_mode,
-                                    color: Theme.of(context).colorScheme.secondary,
+                                    color: const Color.fromARGB(255, 12, 77, 86),
                                   ),
                                 ),
                                 Positioned(
@@ -185,7 +197,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                   child: CircleAvatar(
                                     radius: 5,
                                     backgroundColor: theme == "light"
-                                        ? Theme.of(context).colorScheme.secondary
+                                        ? const Color.fromARGB(255, 12, 77, 86)
                                         : Colors.transparent,
                                   ),
                                 ),
@@ -193,19 +205,25 @@ class _ThemeSetupState extends State<ThemeSetup> {
                             ),
                           ),
                         ),
-                        SizedBox(height: 15),
+                        SizedBox(height: 12),
                         SizedBox(
                           height: 55.0,
                           width: double.infinity,
                           child: TextButton(
                             style: TextButton.styleFrom(
-                              foregroundColor: const Color.fromARGB(255, 76, 81, 175),
-                              backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                              side: BorderSide(
-                                color: const Color.fromARGB(255, 76, 81, 175),
-                                width: 2.0,
-                              ),
-                            ),
+                    foregroundColor: const Color.fromARGB(255, 12, 77, 86),
+                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 117, 117, 117),
+                      fontFamily: "Manrope",
+                      fontWeight: FontWeight.w400,
+                    ),
+                    side: BorderSide(
+                      color: const Color.fromARGB(255, 191, 231, 237),
+                      width: 1.0,
+                      )
+                    ),
                             onPressed: () {
                               colorProvider.setDark();
                               setState(() {
@@ -230,7 +248,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                   bottom: 0,
                                   child: Icon(
                                     Icons.dark_mode,
-                                    color: Theme.of(context).colorScheme.secondary,
+                                    color: const Color.fromARGB(255, 12, 77, 86),
                                   ),
                                 ),
                                 Positioned(
@@ -240,7 +258,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                   child: CircleAvatar(
                                     radius: 5,
                                     backgroundColor: theme == "dark"
-                                        ? Theme.of(context).colorScheme.secondary
+                                        ? const Color.fromARGB(255, 12, 77, 86)
                                         : Colors.transparent,
                                   ),
                                 ),
@@ -252,23 +270,29 @@ class _ThemeSetupState extends State<ThemeSetup> {
                     );
                   }),
                   SizedBox(
-                    height: 60,
+                    height: 32,
                   ),
                   Spacer(),
                   Padding(
                     padding: const EdgeInsets.all(0.0),
                     child: SizedBox(
-                      height: 55.0,
+                      height: 59.0,
                       width: double.infinity,
                       child: TextButton(
                         style: TextButton.styleFrom(
-                          foregroundColor: const Color.fromARGB(255, 76, 81, 175),
-                          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                          side: BorderSide(
-                            color: const Color.fromARGB(255, 76, 81, 175),
-                            width: 2.0,
-                            )
-                          ),
+                    foregroundColor: const Color.fromARGB(255, 12, 77, 86),
+                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 117, 117, 117),
+                      fontFamily: "Manrope",
+                      fontWeight: FontWeight.w400,
+                    ),
+                    side: BorderSide(
+                      color: const Color.fromARGB(255, 191, 231, 237),
+                      width: 1.0,
+                      )
+                    ),
                         onPressed: () {
                           // Navigate to the next page
                           // Navigator.pushReplacement(
@@ -292,6 +316,9 @@ class _ThemeSetupState extends State<ThemeSetup> {
                       ),
                     ),
                   ),
+                  SizedBox(
+                height:12,
+              ),
                 ],
               ),
             ),

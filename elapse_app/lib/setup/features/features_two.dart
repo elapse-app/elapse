@@ -118,10 +118,16 @@ class SecondFeature extends StatelessWidget {
                 width: double.infinity,
                 child: TextButton(
                   style: TextButton.styleFrom(
-                    foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                    foregroundColor: const Color.fromARGB(255, 12, 77, 86),
                     backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 117, 117, 117),
+                      fontFamily: "Manrope",
+                      fontWeight: FontWeight.w400,
+                    ),
                     side: BorderSide(
-                      color: const Color.fromARGB(255, 76, 81, 175),
+                      color: const Color.fromARGB(255, 191, 231, 237),
                       width: 1.0,
                       )
                     ),

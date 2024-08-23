@@ -59,35 +59,39 @@ class TournamentModeSetupPage extends StatelessWidget {
             topRight: Radius.circular(20),
           ),
         ),
+        
         child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 0),
+          padding: EdgeInsets.symmetric(horizontal: 23, vertical: 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              SizedBox(height:46),
               const Text(
                 'Tournament Mode',
                 style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.normal,
-                  fontFamily: "Manrope",
-                ),
+                        fontFamily: "Manrope",
+                        fontSize: 32,
+                        fontWeight: FontWeight.w300,
+                        color: const Color.fromARGB(255, 12, 77, 86),
+                      ),
               ),
-              SizedBox(height: 5),
+              SizedBox(height: 8),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
                 child: const Text(
                   'Get a streamlined view of matches, rankings, and more',
                   style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.normal,
-                  fontFamily: "Manrope",
-                ),
+                    fontWeight: FontWeight.normal,
+                    fontFamily: "Manrope",
+                    fontSize: 16,
+                  color: Color.fromARGB(255, 117, 117, 117),
+                  ),
                   textAlign: TextAlign.center,
                 ),
               ),
-              SizedBox(height: 20),
+              SizedBox(height: 24),
               Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Container(
                   height: 120,
                   width: double.infinity,
@@ -95,13 +99,13 @@ class TournamentModeSetupPage extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                height: 12,
+                height: 24,
               ),
               const Text(
                 'Tournament mode enables the Events tab, where you can find matches and live stats.',
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.normal,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w400,
                   fontFamily: "Manrope",
                 ),
                 textAlign: TextAlign.center,
@@ -112,10 +116,11 @@ class TournamentModeSetupPage extends StatelessWidget {
               const Text(
                 'Tournament mode can be activated the day of the event, and will be automatically deactivated afterwards.',
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.normal,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w400,
                   fontFamily: "Manrope",
-                ),                textAlign: TextAlign.center,
+                ),                
+                textAlign: TextAlign.center,
               ),
               SizedBox(
                 height: 28,
@@ -123,8 +128,8 @@ class TournamentModeSetupPage extends StatelessWidget {
               const Text(
                 'Live Timing helps you stay in sync',
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.normal,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
                   fontFamily: "Manrope",
                 ),
                 textAlign: TextAlign.center,
@@ -135,31 +140,37 @@ class TournamentModeSetupPage extends StatelessWidget {
               const Text(
                 'Live timing detects if matches are delayed or early and updates the in app schedule automatically.',
                 style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.normal,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w400,
                   fontFamily: "Manrope",
                 ),
                 textAlign: TextAlign.center,
               ),
               SizedBox(
-                height: 12,
+                height: 24,
               ),
               ToggleableButton(),
               Spacer(),
               Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16.0, horizontal: 0),
+          padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0),
           child: SizedBox(
             height: 55.0,
             width: double.infinity,
             child: TextButton(
               style: TextButton.styleFrom(
-                foregroundColor: const Color.fromARGB(255, 76, 81, 175),
-                backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                side: BorderSide(
-                  color: const Color.fromARGB(255, 76, 81, 175),
-                  width: 2.0,
-                  )
-                ),
+                    foregroundColor: const Color.fromARGB(255, 12, 77, 86),
+                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 117, 117, 117),
+                      fontFamily: "Manrope",
+                      fontWeight: FontWeight.w400,
+                    ),
+                    side: BorderSide(
+                      color: const Color.fromARGB(255, 191, 231, 237),
+                      width: 1.0,
+                      )
+                    ),
               onPressed: () {
                 Navigator.pushReplacement( 
                   context,
@@ -175,7 +186,7 @@ class TournamentModeSetupPage extends StatelessWidget {
           ),
         ),
               SizedBox(
-                height: 12,
+                height: 38,
               ),
             ],
           ),
@@ -206,13 +217,19 @@ class _ToggleableButtonState extends State<ToggleableButton> {
       width: double.infinity,
       child: TextButton(
         style: TextButton.styleFrom(
-          foregroundColor: const Color.fromARGB(255, 76, 81, 175),
-          backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-          side: BorderSide(
-            color: const Color.fromARGB(255, 76, 81, 175),
-            width: 2.0,
-          ),
-        ),
+                    foregroundColor: const Color.fromARGB(255, 12, 77, 86),
+                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 117, 117, 117),
+                      fontFamily: "Manrope",
+                      fontWeight: FontWeight.w400,
+                    ),
+                    side: BorderSide(
+                      color: const Color.fromARGB(255, 191, 231, 237),
+                      width: 1.0,
+                      )
+                    ),
         onPressed: () {
           _toggleButton();
           

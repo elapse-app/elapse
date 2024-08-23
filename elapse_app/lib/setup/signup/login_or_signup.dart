@@ -116,12 +116,18 @@ class SignUpPage extends StatelessWidget {
                     child: TextButton(
                       
                       style: TextButton.styleFrom(
-                        foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                        textStyle: const TextStyle(
+                          fontSize: 16,
+                          color: Color.fromARGB(255, 12, 77, 86),
+                          fontFamily: "Manrope",
+                          fontWeight: FontWeight.w400,
+                        ),
+                        foregroundColor: const Color.fromARGB(255, 12, 77, 86),
                         backgroundColor: const Color.fromARGB(255, 255, 255, 255),
                         side: BorderSide(
-                          color: const Color.fromARGB(255, 76, 81, 175),
-                          width: 2.0,
-                          )
+                      color: const Color.fromARGB(255, 191, 231, 237),
+                      width: 1.0,
+                      )
                         ),
                       onPressed: () {
                         Navigator.pushReplacement(
@@ -166,12 +172,18 @@ class SignUpPage extends StatelessWidget {
                     width: double.infinity,
                     child: TextButton(
                       style: TextButton.styleFrom(
-                        foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                        textStyle: const TextStyle(
+                          fontSize: 16,
+                          color: Color.fromARGB(255, 12, 77, 86),
+                          fontFamily: "Manrope",
+                          fontWeight: FontWeight.w400,
+                        ),
+                        foregroundColor: const Color.fromARGB(255, 12, 77, 86),
                         backgroundColor: const Color.fromARGB(255, 255, 255, 255),
                         side: BorderSide(
-                          color: const Color.fromARGB(255, 76, 81, 175),
-                          width: 2.0,
-                          )
+                      color: const Color.fromARGB(255, 191, 231, 237),
+                      width: 1.0,
+                      )
                         ),
                       onPressed: () {
                         Navigator.pushReplacement(
@@ -197,12 +209,18 @@ class SignUpPage extends StatelessWidget {
                     width: double.infinity,
                     child: TextButton(
                       style: TextButton.styleFrom(
-                        foregroundColor: const Color.fromARGB(255, 76, 81, 175),
+                        textStyle: const TextStyle(
+                          fontSize: 16,
+                          color: Color.fromARGB(255, 12, 77, 86),
+                          fontFamily: "Manrope",
+                          fontWeight: FontWeight.w400,
+                        ),
+                        foregroundColor: const Color.fromARGB(255, 12, 77, 86),
                         backgroundColor: const Color.fromARGB(255, 255, 255, 255),
                         side: BorderSide(
-                          color: const Color.fromARGB(255, 76, 81, 175),
-                          width: 2.0,
-                          )
+                      color: const Color.fromARGB(255, 191, 231, 237),
+                      width: 1.0,
+                      )
                         ),
                       onPressed: () {
                         Navigator.pushReplacement(
@@ -232,13 +250,19 @@ class SignUpPage extends StatelessWidget {
                     width: double.infinity,
                     child: TextButton(
                       style: TextButton.styleFrom(
-                        foregroundColor: const Color.fromARGB(255, 76, 81, 175),
-                        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                        side: BorderSide(
-                          color: const Color.fromARGB(255, 76, 81, 175),
-                          width: 2.0,
-                          )
-                        ),
+                    foregroundColor: const Color.fromARGB(255, 117, 117, 117),
+                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 148, 151, 151),
+                      fontFamily: "Manrope",
+                      fontWeight: FontWeight.w400,
+                    ),
+                    side: BorderSide(
+                      color: const Color.fromARGB(255, 241, 241, 241),
+                      width: 1.0,
+                      )
+                    ),
                       onPressed: () {
                         Navigator.pushReplacement(
                           context,
@@ -263,13 +287,19 @@ class SignUpPage extends StatelessWidget {
                     width: double.infinity,
                     child: TextButton(
                       style: TextButton.styleFrom(
-                        foregroundColor: const Color.fromARGB(255, 76, 81, 175),
-                        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                        side: BorderSide(
-                          color: const Color.fromARGB(255, 76, 81, 175),
-                          width: 2.0,
-                          )
-                        ),
+                    foregroundColor: const Color.fromARGB(255, 148, 151, 151),
+                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    textStyle: const TextStyle(
+                      fontSize: 16,
+                      color: Color.fromARGB(255, 241, 241, 241),
+                      fontFamily: "Manrope",
+                      fontWeight: FontWeight.w400,
+                    ),
+                    side: BorderSide(
+                      color: const Color.fromARGB(255, 255, 255, 255),
+                      width: 1.0,
+                      )
+                    ),
                       onPressed: () {
                         Navigator.pushReplacement(
                           context,
@@ -286,7 +316,7 @@ class SignUpPage extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 12),
+                SizedBox(height: 38),
               ],
             ),
           ]
