@@ -95,8 +95,8 @@ flutter:
     - assets/system.png
     - assets/lightMode.png
     - assets/darkMode.png
-    - assets/toggleOn.png
-    - assets/toggleOff.png
+    - assets/enabled.png
+    - assets/disabled.png
 
   #   - images/a_dot_ham.jpeg
 
