@@ -228,7 +228,11 @@ class _CreateAccountState extends State<CreateAccount> {
                                 mainAxisAlignment: MainAxisAlignment.start, // Aligns the content to the left
                                 children: [
                                   SizedBox(width: 5), 
-                                  Image.asset('assets/darkMail.png'), // Prefix icon
+                                  Container(
+                                    height: 20,
+                                    width: 20,
+                                    child: Image.asset('assets/darkMail.png'),
+                                  ),  // Prefix icon
                                   SizedBox(width: 10), // Space between icon and text
                                   Text('Create with email'),
                                   Spacer(), // Pushes the suffix icon to the end

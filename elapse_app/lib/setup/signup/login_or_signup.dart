@@ -143,7 +143,11 @@ class SignUpPage extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.start, // Aligns the content to the left
                                 children: [
                                   SizedBox(width: 5), 
-                                  Image.asset('assets/mail.png'), // Prefix icon
+                                  Container(
+                                    height: 20,
+                                    width: 20,
+                                    child: Image.asset('assets/mail.png'),
+                                  ), // Prefix icon
                                   SizedBox(width: 10), // Space between icon and text
                                   Text('Sign up with email'),
                                   Spacer(), // Pushes the suffix icon to the end
@@ -210,7 +214,11 @@ class SignUpPage extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.start, // Aligns the content to the left
                                 children: [
                                   SizedBox(width: 5), 
-                                  Image.asset('assets/google.png'), // Prefix icon
+                                  Container(
+                                    height: 20,
+                                    width: 20,
+                                    child: Image.asset('assets/google.png'),
+                                  ), // Prefix icon
                                   SizedBox(width: 10), // Space between icon and text
                                   Text('Sign up with Google'),
                                   Spacer(), // Pushes the suffix icon to the end
@@ -258,7 +266,11 @@ class SignUpPage extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.start, // Aligns the content to the left
                                 children: [
                                   SizedBox(width: 5), 
-                                  Image.asset('assets/apple.png'), // Prefix icon
+                                  Container(
+                                    height: 20,
+                                    width: 20,
+                                    child: Image.asset('assets/apple.png'),
+                                  ), // // Prefix icon
                                   SizedBox(width: 10), // Space between icon and text
                                   Text('Sign up with Apple'),
                                   Spacer(), // Pushes the suffix icon to the end
