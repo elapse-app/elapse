@@ -78,26 +78,18 @@ class ThirdFeature extends StatelessWidget {
               color: Color.fromARGB(255, 117, 117, 117),
             ),
           ),
-          SizedBox(height: 30),
+          Spacer(flex: 1),
           Center(
             child: Container(
-              height: MediaQuery.of(context).size.height * 0.5, // Fixed height
-              width: MediaQuery.of(context).size.height * 0.25, // Fixed width (9:18 aspect ratio)
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(0),
-                color: Colors.black,
-              ),
+              height: MediaQuery.of(context).size.height * 0.50, // Fixed height
+              width: MediaQuery.of(context).size.height * 0.50 / (452 / 240), // Fixed width (9:18 aspect ratio)
               child: Container(
                 alignment: Alignment.center,
-                height: 480,
-                width: 240,
                 child: Image.asset('assets/onboardingRankings.png'),
               ),
             ),
           ),
-          SizedBox(
-            height:23.0,
-          ),
+          Spacer(flex: 1),
           DotsIndicator(
             dotsCount: 4,
             position: 2,
@@ -109,11 +101,11 @@ class ThirdFeature extends StatelessWidget {
               activeColor: const Color.fromARGB(255, 148, 151, 151),
             ),
           ),
-          Spacer(),
+          Spacer(flex: 1),
           Container(
             alignment: Alignment.bottomCenter,
             child: Padding(
-              padding: const EdgeInsets.all(23.0),
+              padding: const EdgeInsets.fromLTRB(23.0, 0, 23.0, 23.0),
               child: SizedBox(
                 height: 59.0,
                 width: double.infinity,
