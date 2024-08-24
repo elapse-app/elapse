@@ -74,11 +74,30 @@ class EnterDetailsPage extends StatelessWidget {
               child: TextFormField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Color.fromARGB(255, 211, 211, 211),
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: const Color.fromARGB(255, 224, 224, 224),
+                        width: 1.0,
+                      ),
                     ),
-                  ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: const Color.fromARGB(255, 224, 224, 224),
+                        width: 2.0,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: const Color.fromARGB(255, 187, 51, 51),
+                        width: 1.0,
+                      ),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: const Color.fromARGB(255, 187, 51, 51),
+                        width: 2.0,
+                      ),
+                    ),
                   labelText: 'Name',
                   labelStyle: TextStyle(
                     color: Color.fromARGB(255, 73, 69, 79),
@@ -96,11 +115,30 @@ class EnterDetailsPage extends StatelessWidget {
                 controller: _ageController,
                 keyboardType: TextInputType.number,
                 decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(
-                      color: Color.fromARGB(255, 211, 211, 211),
+                  enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: const Color.fromARGB(255, 224, 224, 224),
+                        width: 1.0,
+                      ),
                     ),
-                  ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: const Color.fromARGB(255, 224, 224, 224),
+                        width: 2.0,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: const Color.fromARGB(255, 187, 51, 51),
+                        width: 1.0,
+                      ),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: const Color.fromARGB(255, 187, 51, 51),
+                        width: 2.0,
+                      ),
+                    ),
                   labelText: 'Age',
                   labelStyle: TextStyle(
                     color: Color.fromARGB(255, 73, 69, 79),

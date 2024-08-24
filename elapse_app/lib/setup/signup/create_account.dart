@@ -80,9 +80,28 @@ class _CreateAccountState extends State<CreateAccount> {
                 child: TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(
+                    enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: Color.fromARGB(255, 211, 211, 211),
+                        color: const Color.fromARGB(255, 224, 224, 224),
+                        width: 1.0,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: const Color.fromARGB(255, 224, 224, 224),
+                        width: 2.0,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: const Color.fromARGB(255, 187, 51, 51),
+                        width: 1.0,
+                      ),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: const Color.fromARGB(255, 187, 51, 51),
+                        width: 2.0,
                       ),
                     ),
                     labelText: 'Email',
@@ -108,10 +127,28 @@ class _CreateAccountState extends State<CreateAccount> {
                   controller: _passwordController,
                   obscureText: true,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(
+                    enabledBorder: OutlineInputBorder(
                       borderSide: BorderSide(
-                        color: Color.fromARGB(255, 211, 211, 211),
-                        
+                        color: const Color.fromARGB(255, 224, 224, 224),
+                        width: 1.0,
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: const Color.fromARGB(255, 224, 224, 224),
+                        width: 2.0,
+                      ),
+                    ),
+                    errorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: const Color.fromARGB(255, 187, 51, 51),
+                        width: 1.0,
+                      ),
+                    ),
+                    focusedErrorBorder: OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: const Color.fromARGB(255, 187, 51, 51),
+                        width: 2.0,
                       ),
                     ),
                     labelText: 'Password',
