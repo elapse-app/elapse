@@ -59,8 +59,8 @@ class TournamentModeSetupPage extends StatelessWidget {
             topRight: Radius.circular(20),
           ),
         ),
-        
-        child: Padding(
+        child: Column(children: [
+        Padding(
           padding: EdgeInsets.symmetric(horizontal: 23, vertical: 0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -155,10 +155,17 @@ class TournamentModeSetupPage extends StatelessWidget {
               SizedBox(
                 height: 24,
               ),
-              ToggleableButton(),
+            ],
+            
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 5.0),
+              child: ToggleableButton(),
+            ),
               Spacer(),
-              Padding(
-          padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 0),
+        Padding(
+          padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 23.0),
           child: SizedBox(
             height: 55.0,
             width: double.infinity,
@@ -194,8 +201,7 @@ class TournamentModeSetupPage extends StatelessWidget {
               SizedBox(
                 height: 38,
               ),
-            ],
-          ),
+              ],
         ),
       ),
     );
