@@ -102,7 +102,7 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
                             width: 1,
                           ),
                           gradient: RadialGradient(
-                              colors: [ Color.fromARGB(50, 221, 245, 255), Color.fromARGB(100, 191, 231, 237),],
+                              colors: [ Color.fromARGB(25, 221, 245, 255), Color.fromARGB(50, 191, 231, 237),],
                               center: Alignment.center,
                               radius: 3,
                               stops: [0.0, 1.0],
