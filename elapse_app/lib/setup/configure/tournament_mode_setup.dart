@@ -248,9 +248,12 @@ class _ToggleableButtonState extends State<ToggleableButton> {
               ),
             ),
             Spacer(),
-            Icon(
-              _isEnabled ? Icons.check_circle : Icons.cancel,
-              color: _isEnabled ? Colors.green : Colors.red,
+            Container(
+              width: 48,
+              height: 26,
+              child: Icon(
+              _isEnabled ? Icons.toggle_on : Icons.toggle_off,
+            ),
             ),
           ],
         ),

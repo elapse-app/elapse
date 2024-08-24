@@ -108,40 +108,24 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                 theme = "system";
                               });
                             },
-                            child: Stack(
-                              children: [
-                                Center(
-                                  child: Text(
-                                    'Follow System',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      fontFamily: "Manrope",
-                                      fontSize: 19,
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  right: 16,
-                                  top: 0,
-                                  bottom: 0,
-                                  child: Icon(
-                                    Icons.settings,
-                                    color: const Color.fromARGB(255, 12, 77, 86),
-                                  ),
-                                ),
-                                Positioned(
-                                  left: 16,
-                                  top: 0,
-                                  bottom: 0,
-                                  child: CircleAvatar(
-                                    radius: 5,
-                                    backgroundColor: theme == "system"
-                                        ? const Color.fromARGB(255, 12, 77, 86)
-                                        : Colors.transparent,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start, // Aligns the content to the left
+                                children: [
+                                  SizedBox(width: 5), 
+                                  Image.asset((theme == "system" ? 'assets/radio_button_checked.png': 'assets/radio_button_unchecked.png')), // Prefix icon
+                                  SizedBox(width: 10), // Space between icon and text
+                                  Text('Follow System', 
+                                    style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Color.fromARGB(255, 12, 77, 86),
+                                    fontFamily: "Manrope",
+                                    fontWeight: FontWeight.w400,
+                                  ),), 
+                                  Spacer(), // Pushes the suffix icon to the end
+                                  Image.asset('assets/system.png'), // Suffix icon
+                                  SizedBox(width: 5), 
+                                ],
+                              ),
                           ),
                         ),
                         SizedBox(height: 12),
@@ -169,40 +153,24 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                 theme = "light";
                               });
                             },
-                            child: Stack(
-                              children: [
-                                Center(
-                                  child: Text(
-                                    'Light',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      fontFamily: "Manrope",
-                                      fontSize: 19,
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  right: 16,
-                                  top: 0,
-                                  bottom: 0,
-                                  child: Icon(
-                                    Icons.light_mode,
-                                    color: const Color.fromARGB(255, 12, 77, 86),
-                                  ),
-                                ),
-                                Positioned(
-                                  left: 16,
-                                  top: 0,
-                                  bottom: 0,
-                                  child: CircleAvatar(
-                                    radius: 5,
-                                    backgroundColor: theme == "light"
-                                        ? const Color.fromARGB(255, 12, 77, 86)
-                                        : Colors.transparent,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start, // Aligns the content to the left
+                                children: [
+                                  SizedBox(width: 5), 
+                                  Image.asset((theme == "light" ? 'assets/radio_button_checked.png': 'assets/radio_button_unchecked.png')), // Prefix icon
+                                  SizedBox(width: 10), // Space between icon and text
+                                  Text('Light', 
+                                    style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Color.fromARGB(255, 12, 77, 86),
+                                    fontFamily: "Manrope",
+                                    fontWeight: FontWeight.w400,
+                                  ),), 
+                                  Spacer(), // Pushes the suffix icon to the end
+                                  Image.asset('assets/lightMode.png'), // Suffix icon
+                                  SizedBox(width: 5), 
+                                ],
+                              ),
                           ),
                         ),
                         SizedBox(height: 12),
@@ -230,40 +198,24 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                 theme = "dark";
                               });
                             },
-                            child: Stack(
-                              children: [
-                                Center(
-                                  child: Text(
-                                    'Dark',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w400,
-                                      fontFamily: "Manrope",
-                                      fontSize: 19,
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  right: 16,
-                                  top: 0,
-                                  bottom: 0,
-                                  child: Icon(
-                                    Icons.dark_mode,
-                                    color: const Color.fromARGB(255, 12, 77, 86),
-                                  ),
-                                ),
-                                Positioned(
-                                  left: 16,
-                                  top: 0,
-                                  bottom: 0,
-                                  child: CircleAvatar(
-                                    radius: 5,
-                                    backgroundColor: theme == "dark"
-                                        ? const Color.fromARGB(255, 12, 77, 86)
-                                        : Colors.transparent,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start, // Aligns the content to the left
+                                children: [
+                                  SizedBox(width: 5), 
+                                  Image.asset((theme == "dark" ? 'assets/radio_button_checked.png': 'assets/radio_button_unchecked.png')), // Prefix icon
+                                  SizedBox(width: 10), // Space between icon and text
+                                  Text('Dark', 
+                                    style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Color.fromARGB(255, 12, 77, 86),
+                                    fontFamily: "Manrope",
+                                    fontWeight: FontWeight.w400,
+                                  ),), 
+                                  Spacer(), // Pushes the suffix icon to the end
+                                  Image.asset('assets/darkMode.png'), // Suffix icon
+                                  SizedBox(width: 5), 
+                                ],
+                              ),
                           ),
                         ),
                       ],
