@@ -90,12 +90,14 @@ class TournamentModeSetupPage extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 24),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
+              Center(
                 child: Container(
-                  height: 120,
-                  width: double.infinity,
-                  color: Colors.grey[200],
+                  height: MediaQuery.of(context).size.height * 0.1, // Fixed height
+                  width: MediaQuery.of(context).size.height * 0.1 * 306 / 99, // Fixed width (9:18 aspect ratio)
+                  child: Container(
+                    alignment: Alignment.center,
+                    child: Image.asset('assets/tournamentMode.png'),
+                  ),
                 ),
               ),
               SizedBox(

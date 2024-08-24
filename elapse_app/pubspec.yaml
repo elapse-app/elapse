@@ -79,6 +79,9 @@ flutter:
     - assets/onboardingMyTeam.png
     - assets/onboardingRankings.png
     - assets/onboardingSchedule.png
+    - assets/tournamentMode.png
+    - assets/cloudScout.png
+    - assets/allDone.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

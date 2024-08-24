@@ -79,43 +79,18 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
                   ),
                 ),
               ),
-              SizedBox(height: 24),
+              Spacer(flex: 1),
               Center(
                 child: Container(
-                  height: MediaQuery.of(context).size.height * 0.56, // Fixed height
-                  width: MediaQuery.of(context).size.height * 0.28, // Fixed width (9:18 aspect ratio)
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(0),
-                    color: Colors.black,
-                  ),
-                  child: Container(
-                alignment: Alignment.center,
-                height: 480,
-                width: 240,
-                color: Colors.grey[200],
-                child: Container(
-                  alignment: Alignment.center,
-                  height: 130,
-                  width: 130,
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(65),
-                  ),
+                  height: MediaQuery.of(context).size.height * 0.50, // Fixed height
+                  width: MediaQuery.of(context).size.height * 0.50 / (452 / 240), // Fixed width (9:18 aspect ratio)
                   child: Container(
                     alignment: Alignment.center,
-                    height: 80,
-                    width: 80,
-                    child: Icon(
-                      Icons.checklist,
-                      color: Colors.white,
-                      size: 40,
-                    ),
-                  )
+                    child: Image.asset('assets/allDone.png'),
+                  ),
                 ),
               ),
-                ),
-              ),
-              Spacer(),
+              Spacer(flex: 2),
               SizedBox(
                 height: 59.0,
                 width: double.infinity,
