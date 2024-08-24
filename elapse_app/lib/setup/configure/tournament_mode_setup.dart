@@ -108,6 +108,7 @@ class TournamentModeSetupPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w400,
+                  color: Color.fromARGB(255, 117, 117, 117),
                   fontFamily: "Manrope",
                 ),
                 textAlign: TextAlign.center,
@@ -119,6 +120,7 @@ class TournamentModeSetupPage extends StatelessWidget {
                 'Tournament mode can be activated the day of the event, and will be automatically deactivated afterwards.',
                 style: TextStyle(
                   fontSize: 13,
+                  color: Color.fromARGB(255, 117, 117, 117),
                   fontWeight: FontWeight.w400,
                   fontFamily: "Manrope",
                 ),                
@@ -132,6 +134,7 @@ class TournamentModeSetupPage extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
+                  color: Color.fromARGB(255, 117, 117, 117),
                   fontFamily: "Manrope",
                 ),
                 textAlign: TextAlign.center,
@@ -142,6 +145,7 @@ class TournamentModeSetupPage extends StatelessWidget {
               const Text(
                 'Live timing detects if matches are delayed or early and updates the in app schedule automatically.',
                 style: TextStyle(
+                  color: Color.fromARGB(255, 117, 117, 117),
                   fontSize: 13,
                   fontWeight: FontWeight.w400,
                   fontFamily: "Manrope",
@@ -228,7 +232,7 @@ class _ToggleableButtonState extends State<ToggleableButton> {
                       fontWeight: FontWeight.w400,
                     ),
                     side: BorderSide(
-                      color: const Color.fromARGB(255, 191, 231, 237),
+                      color: const Color.fromARGB(255, 255, 255, 255),
                       width: 1.0,
                       )
                     ),
@@ -242,19 +246,15 @@ class _ToggleableButtonState extends State<ToggleableButton> {
             Text(
               ' Use Live Timing',
               style: TextStyle(
+                color: Color.fromARGB(255, 35, 35, 35),
                 fontWeight: FontWeight.w400,
                 fontFamily: "Manrope",
                 fontSize: 16,
               ),
             ),
             Spacer(),
-            Container(
-              width: 48,
-              height: 26,
-              child: Icon(
-              _isEnabled ? Icons.toggle_on : Icons.toggle_off,
-            ),
-            ),
+            Image.asset(_isEnabled ? "assets/enabled.png" : "assets/disabled.png"),
+            
           ],
         ),
       ),
