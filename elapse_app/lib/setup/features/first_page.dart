@@ -30,14 +30,24 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
           body: Column(
             children: [
               // Blue top section
-              SizedBox(
-                height: MediaQuery.of(context).size.height * 0.18,
-              ),
               Container(
                 color: Color.fromARGB(255, 191, 231, 237),
                 child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Center(
+                  padding: const EdgeInsets.fromLTRB(23.0, 60.0, 23.0, 0),
+                  child: Column(
+                  children: [
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Container(
+                      width: 88,
+                      height: 32.5,
+                      child: Image.asset('assets/lg4x.png'),
+                    ),
+                    ),
+                                  SizedBox(
+                height: MediaQuery.of(context).size.height * 0.13,
+              ),
+                  Center(
                     child: RichText(
                       text: TextSpan(
                         text: 'Your new tournament companion. ',
@@ -70,6 +80,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                       ),
                     ),
                   ),
+                  ],),
                 )
               ),
               Spacer(),
@@ -138,7 +149,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                             width: 1,
                           ),
                           gradient: RadialGradient(
-                              colors: [ Color.fromARGB(50, 221, 245, 255), Color.fromARGB(100, 191, 231, 237),],
+                              colors: [ Color.fromARGB(25, 221, 245, 255), Color.fromARGB(50, 191, 231, 237),],
                               center: Alignment.center,
                               radius: 3,
                               stops: [0.0, 1.0],
