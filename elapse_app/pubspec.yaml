@@ -82,6 +82,14 @@ flutter:
     - assets/tournamentMode.png
     - assets/cloudScout.png
     - assets/allDone.png
+    - assets/darkIcon.png
+    - assets/apple.png
+    - assets/google.png
+    - assets/mail.png
+    - assets/radio_button_unchecked.png
+    - assets/radio_button_checked.png
+    - assets/darkMail.png
+
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

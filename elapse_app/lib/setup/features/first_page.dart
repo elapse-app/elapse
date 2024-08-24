@@ -157,7 +157,18 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                           },
                           child: Builder(
                             builder: (BuildContext context) {
-                              return Text('Get Started');
+                              return Row(
+                                mainAxisAlignment: MainAxisAlignment.start, // Aligns the content to the left
+                                children: [
+                                  SizedBox(width: 5), 
+                                  Image.asset('assets/darkIcon.png'), // Prefix icon
+                                  SizedBox(width: 10), // Space between icon and text
+                                  Text('Get Started'),
+                                  Spacer(), // Pushes the suffix icon to the end
+                                  Icon(Icons.arrow_forward, color: Color.fromARGB(255, 12, 77, 86)), // Suffix icon
+                                  SizedBox(width: 5), 
+                                ],
+                              );
                             },
                           ),
                         ),
