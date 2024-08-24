@@ -48,6 +48,7 @@ dependencies:
   random_string_generator: ^2.0.0
   flutter_sticky_header: ^0.6.5
   dots_indicator: ^2.1.1
+  gradient_borders: ^1.0.1
 
 dev_dependencies:
   flutter_test:
@@ -82,6 +83,8 @@ flutter:
     - assets/tournamentMode.png
     - assets/cloudScout.png
     - assets/allDone.png
+
+
     - assets/darkIcon.png
     - assets/apple.png
     - assets/google.png
@@ -89,6 +92,11 @@ flutter:
     - assets/radio_button_unchecked.png
     - assets/radio_button_checked.png
     - assets/darkMail.png
+    - assets/system.png
+    - assets/lightMode.png
+    - assets/darkMode.png
+    - assets/toggleOn.png
+    - assets/toggleOff.png
 
   #   - images/a_dot_ham.jpeg
 

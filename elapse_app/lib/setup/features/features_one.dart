@@ -142,7 +142,13 @@ class FirstFeature extends StatelessWidget {
                       ),
                     );
                   },
-                  child: Text('Next'),
+                  child: Text('Next', 
+                                    style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Color.fromARGB(255, 12, 77, 86),
+                                    fontFamily: "Manrope",
+                                    fontWeight: FontWeight.w400,
+                                  ),), 
                 ),
               ),
             ),

@@ -212,7 +212,7 @@ class SignUpPage extends StatelessWidget {
                                   SizedBox(width: 5), 
                                   Image.asset('assets/google.png'), // Prefix icon
                                   SizedBox(width: 10), // Space between icon and text
-                                  Text('Sign up with google'),
+                                  Text('Sign up with Google'),
                                   Spacer(), // Pushes the suffix icon to the end
                                   Icon(Icons.arrow_forward, color: Color.fromARGB(255, 12, 77, 86)), // Suffix icon
                                   SizedBox(width: 5), 
@@ -260,7 +260,7 @@ class SignUpPage extends StatelessWidget {
                                   SizedBox(width: 5), 
                                   Image.asset('assets/apple.png'), // Prefix icon
                                   SizedBox(width: 10), // Space between icon and text
-                                  Text('Sign up with apple'),
+                                  Text('Sign up with Apple'),
                                   Spacer(), // Pushes the suffix icon to the end
                                   Icon(Icons.arrow_forward, color: Color.fromARGB(255, 12, 77, 86)), // Suffix icon
                                   SizedBox(width: 5), 

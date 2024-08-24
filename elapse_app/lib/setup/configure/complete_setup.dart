@@ -3,6 +3,7 @@ import 'package:elapse_app/setup/configure/theme_setup.dart';
 import 'package:elapse_app/setup/signup/enter_details.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
+import 'package:gradient_borders/box_borders/gradient_box_border.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/screens/home/home.dart';
 
@@ -92,35 +93,35 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
               ),
               Spacer(flex: 2),
               SizedBox(
-                height: 59.0,
-                width: double.infinity,
-                child: TextButton(
-                  style: TextButton.styleFrom(
+                        height: 59.0,
+                        width: double.infinity,
+                        child: Container(
+                          decoration: BoxDecoration(
+                          border: const GradientBoxBorder(
+                            gradient: LinearGradient(colors: [Color.fromARGB(255, 191, 231, 237), Color.fromARGB(255, 221, 245, 255)]),
+                            width: 1,
+                          ),
+                          gradient: RadialGradient(
+                              colors: [ Color.fromARGB(50, 221, 245, 255), Color.fromARGB(100, 191, 231, 237),],
+                              center: Alignment.center,
+                              radius: 3,
+                              stops: [0.0, 1.0],
+                            ),
+                          borderRadius: BorderRadius.circular(30)
+                        ),
+                        child: TextButton(
+                          style: TextButton.styleFrom(
                     foregroundColor: const Color.fromARGB(255, 12, 77, 86),
-                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    backgroundColor: const Color.fromARGB(0, 255, 255, 255),
                     textStyle: const TextStyle(
                       fontSize: 16,
                       color: Color.fromARGB(255, 117, 117, 117),
                       fontFamily: "Manrope",
                       fontWeight: FontWeight.w400,
                     ),
-                    side: BorderSide(
-                      color: const Color.fromARGB(255, 191, 231, 237),
-                      width: 1.0,
-                      )
                     ),
-                  onPressed: () {
-                    // Navigate to the next page
-                    // Navigator.pushReplacement(
-                    //   context,
-                    //   MaterialPageRoute(
-                    //     builder: (context) => ThemeSetup(
-                    //       prefs: widget.prefs,
-                    //     ),
-                    //   ),
-                    // );
-                    
-                    Navigator.pushReplacement( 
+                          onPressed: () {
+                            Navigator.pushReplacement( 
                       context,
                       MaterialPageRoute(
                         builder: (context) => HomeScreen(
@@ -128,10 +129,11 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
                       ),
                       ),
                     );
-                  },
-                  child: Builder(
-                        builder: (BuildContext context) {
-                          return Row(
+
+                          },
+                          child: Builder(
+                            builder: (BuildContext context) {
+                              return Row(
                                 mainAxisAlignment: MainAxisAlignment.start, // Aligns the content to the left
                                 children: [
                                   SizedBox(width: 5), 
@@ -143,10 +145,11 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
                                   SizedBox(width: 5), 
                                 ],
                               );
-                        },
+                            },
+                          ),
+                        ),
+                        ),
                       ),
-                ),
-              ),
               SizedBox(
                 height:38,
               ),
