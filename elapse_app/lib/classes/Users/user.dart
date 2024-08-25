@@ -1,5 +1,5 @@
-// import 'package:elapse_app/classes/Miscellaneous/location.dart';
-// import 'package:elapse_app/classes/Tournament/tstats.dart';
+import 'package:elapse_app/classes/Miscellaneous/location.dart';
+import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/classes/Groups/teamGroup.dart';
 import 'package:elapse_app/classes/Team/team.dart';
 
@@ -16,7 +16,7 @@ class User {
   String? fname;
   String? lname;
   // Team of the Team Group
-  Team? team;
+  String? teamNumber;
 
   // Members of the Team Group
   List<String> groupID = [];
@@ -26,6 +26,8 @@ class User {
   User({
     required this.uid,
     required this.email,
-    this.team,
+    this.fname,
+    this.lname,
+    this.teamNumber,
   });
 }
