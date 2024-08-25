@@ -14,14 +14,18 @@ class WorldSkillsPage extends StatelessWidget {
     required this.sort,
     required this.filter,
     required this.savedTeams,
+    required this.pickListTeams,
     required this.tournament,
+    required this.scoutedTeams,
   });
 
   final List<WorldSkillsStats> rankings;
   final int sort;
   final WorldRankingsFilter filter;
   final List<TeamPreview> savedTeams;
+  final List<TeamPreview>? pickListTeams;
   final Tournament? tournament;
+  final List<TeamPreview> scoutedTeams;
 
   @override
   Widget build(BuildContext context) {
@@ -40,10 +44,18 @@ class WorldSkillsPage extends StatelessWidget {
           .toList();
     }
 
+    if (filter.onPickList && pickListTeams != null) {
+      teams = teams.where((e) => pickListTeams!.any((e2) => e2.teamID == e.teamId)).toList();
+    }
+
     if (filter.atTournament && tournament != null) {
       teams = teams
           .where((e) => tournament!.teams.any((e2) => e2.id == e.teamId))
           .toList();
+    }
+
+    if (filter.scouted) {
+      teams = teams.where((e) => scoutedTeams.any((e2) => e2.teamID == e.teamId)).toList();
     }
 
     if (sort == 0) {
