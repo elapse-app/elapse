@@ -68,7 +68,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
             child: const Row(
               children: [
                 Icon(Icons.arrow_back),
-                SizedBox(width: 8),
+                SizedBox(width: 12),
                 Text('Setup',
                   style: TextStyle(
                 fontSize: 24,
