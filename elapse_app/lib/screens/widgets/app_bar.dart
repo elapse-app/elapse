@@ -8,6 +8,7 @@ class ElapseAppBar extends StatelessWidget {
     required this.title,
     this.includeSettings = false,
     this.backNavigation = false,
+    this.returnData,
     this.prefs,
     this.background,
   });
@@ -15,6 +16,7 @@ class ElapseAppBar extends StatelessWidget {
   final Widget? background;
   final bool includeSettings;
   final bool backNavigation;
+  final Object? returnData;
   final SharedPreferences? prefs;
 
   @override
@@ -34,7 +36,7 @@ class ElapseAppBar extends StatelessWidget {
                   backNavigation
                       ? GestureDetector(
                           onTap: () {
-                            Navigator.pop(context);
+                            Navigator.pop(context, returnData);
                           },
                           child: Icon(Icons.arrow_back,
                               color: Theme.of(context).colorScheme.onSurface),
@@ -59,7 +61,7 @@ class ElapseAppBar extends StatelessWidget {
               backNavigation
                   ? GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
+                        Navigator.pop(context, returnData);
                       },
                       child: Icon(Icons.arrow_back,
                           color: Theme.of(context).colorScheme.onSurface),

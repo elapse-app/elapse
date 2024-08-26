@@ -4,64 +4,47 @@ import 'package:flutter/material.dart';
 import '../../screens/widgets/app_bar.dart';
 import '../../screens/widgets/custom_tab_bar.dart';
 
-class Season {
-  int vrcId;
-  int? vexUId;
+class LevelClass {
+  int id;
   String name;
-  int programID;
 
-  DateTime startYear;
-  DateTime endYear;
-
-  Season({
-    required this.vrcId,
-    this.vexUId,
+  LevelClass({
+    required this.id,
     required this.name,
-    required this.programID,
-    required this.startYear,
-    required this.endYear,
   });
 }
 
-List<Season> seasons = [
-  Season(vrcId: 190, vexUId: 191, name: "2024-2025 High Stakes", programID: 1, startYear: DateTime(2024), endYear: DateTime(2025)),
-  Season(vrcId: 181, vexUId: 182, name: "2023-2024 Over Under", programID: 1, startYear: DateTime(2023), endYear: DateTime(2024)),
-  Season(vrcId: 173, vexUId: 175, name: "2022-2023 Spin Up", programID: 1, startYear: DateTime(2022), endYear: DateTime(2023)),
-  Season(vrcId: 154, vexUId: 156, name: "2021-2022 Tipping Point", programID: 1, startYear: DateTime(2021), endYear: DateTime(2022)),
-  Season(vrcId: 139, vexUId: 140, name: "2020-2021 Change Up", programID: 1, startYear: DateTime(2020), endYear: DateTime(2021)),
-  Season(vrcId: 130, vexUId: 131, name: "2019-2020 Tower Takeover", programID: 1, startYear: DateTime(2019), endYear: DateTime(2020)),
-  Season(vrcId: 125, vexUId: 126, name: "2018-2019 Turning Point", programID: 1, startYear: DateTime(2018), endYear: DateTime(2019)),
-  Season(vrcId: 119, vexUId: 120, name: "2017-2018 In The Zone", programID: 1, startYear: DateTime(2017), endYear: DateTime(2018)),
-  Season(vrcId: 115, vexUId: 116, name: "2016-2017 Starstruck", programID: 1, startYear: DateTime(2016), endYear: DateTime(2017)),
-  Season(vrcId: 110, vexUId: 111, name: "2015-2016 Nothing but Net", programID: 1, startYear: DateTime(2015), endYear: DateTime(2016)),
-  Season(vrcId: 102, vexUId: 103, name: "2014-2015 Skyrise", programID: 1, startYear: DateTime(2014), endYear: DateTime(2015)),
-  Season(vrcId: 92, vexUId: 93, name: "2013-2014 Toss Up", programID: 1, startYear: DateTime(2013), endYear: DateTime(2014)),
-  Season(vrcId: 85, vexUId: 88, name: "2012-2013 Sack Attack", programID: 1, startYear: DateTime(2012), endYear: DateTime(2013)),
-  Season(vrcId: 73, vexUId: 76, name: "2011-2012 Gateway", programID: 1, startYear: DateTime(2011), endYear: DateTime(2012)),
-  Season(vrcId: 7, vexUId: 10, name: "2010-2011 Round Up", programID: 1, startYear: DateTime(2010), endYear: DateTime(2011)),
-  Season(vrcId: 1, vexUId: 4, name: "209-2010 Clean Sweep", programID: 1, startYear: DateTime(2009), endYear: DateTime(2010)),
+List<LevelClass> levelClasses = [
+  LevelClass(id: 0, name: "All Levels"),
+  LevelClass(id: 1, name: "Event Region Championship"),
+  LevelClass(id: 2, name: "National Championship"),
+  LevelClass(id: 3, name: "World Championship"),
+  LevelClass(id: 9, name: "Signature Event"),
+  LevelClass(id: 12, name: "JROTC Brigade Championship"),
+  LevelClass(id: 13, name: "JROTC National Championship"),
+  LevelClass(id: 16, name: "Showcase Event")
 ];
 
-class SeasonFilterPage extends StatefulWidget {
-  SeasonFilterPage({
+class LevelClassFilterPage extends StatefulWidget {
+  LevelClassFilterPage({
     super.key,
     required this.selected,
   });
 
-  Season selected;
+  LevelClass selected;
 
   @override
-  State<SeasonFilterPage> createState() => _SeasonFilterPageState();
+  State<LevelClassFilterPage> createState() => _LevelClassFilterPageState();
 }
 
-class _SeasonFilterPageState extends State<SeasonFilterPage> {
+class _LevelClassFilterPageState extends State<LevelClassFilterPage> {
   String searchQuery = "";
 
   @override
   Widget build(BuildContext context) {
-    List<Season> filteredSeason = seasons;
+    List<LevelClass> filteredSeason = levelClasses;
     if (searchQuery.isNotEmpty) {
-      filteredSeason = seasons
+      filteredSeason = levelClasses
           .where((e) => e.name.toLowerCase().contains(searchQuery.toLowerCase()))
           .toList();
     }
@@ -72,7 +55,7 @@ class _SeasonFilterPageState extends State<SeasonFilterPage> {
         ElapseAppBar(
           title: const Row(children: [
             Text(
-              "Filter by Season",
+              "Filter by Level Class",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
           ]),

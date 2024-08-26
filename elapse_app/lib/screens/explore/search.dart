@@ -37,12 +37,7 @@ class _ExploreSearchState extends State<ExploreSearch>
   double leftOpacity = 1;
   double rightOpacity = 1;
 
-  EventSearchFilters filters = EventSearchFilters(
-    seasonID: 190,
-    eventName: "",
-    startDate: DateFormat("yyyy-MM-dd").format(DateTime(2024, 8, 1)),
-    endDate: DateFormat("yyyy-MM-dd").format(DateTime(2025, 8, 1)),
-  );
+  ExploreFilter filter = ExploreFilter();
 
   @override
   void initState() {
@@ -83,9 +78,8 @@ class _ExploreSearchState extends State<ExploreSearch>
   void _onSearchSubmitted(String query) {
     setState(() {
       searchQuery = query;
-      filters.eventName = query;
       teamSearch = fetchTeamPreview(searchQuery);
-      tournamentSearch = getTournaments(filters);
+      tournamentSearch = getTournaments(searchQuery, filter);
       currentPage - 1;
     });
   }
@@ -203,23 +197,15 @@ class _ExploreSearchState extends State<ExploreSearch>
                                                   ),
                                                   onPressed: () async {
                                                     final result =
-                                                        await SideSheet.right(
-                                                            barrierDismissible:
-                                                                false,
-                                                            width: 300,
-                                                            body: FiltersPage(
-                                                              filters: filters,
-                                                            ),
-                                                            transitionDuration:
-                                                                Duration(
-                                                                    milliseconds:
-                                                                        250),
-                                                            context: context);
+                                                        await exploreFilter(
+                                                          context,
+                                                          filter
+                                                        );
                                                     setState(() {
-                                                      filters = result;
+                                                      filter = result;
                                                       tournamentSearch =
-                                                          getTournaments(
-                                                              filters);
+                                                          getTournaments(searchQuery,
+                                                              filter);
                                                     });
                                                   },
                                                 )
@@ -286,7 +272,7 @@ class _ExploreSearchState extends State<ExploreSearch>
                                                   () {
                                                     currentPage -= 1;
                                                     tournamentSearch =
-                                                        getTournaments(filters,
+                                                        getTournaments(searchQuery, filter,
                                                             page: currentPage);
                                                   },
                                                 );
@@ -345,7 +331,7 @@ class _ExploreSearchState extends State<ExploreSearch>
                                                   () {
                                                     currentPage += 1;
                                                     tournamentSearch =
-                                                        getTournaments(filters,
+                                                        getTournaments(searchQuery, filter,
                                                             page: currentPage);
                                                   },
                                                 );
