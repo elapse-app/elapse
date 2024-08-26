@@ -130,6 +130,9 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
     stat.sp = t["sp"];
 
     stat.awp = stat.wp - 2 * stat.wins;
+    while (stat.awp > stat.totalMatches) {
+      stat.awp -= 2;
+    }
     stat.awpRate = stat.awp / (stat.totalMatches == 0 ? 1 : stat.totalMatches);
 
     stat.highScore = t["high_score"] ?? 0;
