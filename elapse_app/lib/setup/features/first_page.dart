@@ -66,6 +66,11 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                               color: Color.fromARGB(255, 35, 35, 35),
                             ),
                           ),
+                          TextSpan(text: '\n',
+                          style: TextStyle(
+                            fontSize: 12,
+                          ),
+                          ),
                           TextSpan(
                             text: '\nAll in one place.',
                             style: TextStyle(
