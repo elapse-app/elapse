@@ -31,7 +31,7 @@ class SecondFeature extends StatelessWidget {
             child: const Row(
               children: [
                 Icon(Icons.arrow_back),
-                SizedBox(width: 8),
+                SizedBox(width: 12),
                 Text('Welcome',
                   style: TextStyle(
                 fontSize: 24,

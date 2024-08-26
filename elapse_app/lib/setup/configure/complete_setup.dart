@@ -38,7 +38,7 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
             child: const Row(
               children: [
                 Icon(Icons.arrow_back),
-                SizedBox(width: 8),
+                SizedBox(width: 12),
                 Text('Complete',
                   style: TextStyle(
                 fontSize: 24,
