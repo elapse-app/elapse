@@ -10,16 +10,15 @@ import 'package:elapse_app/setup/features/features_one.dart';
 import 'package:gradient_borders/gradient_borders.dart'; 
 
 class FirstSetupPage extends StatefulWidget {
-  const FirstSetupPage({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const FirstSetupPage({super.key});
+
 
   @override
-  State<FirstSetupPage> createState() => _FirstSetupPageState(prefs: prefs);
+  State<FirstSetupPage> createState() => _FirstSetupPageState();
 }
 
 class _FirstSetupPageState extends State<FirstSetupPage> {
-  _FirstSetupPageState({required this.prefs});
-  final SharedPreferences prefs;
+  _FirstSetupPageState({Key? key}) : super();
   @override
   Widget build(BuildContext context) {
     return Consumer<ColorProvider>(builder: (context, colorProvider, snapshot) {
@@ -172,7 +171,6 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                               context,
                               MaterialPageRoute(
                                 builder: (context) => FirstFeature(
-                                  prefs: prefs,
                                 ),
                               ),
                             );
@@ -221,7 +219,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                             Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => SignUpPage(prefs: prefs),
+                                builder: (context) => SignUpPage(),
                               ),
                             );
                           },

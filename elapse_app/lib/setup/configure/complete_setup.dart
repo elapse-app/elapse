@@ -8,27 +8,49 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/screens/home/home.dart';
 
 class CompleteSetupPage extends StatefulWidget {
-  const CompleteSetupPage({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const CompleteSetupPage({super.key, });
   
   final int teamID = 0;
   //change later
 
   @override
-  State<CompleteSetupPage> createState() => _CompleteSetupPageState(prefs: prefs);
+  State<CompleteSetupPage> createState() => _CompleteSetupPageState();
 }
 
 class _CompleteSetupPageState extends State<CompleteSetupPage> {
-  _CompleteSetupPageState({required this.prefs});
-  final SharedPreferences prefs;
+  _CompleteSetupPageState();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue,
-      appBar: AppBar(
-        title: Text('Join Team'),
-        backgroundColor: Colors.blue,
+      backgroundColor: Color.fromARGB(255, 191, 231, 237),
+      appBar: PreferredSize(
+        preferredSize: MediaQuery.of(context).size * 0.07,
+        child: AppBar(
+          backgroundColor: Color.fromARGB(255, 191, 231, 237),
+          title: GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => CloudScoutSetupPage()),
+              );
+            },
+            child: const Row(
+              children: [
+                Icon(Icons.arrow_back),
+                SizedBox(width: 8),
+                Text('Complete',
+                  style: TextStyle(
+                fontSize: 24,
+                fontFamily: 'Manrope',
+                fontWeight: FontWeight.w500,
+                color: Color.fromARGB(255, 0, 0, 0),
+              ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: Container(
         decoration: BoxDecoration(

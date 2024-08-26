@@ -3,17 +3,42 @@ import 'package:flutter/material.dart';
 import 'package:elapse_app/setup/features/first_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/setup/signup/create_account.dart';
+import 'package:elapse_app/main.dart';
+import 'package:elapse_app/setup/features/features_four.dart';
 
 class SignUpPage extends StatelessWidget {
-  const SignUpPage({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const SignUpPage({super.key, });
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue,
-      appBar: AppBar(
-        title: Text('Sign Up'),
-        backgroundColor: Colors.blue,
+      backgroundColor: Color.fromARGB(255, 191, 231, 237),
+      appBar: PreferredSize(
+        preferredSize: MediaQuery.of(context).size * 0.07,
+        child: AppBar(
+          backgroundColor: Color.fromARGB(255, 191, 231, 237),
+          title: GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => FourthFeature()),
+              );
+            },
+            child: const Row(
+              children: [
+                Icon(Icons.arrow_back),
+                SizedBox(width: 8),
+                Text('Sign up',
+                  style: TextStyle(
+                fontSize: 24,
+                fontFamily: 'Manrope',
+                fontWeight: FontWeight.w500,
+                color: Color.fromARGB(255, 0, 0, 0),
+              ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: Container(
         height: double.infinity,
@@ -133,7 +158,7 @@ class SignUpPage extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => CreateAccount(prefs: prefs),
+                            builder: (context) => CreateAccount(),
                           ),
                         );
                       },
@@ -204,7 +229,7 @@ class SignUpPage extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EnterDetailsPage(prefs: prefs),
+                            builder: (context) => EnterDetailsPage(),
                           ),
                         );
                       },
@@ -256,7 +281,7 @@ class SignUpPage extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => EnterDetailsPage(prefs: prefs),
+                            builder: (context) => EnterDetailsPage(),
                           ),
                         );
                       },
@@ -312,7 +337,7 @@ class SignUpPage extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => FirstSetupPage(prefs: prefs),
+                            builder: (context) => FirstSetupPage(),
                           ),
                         );
                       },
@@ -349,7 +374,7 @@ class SignUpPage extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => FirstSetupPage(prefs: prefs),
+                            builder: (context) => FirstSetupPage(),
                           ),
                         );
                       },

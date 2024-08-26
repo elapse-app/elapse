@@ -1,11 +1,12 @@
 import 'package:elapse_app/setup/signup/verify_account.dart';
+import 'package:elapse_app/setup/signup/login_or_signup.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/setup/features/first_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
 class CreateAccount extends StatefulWidget {
-  const CreateAccount({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const CreateAccount({super.key, });
 
   @override
   _CreateAccountState createState() => _CreateAccountState();
@@ -19,10 +20,34 @@ class _CreateAccountState extends State<CreateAccount> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue,
-      appBar: AppBar(
-        title: Text('Sign Up'),
-        backgroundColor: Colors.blue,
+      backgroundColor: Color.fromARGB(255, 191, 231, 237),
+      appBar: PreferredSize(
+        preferredSize: MediaQuery.of(context).size * 0.07,
+        child: AppBar(
+          backgroundColor: Color.fromARGB(255, 191, 231, 237),
+          title: GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => SignUpPage()),
+              );
+            },
+            child: const Row(
+              children: [
+                Icon(Icons.arrow_back),
+                SizedBox(width: 8),
+                Text('Create account',
+                  style: TextStyle(
+                fontSize: 24,
+                fontFamily: 'Manrope',
+                fontWeight: FontWeight.w500,
+                color: Color.fromARGB(255, 0, 0, 0),
+              ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: Container(
         height: double.infinity,
@@ -211,13 +236,13 @@ class _CreateAccountState extends State<CreateAccount> {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         // Save email and password to SharedPreferences
-                        widget.prefs.setString('email', _emailController.text);
-                        widget.prefs.setString('password', _passwordController.text);
+                        prefs.setString('email', _emailController.text);
+                        prefs.setString('password', _passwordController.text);
 
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => VerifyAccount(prefs: widget.prefs),
+                            builder: (context) => VerifyAccount(),
                           ),
                         );
                       }

@@ -4,10 +4,11 @@ import 'package:elapse_app/setup/signup/verify_account.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/setup/features/first_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
+import 'package:elapse_app/setup/signup/verify_account.dart';
 
 class EnterDetailsPage extends StatelessWidget {
-  const EnterDetailsPage({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const EnterDetailsPage({super.key, });
 
   @override
   Widget build(BuildContext context) {
@@ -15,10 +16,34 @@ class EnterDetailsPage extends StatelessWidget {
     final TextEditingController _ageController = TextEditingController();
 
     return Scaffold(
-      backgroundColor: Colors.blue,
-      appBar: AppBar(
-        title: Text('Sign Up'),
-        backgroundColor: Colors.blue,
+      backgroundColor: Color.fromARGB(255, 191, 231, 237),
+      appBar: PreferredSize(
+        preferredSize: MediaQuery.of(context).size * 0.07,
+        child: AppBar(
+          backgroundColor: Color.fromARGB(255, 191, 231, 237),
+          title: GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => VerifyAccount()),
+              );
+            },
+            child: const Row(
+              children: [
+                Icon(Icons.arrow_back),
+                SizedBox(width: 8),
+                Text('Create account',
+                  style: TextStyle(
+                fontSize: 24,
+                fontFamily: 'Manrope',
+                fontWeight: FontWeight.w500,
+                color: Color.fromARGB(255, 0, 0, 0),
+              ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: Container(
         height: double.infinity,
@@ -177,7 +202,7 @@ class EnterDetailsPage extends StatelessWidget {
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => JoinTeamPage(prefs: prefs),
+                        builder: (context) => JoinTeamPage(),
                       ),
                     );
                   },

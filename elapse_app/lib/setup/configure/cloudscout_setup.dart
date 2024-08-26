@@ -1,29 +1,52 @@
 import 'package:elapse_app/setup/configure/complete_setup.dart';
 import 'package:elapse_app/setup/configure/theme_setup.dart';
+import 'package:elapse_app/setup/configure/tournament_mode_setup.dart';
 import 'package:elapse_app/setup/signup/enter_details.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CloudScoutSetupPage extends StatefulWidget {
-  const CloudScoutSetupPage({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const CloudScoutSetupPage({super.key, });
 
   @override
-  State<CloudScoutSetupPage> createState() => _CloudScoutSetupPageState(prefs: prefs);
+  State<CloudScoutSetupPage> createState() => _CloudScoutSetupPageState();
 }
 
 class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
-  _CloudScoutSetupPageState({required this.prefs});
-  final SharedPreferences prefs;
+  _CloudScoutSetupPageState();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue,
-      appBar: AppBar(
-        title: Text('Join Team'),
-        backgroundColor: Colors.blue,
+      backgroundColor: Color.fromARGB(255, 191, 231, 237),
+      appBar: PreferredSize(
+        preferredSize: MediaQuery.of(context).size * 0.07,
+        child: AppBar(
+          backgroundColor: Color.fromARGB(255, 191, 231, 237),
+          title: GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => TournamentModeSetupPage()),
+              );
+            },
+            child: const Row(
+              children: [
+                Icon(Icons.arrow_back),
+                SizedBox(width: 8),
+                Text('CloudScout',
+                  style: TextStyle(
+                fontSize: 24,
+                fontFamily: 'Manrope',
+                fontWeight: FontWeight.w500,
+                color: Color.fromARGB(255, 0, 0, 0),
+              ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -139,7 +162,6 @@ class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
                       context,
                       MaterialPageRoute(
                         builder: (context) => CompleteSetupPage(
-                          prefs: prefs
                         ),
                       ),
                     );

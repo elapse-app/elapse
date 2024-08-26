@@ -3,18 +3,18 @@ import 'package:elapse_app/setup/signup/enter_details.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
+import 'package:elapse_app/setup/signup/enter_details.dart';
 
 class JoinTeamPage extends StatefulWidget {
-  const JoinTeamPage({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const JoinTeamPage({super.key,});
 
   @override
-  State<JoinTeamPage> createState() => _JoinTeamPageState(prefs: prefs);
+  State<JoinTeamPage> createState() => _JoinTeamPageState();
 }
 
 class _JoinTeamPageState extends State<JoinTeamPage> {
-  _JoinTeamPageState({required this.prefs});
-  final SharedPreferences prefs;
+  _JoinTeamPageState();
   final TextEditingController _teamController = TextEditingController();
   Future<List<TeamPreview>>? teamSearch;
   String searchQuery = "";
@@ -42,21 +42,45 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
   }
 
   void saveTeam(TeamPreview team) {
-    widget.prefs.setString("savedTeam",
+    prefs.setString("savedTeam",
         '{"teamID": ${team.teamID}, "teamNumber": "${team.teamNumber}"}');
     Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => EnterDetailsPage(prefs: widget.prefs)));
+            builder: (context) => EnterDetailsPage()));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue,
-      appBar: AppBar(
-        title: Text('Join Team'),
-        backgroundColor: Colors.blue,
+      backgroundColor: Color.fromARGB(255, 191, 231, 237),
+      appBar: PreferredSize(
+        preferredSize: MediaQuery.of(context).size * 0.07,
+        child: AppBar(
+          backgroundColor: Color.fromARGB(255, 191, 231, 237),
+          title: GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => EnterDetailsPage()),
+              );
+            },
+            child: const Row(
+              children: [
+                Icon(Icons.arrow_back),
+                SizedBox(width: 8),
+                Text('Setup',
+                  style: TextStyle(
+                fontSize: 24,
+                fontFamily: 'Manrope',
+                fontWeight: FontWeight.w500,
+                color: Color.fromARGB(255, 0, 0, 0),
+              ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -180,7 +204,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ThemeSetup(prefs: prefs),
+                              builder: (context) => ThemeSetup(),
                             ),
                           );
                       }
