@@ -38,7 +38,7 @@ class ThirdFeature extends StatelessWidget {
                   style: TextStyle(
                 fontSize: 24,
                 fontFamily: 'Manrope',
-                fontWeight: FontWeight.w500,
+                fontWeight: FontWeight.w600,
                 color: Color.fromARGB(255, 0, 0, 0),
               ),
                 ),
