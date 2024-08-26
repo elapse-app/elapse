@@ -32,7 +32,6 @@ class _TeamSetupPageState extends State<TeamSetupPage> {
         context,
         MaterialPageRoute(
             builder: (context) => ThemeSetup(
-                  prefs: widget.prefs,
                 )));
   }
 

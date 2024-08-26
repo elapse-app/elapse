@@ -1,30 +1,54 @@
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/setup/configure/tournament_mode_setup.dart';
+import 'package:elapse_app/setup/configure/join_team.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeSetup extends StatefulWidget {
-  const ThemeSetup({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const ThemeSetup({super.key, });
+
 
   @override
-  State<ThemeSetup> createState() => _ThemeSetupState(prefs: prefs);
+  State<ThemeSetup> createState() => _ThemeSetupState();
 }
 
 String theme = "system";
 
 class _ThemeSetupState extends State<ThemeSetup> {
-  _ThemeSetupState({required this.prefs});
-  SharedPreferences prefs;
+  _ThemeSetupState();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue,
-      appBar: AppBar(
-        title: Text('Join Team'),
-        backgroundColor: Colors.blue,
+      backgroundColor: Color.fromARGB(255, 191, 231, 237),
+      appBar: PreferredSize(
+        preferredSize: MediaQuery.of(context).size * 0.07,
+        child: AppBar(
+          backgroundColor: Color.fromARGB(255, 191, 231, 237),
+          title: GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => JoinTeamPage()),
+              );
+            },
+            child: const Row(
+              children: [
+                Icon(Icons.arrow_back),
+                SizedBox(width: 8),
+                Text('Theme',
+                  style: TextStyle(
+                fontSize: 24,
+                fontFamily: 'Manrope',
+                fontWeight: FontWeight.w500,
+                color: Color.fromARGB(255, 0, 0, 0),
+              ),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
       body: Container(
         decoration: BoxDecoration(
@@ -259,7 +283,6 @@ class _ThemeSetupState extends State<ThemeSetup> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => TournamentModeSetupPage(
-                                prefs: prefs,
                               ),
                             ),
                           );

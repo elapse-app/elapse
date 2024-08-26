@@ -11,38 +11,37 @@ import 'package:elapse_app/screens/home/home.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/setup/features/features_one.dart';
 import 'package:elapse_app/setup/features/features_three.dart';
+import 'package:elapse_app/setup/features/features_two.dart'; 
 
 class ThirdFeature extends StatelessWidget {
-  const ThirdFeature({super.key, required this.prefs});
-  final SharedPreferences prefs;
+  const ThirdFeature({super.key,});
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.blue,
+      backgroundColor: Color.fromARGB(255, 191, 231, 237),
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(75),
+        preferredSize: MediaQuery.of(context).size * 0.07,
         child: AppBar(
-          backgroundColor: Colors.blue,
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => FirstSetupPage(prefs: prefs)),
-              );
-            },
-          ),
+          backgroundColor: Color.fromARGB(255, 191, 231, 237),
           title: GestureDetector(
             onTap: () {
               Navigator.pushReplacement(
                 context,
-                MaterialPageRoute(builder: (context) => FirstSetupPage(prefs: prefs)),
+                MaterialPageRoute(builder: (context) => SecondFeature()),
               );
             },
             child: const Row(
               children: [
+                Icon(Icons.arrow_back),
                 SizedBox(width: 8),
-                Text('Welcome'),
+                Text('Welcome',
+                  style: TextStyle(
+                fontSize: 24,
+                fontFamily: 'Manrope',
+                fontWeight: FontWeight.w500,
+                color: Color.fromARGB(255, 0, 0, 0),
+              ),
+                ),
               ],
             ),
           ),
@@ -138,7 +137,6 @@ class ThirdFeature extends StatelessWidget {
                       context,
                       MaterialPageRoute(
                         builder: (context) => FourthFeature(
-                          prefs: prefs
                         ),
                       ),
                     );
