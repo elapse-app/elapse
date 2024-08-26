@@ -38,7 +38,7 @@ class FirstFeature extends StatelessWidget {
             sliver: SliverToBoxAdapter(
               //TODO: make this show up @patrick
               child: Container(
-                height: double.infinity,
+                height: 2000,
                 width: double.infinity,
                 decoration: BoxDecoration(
                   color: Colors.white,
