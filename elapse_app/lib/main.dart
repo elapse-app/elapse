@@ -11,7 +11,7 @@ import 'package:elapse_app/screens/tournament_mode/home.dart';
 import 'package:elapse_app/screens/tournament_mode/my_teams.dart';
 import 'package:elapse_app/screens/tournament_mode/tournament.dart';
 import 'package:elapse_app/setup/features/first_page.dart';
-import 'package:elapse_app/setup/setup.dart';
+import 'package:elapse_app/setup/deprecated/setup.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
@@ -51,7 +51,7 @@ void main() async {
         ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
       ],
       child: prefs.getString("savedTeam") == null
-          ? SetupScreen(prefs: prefs)
+          ? FirstSetupPage()
           : MyApp(key: myAppKey, prefs: prefs),
     ),
   );
