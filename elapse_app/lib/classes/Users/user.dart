@@ -10,7 +10,7 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 
 class User {
-  //
+  // User Class
   String? uid;
   String? email;
   String? fname;
@@ -30,4 +30,5 @@ class User {
     this.lname,
     this.teamNumber,
   });
+
 }
