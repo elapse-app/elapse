@@ -21,13 +21,11 @@ class FourthFeature extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: MediaQuery.of(context).size * 0.07,
         child: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: Color.fromARGB(255, 191, 231, 237),
           title: GestureDetector(
             onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => ThirdFeature()),
-              );
+              Navigator.pop(context);
             },
             child: const Row(
               children: [
@@ -78,15 +76,20 @@ class FourthFeature extends StatelessWidget {
           ),
           Spacer(flex: 1),
           Center(
-            child: Container(
-              height: MediaQuery.of(context).size.height * 0.50, // Fixed height
-              width: MediaQuery.of(context).size.height * 0.50 / (452 / 240), // Fixed width (9:18 aspect ratio)
-              child: Container(
-                alignment: Alignment.center,
-                child: Image.asset('assets/onboardingMyTeam.png'),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SignUpPage()),
+                  );
+                },
+                child: Container(
+                  height: MediaQuery.of(context).size.height * 0.50,
+                  width: MediaQuery.of(context).size.height * 0.50 / (452 / 240),
+                  child: Image.asset('assets/onboardingMyTeam.png'),
+                ),
               ),
             ),
-          ),
           Spacer(flex: 1),
           DotsIndicator(
             dotsCount: 4,
@@ -124,7 +127,7 @@ class FourthFeature extends StatelessWidget {
                     ),
                   onPressed: () {
                     // Navigate to the next page
-                    // Navigator.pushReplacement(
+                    // Navigator.push(
                     //   context,
                     //   MaterialPageRoute(
                     //     builder: (context) => ThemeSetup(
@@ -132,7 +135,7 @@ class FourthFeature extends StatelessWidget {
                     //     ),
                     //   ),
                     // );
-                    Navigator.pushReplacement( 
+                    Navigator.push( 
                       context,
                       MaterialPageRoute(
                         builder: (context) => SignUpPage(

@@ -25,13 +25,11 @@ class _ThemeSetupState extends State<ThemeSetup> {
       appBar: PreferredSize(
         preferredSize: MediaQuery.of(context).size * 0.07,
         child: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: Color.fromARGB(255, 191, 231, 237),
           title: GestureDetector(
             onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => JoinTeamPage()),
-              );
+              Navigator.pop(context);
             },
             child: const Row(
               children: [
@@ -271,7 +269,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                     ),
                         onPressed: () {
                           // Navigate to the next page
-                          // Navigator.pushReplacement(
+                          // Navigator.push(
                           //   context,
                           //   MaterialPageRoute(
                           //     builder: (context) => ThemeSetup(
@@ -279,7 +277,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                           //     ),
                           //   ),
                           // );
-                          Navigator.pushReplacement( 
+                          Navigator.push( 
                             context,
                             MaterialPageRoute(
                               builder: (context) => TournamentModeSetupPage(

@@ -20,13 +20,11 @@ class EnterDetailsPage extends StatelessWidget {
       appBar: PreferredSize(
         preferredSize: MediaQuery.of(context).size * 0.07,
         child: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: Color.fromARGB(255, 191, 231, 237),
           title: GestureDetector(
             onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => VerifyAccount()),
-              );
+              Navigator.pop(context);
             },
             child: const Row(
               children: [
@@ -196,10 +194,10 @@ class EnterDetailsPage extends StatelessWidget {
                       )
                     ),
                   onPressed: () {
-                    final name = _nameController.text;
-                    final age = _ageController.text;
+                    prefs.setString('name', _nameController.text);
+                      prefs.setString('age', _ageController.text);
                     // Use the collected name and age here
-                    Navigator.pushReplacement(
+                    Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (context) => JoinTeamPage(),
