@@ -226,7 +226,7 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
               ),
             ),
           ),
-          savedTeams == null || prefs.getStringList("savedTeams")!.isEmpty
+          savedTeams == null || savedTeams.isEmpty
               ? SliverToBoxAdapter(
                   child: BigErrorMessage(
                       icon: Icons.bookmark_add_outlined,
