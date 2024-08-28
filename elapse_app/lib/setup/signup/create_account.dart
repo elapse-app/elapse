@@ -16,7 +16,7 @@ class _CreateAccountState extends State<CreateAccount> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -24,13 +24,11 @@ class _CreateAccountState extends State<CreateAccount> {
       appBar: PreferredSize(
         preferredSize: MediaQuery.of(context).size * 0.07,
         child: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: Color.fromARGB(255, 191, 231, 237),
           title: GestureDetector(
             onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => SignUpPage()),
-              );
+              Navigator.pop(context);
             },
             child: const Row(
               children: [
@@ -239,7 +237,7 @@ class _CreateAccountState extends State<CreateAccount> {
                         prefs.setString('email', _emailController.text);
                         prefs.setString('password', _passwordController.text);
 
-                        Navigator.pushReplacement(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => VerifyAccount(),

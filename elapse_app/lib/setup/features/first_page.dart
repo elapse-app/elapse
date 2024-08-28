@@ -172,7 +172,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                     ),
                     ),
                           onPressed: () {
-                            Navigator.pushReplacement(
+                            Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => FirstFeature(
@@ -221,7 +221,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                               )
                             ),
                           onPressed: () {
-                            Navigator.pushReplacement(
+                            Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => SignUpPage(),
