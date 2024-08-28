@@ -19,8 +19,10 @@ class ExploreSearchFilter {
   })  : this.season = season ?? seasons[0],
         this.levelClass = levelClass ?? levelClasses[0],
         this.gradeLevel = gradeLevel ?? gradeLevels[0],
-        this.startDate = startDate ?? DateTime((season ?? seasons[0]).startYear.year, 5, 1),
-        this.endDate = endDate ?? DateTime((season ?? seasons[0]).endYear.year, 4, 30);
+        this.startDate =
+            startDate ?? DateTime((season ?? seasons[0]).startYear.year, 5, 1),
+        this.endDate =
+            endDate ?? DateTime((season ?? seasons[0]).endYear.year, 4, 30);
 }
 
 Future<ExploreSearchFilter> exploreFilter(
@@ -69,8 +71,11 @@ Future<ExploreSearchFilter> exploreFilter(
                               filter.season != seasons[0] ||
                                       filter.levelClass != levelClasses[0] ||
                                       filter.startDate !=
-                                          DateTime(filter.season.startYear.year, 5, 1) ||
-                                      filter.endDate != DateTime(filter.season.endYear.year, 4, 30)
+                                          DateTime(filter.season.startYear.year,
+                                              5, 1) ||
+                                      filter.endDate !=
+                                          DateTime(
+                                              filter.season.endYear.year, 4, 30)
                                   ? TextButton(
                                       child: Text("Reset",
                                           style: TextStyle(
@@ -127,8 +132,10 @@ Future<ExploreSearchFilter> exploreFilter(
                               );
                               setModalState(() {
                                 filter.season = updated;
-                                filter.startDate = DateTime(filter.season.startYear.year, 5, 1);
-                                filter.endDate = DateTime(filter.season.endYear.year, 4, 30);
+                                filter.startDate = DateTime(
+                                    filter.season.startYear.year, 5, 1);
+                                filter.endDate =
+                                    DateTime(filter.season.endYear.year, 4, 30);
                               });
                             },
                           ),
@@ -144,7 +151,7 @@ Future<ExploreSearchFilter> exploreFilter(
                             border: Border.all(
                                 color: Theme.of(context).colorScheme.primary),
                             borderRadius:
-                            const BorderRadius.all(Radius.circular(100)),
+                                const BorderRadius.all(Radius.circular(100)),
                           ),
                           child: InkWell(
                             child: Row(

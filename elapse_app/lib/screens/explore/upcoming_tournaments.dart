@@ -30,37 +30,32 @@ class _UpcomingTournamentsState extends State<UpcomingTournaments> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: widget.upcomingTournaments,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const SizedBox(
-            height: 100,
-            width: 100,
-            child: Center(
-                child: CircularProgressIndicator()
-            )
-          );
-        } else if (snapshot.hasData) {
-          return _LoadedUpcomingTournaments(tournaments: (snapshot.data as TournamentList).tournaments);
-        } else {
-          return const Center(
-            child: BigErrorMessage(
+        future: widget.upcomingTournaments,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const SizedBox(
+                height: 100,
+                width: 100,
+                child: Center(child: CircularProgressIndicator()));
+          } else if (snapshot.hasData) {
+            return _LoadedUpcomingTournaments(
+                tournaments: (snapshot.data as TournamentList).tournaments);
+          } else {
+            return const Center(
+              child: BigErrorMessage(
                 icon: Icons.emoji_events,
                 message: "Unable to load upcoming tournaments",
                 topPadding: 15,
-              textPadding: 10,
-            ),
-          );
-        }
-      }
-    );
+                textPadding: 10,
+              ),
+            );
+          }
+        });
   }
 }
 
 class _LoadedUpcomingTournaments extends StatelessWidget {
-  const _LoadedUpcomingTournaments({
-    required this.tournaments
-  });
+  const _LoadedUpcomingTournaments({required this.tournaments});
 
   final List<TournamentPreview> tournaments;
 
@@ -69,17 +64,17 @@ class _LoadedUpcomingTournaments extends StatelessWidget {
     if (tournaments.isEmpty) {
       return const Center(
         child: BigErrorMessage(
-            icon: Icons.emoji_events_outlined,
-            message: "No upcoming signature events",
-            topPadding: 15,
+          icon: Icons.emoji_events_outlined,
+          message: "No upcoming signature events",
+          topPadding: 15,
           textPadding: 10,
         ),
       );
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-    itemCount: tournaments.length,
+        padding: const EdgeInsets.symmetric(vertical: 5),
+        itemCount: tournaments.length,
         itemBuilder: (context, index) {
           return Column(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -89,7 +84,7 @@ class _LoadedUpcomingTournaments extends StatelessWidget {
                       alignment: Alignment.center,
                       decoration: BoxDecoration(
                         borderRadius:
-                        const BorderRadius.all(Radius.circular(10)),
+                            const BorderRadius.all(Radius.circular(10)),
                         color: Theme.of(context).colorScheme.surface,
                       ),
                       // padding: const EdgeInsets.symmetric(
@@ -110,15 +105,15 @@ class _LoadedUpcomingTournaments extends StatelessWidget {
                                     ),
                                     const SizedBox(height: 5),
                                     Text(
-                                      "${tournaments[index].location?.city ?? ""}, ${tournaments[index].location?.region ?? ""}  -  ${DateFormat("yyyy/MM/dd").format(tournaments[index].startDate!)} ${
-                                          tournaments[index].startDate != tournaments[index].endDate ? "- ${DateFormat("yyyy/MM/dd").format(tournaments[index].endDate!)}" : ""}",
+                                      "${tournaments[index].location?.city ?? ""}, ${tournaments[index].location?.region ?? ""}  -  ${DateFormat("yyyy/MM/dd").format(tournaments[index].startDate!)} ${tournaments[index].startDate != tournaments[index].endDate ? "- ${DateFormat("yyyy/MM/dd").format(tournaments[index].endDate!)}" : ""}",
                                       overflow: TextOverflow.ellipsis,
                                       style: const TextStyle(fontSize: 12),
                                     )
-                                  ]
-                              ),
+                                  ]),
                             ),
-                            DateTime.now().isAfter(tournaments[index].startDate ?? DateTime.now())
+                            DateTime.now().isAfter(
+                                    tournaments[index].startDate ??
+                                        DateTime.now())
                                 ? const Icon(Icons.adjust, color: Colors.green)
                                 : const SizedBox(),
                             const Icon(Icons.arrow_right),
@@ -128,18 +123,17 @@ class _LoadedUpcomingTournaments extends StatelessWidget {
                       Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => TournamentScreen(tournamentID: tournaments[index].id),
-                          )
-                      );
+                            builder: (context) => TournamentScreen(
+                                tournamentID: tournaments[index].id),
+                          ));
                     }),
                 index != tournaments.length - 1
                     ? Divider(
-                  height: 3,
-                  color: Theme.of(context).colorScheme.surfaceDim,
-                )
+                        height: 3,
+                        color: Theme.of(context).colorScheme.surfaceDim,
+                      )
                     : Container(),
               ]);
-        }
-    );
+        });
   }
 }

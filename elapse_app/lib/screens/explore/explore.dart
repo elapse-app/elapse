@@ -224,30 +224,48 @@ class ExploreScreen extends StatelessWidget {
                     style: TextStyle(fontSize: 24),
                   ),
                   Container(
-                    width: MediaQuery.sizeOf(context).width,
-                    height: 200,
-                    margin: const EdgeInsets.only(top: 18),
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          color: Theme.of(context).colorScheme.primary),
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    child: ShaderMask(
+                      width: MediaQuery.sizeOf(context).width,
+                      height: 200,
+                      margin: const EdgeInsets.only(top: 18),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            color: Theme.of(context).colorScheme.primary),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      child: ShaderMask(
                         shaderCallback: (Rect rect) {
                           return LinearGradient(
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
-                            colors: [Theme.of(context).colorScheme.surface, Theme.of(context).colorScheme.surface.withOpacity(0), Theme.of(context).colorScheme.surface.withOpacity(0), Theme.of(context).colorScheme.surface],
-                            stops: const [0.0, 0.1, 0.9, 1.0], // 10% purple, 80% transparent, 10% purple
+                            colors: [
+                              Theme.of(context).colorScheme.surface,
+                              Theme.of(context)
+                                  .colorScheme
+                                  .surface
+                                  .withOpacity(0),
+                              Theme.of(context)
+                                  .colorScheme
+                                  .surface
+                                  .withOpacity(0),
+                              Theme.of(context).colorScheme.surface
+                            ],
+                            stops: const [
+                              0.0,
+                              0.1,
+                              0.9,
+                              1.0
+                            ], // 10% purple, 80% transparent, 10% purple
                           ).createShader(rect);
                         },
                         blendMode: BlendMode.dstOut,
                         child: UpcomingTournaments(
-                            filter: ExploreSearchFilter(levelClass: levelClasses[4], startDate: DateTime.now(), endDate: DateTime.now().add(const Duration(days: 30)))
-                        ),
-                    )
-                  )
+                            filter: ExploreSearchFilter(
+                                levelClass: levelClasses[4],
+                                startDate: DateTime.now(),
+                                endDate: DateTime.now()
+                                    .add(const Duration(days: 30)))),
+                      ))
                 ],
               ),
             ),
