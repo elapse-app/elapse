@@ -40,7 +40,6 @@ class TeamPreview {
 
 TeamPreview loadTeamPreview(teamPreview) {
   dynamic preview = jsonDecode(teamPreview);
-  print(preview);
   return TeamPreview(
     teamNumber: preview["teamNumber"],
     teamID: preview["teamID"],
