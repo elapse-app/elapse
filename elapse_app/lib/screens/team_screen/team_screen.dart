@@ -100,7 +100,7 @@ class _TeamScreenState extends State<TeamScreen> {
             ),
             backNavigation: true,
           ),
-          CustomTabBar(tabs: ["Details, Scoutsheet"], onPressed: (value) {}),
+          CustomTabBar(tabs: ["Details", "Scoutsheet"], onPressed: (value) {}),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 23),
             sliver: SliverToBoxAdapter(
