@@ -198,13 +198,12 @@ class _ExploreSearchState extends State<ExploreSearch>
                                                   onPressed: () async {
                                                     final result =
                                                         await exploreFilter(
-                                                          context,
-                                                          filter
-                                                        );
+                                                            context, filter);
                                                     setState(() {
                                                       filter = result;
                                                       tournamentSearch =
-                                                          getTournaments(searchQuery,
+                                                          getTournaments(
+                                                              searchQuery,
                                                               filter);
                                                     });
                                                   },
@@ -272,7 +271,8 @@ class _ExploreSearchState extends State<ExploreSearch>
                                                   () {
                                                     currentPage -= 1;
                                                     tournamentSearch =
-                                                        getTournaments(searchQuery, filter,
+                                                        getTournaments(
+                                                            searchQuery, filter,
                                                             page: currentPage);
                                                   },
                                                 );
@@ -331,7 +331,8 @@ class _ExploreSearchState extends State<ExploreSearch>
                                                   () {
                                                     currentPage += 1;
                                                     tournamentSearch =
-                                                        getTournaments(searchQuery, filter,
+                                                        getTournaments(
+                                                            searchQuery, filter,
                                                             page: currentPage);
                                                   },
                                                 );
