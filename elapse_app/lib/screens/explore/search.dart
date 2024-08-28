@@ -28,7 +28,7 @@ class _ExploreSearchState extends State<ExploreSearch>
   String searchQuery = "";
   int selectedIndex = 0;
   Future<List<TeamPreview>>? teamSearch;
-  Future<SearchPageData>? tournamentSearch;
+  Future<TournamentList>? tournamentSearch;
   List<String> titles = ["Search for Something", "Teams", "Tournaments"];
   List<RecentTeamSearch> recentTeamSearches = [];
   List<RecentTournamentSearch> recentTournamentSearches = [];
