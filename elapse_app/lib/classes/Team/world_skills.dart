@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Filters/region.dart';
+import '../Filters/season.dart';
 import '../Miscellaneous/location.dart';
 import "package:http/http.dart" as http;
 
@@ -53,11 +54,12 @@ class WorldSkillsStats {
           region: json["team"]["region"],
           country: json["team"]["country"],
         ),
-      eventRegion: Region(
-        name: json["team"]["eventRegion"] == "British Columbia" ? "British Columbia (BC)" : json["team"]["eventRegion"],
-        id: json["team"]["eventRegionId"],
-      )
-    );
+        eventRegion: Region(
+          name: json["team"]["eventRegion"] == "British Columbia"
+              ? "British Columbia (BC)"
+              : json["team"]["eventRegion"],
+          id: json["team"]["eventRegionId"],
+        ));
   }
 }
 
@@ -68,7 +70,13 @@ Future<List<WorldSkillsStats>> getWorldSkillsRankings(int seasonID) async {
 
   List<dynamic> parsed = [];
 
-  if (worldSkillsData == null ||
+  if (seasonID != seasons[0].vrcId) {
+    final response = await http.get(
+      Uri.parse("https://www.robotevents.com/api/seasons/$seasonID/skills"),
+    );
+
+    parsed = jsonDecode(response.body) as List;
+  } else if (worldSkillsData == null ||
       expiryDate == null ||
       DateTime.parse(expiryDate).isBefore(DateTime.now())) {
     final response = await http.get(

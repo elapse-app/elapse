@@ -8,6 +8,7 @@ import 'package:elapse_app/screens/explore/worldRankings/world_rankings_search_s
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
 
+import '../../classes/Filters/season.dart';
 import '../../classes/Team/teamPreview.dart';
 import '../../classes/Team/world_skills.dart';
 import '../../classes/Tournament/tournament.dart';
@@ -47,14 +48,14 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
 
   WorldRankingsFilter filter = WorldRankingsFilter();
 
-  int seasonID = 190;
+  Season season = seasons[0];
 
   @override
   void initState() {
     super.initState();
     selectedIndex = widget.initIndex;
 
-    futureSkillsStats = getWorldSkillsRankings(seasonID);
+    futureSkillsStats = getWorldSkillsRankings(season.vrcId);
     futures.add(futureSkillsStats);
     futureVDAStats = getTrueSkillData();
     futures.add(futureVDAStats);
@@ -124,6 +125,50 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
               ),
             ),
             backNavigation: true,
+            background: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.5),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Icon(Icons.arrow_back,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface),
+                  ),
+                  const Spacer(),
+                  GestureDetector(
+                      onTap: () async {
+                        Season updated = await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => SeasonFilterPage(selected: season),
+                          ),
+                        );
+                        setState(() {
+                          season = updated;
+                          futureSkillsStats = getWorldSkillsRankings(season.vrcId);
+                          futures[0] = futureSkillsStats;
+                        });
+                      },
+                      child: Row(
+                          children: [
+                            const Icon(Icons.event_note),
+                            const SizedBox(width: 4),
+                            Text(
+                              season.name,
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            const Icon(Icons.arrow_right)
+                          ]
+                      )
+                  )
+                ],
+              ),
+            ),
           ),
           CustomTabBar(
             tabs: pageTitles,
@@ -402,36 +447,40 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
           FutureBuilder(
                   future: Future.wait(futures),
                   builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      List<Widget> pages = [
-                        WorldSkillsPage(
-                          rankings: snapshot.data![0] as List<WorldSkillsStats>,
-                          sort: sortIndex,
-                          filter: filter,
-                          savedTeams: savedTeams,
-                          pickListTeams: const [],
-                          tournament: inTM ? snapshot.data![2] as Tournament? : null,
-                          scoutedTeams: const [],
-                        ),
-                        WorldTrueSkillPage(
-                          stats: snapshot.data![1] as List<VDAStats>,
-                          sort: sortIndex,
-                          filter: filter,
-                          savedTeams: savedTeams,
-                          tournament: inTM ? snapshot.data![2] as Tournament? : null,
-                        ),
-                      ];
-                      return pages[selectedIndex];
-                    }
                     if (snapshot.hasError) {
                       return const SliverToBoxAdapter(
                           child: Center(
-                        child: Text("Failed to load world rankings"),
-                      ));
-                    } else {
-                      return const SliverToBoxAdapter(
-                        child: LinearProgressIndicator(),
-                      );
+                            child: Text("Failed to load world rankings"),
+                          ));
+                    }
+
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.none:
+                      case ConnectionState.waiting:
+                      case ConnectionState.active:
+                        return const SliverToBoxAdapter(
+                          child: LinearProgressIndicator(),
+                        );
+                      case ConnectionState.done:
+                        List<Widget> pages = [
+                          WorldSkillsPage(
+                            rankings: snapshot.data![0] as List<WorldSkillsStats>,
+                            sort: sortIndex,
+                            filter: filter,
+                            savedTeams: savedTeams,
+                            pickListTeams: const [],
+                            tournament: inTM ? snapshot.data![2] as Tournament? : null,
+                            scoutedTeams: const [],
+                          ),
+                          WorldTrueSkillPage(
+                            stats: snapshot.data![1] as List<VDAStats>,
+                            sort: sortIndex,
+                            filter: filter,
+                            savedTeams: savedTeams,
+                            tournament: inTM ? snapshot.data![2] as Tournament? : null,
+                          ),
+                        ];
+                        return pages[selectedIndex];
                     }
                   })
         ],
