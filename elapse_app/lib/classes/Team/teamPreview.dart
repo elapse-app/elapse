@@ -23,6 +23,8 @@ class TeamPreview {
     return {
       'teamNumber': teamNumber,
       'teamID': teamID,
+      'location': location?.toJson(),
+      'teamName': teamName,
     };
   }
 
@@ -37,9 +39,14 @@ class TeamPreview {
 }
 
 TeamPreview loadTeamPreview(teamPreview) {
+  dynamic preview = jsonDecode(teamPreview);
+  print(preview);
   return TeamPreview(
-    teamNumber: teamPreview["teamNumber"],
-    teamID: teamPreview["teamID"],
+    teamNumber: preview["teamNumber"],
+    teamID: preview["teamID"],
+    location:
+        preview["location"] != null ? loadLocation(preview["location"]) : null,
+    teamName: preview["teamName"],
   );
 }
 
