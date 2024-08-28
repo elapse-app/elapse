@@ -199,6 +199,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                         searchTeam();
                       } else if (buttonLabel == "Confirm" && selectedTeam != null) {
                         saveTeam(selectedTeam!);
+                        prefs.setString('savedTeam', _teamController.text);
                         Navigator.push(
                             context,
                             MaterialPageRoute(

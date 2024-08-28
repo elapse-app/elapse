@@ -148,14 +148,20 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
                     ),
                     ),
                           onPressed: () {
-                            MultiProvider(
-                              providers: [
-                                ChangeNotifierProvider(
-                                  create: (context) => ColorProvider(),
-                                ),
-                                ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
-                              ],
-                              child: MyApp(key: myAppKey, prefs: prefs),
+                            // MultiProvider(
+                            //   providers: [
+                            //     ChangeNotifierProvider(
+                            //       create: (context) => ColorProvider(),
+                            //     ),
+                            //     ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
+                            //   ],
+                            //   child: MyApp(key: myAppKey, prefs: prefs),
+                            // );
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => MyApp(prefs: prefs), // Navigate to main app
+                              ),
                             );
                           },
                           child: Builder(
