@@ -1,5 +1,8 @@
+import 'dart:convert';
+
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/classes/Team/team.dart';
+import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Team/vdaStats.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
@@ -21,12 +24,23 @@ class TeamScreen extends StatefulWidget {
 }
 
 class _TeamScreenState extends State<TeamScreen> {
+  late TeamPreview teamSave;
+  bool locationLoaded = false;
   @override
   void initState() {
     super.initState();
+    teamSave = TeamPreview(teamID: widget.teamID, teamNumber: widget.teamName);
     isSaved = false;
     displaySave = true;
-    team = fetchTeam(widget.teamID);
+    team = fetchTeam(widget.teamID).then(
+      (value) {
+        setState(() {
+          teamSave.location = value.location;
+          locationLoaded = true;
+        });
+        return value;
+      },
+    );
     teamStats = getTrueSkillDataForTeam(widget.teamName);
     teamTournaments = fetchTeamTournaments(widget.teamID, 181);
     teamAwards = getAwards(widget.teamID, 181);
@@ -36,18 +50,21 @@ class _TeamScreenState extends State<TeamScreen> {
 
   bool alreadySaved() {
     List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
-    return savedTeams.contains(
-            '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}') ||
-        prefs.getString("savedTeam") ==
-            '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}';
+    return savedTeams.any((element) {
+          return jsonDecode(element)["teamID"] == widget.teamID;
+        }) ||
+        isMainTeam();
   }
 
   bool isMainTeam() {
-    return prefs.getString("savedTeam") ==
-        '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}';
+    return jsonDecode(prefs.getString("savedTeam") ?? "")["teamID"] ==
+        widget.teamID.toString();
   }
 
   void toggleSaveTeam() {
+    if (!locationLoaded) {
+      return;
+    }
     List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
     if (isSaved) {
       savedTeams.remove(
