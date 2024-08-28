@@ -14,7 +14,7 @@ class UpcomingTournaments extends StatefulWidget {
   });
 
   late Future<TournamentList> upcomingTournaments;
-  final ExploreFilter filter;
+  final ExploreSearchFilter filter;
 
   @override
   State<UpcomingTournaments> createState() => _UpcomingTournamentsState();

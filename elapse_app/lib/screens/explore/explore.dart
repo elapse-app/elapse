@@ -244,7 +244,7 @@ class ExploreScreen extends StatelessWidget {
                         },
                         blendMode: BlendMode.dstOut,
                         child: UpcomingTournaments(
-                            filter: ExploreFilter(levelClass: levelClasses[4], startDate: DateTime.now(), endDate: DateTime.now().add(const Duration(days: 30)))
+                            filter: ExploreSearchFilter(levelClass: levelClasses[4], startDate: DateTime.now(), endDate: DateTime.now().add(const Duration(days: 30)))
                         ),
                     )
                   )
