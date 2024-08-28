@@ -3,14 +3,14 @@ import 'package:elapse_app/classes/Filters/levelClass.dart';
 import '../../classes/Filters/gradeLevel.dart';
 import 'package:flutter/material.dart';
 
-class ExploreFilter {
+class ExploreSearchFilter {
   Season season;
   LevelClass levelClass;
   GradeLevel gradeLevel;
   DateTime startDate;
   DateTime endDate;
 
-  ExploreFilter({
+  ExploreSearchFilter({
     Season? season,
     LevelClass? levelClass,
     GradeLevel? gradeLevel,
@@ -23,11 +23,11 @@ class ExploreFilter {
         this.endDate = endDate ?? DateTime((season ?? seasons[0]).endYear.year, 4, 30);
 }
 
-Future<ExploreFilter> exploreFilter(
-    BuildContext context, ExploreFilter filter) async {
+Future<ExploreSearchFilter> exploreFilter(
+    BuildContext context, ExploreSearchFilter filter) async {
   final DraggableScrollableController dra = DraggableScrollableController();
 
-  return await showModalBottomSheet<ExploreFilter>(
+  return await showModalBottomSheet<ExploreSearchFilter>(
       context: context,
       isScrollControlled: true,
       builder: (BuildContext context) {
@@ -83,7 +83,7 @@ Future<ExploreFilter> exploreFilter(
                                           )),
                                       onPressed: () {
                                         setModalState(() {
-                                          filter = ExploreFilter();
+                                          filter = ExploreSearchFilter();
                                         });
                                       },
                                     )

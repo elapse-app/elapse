@@ -37,7 +37,7 @@ class _ExploreSearchState extends State<ExploreSearch>
   double leftOpacity = 1;
   double rightOpacity = 1;
 
-  ExploreFilter filter = ExploreFilter();
+  ExploreSearchFilter filter = ExploreSearchFilter();
 
   @override
   void initState() {
