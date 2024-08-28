@@ -36,6 +36,7 @@ class _TeamScreenState extends State<TeamScreen> {
       (value) {
         setState(() {
           teamSave.location = value.location;
+          teamSave.teamName = value.teamName;
           locationLoaded = true;
         });
         return value;
@@ -67,11 +68,11 @@ class _TeamScreenState extends State<TeamScreen> {
     }
     List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
     if (isSaved) {
-      savedTeams.remove(
-          '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}');
+      savedTeams.removeWhere((test) {
+        return jsonDecode(test)["teamID"] == widget.teamID;
+      });
     } else {
-      savedTeams.add(
-          '{"teamID": ${widget.teamID}, "teamNumber": "${widget.teamName}"}');
+      savedTeams.add(jsonEncode(teamSave.toJson()));
     }
     prefs.setStringList("savedTeams", savedTeams);
     setState(() {
