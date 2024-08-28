@@ -12,6 +12,7 @@ import 'package:elapse_app/screens/tournament/pages/rankings/rankings_filter.dar
 import 'package:elapse_app/screens/tournament/pages/schedule/qualification_matches.dart';
 import 'package:elapse_app/screens/tournament/pages/skills/skills.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
+import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
@@ -465,7 +466,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
                             children: [
                               ListView(
                                 scrollDirection: Axis.horizontal,
-                                children: List<Widget>.generate(sorts.length, (int index) {
+                                children: List<Widget>.generate(sorts.length,
+                                    (int index) {
                                   return Container(
                                     padding: const EdgeInsets.only(right: 5),
                                     child: ChoiceChip(
@@ -669,6 +671,14 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
                   sliver: showElimination
                       ? MatchesView(games: eliminations, useLiveTiming: true)
                       : SliverToBoxAdapter(),
+                )
+              : SliverToBoxAdapter(),
+
+          selectedIndex == 0 &&
+                  (division.games == null || division.games!.isEmpty)
+              ? SliverToBoxAdapter(
+                  child: BigErrorMessage(
+                      icon: Icons.schedule, message: "Schedule Not Available"),
                 )
               : SliverToBoxAdapter(),
 

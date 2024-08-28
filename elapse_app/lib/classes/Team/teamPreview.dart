@@ -23,6 +23,7 @@ class TeamPreview {
     return {
       'teamNumber': teamNumber,
       'teamID': teamID,
+      'location': location?.toJson(),
     };
   }
 
