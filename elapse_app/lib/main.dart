@@ -113,6 +113,7 @@ class MyAppState extends State<MyApp> {
               teamID: teamID,
               teamNumber: teamNumber,
             ),
+            CloudScoutScreen(),
             TMTournamentScreen(
               tournamentID: widget.prefs.getInt("tournamentID"),
               isPreview: false,
