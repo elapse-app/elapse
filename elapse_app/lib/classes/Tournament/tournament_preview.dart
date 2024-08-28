@@ -48,11 +48,11 @@ class TournamentPreview {
   }
 }
 
-class SearchPageData {
+class TournamentList {
   List<TournamentPreview> tournaments;
   int maxPage;
 
-  SearchPageData({required this.tournaments, required this.maxPage});
+  TournamentList({required this.tournaments, required this.maxPage});
 }
 
 Future<List<TournamentPreview>> fetchTeamTournaments(
@@ -79,9 +79,10 @@ Future<List<TournamentPreview>> fetchTeamTournaments(
   return tournaments;
 }
 
-Future<SearchPageData> getTournaments(String eventName, ExploreFilter filters,
+Future<TournamentList> getTournaments(String eventName, ExploreFilter filters,
     {int page = 1}) async {
   try {
+    print("https://www.robotevents.com/robot-competitions/${filters.gradeLevel.id == 4 ? "college-competition" : "vex-robotics-competition"}?country_id=*&seasonId=${filters.gradeLevel.id == 4 ? filters.season.vexUId ?? "" : filters.season.vrcId}&eventType=&name=$eventName&grade_level_id=${filters.gradeLevel.id != 0 ? filters.gradeLevel.id : ""}&level_class_id=${filters.levelClass.id == 0 ? "" : filters.levelClass.id}&from_date=${DateFormat("yyyy-MM-dd").format(filters.startDate)}&to_date=${DateFormat("yyyy-MM-dd").format(filters.endDate)}&event_region=&city=&distance=30&page=1");
     final parser = await Chaleno().load(
         "https://www.robotevents.com/robot-competitions/${filters.gradeLevel.id == 4 ? "college-competition" : "vex-robotics-competition"}?country_id=*&seasonId=${filters.gradeLevel.id == 4 ? filters.season.vexUId ?? "" : filters.season.vrcId}&eventType=&name=$eventName&grade_level_id=${filters.gradeLevel.id != 0 ? filters.gradeLevel.id : ""}&level_class_id=${filters.levelClass.id == 0 ? "" : filters.levelClass.id}&from_date=${DateFormat("yyyy-MM-dd").format(filters.startDate)}&to_date=${DateFormat("yyyy-MM-dd").format(filters.endDate)}&event_region=&city=&distance=30&page=1");
     List<Result> result = parser!.querySelectorAll(
@@ -106,7 +107,7 @@ Future<SearchPageData> getTournaments(String eventName, ExploreFilter filters,
           .cast<TournamentPreview>();
     });
 
-    return SearchPageData(tournaments: tournaments, maxPage: maxPage);
+    return TournamentList(tournaments: tournaments, maxPage: maxPage);
   } catch (e) {
     throw e;
   }

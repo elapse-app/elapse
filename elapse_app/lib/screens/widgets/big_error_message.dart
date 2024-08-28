@@ -5,17 +5,21 @@ class BigErrorMessage extends StatelessWidget {
     super.key,
     required this.icon,
     required this.message,
+    this.topPadding = 50,
+    this.textPadding = 25,
   });
 
   final IconData icon;
   final String message;
+  final double topPadding;
+  final double textPadding;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        const SizedBox(
-          height: 50,
+        SizedBox(
+          height: topPadding,
         ),
         Icon(
           icon,
@@ -24,7 +28,7 @@ class BigErrorMessage extends StatelessWidget {
           color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
         ),
         SizedBox(
-          height: 25,
+          height: textPadding,
         ),
         Text(
           message,
