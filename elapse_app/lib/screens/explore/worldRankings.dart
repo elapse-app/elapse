@@ -13,6 +13,7 @@ import '../../classes/Team/teamPreview.dart';
 import '../../classes/Team/world_skills.dart';
 import '../../classes/Tournament/tournament.dart';
 import '../widgets/app_bar.dart';
+import '../widgets/big_error_message.dart';
 import '../widgets/custom_tab_bar.dart';
 
 class WorldRankingsScreen extends StatefulWidget {
@@ -57,7 +58,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
 
     futureSkillsStats = getWorldSkillsRankings(season.vrcId);
     futures.add(futureSkillsStats);
-    futureVDAStats = getTrueSkillData();
+    futureVDAStats = getTrueSkillData(season.vrcId);
     futures.add(futureVDAStats);
     savedTeams = _getSavedTeams();
     inTM = prefs.getBool("isTournamentMode") ?? false;
@@ -151,7 +152,9 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                         setState(() {
                           season = updated;
                           futureSkillsStats = getWorldSkillsRankings(season.vrcId);
+                          futureVDAStats = getTrueSkillData(season.vrcId);
                           futures[0] = futureSkillsStats;
+                          futures[1] = futureVDAStats;
                         });
                       },
                       child: Row(
@@ -448,9 +451,11 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                   future: Future.wait(futures),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
+                      print(snapshot.error);
                       return const SliverToBoxAdapter(
-                          child: Center(
-                            child: Text("Failed to load world rankings"),
+                          child: BigErrorMessage(
+                            icon: Icons.list,
+                             message: "Failed to load world rankings",
                           ));
                     }
 
