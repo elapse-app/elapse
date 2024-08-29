@@ -1,3 +1,4 @@
+import 'package:chaleno/chaleno.dart';
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
@@ -5,7 +6,9 @@ import 'package:elapse_app/screens/tournament/pages/info/all_teams.dart';
 import 'package:elapse_app/screens/tournament/pages/info/award_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
+import 'package:http/http.dart' as http;
 
 class InfoPage extends StatelessWidget {
   const InfoPage({super.key, required this.tournament, required this.awards});
@@ -14,6 +17,8 @@ class InfoPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Future<bool> livestream = hasLivestream(tournament.sku);
+
     final String tournamentName = tournament.name;
     final Location location = tournament.location;
 
@@ -115,6 +120,49 @@ class InfoPage extends StatelessWidget {
                           : Container(),
                     ],
                   ),
+                  const SizedBox(
+                    height: 45,
+                  ),
+                  FutureBuilder(
+                      future: livestream,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return const Text(
+                            "No livestream available",
+                            style: TextStyle(fontSize: 20),
+                          );
+                        }
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.none:
+                          case ConnectionState.waiting:
+                          case ConnectionState.active:
+                            return const CircularProgressIndicator();
+                          case ConnectionState.done:
+                            if (snapshot.data as bool) {
+                              return TextButton.icon(
+                                style: TextButton.styleFrom(
+                                    foregroundColor:
+                                        Theme.of(context).colorScheme.secondary,
+                                    padding: const EdgeInsets.only(
+                                        right: 10, bottom: 10)),
+                                onPressed: () {
+                                  launchUrl(Uri.parse(
+                                      "https://www.robotevents.com/robot-competitions/vex-robotics-competition/${tournament.sku}.html#webcast"));
+                                },
+                                icon: const Icon(Icons.live_tv),
+                                label: const Text(
+                                  "View Livestream",
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                              );
+                            } else {
+                              return const Text(
+                                "No livestream available",
+                                style: TextStyle(fontSize: 20),
+                              );
+                            }
+                        }
+                      })
                 ],
               ),
             ),
@@ -184,4 +232,11 @@ class InfoPage extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<bool> hasLivestream(String sku) async {
+  final response = await http.get(Uri.parse(
+      "https://www.robotevents.com/robot-competitions/vex-robotics-competition/$sku.html#general-info"));
+  print(response.body.contains("<h4>Webcast</h4>"));
+  return response.body.contains("<h4>Webcast</h4>");
 }
