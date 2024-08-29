@@ -84,7 +84,7 @@ class WorldSkillsPage extends StatelessWidget {
       return const SliverToBoxAdapter(
         child: BigErrorMessage(
             icon: Icons.sports_esports_outlined,
-            message: "Skills rankings not available"),
+            message: "Skills ranking not available"),
       );
     }
 
