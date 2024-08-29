@@ -152,7 +152,6 @@ Future<List<VDAStats>> getTrueSkillData(seasonId) async {
   } else {
     parsed = jsonDecode(vdaData) as List;
   }
-  print(parsed);
 
   List<VDAStats> vdaStats =
       parsed.map<VDAStats>((json) => VDAStats.fromJson(json)).toList();

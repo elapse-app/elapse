@@ -14,6 +14,8 @@ import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
 
+import '../../classes/Team/world_skills.dart';
+
 class MyTeams extends StatefulWidget {
   const MyTeams({super.key});
 
@@ -52,6 +54,7 @@ class _MyTeamsState extends State<MyTeams> {
     super.initState();
     team = fetchTeam(savedTeamPreview.teamID);
     teamStats = getTrueSkillDataForTeam(savedTeamPreview.teamNumber);
+    skillsStats = getWorldSkillsForTeam(seasonID, savedTeamPreview.teamID);
     teamTournaments = fetchTeamTournaments(savedTeamPreview.teamID, seasonID);
     teamAwards = getAwards(savedTeamPreview.teamID, seasonID);
   }
@@ -62,6 +65,7 @@ class _MyTeamsState extends State<MyTeams> {
         selectedTeamPreview = value;
         team = fetchTeam(value.teamID);
         teamStats = getTrueSkillDataForTeam(value.teamNumber);
+        skillsStats = getWorldSkillsForTeam(seasonID, savedTeamPreview.teamID);
         teamTournaments = fetchTeamTournaments(value.teamID, seasonID);
         teamAwards = getAwards(value.teamID, seasonID);
       });
@@ -70,6 +74,7 @@ class _MyTeamsState extends State<MyTeams> {
 
   Future<Team>? team;
   Future<VDAStats>? teamStats;
+  Future<WorldSkillsStats>? skillsStats;
   Future<List<TournamentPreview>>? teamTournaments;
   Future<List<Award>>? teamAwards;
   @override
@@ -303,22 +308,15 @@ class _MyTeamsState extends State<MyTeams> {
                 child: Padding(
                   padding: const EdgeInsets.all(18.0),
                   child: FutureBuilder<Object>(
-                    future: teamStats,
+                    future: skillsStats,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        VDAStats stats = snapshot.data as VDAStats;
-                        if (stats.worldSkillsRank == null) {
-                          stats.worldSkillsRank = 0;
-                          stats.skillsScore = 0;
-                          stats.maxDriver = 0;
-                          stats.maxAuto = 0;
-                        }
-
+                        WorldSkillsStats stats = snapshot.data as WorldSkillsStats;
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              stats.worldSkillsRank.toString(),
+                              stats.rank.toString(),
                               style: const TextStyle(
                                   fontSize: 64, height: 1, letterSpacing: -2),
                             ),
@@ -338,7 +336,7 @@ class _MyTeamsState extends State<MyTeams> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      stats.skillsScore.toString(),
+                                      stats.score.toString(),
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500),
@@ -354,7 +352,7 @@ class _MyTeamsState extends State<MyTeams> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      stats.maxDriver.toString(),
+                                      stats.driver.toString(),
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500),
@@ -370,7 +368,7 @@ class _MyTeamsState extends State<MyTeams> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      stats.maxAuto.toString(),
+                                      stats.auton.toString(),
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500),
