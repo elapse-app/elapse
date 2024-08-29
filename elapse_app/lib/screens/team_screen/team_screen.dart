@@ -12,6 +12,8 @@ import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
 
+import '../../classes/Team/world_skills.dart';
+
 class TeamScreen extends StatefulWidget {
   const TeamScreen(
       {super.key, required this.teamID, required this.teamName, this.team});
@@ -43,6 +45,7 @@ class _TeamScreenState extends State<TeamScreen> {
       },
     );
     teamStats = getTrueSkillDataForTeam(widget.teamName);
+    skillsStats = getWorldSkillsForTeam(190, widget.teamID);
     teamTournaments = fetchTeamTournaments(widget.teamID, 181);
     teamAwards = getAwards(widget.teamID, 181);
     isSaved = alreadySaved();
@@ -82,6 +85,7 @@ class _TeamScreenState extends State<TeamScreen> {
 
   Future<Team>? team;
   Future<VDAStats>? teamStats;
+  Future<WorldSkillsStats>? skillsStats;
   Future<List<TournamentPreview>>? teamTournaments;
   Future<List<Award>>? teamAwards;
 
@@ -308,22 +312,15 @@ class _TeamScreenState extends State<TeamScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(18.0),
                   child: FutureBuilder<Object>(
-                    future: teamStats,
+                    future: skillsStats,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        VDAStats stats = snapshot.data as VDAStats;
-                        if (stats.worldSkillsRank == null) {
-                          stats.worldSkillsRank = 0;
-                          stats.skillsScore = 0;
-                          stats.maxDriver = 0;
-                          stats.maxAuto = 0;
-                        }
-
+                        WorldSkillsStats stats = snapshot.data as WorldSkillsStats;
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              stats.worldSkillsRank.toString(),
+                              stats.rank.toString(),
                               style: const TextStyle(
                                   fontSize: 64, height: 1, letterSpacing: -2),
                             ),
@@ -343,7 +340,7 @@ class _TeamScreenState extends State<TeamScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      stats.skillsScore.toString(),
+                                      stats.score.toString(),
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500),
@@ -359,7 +356,7 @@ class _TeamScreenState extends State<TeamScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      stats.maxDriver.toString(),
+                                      stats.driver.toString(),
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500),
@@ -375,7 +372,7 @@ class _TeamScreenState extends State<TeamScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      stats.maxAuto.toString(),
+                                      stats.auton.toString(),
                                       style: const TextStyle(
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500),

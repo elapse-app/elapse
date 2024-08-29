@@ -95,3 +95,8 @@ Future<List<WorldSkillsStats>> getWorldSkillsRankings(int seasonID) async {
       parsed.map((e) => WorldSkillsStats.fromJson(e)).toList();
   return ranking;
 }
+
+Future<WorldSkillsStats> getWorldSkillsForTeam(int seasonID, int teamID) async {
+  List<WorldSkillsStats> rankings = await getWorldSkillsRankings(seasonID);
+  return rankings.singleWhere((e) => e.teamId == teamID);
+}
