@@ -7,6 +7,8 @@ import 'package:elapse_app/classes/Team/vdaStats.dart';
 import 'package:elapse_app/extras/token.dart';
 import 'package:http/http.dart' as http;
 
+import '../Filters/season.dart';
+
 class TeamPreview {
   String teamNumber;
   int teamID;
@@ -89,7 +91,7 @@ Future<List<TeamPreview>> fetchTeamPreview(String searchQuery) async {
     }
   });
 
-  getTrueSkillData().then((value) {
+  getTrueSkillData(seasons[0].vrcId).then((value) {
     if (!vdaStatsCompleter.isCompleted) {
       List<TeamPreview> vdaTeams = value.where((element) {
         if (searchQuery.isEmpty) {

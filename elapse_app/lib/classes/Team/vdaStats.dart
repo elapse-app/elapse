@@ -4,6 +4,8 @@ import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/main.dart';
 import 'package:http/http.dart' as http;
 
+import '../Filters/season.dart';
+
 class VDAStats {
   int id;
   String teamNum;
@@ -94,29 +96,63 @@ class VDAStats {
       regionSkillsRank: json["region_grade_skills_rank"]?.truncate(),
     );
   }
+
+  factory VDAStats.fromHistorical(Map<String, dynamic> json) {
+    return VDAStats(
+      id: json["team_id"]?.truncate() ?? 0,
+      teamNum: json["team_num"] ?? "",
+      teamName: json["team_name"],
+      opr: json["opr"],
+      dpr: json["dpr"],
+      ccwm: json["ccwm"],
+      wins: json["total_wins"]?.truncate(),
+      losses: json["total_losses"]?.truncate(),
+      ties: json["total_ties"]?.truncate(),
+      matches: ((json["total_wins"] ?? 0) + (json["total_losses"] ?? 0) + (json["total_ties"] ?? 0))?.truncate() ?? 0,
+      winPercent: (json["total_wins"] ?? 0) / (((json["total_wins"] ?? 0) + (json["total_losses"] ?? 0) + (json["total_ties"] ?? 0)) == 0 ? 1 : ((json["total_wins"] ?? 0) + (json["total_losses"] ?? 0) + (json["total_ties"] ?? 0))) * 100,
+      trueSkill: json["trueskill"],
+      trueSkillGlobalRank: json["ts_ranking"]?.truncate(),
+      trueSkillRegionRank: 0,
+      regionalQual: 0,
+      worldsQual: 0,
+      eventRegion: "",
+    );
+  }
 }
 
-Future<List<VDAStats>> getTrueSkillData() async {
+Future<List<VDAStats>> getTrueSkillData(seasonId) async {
   final String? vdaData = prefs.getString("vdaData");
   final String? expiryDate = prefs.getString("vdaExpiry");
 
   List<dynamic> parsed = [];
 
-  if (vdaData == null ||
+  if (seasonId < seasons[3].vrcId) {
+    return List<VDAStats>.empty();
+  }
+
+  if (seasonId != seasons[0].vrcId) {
+    final response = await http.get(
+      Uri.parse("https://vrc-data-analysis.com/v1/historical_allteams/$seasonId"),
+    );
+    parsed = jsonDecode(response.body) as List;
+
+    List<VDAStats> vdaStats = parsed.map<VDAStats>((json) => VDAStats.fromHistorical(json)).toList();
+    return vdaStats;
+  } else if (vdaData == null ||
       expiryDate == null ||
       DateTime.parse(expiryDate).isBefore(DateTime.now())) {
     final response = await http.get(
-      Uri.parse("https://vrc-data-analysis.com/v1/allteams"),
-    );
+        Uri.parse("https://vrc-data-analysis.com/v1/allteams"),
+      );
 
     parsed = jsonDecode(response.body) as List;
     prefs.setString("vdaData", response.body);
     prefs.setString(
         "vdaExpiry", DateTime.now().add(const Duration(hours: 2)).toString());
-    parsed = jsonDecode(response.body) as List;
   } else {
     parsed = jsonDecode(vdaData) as List;
   }
+  print(parsed);
 
   List<VDAStats> vdaStats =
       parsed.map<VDAStats>((json) => VDAStats.fromJson(json)).toList();
@@ -124,6 +160,6 @@ Future<List<VDAStats>> getTrueSkillData() async {
 }
 
 Future<VDAStats> getTrueSkillDataForTeam(String teamNum) async {
-  final response = await getTrueSkillData();
+  final response = await getTrueSkillData(seasons[0].vrcId);
   return response.firstWhere((element) => element.teamNum == teamNum);
 }
