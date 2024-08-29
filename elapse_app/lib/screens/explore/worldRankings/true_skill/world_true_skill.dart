@@ -71,7 +71,7 @@ class WorldTrueSkillPage extends StatelessWidget {
     if (teams.isEmpty) {
       return const SliverToBoxAdapter(
         child: BigErrorMessage(
-            icon: Icons.list_outlined, message: "True Skill not available"),
+            icon: Icons.list_outlined, message: "TrueSkill ranking not available"),
       );
     }
 

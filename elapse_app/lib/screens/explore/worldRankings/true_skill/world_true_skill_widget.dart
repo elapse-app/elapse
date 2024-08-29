@@ -18,7 +18,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        worldTrueSkillPage(context, stats.id, stats.teamNum, stats);
+        worldTrueSkillPage(context, stats.id, stats.teamNum.isEmpty ? stats.teamName! : stats.teamNum, stats);
       },
       child: Container(
           height: 72,
@@ -35,7 +35,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
                       Flexible(
                           fit: FlexFit.tight,
                           flex: 25,
-                          child: Text(stats.teamNum,
+                          child: Text(stats.teamNum.isEmpty ? stats.teamName! : stats.teamNum,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -57,7 +57,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
                                 style: const TextStyle(
                                   fontSize: 16,
                                 )),
-                            Text("${stats.trueSkill ?? "N/A"}",
+                            Text(stats.trueSkill?.toStringAsFixed(1) ?? "N/A",
                                 style: const TextStyle(
                                   fontSize: 16,
                                 )),
