@@ -475,7 +475,7 @@ class _ExploreSearchState extends State<ExploreSearch>
                                     MaterialPageRoute(
                                       builder: (context) => TeamScreen(
                                         teamID: e.teamID,
-                                        teamName: e.searchTerm,
+                                        teamNumber: e.searchTerm,
                                       ),
                                     ),
                                   );

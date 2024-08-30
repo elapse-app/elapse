@@ -131,25 +131,23 @@ class _LoadedTopWorldSkills extends StatelessWidget {
                                           .surfaceDim)),
                             ),
                             Flexible(
-                              fit: FlexFit.tight,
-                              flex: 3,
-                              child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Text("${rankings[index].driver}",
-                                      style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w400)),
-                                  const SizedBox(width: 2),
-                                  const Icon(Icons.sports_esports_outlined),
-                                ]
-                              )
-                            ),
+                                fit: FlexFit.tight,
+                                flex: 3,
+                                child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Text("${rankings[index].driver}",
+                                          style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w400)),
+                                      const SizedBox(width: 2),
+                                      const Icon(Icons.sports_esports_outlined),
+                                    ])),
                             Flexible(
                                 fit: FlexFit.tight,
                                 flex: 3,
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       Text("${rankings[index].auton}",
                                           style: const TextStyle(
@@ -157,9 +155,7 @@ class _LoadedTopWorldSkills extends StatelessWidget {
                                               fontWeight: FontWeight.w400)),
                                       const SizedBox(width: 2),
                                       const Icon(Icons.data_object),
-                                    ]
-                                )
-                            ),
+                                    ])),
                           ]),
                     ),
                     onTap: () {
@@ -168,7 +164,7 @@ class _LoadedTopWorldSkills extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (context) => TeamScreen(
                                 teamID: rankings[index].teamId,
-                                teamName: rankings[index].teamNum),
+                                teamNumber: rankings[index].teamNum),
                           ));
                     }),
                 index != 10
