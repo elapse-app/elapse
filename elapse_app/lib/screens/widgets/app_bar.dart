@@ -22,7 +22,7 @@ class ElapseAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget? appBarBackground = background;
-    if (includeSettings) {
+    if (includeSettings && background == null) {
       appBarBackground = SafeArea(
         child: Padding(
           padding: EdgeInsets.only(left: 23, right: 12, bottom: 20, top: 10),
