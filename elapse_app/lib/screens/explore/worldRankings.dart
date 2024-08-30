@@ -162,7 +162,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                             const Icon(Icons.event_note),
                             const SizedBox(width: 4),
                             Text(
-                              season.name,
+                              season.name.substring(10),
                               style: const TextStyle(fontSize: 16),
                             ),
                             const Icon(Icons.arrow_right)

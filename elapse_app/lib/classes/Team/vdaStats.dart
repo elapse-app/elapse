@@ -158,7 +158,8 @@ Future<List<VDAStats>> getTrueSkillData(seasonId) async {
   return vdaStats;
 }
 
-Future<VDAStats> getTrueSkillDataForTeam(String teamNum) async {
-  final response = await getTrueSkillData(seasons[0].vrcId);
-  return response.firstWhere((element) => element.teamNum == teamNum);
+Future<VDAStats?> getTrueSkillDataForTeam(int seasonId, String teamNum) async {
+  final response = await getTrueSkillData(seasonId);
+  if (response.isEmpty) return null;
+  return response.firstWhere((element) => element.teamName == teamNum || element.teamNum == teamNum);
 }
