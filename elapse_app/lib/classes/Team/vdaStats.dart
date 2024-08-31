@@ -126,7 +126,7 @@ Future<List<VDAStats>> getTrueSkillData(seasonId) async {
 
   List<dynamic> parsed = [];
 
-  if (seasonId < seasons[3].vrcId) {
+  if (seasonId < 154) { // TiP season ID (earliest season that had VDA stats)
     return List<VDAStats>.empty();
   }
 

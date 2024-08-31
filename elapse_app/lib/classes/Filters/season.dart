@@ -46,9 +46,11 @@ class SeasonFilterPage extends StatefulWidget {
   SeasonFilterPage({
     super.key,
     required this.selected,
-  });
+    List<Season>? seasonsList,
+  }) : this.seasonsList = seasonsList ?? seasons;
 
   Season selected;
+  List<Season> seasonsList;
 
   @override
   State<SeasonFilterPage> createState() => _SeasonFilterPageState();
@@ -150,7 +152,10 @@ class _SeasonFilterPageState extends State<SeasonFilterPage> {
                             children: [
                               Text(
                                 season.name,
-                                style: const TextStyle(fontSize: 16),
+                                style: TextStyle(
+                                    fontSize: 16,
+                                  color: widget.seasonsList.contains(season) ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.surfaceDim,
+                                ),
                               ),
                               selected
                                   ? const Icon(Icons.check)
@@ -159,7 +164,9 @@ class _SeasonFilterPageState extends State<SeasonFilterPage> {
                       ),
                       onTap: () {
                         setState(() {
-                          widget.selected = season;
+                          if (widget.seasonsList.contains(season)) {
+                            widget.selected = season;
+                          }
                         });
                       }),
                   index != filteredSeason.length - 1

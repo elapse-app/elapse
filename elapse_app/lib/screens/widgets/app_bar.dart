@@ -101,7 +101,7 @@ class ElapseAppBar extends StatelessWidget {
                   backNavigation
                       ? GestureDetector(
                           onTap: () {
-                            Navigator.pop(context);
+                            Navigator.pop(context, returnData);
                           },
                           child: Icon(
                             Icons.arrow_back,

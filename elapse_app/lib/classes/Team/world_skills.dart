@@ -70,6 +70,10 @@ Future<List<WorldSkillsStats>> getWorldSkillsRankings(int seasonID) async {
 
   List<dynamic> parsed = [];
 
+  if (seasonID < 115) { // Starstruck season ID (earliest season that had world skills data)
+    return List<WorldSkillsStats>.empty();
+  }
+
   if (seasonID != seasons[0].vrcId) {
     final response = await http.get(
       Uri.parse("https://www.robotevents.com/api/seasons/$seasonID/skills"),
