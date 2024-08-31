@@ -146,7 +146,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                         Season updated = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SeasonFilterPage(selected: season),
+                            builder: (context) => SeasonFilterPage(selected: season, seasonsList: seasons.sublist(0, seasons.indexWhere((e) => e.vrcId == 115) + 1)),
                           ),
                         );
                         setState(() {
@@ -450,15 +450,6 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
           FutureBuilder(
                   future: Future.wait(futures),
                   builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      print(snapshot.error);
-                      return const SliverToBoxAdapter(
-                          child: BigErrorMessage(
-                            icon: Icons.list,
-                             message: "Failed to load world rankings",
-                          ));
-                    }
-
                     switch (snapshot.connectionState) {
                       case ConnectionState.none:
                       case ConnectionState.waiting:
@@ -467,6 +458,15 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                           child: LinearProgressIndicator(),
                         );
                       case ConnectionState.done:
+                        if (snapshot.hasError) {
+                          print(snapshot.error);
+                          return const SliverToBoxAdapter(
+                              child: BigErrorMessage(
+                                icon: Icons.list,
+                                message: "Failed to load world rankings",
+                              ));
+                        }
+
                         List<Widget> pages = [
                           WorldSkillsPage(
                             rankings: snapshot.data![0] as List<WorldSkillsStats>,
