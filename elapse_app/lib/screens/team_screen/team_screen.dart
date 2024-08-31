@@ -819,7 +819,8 @@ class _TeamScreenState extends State<TeamScreen> {
             direction: Axis.horizontal,
             children: [
               Flexible(
-                flex: 4,
+                flex: 6,
+                fit: FlexFit.tight,
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(9),
@@ -836,9 +837,15 @@ class _TeamScreenState extends State<TeamScreen> {
                     isExpanded: true,
                     value: "Caution Tape",
                     menuMaxHeight: 250,
+                    style: TextStyle(
+                        overflow: TextOverflow.ellipsis,
+                        fontFamily: "Manrope",
+                        fontSize: 16.25,
+                        fontWeight: FontWeight.w500),
                     items: [
                       DropdownMenuItem(
-                          value: "Caution Tape", child: Text("Caution Tape")),
+                          value: "Caution Tape",
+                          child: Text("Caution Tape Halloween Qualifier")),
                       DropdownMenuItem(
                           value: "Caution Tap", child: Text("Caution Tape")),
                       DropdownMenuItem(
@@ -854,23 +861,183 @@ class _TeamScreenState extends State<TeamScreen> {
                   ),
                 ),
               ),
-              Flexible(flex: 2, child: SizedBox()),
+              Flexible(flex: 2, fit: FlexFit.tight, child: SizedBox()),
               Flexible(
+                  fit: FlexFit.tight,
                   child: IconButton(
-                onPressed: () {
-                  setState(() {
-                    isEditing = true;
-                  });
-                },
-                icon: Icon(
-                  Icons.edit,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-                padding: EdgeInsets.all(8),
-                constraints: BoxConstraints(),
-              ))
+                    onPressed: () {
+                      setState(() {
+                        isEditing = true;
+                      });
+                    },
+                    icon: Icon(
+                      Icons.edit_outlined,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                    padding: EdgeInsets.all(8),
+                    constraints: BoxConstraints(),
+                  ))
             ],
           ),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: Container(
+          margin: EdgeInsets.only(top: 10, left: 23, right: 23),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.primary,
+              width: 2,
+            ),
+          ),
+          padding: EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("${widget.teamNumber} Specs",
+                  style: TextStyle(fontSize: 24)),
+              SizedBox(height: 18),
+              Text("Hook Intake",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+              Text("Intake Type",
+                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400)),
+              SizedBox(height: 12),
+              Divider(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+              ),
+              SizedBox(height: 12),
+              Row(
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "6",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Text("# of Motors", style: TextStyle(fontSize: 12)),
+                    ],
+                  ),
+                  SizedBox(width: 18),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "450",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                      Text("RPM", style: TextStyle(fontSize: 12)),
+                    ],
+                  ),
+                ],
+              ),
+              SizedBox(height: 12),
+              Divider(
+                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+              ),
+              SizedBox(height: 12),
+              Text(
+                  "They have a PTO mechanism that shifts 2 of their drivetrain motors to their wall stake mechanism",
+                  style: TextStyle(fontSize: 16)),
+              SizedBox(height: 9),
+            ],
+          ),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.primary,
+              width: 2,
+            ),
+          ),
+          margin: EdgeInsets.only(left: 23, right: 23, top: 15),
+          padding: EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Photos", style: TextStyle(fontSize: 24)),
+              SizedBox(
+                height: 18,
+              ),
+              Flex(
+                direction: Axis.horizontal,
+                children: [
+                  Flexible(
+                    child: Container(
+                      height: 175,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          color: Theme.of(context).colorScheme.primary),
+                    ),
+                  ),
+                  SizedBox(width: 12),
+                  Flexible(
+                    child: Container(
+                      height: 175,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(18),
+                          color: Theme.of(context).colorScheme.primary),
+                    ),
+                  )
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.primary,
+              width: 2,
+            ),
+          ),
+          margin: EdgeInsets.only(
+            left: 23,
+            right: 23,
+            top: 15,
+          ),
+          padding: EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("Auton Notes", style: TextStyle(fontSize: 24)),
+              SizedBox(
+                height: 18,
+              ),
+              Text("They have a rush auton, an AWP auton and a 4 ring auton",
+                  style: TextStyle(fontSize: 16)),
+            ],
+          ),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: Container(
+          margin: EdgeInsets.only(top: 30, left: 23, right: 23),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [Text("Scouted Matches", style: TextStyle(fontSize: 24))],
+          ),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: Container(
+          margin: EdgeInsets.only(top: 15, left: 23, right: 23),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [Text("All Matches", style: TextStyle(fontSize: 24))],
+          ),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: SizedBox(
+          height: MediaQuery.of(context).padding.bottom,
         ),
       )
     ];
@@ -883,7 +1050,8 @@ class _TeamScreenState extends State<TeamScreen> {
             direction: Axis.horizontal,
             children: [
               Flexible(
-                flex: 4,
+                fit: FlexFit.tight,
+                flex: 6,
                 child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(9),
@@ -896,27 +1064,30 @@ class _TeamScreenState extends State<TeamScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 9),
                     alignment: Alignment.centerLeft,
                     child: Text(
-                      "Caution Tape",
+                      "Caution Tape Halloween Qualifier",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(
                           fontSize: 15.8, fontWeight: FontWeight.w500),
                     )),
               ),
-              Flexible(flex: 2, child: SizedBox()),
+              Flexible(flex: 2, fit: FlexFit.tight, child: SizedBox()),
               Flexible(
+                  fit: FlexFit.tight,
                   child: IconButton(
-                onPressed: () {
-                  setState(() {
-                    isEditing = false;
-                  });
-                },
-                icon: Icon(
-                  Icons.check,
-                  weight: 800,
-                  color: Theme.of(context).colorScheme.secondary,
-                ),
-                padding: EdgeInsets.all(12),
-                constraints: BoxConstraints(),
-              ))
+                    onPressed: () {
+                      setState(() {
+                        isEditing = false;
+                      });
+                    },
+                    icon: Icon(
+                      Icons.check,
+                      weight: 800,
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                    padding: EdgeInsets.all(8),
+                    constraints: BoxConstraints(),
+                  ))
             ],
           ),
         ),
@@ -1000,7 +1171,7 @@ class _TeamScreenState extends State<TeamScreen> {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(9)),
                     color: Theme.of(context).colorScheme.tertiary),
-                height: 150,
+                height: 175,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
@@ -1017,6 +1188,58 @@ class _TeamScreenState extends State<TeamScreen> {
               )
             ],
           ),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.primary,
+              width: 2,
+            ),
+          ),
+          margin: EdgeInsets.only(left: 23, right: 23, top: 15),
+          padding: EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Auton Notes",
+                style: TextStyle(fontSize: 24),
+              ),
+              SizedBox(
+                height: 18,
+              ),
+              TextField(
+                maxLines: 8,
+                decoration: ElapseInputDecoration("Enter Notes"),
+              ),
+            ],
+          ),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: Container(
+          margin: EdgeInsets.only(top: 35, left: 23, right: 23),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [Text("Scouted Matches", style: TextStyle(fontSize: 24))],
+          ),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: Container(
+          margin: EdgeInsets.only(top: 15, left: 23, right: 23),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [Text("All Matches", style: TextStyle(fontSize: 24))],
+          ),
+        ),
+      ),
+      SliverToBoxAdapter(
+        child: SizedBox(
+          height: MediaQuery.of(context).padding.bottom,
         ),
       )
     ];
