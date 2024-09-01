@@ -12,6 +12,7 @@ import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
 
+import '../../classes/Filters/gradeLevel.dart';
 import '../../classes/Filters/season.dart';
 import '../../classes/Team/world_skills.dart';
 
@@ -46,6 +47,7 @@ class _TeamScreenState extends State<TeamScreen> {
       },
     );
     season = seasons[0];
+    grade = gradeLevels["High School"]!;
     teamStats = getTrueSkillDataForTeam(season.vrcId, widget.teamName);
     skillsStats = getWorldSkillsForTeam(season.vrcId, widget.teamID);
     teamTournaments = fetchTeamTournaments(widget.teamID, season.vrcId);
@@ -92,6 +94,7 @@ class _TeamScreenState extends State<TeamScreen> {
   Future<List<Award>>? teamAwards;
 
   late Season season;
+  late GradeLevel grade;
 
   late bool isSaved;
   late bool displaySave;
@@ -319,7 +322,7 @@ class _TeamScreenState extends State<TeamScreen> {
                               if (snapshot.hasData) {
                                 Team team = snapshot.data as Team;
                                 return TeamBio(
-                                  grade: team.grade ?? "",
+                                  grade: team.grade?.name ?? "",
                                   location: team.location ?? Location(),
                                   teamName: team.teamName ?? "",
                                   organization: team.organization ?? "",
@@ -341,7 +344,7 @@ class _TeamScreenState extends State<TeamScreen> {
                             },
                           )
                         : TeamBio(
-                            grade: getGrade(widget.team?.grade),
+                            grade: getGrade(widget.team?.grade?.name),
                             location: widget.team?.location ?? Location(),
                             teamName: widget.team?.teamName ?? "",
                             organization: widget.team?.organization ?? ""),

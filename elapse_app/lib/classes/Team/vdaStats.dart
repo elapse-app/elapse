@@ -4,12 +4,15 @@ import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/main.dart';
 import 'package:http/http.dart' as http;
 
+import '../Filters/gradeLevel.dart';
 import '../Filters/season.dart';
 
 class VDAStats {
   int id;
   String teamNum;
   String? teamName;
+  GradeLevel? gradeLevel;
+
   double? opr;
   double? dpr;
   double? ccwm;
@@ -28,7 +31,6 @@ class VDAStats {
   num? worldsQual;
 
   String? eventRegion;
-
   Location? location;
 
   num? skillsScore;
@@ -42,6 +44,7 @@ class VDAStats {
     required this.id,
     required this.teamNum,
     required this.teamName,
+    required this.gradeLevel,
     required this.opr,
     required this.dpr,
     required this.ccwm,
@@ -69,6 +72,7 @@ class VDAStats {
       id: json["id"],
       teamNum: json["team_number"],
       teamName: json["team_name"],
+      gradeLevel: gradeLevels[json["grade"]],
       opr: json["opr"],
       dpr: json["dpr"],
       ccwm: json["ccwm"],
@@ -102,6 +106,7 @@ class VDAStats {
       id: json["team_id"]?.truncate() ?? 0,
       teamNum: json["team_num"] ?? "",
       teamName: json["team_name"],
+      gradeLevel: null,
       opr: json["opr"],
       dpr: json["dpr"],
       ccwm: json["ccwm"],
