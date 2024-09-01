@@ -1,3 +1,4 @@
+import 'package:flutter/rendering.dart';
 import 'package:random_string_generator/random_string_generator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -38,7 +39,6 @@ class Database {
     }
     return null;    
   }
-
 
 /* Team Groups */
 
@@ -153,6 +153,189 @@ class Database {
     }
     return null;    
   }
+
+
+
+/* ------------------------------ */
+/*         Team ScoutSheet        */
+/* ------------------------------ */
+
+
+// Make a copy constructor to make teams/users easily able to share via QR CODE
+// Add Realtime Listener
+
+  Future<String> createTeamScoutSheet(String teamGroupID, String teamid, String tournamentID) async {
+    String returnVal = 'hello';
+    try {
+      await _firestore.collection('teamGroups').doc(teamGroupID).collection('scoutsheets').add({
+        /* Made with creation */
+        // Comp Specific stuff
+        'teamID': teamid, 
+        'tournamentID': tournamentID, 
+
+        // Timestamp Stuff
+        'createTime': DateTime.now(),
+
+        /* Updated with Editing */
+        'latestUpdate': null,
+        // List of the properties of the scouted robot
+        'properties': {"Specs": {"dbMotors" : "", "dbRPM" : "", "intakeType" :  "", "otherNotes" : ""},},
+        // Notes about the team & match
+        'teamNotes': "",
+        'gameNotes': "",
+        // List of the URLs for any pictures
+        'photos': [],
+        // Bool For currently Editing
+        'isEditing': false,
+      });
+    } catch (e) {
+      print(e);
+    }
+    return returnVal;
+  }
+
+  Future<String> removeTeamScoutSheet(String teamid, String teamGroupID, String tournamentID) async {
+    String returnVal = 'hello';
+    try {
+      var scoutSheetCollection = await _firestore.collection('teamGroups').doc(teamGroupID).collection('scoutsheets').where('teamID', isEqualTo: teamid).where('tournamentID', isEqualTo: tournamentID).limit(1).get();
+      DocumentSnapshot? collection = scoutSheetCollection.docs.first;
+      collection.reference.delete();
+    } catch (e) {
+      print(e);
+    }
+    return returnVal;
+  }
+
+  Future<String> updateMemberEditing(String teamGroupId, String teamID, String tournamentID, bool Val) async {
+    String returnVal = "";
+    try {
+      var scoutSheetCollection = await _firestore.collection('teamGroups').doc(teamGroupId).collection('scoutsheets').where('teamID', isEqualTo: teamID).where('tournamentID', isEqualTo: tournamentID).limit(1).get();
+      DocumentSnapshot? collection = scoutSheetCollection.docs.first;
+      collection.reference.update({
+        'isEditing': Val,
+      });
+    } catch (e) {
+      print(e);
+    }
+    return returnVal;
+  }
+
+  Future<List?>? getAllTeamScoutSheets(String teamGroupId, String teamID, String tournamentID) async {
+    try {
+      var collection = await _firestore.collection('teamGroups').doc(teamGroupId).collection('scoutsheets').get();
+      return collection.docs.toList(); // Unchecked
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  Future<Map<String, dynamic>?> getTeamScoutSheetInfo(String teamGroupId, String teamID, String tournamentID) async {
+    try {
+      var collection = await _firestore.collection('teamGroups').doc(teamGroupId).collection('scoutsheets').where('teamID', isEqualTo: teamID).where('tournamentID', isEqualTo: tournamentID).limit(1).get();
+      return collection.docs.first.data();
+    } catch (e) {
+      print(e);
+    }
+    return null;    
+  }
+
+  Future<Map<String, dynamic>?> updateProperty(String teamGroupId, String teamID, String tournamentID, String property, Map<String, Object> val) async { // Will probably need to be changed
+    try {
+      var scoutSheetCollection = await _firestore.collection('teamGroups').doc(teamGroupId).collection('scoutsheets').where('teamID', isEqualTo: teamID).where('tournamentID', isEqualTo: tournamentID).limit(1).get();
+      DocumentSnapshot? collection = scoutSheetCollection.docs.first;
+      collection.reference.update({
+        'properties.$property': val,
+      });
+    } catch (e) {
+      print(e);
+    }
+    return null;    
+  }
+
+  Future<Map<String, dynamic>?> updateTeamNotes(String teamGroupId, String teamID, String tournamentID, String notes) async { // Will probably need to be changed
+    try {
+      var scoutSheetCollection = await _firestore.collection('teamGroups').doc(teamGroupId).collection('scoutsheets').where('teamID', isEqualTo: teamID).where('tournamentID', isEqualTo: tournamentID).limit(1).get();
+      DocumentSnapshot? collection = scoutSheetCollection.docs.first;
+      collection.reference.update({
+        'teamNotes': notes,
+      });
+    } catch (e) {
+      print(e);
+    }
+    return null;    
+  }
+
+  Future<Map<String, dynamic>?> addPhoto(String teamGroupId, String teamID, String tournamentID, String URL) async { // Will probably need to be changed
+    try {
+      var scoutSheetCollection = await _firestore.collection('teamGroups').doc(teamGroupId).collection('scoutsheets').where('teamID', isEqualTo: teamID).where('tournamentID', isEqualTo: tournamentID).limit(1).get();
+      DocumentSnapshot? collection = scoutSheetCollection.docs.first;
+      collection.reference.update({
+        'photos': FieldValue.arrayUnion([URL]),
+      });
+    } catch (e) {
+      print(e);
+    }
+    return null;    
+  }
+
+  Future<Map<String, dynamic>?> removePhoto(String teamGroupId, String teamID, String tournamentID, String URL) async { // Will probably need to be changed
+    try {
+      var scoutSheetCollection = await _firestore.collection('teamGroups').doc(teamGroupId).collection('scoutsheets').where('teamID', isEqualTo: teamID).where('tournamentID', isEqualTo: tournamentID).limit(1).get();
+      DocumentSnapshot? collection = scoutSheetCollection.docs.first;
+      collection.reference.update({
+        'photos': FieldValue.arrayRemove([URL]),
+      });
+    } catch (e) {
+      print(e);
+    }
+    return null;    
+  }
+
+/* ------------------------------ */
+/*         User ScoutSheet        */
+/* ------------------------------ */
+
+// Future<String> createUserScoutSheet(String uid, String teamid, String tournamentID) async {
+//     String returnVal = 'hello';
+//     try {
+//       await _firestore.collection('Users').doc(uid).collection('scoutsheets').doc().set({
+//         /* Made with creation */
+//         // Comp Specific stuff
+//         'teamID': teamid, 
+//         'tournamentID': tournamentID, 
+
+//         // Timestamp Stuff
+//         'createTime': DateTime.now(),
+
+//         /* Updated with Editing */
+//         'latestUpdate': DateTime,
+//         // List of the properties of the scouted robot
+//         'properties': {},
+//         // Notes about the team & match
+//         'teamNotes': "",
+//         'gameNotes': {},
+//         // List of the URLs for any pictures
+//         'photos': [],
+//         // Bool For currently Editing // Not Necesary since only 1 user
+//         // 'isEditing': false,
+//       });
+//     } catch (e) {
+//       print(e);
+//     }
+//     return returnVal;
+//   }
+
+//   Future<Map<String, dynamic>?> getUserScoutSheetInfo(String uid, String teamID, String tournamentID) async {
+//     try {
+//       var collection = await _firestore.collection('Users').doc(uid).collection('scoutsheets').where('teamID', isEqualTo: teamID).where('tournamentID', isEqualTo: tournamentID).limit(1).get();
+//       return collection.docs.first.data();
+//     } catch (e) {
+//       print(e);
+//     }
+//     return null;    
+//   }
+
 
 
 }
