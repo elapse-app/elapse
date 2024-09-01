@@ -1,7 +1,7 @@
+import 'package:elapse_app/screens/team_screen/camera/camera.dart';
 import 'package:flutter/material.dart';
 
-List<Widget> EditState(
-    BuildContext context, void Function() buttonAction, String teamNumber) {
+List<Widget> EditState(BuildContext context, String teamNumber) {
   InputDecoration ElapseInputDecoration(String label) {
     return InputDecoration(
       labelText: label,
@@ -30,7 +30,7 @@ List<Widget> EditState(
             width: 2,
           ),
         ),
-        margin: EdgeInsets.only(left: 23, right: 23, top: 10),
+        margin: EdgeInsets.only(left: 23, right: 23, top: 8),
         padding: EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -96,23 +96,28 @@ List<Widget> EditState(
             SizedBox(
               height: 18,
             ),
-            Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(Radius.circular(9)),
-                  color: Theme.of(context).colorScheme.tertiary),
-              height: 175,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.add_photo_alternate_outlined),
-                      SizedBox(height: 5),
-                      Text("Add Photo")
-                    ],
-                  ),
-                ],
+            GestureDetector(
+              onTap: () {
+                takePicture(context);
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(9)),
+                    color: Theme.of(context).colorScheme.tertiary),
+                height: 175,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.add_photo_alternate_outlined),
+                        SizedBox(height: 5),
+                        Text("Add Photo")
+                      ],
+                    ),
+                  ],
+                ),
               ),
             )
           ],
