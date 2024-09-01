@@ -7,12 +7,12 @@ class LongButton extends StatelessWidget {
       this.gradient = false,
       required this.text,
       this.icon,
-      this.useForwardArrow = true});
+      this.trailingIcon = Icons.arrow_forward});
   final void Function()? onPressed;
   final bool gradient;
   final String text;
   final IconData? icon;
-  final bool useForwardArrow;
+  final IconData trailingIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -64,11 +64,10 @@ class LongButton extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  if (useForwardArrow)
-                    Icon(
-                      Icons.arrow_forward,
-                      color: Theme.of(context).colorScheme.secondary,
-                    ),
+                  Icon(
+                    trailingIcon,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
                 ],
               ),
             ),

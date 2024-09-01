@@ -9,6 +9,7 @@ import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
 import 'package:elapse_app/screens/team_screen/details/details.dart';
 import 'package:elapse_app/screens/team_screen/scoutsheet/closed.dart';
 import 'package:elapse_app/screens/team_screen/scoutsheet/edit.dart';
+import 'package:elapse_app/screens/team_screen/scoutsheet/empty.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/custom_tab_bar.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
@@ -31,7 +32,7 @@ class _TeamScreenState extends State<TeamScreen> {
   bool locationLoaded = false;
   bool isEditing = false;
   int pageIndex = 0;
-  int scoutSheetStateIndex = 1;
+  int scoutSheetStateIndex = 0;
   @override
   void initState() {
     super.initState();
@@ -126,19 +127,17 @@ class _TeamScreenState extends State<TeamScreen> {
         teamAwards,
         teamTournaments);
 
-    List<Widget> ScoutSheetClosedScreen = ClosedState(context, () {
-      setState(() {
-        scoutSheetStateIndex = 1;
-      });
-    }, widget.teamNumber);
+    List<Widget> ScoutSheetClosedScreen =
+        ClosedState(context, widget.teamNumber);
 
-    List<Widget> ScoutsheetEditScreen = EditState(context, () {
+    List<Widget> ScoutsheetEditScreen = EditState(context, widget.teamNumber);
+
+    List<Widget> ScoutSheetEmpty = EmptyState(context, () {
       setState(() {
         scoutSheetStateIndex = 2;
       });
-    }, widget.teamNumber);
-
-    List<Widget> ScoutSheetEmpty = [];
+      print(scoutSheetStateIndex);
+    });
 
     List<List<Widget>> ScoutSheetScreens = [
       ScoutSheetEmpty,
@@ -153,7 +152,7 @@ class _TeamScreenState extends State<TeamScreen> {
         button = IconButton(
           onPressed: () {
             setState(() {
-              scoutSheetStateIndex = 2;
+              scoutSheetStateIndex = 0;
             });
           },
           icon: Icon(
@@ -168,7 +167,7 @@ class _TeamScreenState extends State<TeamScreen> {
         button = IconButton(
           onPressed: () {
             setState(() {
-              scoutSheetStateIndex = 1;
+              scoutSheetStateIndex = 0;
             });
           },
           icon: Icon(
@@ -180,7 +179,18 @@ class _TeamScreenState extends State<TeamScreen> {
         );
         break;
       default:
-        button = Container();
+        button = IconButton(
+          onPressed: () {},
+          focusColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          icon: Icon(
+            Icons.crop_square_sharp,
+            color: Colors.transparent,
+          ),
+          padding: EdgeInsets.all(8),
+        );
         break;
     }
 
@@ -206,7 +216,7 @@ class _TeamScreenState extends State<TeamScreen> {
                   height: 32,
                   padding: const EdgeInsets.only(left: 9),
                   alignment: Alignment.centerLeft,
-                  child: scoutSheetStateIndex == 1
+                  child: scoutSheetStateIndex == 1 || scoutSheetStateIndex == 0
                       ? DropdownButton(
                           borderRadius: BorderRadius.circular(18),
                           isExpanded: true,

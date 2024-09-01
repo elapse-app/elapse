@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 
-List<Widget> ClosedState(
-    BuildContext context, void Function() buttonAction, String teamNumber) {
+List<Widget> ClosedState(BuildContext context, String teamNumber) {
   return [
     SliverToBoxAdapter(
       child: Container(
-        margin: EdgeInsets.only(top: 10, left: 23, right: 23),
+        margin: EdgeInsets.only(top: 8, left: 23, right: 23),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
