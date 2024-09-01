@@ -264,7 +264,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                         if (snapshot.hasData) {
                           Team team = snapshot.data as Team;
                           return TeamBio(
-                            grade: team.grade ?? "",
+                            grade: team.grade?.name ?? "",
                             location: team.location ?? Location(),
                             teamName: team.teamName ?? "",
                             organization: team.organization ?? "",

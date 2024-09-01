@@ -14,6 +14,7 @@ import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
 
+import '../../classes/Filters/gradeLevel.dart';
 import '../../classes/Filters/season.dart';
 import '../../classes/Team/world_skills.dart';
 import '../widgets/settings_button.dart';
@@ -39,9 +40,10 @@ class _MyTeamsState extends State<MyTeams> {
   @override
   void initState() {
     final String savedTeam = prefs.getString("savedTeam") ?? "";
+    final parsed = jsonDecode(savedTeam);
     savedTeamPreview = TeamPreview(
-        teamID: jsonDecode(savedTeam)["teamID"],
-        teamNumber: jsonDecode(savedTeam)["teamNumber"]);
+        teamID: parsed["teamID"],
+        teamNumber: parsed["teamNumber"]);
 
     savedTeamStrings = prefs.getStringList("savedTeams") ?? [];
     savedTeamPreviews.add(savedTeamPreview);
@@ -318,7 +320,7 @@ class _MyTeamsState extends State<MyTeams> {
                         if (snapshot.hasData) {
                           Team team = snapshot.data as Team;
                           return TeamBio(
-                            grade: team.grade ?? "",
+                            grade: team.grade?.name ?? "",
                             location: team.location ?? Location(),
                             teamName: team.teamName ?? "",
                             organization: team.organization ?? "",

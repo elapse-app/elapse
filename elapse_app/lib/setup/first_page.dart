@@ -27,6 +27,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
   void saveTeam(TeamPreview team) {
     prefs.setString("savedTeam",
         '{"teamID": ${team.teamID}, "teamNumber": "${team.teamNumber}"}');
+    prefs.setString("defaultGrade", team.gradeLevel!.name);
     Navigator.pushReplacement(
         context, MaterialPageRoute(builder: (context) => ThemeSetup()));
   }

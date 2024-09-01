@@ -3,6 +3,8 @@ import 'package:elapse_app/classes/Filters/levelClass.dart';
 import '../../classes/Filters/gradeLevel.dart';
 import 'package:flutter/material.dart';
 
+import '../../main.dart';
+
 class ExploreSearchFilter {
   Season season;
   LevelClass levelClass;
@@ -18,7 +20,7 @@ class ExploreSearchFilter {
     DateTime? endDate,
   })  : this.season = season ?? seasons[0],
         this.levelClass = levelClass ?? levelClasses[0],
-        this.gradeLevel = gradeLevel ?? gradeLevels[0],
+        this.gradeLevel = gradeLevel ?? gradeLevels[prefs.getString("defaultGrade")]!,
         this.startDate =
             startDate ?? DateTime((season ?? seasons[0]).startYear.year, 5, 1),
         this.endDate =
@@ -28,6 +30,9 @@ class ExploreSearchFilter {
 Future<ExploreSearchFilter> exploreFilter(
     BuildContext context, ExploreSearchFilter filter) async {
   final DraggableScrollableController dra = DraggableScrollableController();
+
+  List<GradeLevel> gradeFilters = gradeLevels.values.toList();
+  gradeFilters.insert(0, GradeLevel(id: 0, name: "Middle and High School"));
 
   return await showModalBottomSheet<ExploreSearchFilter>(
       context: context,
@@ -197,7 +202,7 @@ Future<ExploreSearchFilter> exploreFilter(
                                 const SizedBox(width: 10),
                                 DropdownButton<GradeLevel>(
                                   value: filter.gradeLevel,
-                                  items: gradeLevels.map((grade) {
+                                  items: gradeFilters.map((grade) {
                                     return DropdownMenuItem(
                                       value: grade,
                                       child: Text(grade.name,

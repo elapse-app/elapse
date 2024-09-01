@@ -1,8 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../../../classes/Filters/gradeLevel.dart';
 import '../../../classes/Filters/season.dart';
 import '../../../classes/Team/world_skills.dart';
+import '../../../main.dart';
 import '../../team_screen/team_screen.dart';
 import '../../widgets/big_error_message.dart';
 
@@ -21,7 +23,7 @@ class _TopWorldSkillsState extends State<TopWorldSkills> {
   @override
   void initState() {
     super.initState();
-    widget.rankings = getWorldSkillsRankings(seasons[0].vrcId);
+    widget.rankings = getWorldSkillsRankings(seasons[0].vrcId, gradeLevels[prefs.getString("defaultGrade")]!);
   }
 
   @override

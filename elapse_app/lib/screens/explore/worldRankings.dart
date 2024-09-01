@@ -8,10 +8,12 @@ import 'package:elapse_app/screens/explore/worldRankings/world_rankings_search_s
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
 
+import '../../classes/Filters/gradeLevel.dart';
 import '../../classes/Filters/season.dart';
 import '../../classes/Team/teamPreview.dart';
 import '../../classes/Team/world_skills.dart';
 import '../../classes/Tournament/tournament.dart';
+import '../my_team/my_team.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/big_error_message.dart';
 import '../widgets/custom_tab_bar.dart';
@@ -50,13 +52,14 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
   WorldRankingsFilter filter = WorldRankingsFilter();
 
   Season season = seasons[0];
+  GradeLevel grade = gradeLevels[prefs.getString("defaultGrade")]!;
 
   @override
   void initState() {
     super.initState();
     selectedIndex = widget.initIndex;
 
-    futureSkillsStats = getWorldSkillsRankings(season.vrcId);
+    futureSkillsStats = getWorldSkillsRankings((grade == gradeLevels["College"] ? season.vexUId! : season.vrcId), grade);
     futures.add(futureSkillsStats);
     futureVDAStats = getTrueSkillData(season.vrcId);
     futures.add(futureVDAStats);
@@ -141,6 +144,31 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                             .onSurface),
                   ),
                   const Spacer(),
+                  Row(
+                      children: [
+                        const Icon(Icons.school),
+                        const SizedBox(width: 4),
+                        DropdownButton<GradeLevel>(
+                          value: grade,
+                          items: gradeLevels.values.map((grade) {
+                            return DropdownMenuItem(
+                              value: grade,
+                              child: Text(getGrade(grade.name),
+                                  overflow: TextOverflow.fade,
+                                  style: const TextStyle(fontSize: 16)),
+                            );
+                          }).toList(),
+                          onChanged: (GradeLevel? value) => {
+                            setState(() {
+                              grade = value!;
+                              futureSkillsStats = getWorldSkillsRankings(grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade);
+                              futures[0] = futureSkillsStats;
+                            })
+                          },
+                        ),
+                      ]
+                  ),
+                  const SizedBox(width: 15),
                   GestureDetector(
                       onTap: () async {
                         Season updated = await Navigator.push(
@@ -151,7 +179,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                         );
                         setState(() {
                           season = updated;
-                          futureSkillsStats = getWorldSkillsRankings(season.vrcId);
+                          futureSkillsStats = getWorldSkillsRankings(grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade);
                           futureVDAStats = getTrueSkillData(season.vrcId);
                           futures[0] = futureSkillsStats;
                           futures[1] = futureVDAStats;

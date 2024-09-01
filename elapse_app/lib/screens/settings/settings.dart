@@ -1,3 +1,4 @@
+import 'package:elapse_app/screens/settings/set_grade.dart';
 import 'package:elapse_app/screens/settings/theme.dart';
 import 'package:elapse_app/screens/settings/set_team.dart';
 import 'package:elapse_app/screens/settings/signin.dart';
@@ -77,6 +78,33 @@ class SettingsScreen extends StatelessWidget {
                           children: [
                             Text(
                               "Set Main Team",
+                              style: TextStyle(fontSize: 24),
+                            ),
+                            Icon(Icons.arrow_forward)
+                          ],
+                        ),
+                      ),
+                    ),
+                    Divider(
+                      color: Theme.of(context).colorScheme.surfaceDim,
+                    ),
+                    GestureDetector(
+                      behavior: HitTestBehavior.opaque,
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => GradeSettings(),
+                          ),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 9.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Set Default Grade",
                               style: TextStyle(fontSize: 24),
                             ),
                             Icon(Icons.arrow_forward)
