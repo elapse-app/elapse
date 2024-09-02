@@ -1,21 +1,11 @@
 import 'dart:convert';
 
-import 'package:elapse_app/screens/settings/set_grade.dart';
-import 'package:elapse_app/screens/settings/theme.dart';
-import 'package:elapse_app/screens/settings/set_team.dart';
-import 'package:elapse_app/screens/settings/signin.dart';
-import 'package:elapse_app/screens/settings/authemail.dart';
-import 'package:elapse_app/screens/settings/authpass.dart';
-import 'package:elapse_app/screens/settings/authdel.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:provider/provider.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
-
-import '../../classes/Team/team.dart';
 import '../../classes/Team/teamPreview.dart';
 import '../../main.dart';
 
