@@ -40,6 +40,7 @@ class _TeamScreenState extends State<TeamScreen> {
         setState(() {
           teamSave.location = value.location;
           teamSave.teamName = value.teamName;
+          teamSave.gradeLevel = value.grade;
           locationLoaded = true;
         });
         return value;
@@ -319,7 +320,7 @@ class _TeamScreenState extends State<TeamScreen> {
                               if (snapshot.hasData) {
                                 Team team = snapshot.data as Team;
                                 return TeamBio(
-                                  grade: team.grade ?? "",
+                                  grade: team.grade?.name ?? "",
                                   location: team.location ?? Location(),
                                   teamName: team.teamName ?? "",
                                   organization: team.organization ?? "",
@@ -341,7 +342,7 @@ class _TeamScreenState extends State<TeamScreen> {
                             },
                           )
                         : TeamBio(
-                            grade: getGrade(widget.team?.grade),
+                            grade: getGrade(widget.team?.grade?.name),
                             location: widget.team?.location ?? Location(),
                             teamName: widget.team?.teamName ?? "",
                             organization: widget.team?.organization ?? ""),

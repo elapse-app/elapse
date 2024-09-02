@@ -1,17 +1,29 @@
-import 'package:elapse_app/screens/settings/theme.dart';
-import 'package:elapse_app/screens/settings/set_team.dart';
-import 'package:elapse_app/screens/settings/signin.dart';
-import 'package:elapse_app/screens/settings/authemail.dart';
-import 'package:elapse_app/screens/settings/authpass.dart';
-import 'package:elapse_app/screens/settings/authdel.dart';
+import 'dart:convert';
+
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
+import 'package:elapse_app/providers/color_provider.dart';
+import 'package:provider/provider.dart';
 
-import 'package:firebase_auth/firebase_auth.dart';
+import '../../classes/Team/teamPreview.dart';
+import '../../main.dart';
 
-class SettingsScreen extends StatelessWidget {
+class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
+
+  @override
+  State<SettingsScreen> createState() => _SettingsScreenState();
+}
+
+String theme = "system";
+
+class _SettingsScreenState extends State<SettingsScreen> {
+  _SettingsScreenState();
+
+  int mainTeamId = jsonDecode(prefs.getString("savedTeam") ?? "")["teamID"];
+  bool useLiveTiming = prefs.getBool("useLiveTiming") ?? true;
+  String defaultGrade = prefs.getString("defaultGrade") ?? "Main Team";
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +31,7 @@ class SettingsScreen extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
-          ElapseAppBar(
+          const ElapseAppBar(
             title: Text(
               "Settings",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
@@ -30,199 +42,240 @@ class SettingsScreen extends StatelessWidget {
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 23),
             sliver: SliverToBoxAdapter(
-              child: Container(
-                child: Column(
-                  children: [
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ThemeSettings(),
-                          ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 9.0),
-                        child: Row(
+              child: Column(
+                children: [
+                  Container(
+                    height: 280,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Theme.of(context).colorScheme.secondary),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    padding: const EdgeInsets.all(18),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text(
-                              "Change Theme",
-                              style: TextStyle(fontSize: 24),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text("Account Name", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                                Text("example.email@gmail.com", style: const TextStyle(fontSize: 16)),
+                              ]
                             ),
-                            Icon(Icons.arrow_forward)
-                          ],
+                            CircleAvatar(
+                              radius: 40,
+                              child: const Icon(Icons.person, size: 40),
+                            )
+                          ]
                         ),
-                      ),
-                    ),
-                    Divider(
-                      color: Theme.of(context).colorScheme.surfaceDim,
-                    ),
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SetMainTeam(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Theme.of(context).colorScheme.secondary),
+                            borderRadius: BorderRadius.circular(100),),
+                          child: Row(
+                            children: [
+                              Icon(Icons.group, color: Theme.of(context).colorScheme.secondary),
+                              const SizedBox(width: 15),
+                              Expanded(
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton(
+                                    isExpanded: true,
+                                    value: mainTeamId,
+                                    items: getSavedTeams().map((e) => DropdownMenuItem(value: e.teamID, child: Text("Team ${e.teamNumber}"))).toList(),
+                                    onChanged: (int? value) {
+                                      final String savedTeam = prefs.getString("savedTeam") ?? "";
+                                      final List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
+                                      String selected = savedTeams.where((e) => jsonDecode(e)["teamID"] == value).toList()[0];
+                                      savedTeams.removeWhere((e) => jsonDecode(e)["teamID"] == value);
+                                      savedTeams.add(savedTeam);
+                                      prefs.setStringList("savedTeams", savedTeams);
+                                      prefs.setString("savedTeam", selected);
+
+                                      setState(() {
+                                        mainTeamId = value!;
+                                      });
+                                    },
+                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, color: Theme.of(context).colorScheme.secondary),
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              )
+                            ]
                           ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 9.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Set Main Team",
-                              style: TextStyle(fontSize: 24),
-                            ),
-                            Icon(Icons.arrow_forward)
-                          ],
                         ),
-                      ),
-                    ),
-                    Divider(
-                      color: Theme.of(context).colorScheme.surfaceDim,
-                    ),
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AuthSignIn(),
+                        Container(
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(18),
+                            color: Theme.of(context).colorScheme.tertiary,
                           ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 9.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Sign In / Sign Up",
-                              style: TextStyle(fontSize: 24),
-                            ),
-                            Icon(Icons.arrow_forward)
-                          ],
-                        ),
+                          padding: const EdgeInsets.all(10),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Flexible(
+                                fit: FlexFit.tight,
+                                flex: 10,
+                                child: GestureDetector(
+                                  child: const Text("Add Team", textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
+                                  onTap: () {},
+                                ),
+                              ),
+                              const Flexible(
+                                fit: FlexFit.tight,
+                                flex: 1,
+                                child: SizedBox(
+                                  height: 50,
+                                  child: VerticalDivider(width: 3, thickness: 0.5),
+                                ),
+                              ),
+                              Flexible(
+                                fit: FlexFit.tight,
+                                flex: 10,
+                                child: GestureDetector(
+                                  child: const Text("Edit Profile", textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
+                                  onTap: () {},
+                                ),
+                              ),
+                            ]
+                          )
+                        )
+                      ]
+                    )
+                  ),
+                  const SizedBox(height: 32),
+                  const SizedBox(
+                    width: double.infinity,
+                    child: Text("Tournament Settings", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                  ),
+                  const SizedBox(height: 25),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text("Use Live Timing", style: TextStyle(fontSize: 18)),
+                      Switch(
+                        value: useLiveTiming,
+                        activeColor: Theme.of(context).colorScheme.secondary,
+                        onChanged: (bool? value) {
+                          prefs.setBool("useLiveTiming", value!);
+                            setState(() {
+                              useLiveTiming = value;
+                            });
+                          },
+                      )
+                    ]
+                  ),
+                  Divider(
+                    color: Theme.of(context).colorScheme.surfaceDim,
+                  ),
+                  const SizedBox(height: 32),
+                  const SizedBox(
+                    width: double.infinity,
+                    child: Text("General Settings", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                  ),
+                  const SizedBox(height: 25),
+                  Consumer<ColorProvider>(builder: (context, colorProvider, snapshot) {
+                    return Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text("Theme", style: TextStyle(fontSize: 18)),
+                          DropdownButtonHideUnderline(
+                              child: DropdownButton(
+                            value: theme,
+                            items: const [DropdownMenuItem(value: "system", child: Align(alignment: Alignment.centerRight, child: Text("Follow system"))), DropdownMenuItem(value: "dark", child: Align(alignment: Alignment.centerRight, child: Text("Dark"))), DropdownMenuItem(value: "light", child: Align(alignment: Alignment.centerRight, child: Text("Light")))],
+                            onChanged: (String? value) {
+                              switch (value) {
+                                case "system":
+                                  colorProvider.setSystem();
+                                  break;
+                                case "dark":
+                                  colorProvider.setDark();
+                                  break;
+                                case "light":
+                                  colorProvider.setLight();
+                                  break;
+                                default:
+                                  colorProvider.setSystem();
+                                  break;
+                              }
+
+                              setState(() {
+                                theme = value!;
+                              });
+                            },
+                            style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 18),
+                                icon: const SizedBox.shrink(),
+                                borderRadius: BorderRadius.circular(10),
+                                alignment: Alignment.centerRight,
+                          ))
+                        ]
+                    );
+                  }),
+                  Divider(
+                    color: Theme.of(context).colorScheme.surfaceDim,
+                  ),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Default grade", style: TextStyle(fontSize: 18)),
+                        DropdownButtonHideUnderline(
+                            child: DropdownButton(
+                              value: defaultGrade,
+                              items: const [DropdownMenuItem(value: "Main Team", child: Align(alignment: Alignment.centerRight, child: Text("Main Team"))), DropdownMenuItem(value: "Middle School", child: Align(alignment: Alignment.centerRight, child: Text("Middle School"))), DropdownMenuItem(value: "High School", child: Align(alignment: Alignment.centerRight, child: Text("High School"))), DropdownMenuItem(value: "College", child: Align(alignment: Alignment.centerRight, child: Text("College")))],
+                              onChanged: (String? value) {
+                                prefs.setString("defaultGrade", value!);
+
+                                setState(() {
+                                  defaultGrade = value;
+                                });
+                              },
+                              style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 18),
+                              icon: const SizedBox.shrink(),
+                              borderRadius: BorderRadius.circular(10),
+                              alignment: Alignment.centerRight,
+                            )),
+                      ]
+                  ),
+                  Divider(
+                    color: Theme.of(context).colorScheme.surfaceDim,
+                  ),
+                  const SizedBox(height: 32),
+                  const SizedBox(
+                    width: double.infinity,
+                    child: Text("Other", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                  ),
+                  const SizedBox(height: 25),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text("Version", style: TextStyle(fontSize: 18)),
+                          Text("1.0.0", style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.onSurfaceVariant))
+                        ]
+                    ),
+                  ),
+                  Divider(
+                    color: Theme.of(context).colorScheme.surfaceDim,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 9),
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: const Text("Send Feedback", style: TextStyle(fontSize: 18)),
                       ),
                     ),
-                    Divider(
-                      color: Theme.of(context).colorScheme.surfaceDim,
-                    ),
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AuthEmail(),
-                          ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 9.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Update Email",
-                              style: TextStyle(fontSize: 24),
-                            ),
-                            Icon(Icons.arrow_forward)
-                          ],
-                        ),
-                      ),
-                    ),
-                    Divider(
-                      color: Theme.of(context).colorScheme.surfaceDim,
-                    ),
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AuthPass(),
-                          ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 9.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Update Password",
-                              style: TextStyle(fontSize: 24),
-                            ),
-                            Icon(Icons.arrow_forward)
-                          ],
-                        ),
-                      ),
-                    ),
-                    Divider(
-                      color: Theme.of(context).colorScheme.surfaceDim,
-                    ),
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        FirebaseAuth.instance.signOut();
-                        print('authSucc - signed out user');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text(
-                                'Success! You have been signed out.'),
-                          ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 9.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Sign Out",
-                              style: TextStyle(fontSize: 24),
-                            ),
-                            Icon(Icons.arrow_forward)
-                          ],
-                        ),
-                      ),
-                    ),
-                    Divider(
-                      color: Theme.of(context).colorScheme.surfaceDim,
-                    ),
-                    GestureDetector(
-                      behavior: HitTestBehavior.opaque,
-                      onTap: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AuthDel(),
-                          ),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 9.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Delete Account",
-                              style: TextStyle(fontSize: 24),
-                            ),
-                            Icon(Icons.arrow_forward)
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  Divider(
+                    color: Theme.of(context).colorScheme.surfaceDim,
+                  ),
+                ],
               ),
             ),
           )
@@ -230,4 +283,15 @@ class SettingsScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+List<TeamPreview> getSavedTeams() {
+  final String savedTeam = prefs.getString("savedTeam") ?? "";
+  final parsed = jsonDecode(savedTeam);
+  List<TeamPreview> savedTeamsList = [TeamPreview(teamID: parsed["teamID"], teamNumber: parsed["teamNumber"])];
+
+  final List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
+  savedTeamsList.addAll(savedTeams.map((e) => TeamPreview(teamID: jsonDecode(e)["teamID"], teamNumber: jsonDecode(e)["teamNumber"])));
+
+  return savedTeamsList;
 }
