@@ -23,7 +23,7 @@ class _TopWorldSkillsState extends State<TopWorldSkills> {
   @override
   void initState() {
     super.initState();
-    widget.rankings = getWorldSkillsRankings(seasons[0].vrcId, gradeLevels[prefs.getString("defaultGrade")]!);
+    widget.rankings = getWorldSkillsRankings(seasons[0].vrcId, getGradeLevel(prefs.getString("defaultGrade")));
   }
 
   @override

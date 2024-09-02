@@ -12,7 +12,6 @@ import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
 
-import '../../classes/Filters/gradeLevel.dart';
 import '../../classes/Filters/season.dart';
 import '../../classes/Team/world_skills.dart';
 
@@ -41,13 +40,13 @@ class _TeamScreenState extends State<TeamScreen> {
         setState(() {
           teamSave.location = value.location;
           teamSave.teamName = value.teamName;
+          teamSave.gradeLevel = value.grade;
           locationLoaded = true;
         });
         return value;
       },
     );
     season = seasons[0];
-    grade = gradeLevels["High School"]!;
     teamStats = getTrueSkillDataForTeam(season.vrcId, widget.teamName);
     skillsStats = getWorldSkillsForTeam(season.vrcId, widget.teamID);
     teamTournaments = fetchTeamTournaments(widget.teamID, season.vrcId);
@@ -94,7 +93,6 @@ class _TeamScreenState extends State<TeamScreen> {
   Future<List<Award>>? teamAwards;
 
   late Season season;
-  late GradeLevel grade;
 
   late bool isSaved;
   late bool displaySave;

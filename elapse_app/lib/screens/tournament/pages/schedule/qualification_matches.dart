@@ -2,15 +2,18 @@ import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../main.dart';
+
 class MatchesView extends StatelessWidget {
   const MatchesView(
-      {super.key, required this.games, required this.useLiveTiming});
+      {super.key, required this.games});
 
   final List<Game> games;
-  final bool useLiveTiming;
 
   @override
   Widget build(BuildContext context) {
+    final bool useLiveTiming = prefs.getBool("useLiveTiming") ?? true;
+
     return SliverList(
       delegate: SliverChildBuilderDelegate(
         (context, index) {

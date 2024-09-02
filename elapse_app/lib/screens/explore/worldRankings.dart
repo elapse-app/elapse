@@ -52,7 +52,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
   WorldRankingsFilter filter = WorldRankingsFilter();
 
   Season season = seasons[0];
-  GradeLevel grade = gradeLevels[prefs.getString("defaultGrade")]!;
+  GradeLevel grade = getGradeLevel(prefs.getString("defaultGrade"));
 
   @override
   void initState() {

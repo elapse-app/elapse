@@ -78,7 +78,7 @@ Future<List<WorldSkillsStats>> getWorldSkillsRankings(int seasonID, GradeLevel g
     return List<WorldSkillsStats>.empty();
   }
 
-  if (seasonID != (grade == gradeLevels["College"] ? seasons[0].vexUId : seasons[0].vrcId) || grade != gradeLevels[prefs.getString("defaultGrade")]) {
+  if (seasonID != (grade == gradeLevels["College"] ? seasons[0].vexUId : seasons[0].vrcId) || grade != getGradeLevel(prefs.getString("defaultGrade"))) {
     final response = await http.get(
       Uri.parse("https://www.robotevents.com/api/seasons/$seasonID/skills?grade_level=${grade.name.replaceAll(" ", "%20")}"),
     );
