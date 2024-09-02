@@ -30,7 +30,7 @@ class TeamPreview {
       'teamID': teamID,
       'location': location?.toJson(),
       'teamName': teamName,
-      'gradeLevel': gradeLevel?.name,
+      'grade': gradeLevel?.name,
     };
   }
 

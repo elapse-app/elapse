@@ -55,7 +55,6 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
   List<Team> rankingsTeams = [];
   List<TeamPreview> savedTeams = [];
   bool useSavedTeams = false;
-  bool useLiveTiming = true;
 
   List<Game> practice = [];
   List<Game> qualifications = [];
@@ -639,7 +638,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
                     });
                   }, showPractice),
                   sliver: showPractice
-                      ? MatchesView(games: practice, useLiveTiming: true)
+                      ? MatchesView(games: practice)
                       : SliverToBoxAdapter(),
                 )
               : SliverToBoxAdapter(),
@@ -654,7 +653,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
                     });
                   }, showQualification),
                   sliver: showQualification
-                      ? MatchesView(games: qualifications, useLiveTiming: true)
+                      ? MatchesView(games: qualifications)
                       : SliverToBoxAdapter(),
                 )
               : SliverToBoxAdapter(),
@@ -669,7 +668,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
                     });
                   }, showElimination),
                   sliver: showElimination
-                      ? MatchesView(games: eliminations, useLiveTiming: true)
+                      ? MatchesView(games: eliminations)
                       : SliverToBoxAdapter(),
                 )
               : SliverToBoxAdapter(),

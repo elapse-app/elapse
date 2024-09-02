@@ -20,7 +20,7 @@ class ExploreSearchFilter {
     DateTime? endDate,
   })  : this.season = season ?? seasons[0],
         this.levelClass = levelClass ?? levelClasses[0],
-        this.gradeLevel = gradeLevel ?? gradeLevels[prefs.getString("defaultGrade")]!,
+        this.gradeLevel = gradeLevel ?? getGradeLevel(prefs.getString("defaultGrade")),
         this.startDate =
             startDate ?? DateTime((season ?? seasons[0]).startYear.year, 5, 1),
         this.endDate =

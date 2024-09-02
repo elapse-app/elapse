@@ -38,13 +38,7 @@ class Team {
           address1: (json["location"] as Map)["address_1"],
           address2: (json["location"] as Map)["address_2"],
           country: (json["location"] as Map)["country"]),
-      grade: json["grade"] == "Middle School"
-          ? gradeLevels[1]
-          : json["grade"] == "High School"
-              ? gradeLevels[2]
-              : json["grade"] == "College"
-                  ? gradeLevels[3]
-                  : null,
+      grade: getGradeLevel(json["grade"]),
     );
   }
 
