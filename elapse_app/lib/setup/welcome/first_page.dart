@@ -1,45 +1,46 @@
 import 'package:elapse_app/setup/signup/login_or_signup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter/painting.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:elapse_app/setup/configure/theme_setup.dart';
-import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/providers/color_provider.dart';
-import 'package:elapse_app/setup/features/features_one.dart'; 
+import 'package:elapse_app/setup/welcome/features.dart';
 import 'package:gradient_borders/gradient_borders.dart'; 
 
-class FirstSetupPage extends StatefulWidget {
+// class FirstSetupPage extends StatefulWidget {
+//   const FirstSetupPage({super.key});
+//
+//   @override
+//   State<FirstSetupPage> createState() => _FirstSetupPageState();
+// }
+//
+// class _FirstSetupPageState extends State<FirstSetupPage> {
+class FirstSetupPage extends StatelessWidget {
   const FirstSetupPage({super.key});
-
-  @override
-  State<FirstSetupPage> createState() => _FirstSetupPageState();
-}
-
-class _FirstSetupPageState extends State<FirstSetupPage> {
-  _FirstSetupPageState({Key? key}) : super();
 
   @override
   Widget build(BuildContext context) {
     return Consumer<ColorProvider>(builder: (context, colorProvider, snapshot) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        colorProvider.setSystem();
+      });
+
       return Directionality(
         textDirection: TextDirection.ltr,
         child: Builder(
           builder: (BuildContext context) {
             return Scaffold(
-              backgroundColor: Color.fromARGB(255, 191, 231, 237),
+              backgroundColor: Theme.of(context).colorScheme.primary,
               body: Column(
                 children: [
                   // Blue top section
                   Container(
-                    color: Color.fromARGB(255, 191, 231, 237),
+                    color: Theme.of(context).colorScheme.primary,
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(23.0, 60.0, 23.0, 0),
                       child: Column(
                         children: [
                           Align(
                             alignment: Alignment.centerLeft,
-                            child: Container(
+                            child: SizedBox(
                               width: 88,
                               height: 32.5,
                               child: Image.asset('assets/lg4x.png'),
@@ -53,22 +54,22 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                               text: TextSpan(
                                 text: 'Your new tournament companion. ',
                                 style: TextStyle(
-                                  fontFamily: "Manrope",
                                   fontSize: 33,
                                   fontWeight: FontWeight.w300,
-                                  color: const Color.fromARGB(255, 12, 77, 86),
+                                  fontFamily: "Manrope",
+                                  color: Theme.of(context).colorScheme.secondary,
                                 ),
                                 children: <TextSpan>[
                                   TextSpan(
                                     text: 'Matches, Rankings, Scouting.',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w300,
-                                      fontFamily: "Manrope",
                                       fontSize: 33,
-                                      color: Color.fromARGB(255, 35, 35, 35),
+                                      fontFamily: "Manrope",
+                                      color: Theme.of(context).colorScheme.onSurface,
                                     ),
                                   ),
-                                  TextSpan(
+                                  const TextSpan(
                                     text: '\n',
                                     style: TextStyle(
                                       fontSize: 12,
@@ -78,9 +79,9 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                                     text: '\nAll in one place.',
                                     style: TextStyle(
                                       fontWeight: FontWeight.w500,
-                                      fontFamily: "Manrope",
                                       fontSize: 33,
-                                      color: const Color.fromARGB(255, 22, 98, 128),
+                                      fontFamily: "Manrope",
+                                      color: Theme.of(context).colorScheme.secondary,
                                     ),
                                   ),
                                 ],
@@ -95,8 +96,8 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                   Container(
                     height: 300,
                     decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: const BorderRadius.only(
                         topLeft: Radius.circular(30),
                         topRight: Radius.circular(30),
                       ),
@@ -114,10 +115,10 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                                 text: TextSpan(
                                   text: 'Welcome to Elapse',
                                   style: TextStyle(
-                                    fontFamily: "Manrope",
                                     fontSize: 24,
                                     fontWeight: FontWeight.w400,
-                                    color: const Color.fromARGB(255, 12, 77, 86),
+                                    fontFamily: "Manrope",
+                                    color: Theme.of(context).colorScheme.secondary,
                                   ),
                                 ),
                               ),
@@ -133,10 +134,10 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                                 text: TextSpan(
                                   text: 'The smart VRC App.',
                                   style: TextStyle(
-                                    fontFamily: "Manrope",
                                     fontSize: 16,
                                     fontWeight: FontWeight.w400,
-                                    color: const Color.fromARGB(255, 0, 0, 0),
+                                    fontFamily: "Manrope",
+                                    color: Theme.of(context).colorScheme.onSurface,
                                   ),
                                 ),
                               ),
@@ -156,50 +157,44 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                                   width: 1,
                                 ),
                                 gradient: RadialGradient(
-                                  colors: [Color.fromARGB(25, 221, 245, 255), Color.fromARGB(50, 191, 231, 237)],
+                                  colors: [Theme.of(context).colorScheme.primary.withOpacity(0.05), Theme.of(context).colorScheme.primary],
                                   center: Alignment.center,
                                   radius: 3,
-                                  stops: [0.0, 1.0],
+                                  stops: const [0.0, 1.0],
                                 ),
                                 borderRadius: BorderRadius.circular(30),
                               ),
                               child: TextButton(
                                 style: TextButton.styleFrom(
-                                  foregroundColor: const Color.fromARGB(255, 12, 77, 86),
-                                  backgroundColor: const Color.fromARGB(0, 255, 255, 255),
-                                  textStyle: const TextStyle(
-                                    fontSize: 16,
-                                    color: Color.fromARGB(255, 117, 117, 117),
-                                    fontFamily: "Manrope",
-                                    fontWeight: FontWeight.w400,
-                                  ),
+                                  foregroundColor: Theme.of(context).colorScheme.secondary,
+                                  backgroundColor: Theme.of(context).colorScheme.surface,
                                 ),
                                 onPressed: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => FirstFeature(),
+                                      builder: (context) => const Features(),
                                     ),
                                   );
                                 },
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   children: [
-                                    SizedBox(width: 5),
+                                    const SizedBox(width: 5),
                                     Image.asset('assets/darkIcon.png'),
-                                    SizedBox(width: 10),
+                                    const SizedBox(width: 10),
                                     Text(
                                       'Get Started',
-                                      style: const TextStyle(
+                                      style: TextStyle(
                                         fontSize: 16,
-                                        color: Color.fromARGB(255, 12, 77, 86),
                                         fontFamily: "Manrope",
+                                        color: Theme.of(context).colorScheme.secondary,
                                         fontWeight: FontWeight.w400,
                                       ),
                                     ),
-                                    Spacer(),
-                                    Icon(Icons.arrow_forward, color: Color.fromARGB(255, 12, 77, 86)),
-                                    SizedBox(width: 5),
+                                    const Spacer(),
+                                    Icon(Icons.arrow_forward, color: Theme.of(context).colorScheme.secondary),
+                                    const SizedBox(width: 5),
                                   ],
                                 ),
                               ),
@@ -235,7 +230,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                                     fontFamily: "Manrope",
                                     fontWeight: FontWeight.w200,
                                     fontSize: 16,
-                                    color: Color.fromARGB(255, 148, 151, 151),
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant,
                                   ),
                                   children: <TextSpan>[
                                     TextSpan(
@@ -244,7 +239,7 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                                         fontWeight: FontWeight.w400,
                                         fontFamily: "Manrope",
                                         fontSize: 16,
-                                        color: Color.fromARGB(255, 117, 117, 117),
+                                        color: Theme.of(context).colorScheme.onSurface,
                                       ),
                                     ),
                                   ],

@@ -3,15 +3,13 @@ import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/setup/configure/cloudscout_setup.dart';
 import 'package:elapse_app/setup/configure/theme_setup.dart';
-import 'package:elapse_app/setup/features/first_page.dart';
+import 'package:elapse_app/setup/welcome/first_page.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/setup/deprecated/team_setup.dart';
 import 'package:elapse_app/screens/home/home.dart';
 import 'package:elapse_app/main.dart';
-import 'package:elapse_app/setup/features/features_one.dart';
-import 'package:elapse_app/setup/features/features_three.dart';
 
 class TournamentModeSetupPage extends StatelessWidget {
   const TournamentModeSetupPage({super.key,});
