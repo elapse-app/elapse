@@ -1,7 +1,18 @@
+import 'dart:io';
+
+import 'package:elapse_app/classes/ScoutSheet/scoutSheetUi.dart';
 import 'package:elapse_app/screens/team_screen/camera/camera.dart';
+import 'package:elapse_app/screens/team_screen/camera/photo_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 
-List<Widget> EditState(BuildContext context, String teamNumber) {
+List<Widget> EditState(
+    BuildContext context,
+    String teamNumber,
+    void Function(File) addPhoto,
+    void Function(int) removePhoto,
+    List<File> photos,
+    void Function(String property, String value) updateProperty,
+    ScoutSheetUI sheet) {
   InputDecoration ElapseInputDecoration(String label) {
     return InputDecoration(
       labelText: label,
@@ -17,6 +28,158 @@ List<Widget> EditState(BuildContext context, String teamNumber) {
           color: Theme.of(context).colorScheme.primary,
         ),
       ),
+    );
+  }
+
+  Widget photosDisplay = GestureDetector(
+    onTap: () async {
+      final result = await getPhoto(context);
+      print(result);
+      if (result != null) {
+        addPhoto(result);
+        print(photos.length);
+      }
+    },
+    child: Container(
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(9)),
+          color: Theme.of(context).colorScheme.tertiary),
+      height: 175,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.add_photo_alternate_outlined),
+              SizedBox(height: 5),
+              Text("Add Photo")
+            ],
+          ),
+        ],
+      ),
+    ),
+  );
+
+  if (photos.length == 1) {
+    photosDisplay = Flex(
+      direction: Axis.horizontal,
+      children: [
+        Flexible(
+          child: Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(9),
+                child: Image.file(
+                  photos[0],
+                  height: 175,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    height: 36,
+                    width: 36,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.black.withOpacity(0.5)),
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        removePhoto(0);
+                      },
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                      )),
+                ],
+              ),
+            ],
+          ),
+        ),
+        SizedBox(width: 9),
+        Flexible(child: photosDisplay)
+      ],
+    );
+  } else if (photos.length == 2) {
+    photosDisplay = Flex(
+      direction: Axis.horizontal,
+      children: [
+        Flexible(
+          child: Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(9),
+                child: Image.file(
+                  photos[0],
+                  height: 175,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    height: 36,
+                    width: 36,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.black.withOpacity(0.5)),
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        removePhoto(0);
+                      },
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                      )),
+                ],
+              ),
+            ],
+          ),
+        ),
+        SizedBox(width: 9),
+        Flexible(
+          child: Stack(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(9),
+                child: Image.file(
+                  photos[1],
+                  height: 175,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    height: 36,
+                    width: 36,
+                    decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.black.withOpacity(0.5)),
+                  ),
+                  IconButton(
+                      onPressed: () {
+                        removePhoto(1);
+                      },
+                      icon: Icon(
+                        Icons.close,
+                        color: Colors.white,
+                      )),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -40,8 +203,12 @@ List<Widget> EditState(BuildContext context, String teamNumber) {
               style: TextStyle(fontSize: 24),
             ),
             SizedBox(height: 18),
-            TextField(
+            TextFormField(
               decoration: ElapseInputDecoration("Intake Type"),
+              onChanged: (value) {
+                updateProperty("intakeType", value);
+              },
+              initialValue: sheet.intakeType,
             ),
             SizedBox(height: 18),
             Flex(
@@ -50,16 +217,24 @@ List<Widget> EditState(BuildContext context, String teamNumber) {
                 Flexible(
                   flex: 2,
                   fit: FlexFit.tight,
-                  child: TextField(
+                  child: TextFormField(
                     decoration: ElapseInputDecoration("# of Motors"),
+                    onChanged: (value) {
+                      updateProperty("numMotors", value);
+                    },
+                    initialValue: sheet.numMotors,
                   ),
                 ),
                 SizedBox(width: 9),
                 Flexible(
                   flex: 2,
                   fit: FlexFit.tight,
-                  child: TextField(
+                  child: TextFormField(
                     decoration: ElapseInputDecoration("RPM"),
+                    onChanged: (value) {
+                      updateProperty("RPM", value);
+                    },
+                    initialValue: sheet.RPM,
                   ),
                 ),
               ],
@@ -67,9 +242,13 @@ List<Widget> EditState(BuildContext context, String teamNumber) {
             SizedBox(
               height: 18,
             ),
-            TextField(
+            TextFormField(
               maxLines: 5,
               decoration: ElapseInputDecoration("Other Notes"),
+              onChanged: (value) {
+                updateProperty("otherNotes", value);
+              },
+              initialValue: sheet.otherNotes,
             ),
           ],
         ),
@@ -96,30 +275,7 @@ List<Widget> EditState(BuildContext context, String teamNumber) {
             SizedBox(
               height: 18,
             ),
-            GestureDetector(
-              onTap: () {
-                takePicture(context);
-              },
-              child: Container(
-                decoration: BoxDecoration(
-                    borderRadius: BorderRadius.all(Radius.circular(9)),
-                    color: Theme.of(context).colorScheme.tertiary),
-                height: 175,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.add_photo_alternate_outlined),
-                        SizedBox(height: 5),
-                        Text("Add Photo")
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            )
+            photosDisplay
           ],
         ),
       ),
@@ -145,9 +301,13 @@ List<Widget> EditState(BuildContext context, String teamNumber) {
             SizedBox(
               height: 18,
             ),
-            TextField(
+            TextFormField(
               maxLines: 8,
               decoration: ElapseInputDecoration("Enter Notes"),
+              onChanged: (value) {
+                updateProperty("autonNotes", value);
+              },
+              initialValue: sheet.autonNotes,
             ),
           ],
         ),

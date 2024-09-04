@@ -33,7 +33,7 @@ class LongButton extends StatelessWidget {
                   )
                 : null,
             border: Border.all(
-              width: 1,
+              width: 2,
               color: Theme.of(context).colorScheme.primary,
             ),
           ),
