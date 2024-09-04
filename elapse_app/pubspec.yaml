@@ -49,6 +49,7 @@ dependencies:
   flutter_sticky_header: ^0.6.5
   dots_indicator: ^2.1.1
   gradient_borders: ^1.0.1
+  carousel_slider: ^5.0.0
 
 dev_dependencies:
   flutter_test:

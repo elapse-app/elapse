@@ -10,12 +10,14 @@ class ElapseAppBar extends StatelessWidget {
     this.backNavigation = false,
     this.prefs,
     this.background,
+    this.maxHeight = 125,
   });
   final Widget title;
   final Widget? background;
   final bool includeSettings;
   final bool backNavigation;
   final SharedPreferences? prefs;
+  final double maxHeight;
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +74,7 @@ class ElapseAppBar extends StatelessWidget {
     }
     return SliverAppBar.large(
       automaticallyImplyLeading: false,
-      expandedHeight: 125,
+      expandedHeight: maxHeight,
       centerTitle: false,
       flexibleSpace: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {

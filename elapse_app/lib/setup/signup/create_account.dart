@@ -1,7 +1,7 @@
 import 'package:elapse_app/setup/signup/verify_account.dart';
 import 'package:elapse_app/setup/signup/login_or_signup.dart';
 import 'package:flutter/material.dart';
-import 'package:elapse_app/setup/features/first_page.dart';
+import 'package:elapse_app/setup/welcome/first_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/main.dart';
 

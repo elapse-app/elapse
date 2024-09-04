@@ -10,7 +10,7 @@ import 'package:elapse_app/screens/my_team/my_team.dart';
 import 'package:elapse_app/screens/tournament_mode/home.dart';
 import 'package:elapse_app/screens/tournament_mode/my_teams.dart';
 import 'package:elapse_app/screens/tournament_mode/tournament.dart';
-import 'package:elapse_app/setup/features/first_page.dart';
+import 'package:elapse_app/setup/welcome/first_page.dart';
 import 'package:elapse_app/setup/deprecated/setup.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -51,7 +51,18 @@ void main() async {
         ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
       ],
       child: prefs.getString("savedTeam") == null
-          ? FirstSetupPage()
+          ? Consumer<ColorProvider>(
+        builder: (context, colorProvider, child) {
+          return MaterialApp(home: const FirstSetupPage(), theme: ThemeData(
+            colorScheme:  MediaQuery.of(context).platformBrightness == Brightness.dark
+                ? darkScheme
+                : lightScheme,
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            fontFamily: "Manrope",
+          ));
+        }
+      )
           : MyApp(key: myAppKey, prefs: prefs),
     ),
   );
@@ -102,11 +113,18 @@ class MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    if(!isLoggedIn) {
+    // if(!isLoggedIn) {
       return MaterialApp(
-        home:FirstSetupPage(),
-      );
-    }
+        home: const FirstSetupPage(),
+        theme: ThemeData(
+          colorScheme:  MediaQuery.of(context).platformBrightness == Brightness.dark
+              ? darkScheme
+              : lightScheme,
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          fontFamily: "Manrope",
+        ));
+    // }
     TeamPreview savedTeam = TeamPreview(
         teamNumber:
             jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"],
