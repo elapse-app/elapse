@@ -1,7 +1,6 @@
 import 'package:elapse_app/setup/signup/enter_details.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/setup/welcome/first_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/setup/signup/create_account.dart';
 
 import '../../screens/widgets/app_bar.dart';
@@ -72,8 +71,8 @@ class SignUpPage extends StatelessWidget {
               height: double.infinity,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(30),
                   topRight: Radius.circular(30),
                 ),
@@ -82,7 +81,7 @@ class SignUpPage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    SizedBox(height: 46),
+                    const SizedBox(height: 46),
                     Padding(
                         padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
                         child: Center(
@@ -93,12 +92,12 @@ class SignUpPage extends StatelessWidget {
                                 fontFamily: "Manrope",
                                 fontSize: 32,
                                 fontWeight: FontWeight.w300,
-                                color: const Color.fromARGB(255, 12, 77, 86),
+                                color: Theme.of(context).colorScheme.secondary,
                               ),
                             ),
                           ),
                         )),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Padding(
                         padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
                         child: Center(
@@ -109,7 +108,7 @@ class SignUpPage extends StatelessWidget {
                                     fontWeight: FontWeight.w400,
                                     fontFamily: "Manrope",
                                     fontSize: 16,
-                                    color: Color.fromARGB(255, 117, 117, 117),
+                                    color: Theme.of(context).colorScheme.onSurface,
                                   ),
                                 )))),
                     Padding(
@@ -124,7 +123,7 @@ class SignUpPage extends StatelessWidget {
                                       fontWeight: FontWeight.w400,
                                       fontFamily: "Manrope",
                                       fontSize: 16,
-                                      color: Color.fromARGB(255, 117, 117, 117),
+                                      color: Theme.of(context).colorScheme.onSurface,
                                     ),
                                   ),
                                   TextSpan(
@@ -133,7 +132,7 @@ class SignUpPage extends StatelessWidget {
                                       fontWeight: FontWeight.w500,
                                       fontFamily: "Manrope",
                                       fontSize: 16,
-                                      color: const Color.fromARGB(255, 12, 77, 86),
+                                      color: Theme.of(context).colorScheme.secondary,
                                     ),
                                   ),
                                   TextSpan(
@@ -142,7 +141,7 @@ class SignUpPage extends StatelessWidget {
                                       fontWeight: FontWeight.w400,
                                       fontFamily: "Manrope",
                                       fontSize: 16,
-                                      color: Color.fromARGB(255, 117, 117, 117),
+                                      color: Theme.of(context).colorScheme.onSurface,
                                     ),
                                   ),
                                 ],
@@ -165,30 +164,28 @@ class SignUpPage extends StatelessWidget {
                             width: double.infinity,
                             child: TextButton(
                               style: TextButton.styleFrom(
-                                  textStyle: const TextStyle(
+                                  textStyle: TextStyle(
                                     fontSize: 16,
-                                    color: Color.fromARGB(255, 12, 77, 86),
+                                    color: Theme.of(context).colorScheme.secondary,
                                     fontFamily: "Manrope",
                                     fontWeight: FontWeight.w400,
                                   ),
-                                  foregroundColor:
-                                  const Color.fromARGB(255, 12, 77, 86),
-                                  backgroundColor:
-                                  const Color.fromARGB(255, 255, 255, 255),
+                                  foregroundColor: Theme.of(context).colorScheme.secondary,
+                                  backgroundColor: Theme.of(context).colorScheme.surface,
                                   side: BorderSide(
-                                    color: const Color.fromARGB(255, 191, 231, 237),
+                                    color: Theme.of(context).colorScheme.primary,
                                     width: 1.0,
                                   )),
                               onPressed: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => CreateAccount(),
+                                    builder: (context) => const CreateAccount(),
                                   ),
                                 );
                               },
                               child: Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 5),
+                                padding: const EdgeInsets.symmetric(horizontal: 5),
                                 child: Row(
                                     mainAxisAlignment: MainAxisAlignment
                                         .start, // Aligns the content to the left
@@ -289,49 +286,42 @@ class SignUpPage extends StatelessWidget {
                             width: double.infinity,
                             child: TextButton(
                               style: TextButton.styleFrom(
-                                  textStyle: const TextStyle(
+                                  textStyle: TextStyle(
                                     fontSize: 16,
-                                    color: Color.fromARGB(255, 12, 77, 86),
+                                    color: Theme.of(context).colorScheme.secondary,
                                     fontFamily: "Manrope",
                                     fontWeight: FontWeight.w400,
                                   ),
-                                  foregroundColor:
-                                  const Color.fromARGB(255, 12, 77, 86),
-                                  backgroundColor:
-                                  const Color.fromARGB(255, 255, 255, 255),
+                                  foregroundColor: Theme.of(context).colorScheme.secondary,
+                                  backgroundColor: Theme.of(context).colorScheme.surface,
                                   side: BorderSide(
-                                    color: const Color.fromARGB(255, 191, 231, 237),
+                                    color: Theme.of(context).colorScheme.primary,
                                     width: 1.0,
                                   )),
                               onPressed: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => EnterDetailsPage(),
+                                    builder: (context) => const EnterDetailsPage(),
                                   ),
                                 );
                               },
                               child: Builder(
                                 builder: (BuildContext context) {
-                                  return Row(
-                                    mainAxisAlignment: MainAxisAlignment
-                                        .start, // Aligns the content to the left
-                                    children: [
-                                      SizedBox(width: 5),
-                                      Container(
-                                        height: 20,
-                                        width: 20,
-                                        child: Image.asset('assets/apple.png'),
-                                      ), // // Prefix icon
-                                      SizedBox(
-                                          width: 10), // Space between icon and text
-                                      Text('Sign up with Apple'),
-                                      Spacer(), // Pushes the suffix icon to the end
-                                      Icon(Icons.arrow_forward,
-                                          color: Color.fromARGB(
-                                              255, 12, 77, 86)), // Suffix icon
-                                      SizedBox(width: 5),
-                                    ],
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                                    child: Row(
+                                      mainAxisAlignment: MainAxisAlignment
+                                          .start, // Aligns the content to the left
+                                      children: [
+                                        Image.asset('assets/apple.png', width: 20, height: 20), // Prefix icon
+                                        const SizedBox(width: 10), // Space between icon and text
+                                        const Text('Sign up with Apple'),
+                                        const Spacer(), // Pushes the suffix icon to the end
+                                        Icon(Icons.arrow_forward,
+                                            color: Theme.of(context).colorScheme.secondary), // Suffix icon
+                                      ],
+                                    ),
                                   );
                                 },
                               ),
@@ -340,7 +330,7 @@ class SignUpPage extends StatelessWidget {
                         ),
                       ],
                     ),
-                    Spacer(),
+                    const Spacer(),
                     Column(
                       children: [
                         Padding(
@@ -353,36 +343,30 @@ class SignUpPage extends StatelessWidget {
                             width: double.infinity,
                             child: TextButton(
                               style: TextButton.styleFrom(
-                                  foregroundColor:
-                                  const Color.fromARGB(255, 117, 117, 117),
-                                  backgroundColor:
-                                  const Color.fromARGB(255, 255, 255, 255),
-                                  textStyle: const TextStyle(
+                                  foregroundColor: Theme.of(context).colorScheme.onSurface,
+                                  backgroundColor: Theme.of(context).colorScheme.surface,
+                                  textStyle: TextStyle(
                                     fontSize: 16,
-                                    color: Color.fromARGB(255, 148, 151, 151),
+                                    color: Theme.of(context).colorScheme.onSurface,
                                     fontFamily: "Manrope",
                                     fontWeight: FontWeight.w400,
                                   ),
-                                  side: BorderSide(
-                                    color: const Color.fromARGB(255, 241, 241, 241),
-                                    width: 1.0,
-                                  )),
+                                side: BorderSide(
+                                  color: Theme.of(context).colorScheme.surfaceDim,
+                                )
+                              ),
                               onPressed: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => FirstSetupPage(),
+                                    builder: (context) => const FirstSetupPage(),
                                   ),
                                 );
                               },
-                              child: Builder(
-                                builder: (BuildContext context) {
-                                  return Text('Existing user? Sign in here');
-                                },
+                              child: const Text('Existing user? Sign in here'),
                               ),
                             ),
                           ),
-                        ),
                         Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 23.0,
@@ -393,37 +377,28 @@ class SignUpPage extends StatelessWidget {
                             width: double.infinity,
                             child: TextButton(
                               style: TextButton.styleFrom(
-                                  foregroundColor:
-                                  const Color.fromARGB(255, 148, 151, 151),
-                                  backgroundColor:
-                                  const Color.fromARGB(255, 255, 255, 255),
-                                  textStyle: const TextStyle(
+                                  foregroundColor: Theme.of(context).colorScheme.onSurface,
+                                  backgroundColor: Theme.of(context).colorScheme.surface,
+                                  textStyle: TextStyle(
                                     fontSize: 16,
-                                    color: Color.fromARGB(255, 241, 241, 241),
+                                    color: Theme.of(context).colorScheme.onSurface,
                                     fontFamily: "Manrope",
                                     fontWeight: FontWeight.w400,
                                   ),
-                                  side: BorderSide(
-                                    color: const Color.fromARGB(255, 255, 255, 255),
-                                    width: 1.0,
-                                  )),
+                              ),
                               onPressed: () {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => FirstSetupPage(),
+                                    builder: (context) => const FirstSetupPage(),
                                   ),
                                 );
                               },
-                              child: Builder(
-                                builder: (BuildContext context) {
-                                  return Text('Use elapse without an account');
-                                },
+                              child: const Text('Use elapse without an account'),
                               ),
                             ),
                           ),
-                        ),
-                        SizedBox(height: 38),
+                        const SizedBox(height: 38),
                       ],
                     ),
                   ])),),
