@@ -185,8 +185,9 @@ class Database {
         'gameNotes': "",
         // List of the URLs for any pictures
         'photos': [],
-        // Bool For currently Editing
+        // Bool for Currently Editing and Ablility to Join
         'isEditing': false,
+        'allowJoin': false,
       });
     } catch (e) {
       print(e);
