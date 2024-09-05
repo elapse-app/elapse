@@ -1,6 +1,8 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
+import 'package:elapse_app/classes/ScoutSheet/scoutSheetUi.dart';
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Team/vdaStats.dart';
@@ -9,6 +11,7 @@ import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
 import 'package:elapse_app/screens/team_screen/details/details.dart';
 import 'package:elapse_app/screens/team_screen/scoutsheet/closed.dart';
 import 'package:elapse_app/screens/team_screen/scoutsheet/edit.dart';
+import 'package:elapse_app/screens/team_screen/scoutsheet/empty.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/custom_tab_bar.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
@@ -31,7 +34,16 @@ class _TeamScreenState extends State<TeamScreen> {
   bool locationLoaded = false;
   bool isEditing = false;
   int pageIndex = 0;
-  int scoutSheetStateIndex = 1;
+  int scoutSheetStateIndex = 0;
+  ScoutSheetUI activeScoutSheet = ScoutSheetUI(
+    intakeType: "",
+    numMotors: "",
+    RPM: "",
+    otherNotes: "",
+    photos: [],
+    autonNotes: "",
+  );
+
   @override
   void initState() {
     super.initState();
@@ -87,6 +99,50 @@ class _TeamScreenState extends State<TeamScreen> {
     });
   }
 
+  List<File> photos = [];
+
+  void addPhoto(File photo) {
+    setState(() {
+      activeScoutSheet.photos.add(photo);
+    });
+  }
+
+  void removePhoto(int index) {
+    setState(() {
+      activeScoutSheet.photos.removeAt(index);
+    });
+  }
+
+  void updateSheet(String property, String value) {
+    switch (property) {
+      case "intakeType":
+        setState(() {
+          activeScoutSheet.intakeType = value;
+        });
+        break;
+      case "numMotors":
+        setState(() {
+          activeScoutSheet.numMotors = value;
+        });
+        break;
+      case "RPM":
+        setState(() {
+          activeScoutSheet.RPM = value;
+        });
+        break;
+      case "otherNotes":
+        setState(() {
+          activeScoutSheet.otherNotes = value;
+        });
+        break;
+      case "autonNotes":
+        setState(() {
+          activeScoutSheet.autonNotes = value;
+        });
+        break;
+    }
+  }
+
   Future<Team>? team;
   Future<VDAStats>? teamStats;
   Future<List<TournamentPreview>>? teamTournaments;
@@ -96,24 +152,6 @@ class _TeamScreenState extends State<TeamScreen> {
   late bool displaySave;
   @override
   Widget build(BuildContext context) {
-    InputDecoration ElapseInputDecoration(String label) {
-      return InputDecoration(
-        labelText: label,
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(9)),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.surfaceDim,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(9)),
-          borderSide: BorderSide(
-            color: Theme.of(context).colorScheme.primary,
-          ),
-        ),
-      );
-    }
-
     List<Widget> DetailsScreen = Details(
         context,
         widget.teamNumber,
@@ -126,19 +164,21 @@ class _TeamScreenState extends State<TeamScreen> {
         teamAwards,
         teamTournaments);
 
-    List<Widget> ScoutSheetClosedScreen = ClosedState(context, () {
-      setState(() {
-        scoutSheetStateIndex = 1;
-      });
-    }, widget.teamNumber);
-
-    List<Widget> ScoutsheetEditScreen = EditState(context, () {
+    List<Widget> ScoutSheetClosedScreen =
+        ClosedState(context, widget.teamNumber, activeScoutSheet);
+    List<Widget> ScoutsheetEditScreen = EditState(
+        context,
+        widget.teamNumber,
+        addPhoto,
+        removePhoto,
+        activeScoutSheet.photos,
+        updateSheet,
+        activeScoutSheet);
+    List<Widget> ScoutSheetEmpty = EmptyState(context, () {
       setState(() {
         scoutSheetStateIndex = 2;
       });
-    }, widget.teamNumber);
-
-    List<Widget> ScoutSheetEmpty = [];
+    });
 
     List<List<Widget>> ScoutSheetScreens = [
       ScoutSheetEmpty,
@@ -180,7 +220,18 @@ class _TeamScreenState extends State<TeamScreen> {
         );
         break;
       default:
-        button = Container();
+        button = IconButton(
+          onPressed: () {},
+          focusColor: Colors.transparent,
+          hoverColor: Colors.transparent,
+          splashColor: Colors.transparent,
+          highlightColor: Colors.transparent,
+          icon: Icon(
+            Icons.crop_square_sharp,
+            color: Colors.transparent,
+          ),
+          padding: EdgeInsets.all(8),
+        );
         break;
     }
 
@@ -206,7 +257,7 @@ class _TeamScreenState extends State<TeamScreen> {
                   height: 32,
                   padding: const EdgeInsets.only(left: 9),
                   alignment: Alignment.centerLeft,
-                  child: scoutSheetStateIndex == 1
+                  child: scoutSheetStateIndex == 1 || scoutSheetStateIndex == 0
                       ? DropdownButton(
                           borderRadius: BorderRadius.circular(18),
                           isExpanded: true,
@@ -216,7 +267,8 @@ class _TeamScreenState extends State<TeamScreen> {
                               overflow: TextOverflow.ellipsis,
                               fontFamily: "Manrope",
                               fontSize: 16.25,
-                              fontWeight: FontWeight.w500),
+                              fontWeight: FontWeight.w500,
+                              color: Theme.of(context).colorScheme.onSurface),
                           items: [
                             DropdownMenuItem(
                                 value: "Caution Tape",

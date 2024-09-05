@@ -1,11 +1,68 @@
+import 'package:elapse_app/classes/ScoutSheet/scoutSheetUi.dart';
 import 'package:flutter/material.dart';
 
 List<Widget> ClosedState(
-    BuildContext context, void Function() buttonAction, String teamNumber) {
+    BuildContext context, String teamNumber, ScoutSheetUI sheet) {
+  Widget photosDisplay = Container(
+    decoration: BoxDecoration(
+        borderRadius: BorderRadius.all(Radius.circular(9)),
+        color: Theme.of(context).colorScheme.tertiary),
+    height: 175,
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [Text("No Photos uploaded")],
+        ),
+      ],
+    ),
+  );
+
+  if (sheet.photos.length == 1) {
+    photosDisplay = ClipRRect(
+      borderRadius: BorderRadius.circular(9),
+      child: Image.file(
+        sheet.photos[0],
+        height: 175,
+        width: double.infinity,
+        fit: BoxFit.cover,
+      ),
+    );
+  } else if (sheet.photos.length == 2) {
+    photosDisplay = Flex(
+      direction: Axis.horizontal,
+      children: [
+        Flexible(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(9),
+            child: Image.file(
+              sheet.photos[0],
+              height: 175,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        SizedBox(width: 9),
+        Flexible(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(9),
+            child: Image.file(
+              sheet.photos[1],
+              height: 175,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
   return [
     SliverToBoxAdapter(
       child: Container(
-        margin: EdgeInsets.only(top: 10, left: 23, right: 23),
+        margin: EdgeInsets.only(top: 8, left: 23, right: 23),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
@@ -19,7 +76,7 @@ List<Widget> ClosedState(
           children: [
             Text("${teamNumber} Specs", style: TextStyle(fontSize: 24)),
             SizedBox(height: 18),
-            Text("Hook Intake",
+            Text(sheet.intakeType,
                 style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             Text("Intake Type",
                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400)),
@@ -34,7 +91,7 @@ List<Widget> ClosedState(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "6",
+                      sheet.numMotors,
                       style: TextStyle(fontSize: 16),
                     ),
                     Text("# of Motors", style: TextStyle(fontSize: 12)),
@@ -45,7 +102,7 @@ List<Widget> ClosedState(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "450",
+                      sheet.RPM,
                       style: TextStyle(fontSize: 16),
                     ),
                     Text("RPM", style: TextStyle(fontSize: 12)),
@@ -54,14 +111,18 @@ List<Widget> ClosedState(
               ],
             ),
             SizedBox(height: 12),
-            Divider(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
-            ),
-            SizedBox(height: 12),
-            Text(
-                "They have a PTO mechanism that shifts 2 of their drivetrain motors to their wall stake mechanism",
-                style: TextStyle(fontSize: 16)),
-            SizedBox(height: 9),
+            sheet.otherNotes != ""
+                ? Divider(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withOpacity(0.2),
+                  )
+                : SizedBox(),
+            sheet.otherNotes != "" ? SizedBox(height: 12) : SizedBox(),
+            sheet.otherNotes != ""
+                ? Text("Nice", style: TextStyle(fontSize: 16))
+                : SizedBox(),
           ],
         ),
       ),
@@ -84,28 +145,7 @@ List<Widget> ClosedState(
             SizedBox(
               height: 18,
             ),
-            Flex(
-              direction: Axis.horizontal,
-              children: [
-                Flexible(
-                  child: Container(
-                    height: 175,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(18),
-                        color: Theme.of(context).colorScheme.primary),
-                  ),
-                ),
-                SizedBox(width: 12),
-                Flexible(
-                  child: Container(
-                    height: 175,
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(18),
-                        color: Theme.of(context).colorScheme.primary),
-                  ),
-                )
-              ],
-            )
+            photosDisplay
           ],
         ),
       ),
@@ -132,7 +172,8 @@ List<Widget> ClosedState(
             SizedBox(
               height: 18,
             ),
-            Text("They have a rush auton, an AWP auton and a 4 ring auton",
+            Text(
+                sheet.autonNotes != "" ? sheet.autonNotes : "No notes provided",
                 style: TextStyle(fontSize: 16)),
           ],
         ),
