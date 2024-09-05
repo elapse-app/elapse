@@ -9,7 +9,7 @@ class CreateAccount extends StatefulWidget {
   const CreateAccount({super.key, });
 
   @override
-  _CreateAccountState createState() => _CreateAccountState();
+  State<CreateAccount> createState() => _CreateAccountState();
 }
 
 class _CreateAccountState extends State<CreateAccount> {
