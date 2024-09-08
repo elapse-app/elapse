@@ -61,7 +61,7 @@ Team loadTeam(team) {
     teamNumber: team["number"],
     organization: team["organization"],
     location: loadLocation(team["location"]),
-    grade: team["grade"],
+    grade: getGradeLevel(team["grade"]),
   );
 }
 

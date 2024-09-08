@@ -79,10 +79,10 @@ class ElapseAppBar extends StatelessWidget {
       flexibleSpace: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           double leftPadding = backNavigation
-              ? -0.5 *
+              ? (-0.5 *
                   (constraints.maxHeight -
                       MediaQuery.of(context).padding.top -
-                      125)
+                      125)).clamp(0, double.infinity)
               : 0;
           return FlexibleSpaceBar(
               expandedTitleScale: 1.25,
@@ -108,10 +108,10 @@ class ElapseAppBar extends StatelessWidget {
                             color: Theme.of(context)
                                 .colorScheme
                                 .onSurface
-                                .withOpacity((constraints.maxHeight -
+                                .withOpacity(((constraints.maxHeight -
                                         MediaQuery.of(context).padding.top -
                                         125) /
-                                    -62),
+                                    -62).clamp(0, 1)),
                           ),
                         )
                       : Container(

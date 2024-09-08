@@ -125,7 +125,7 @@ class VDAStats {
   }
 }
 
-Future<List<VDAStats>> getTrueSkillData(seasonId) async {
+Future<List<VDAStats>> getTrueSkillData(int seasonId) async {
   final String? vdaData = prefs.getString("vdaData");
   final String? expiryDate = prefs.getString("vdaExpiry");
 
