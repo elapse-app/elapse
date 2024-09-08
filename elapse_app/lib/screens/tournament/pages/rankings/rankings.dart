@@ -10,18 +10,29 @@ import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dar
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../classes/Team/vdaStats.dart';
+import '../../../../classes/Team/world_skills.dart';
+import '../../../../classes/Tournament/tskills.dart';
+
 class RankingsPage extends StatelessWidget {
   const RankingsPage(
       {super.key,
-      required this.searchQuery,
-      required this.sort,
-      required this.divisionIndex,
-      required this.filter});
+        required this.searchQuery,
+        required this.sort,
+        required this.divisionIndex,
+        required this.filter,
+        required this.skills,
+        required this.worldSkills,
+        required this.vda,
+      });
 
   final String searchQuery;
   final int divisionIndex;
   final String sort;
   final TournamentRankingsFilter filter;
+  final Map<int, TournamentSkills> skills;
+  final List<WorldSkillsStats> worldSkills;
+  final List<VDAStats> vda;
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +103,18 @@ class RankingsPage extends StatelessWidget {
     } else if (sort == "CCWM") {
       divisionTeams.sort((a, b) {
         return rankings[b.id]!.ccwm.compareTo(rankings[a.id]!.ccwm);
+      });
+    } else if (sort == "Skills") {
+      divisionTeams.sort((a, b) {
+        return skills[b.id]?.score.compareTo(skills[a.id]?.score ?? 0) ?? 0;
+      });
+    } else if (sort == "World Skills") {
+      divisionTeams.sort((a, b) {
+        return worldSkills.singleWhere((e) => e.teamId == b.id, orElse: () { return WorldSkillsStats(teamId: b.id, teamNum: b.teamNumber ?? ""); }).score.compareTo(worldSkills.singleWhere((e) => e.teamId == a.id, orElse: () { return WorldSkillsStats(teamId: b.id, teamNum: b.teamNumber ?? ""); }).score);
+      });
+    } else if (sort == "TrueSkill") {
+      divisionTeams.sort((a, b) {
+        return vda.singleWhere((e) => e.id == b.id).trueSkill?.compareTo(vda.singleWhere((e) => e.id == a.id).trueSkill ?? 0) ?? 0;
       });
     }
 

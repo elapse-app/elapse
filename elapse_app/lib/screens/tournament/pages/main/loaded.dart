@@ -19,6 +19,12 @@ import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 
+import '../../../../classes/Filters/gradeLevel.dart';
+import '../../../../classes/Filters/season.dart';
+import '../../../../classes/Team/vdaStats.dart';
+import '../../../../classes/Team/world_skills.dart';
+import '../../../../classes/Tournament/tskills.dart';
+
 class TournamentLoadedScreen extends StatefulWidget {
   final Tournament tournament;
   final bool isPreview;
@@ -37,7 +43,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
   late int selectedIndex;
   int sortIndex = 0;
   List<String> titles = ["Schedule", "Rankings", "Skills", "Info"];
-  List<String> sorts = ["Rank", "AP", "SP", "AWP", "OPR", "DPR", "CCWM"];
+  List<String> sorts = ["Rank", "AP", "SP", "AWP", "OPR", "DPR", "CCWM", "Skills", "World Skills", "TrueSkill"];
   TournamentRankingsFilter filter = TournamentRankingsFilter();
 
   bool showPractice = true;
@@ -61,6 +67,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
   List<Game> eliminations = [];
 
   List<Widget> widgets = [SliverToBoxAdapter(), SliverToBoxAdapter()];
+
+  late Future<List<WorldSkillsStats>> worldSkillsStats;
+  late Future<List<VDAStats>> vdaStats;
 
   void savedPress() {
     setState(() {
@@ -97,6 +106,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
     savedQuery = "";
     _scrollController = ScrollController();
 
+    worldSkillsStats = getWorldSkillsRankings(seasons[0].vrcId, getGradeLevel(prefs.getString("defaultGrade")));
+    vdaStats = getTrueSkillData(seasons[0].vrcId);
+
     if (widget.tournament.divisions[0].games == null ||
         widget.tournament.divisions[0].games!.isEmpty) {
       selectedIndex = 3;
@@ -124,11 +136,30 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
 
     List<Widget> pages = [
       SliverToBoxAdapter(),
-      RankingsPage(
-        searchQuery: searchQuery,
-        sort: sorts[sortIndex],
-        divisionIndex: division.order - 1,
-        filter: filter,
+      FutureBuilder(
+        future: Future.wait([worldSkillsStats, vdaStats]),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+            case ConnectionState.waiting:
+            case ConnectionState.active:
+              return const SliverToBoxAdapter(child: LinearProgressIndicator());
+            case ConnectionState.done:
+              if (snapshot.hasError) {
+                return const BigErrorMessage(icon: Icons.list_outlined, message: "Unable to load rankings");
+              }
+
+              return RankingsPage(
+                searchQuery: searchQuery,
+                sort: sorts[sortIndex],
+                divisionIndex: division.order - 1,
+                filter: filter,
+                skills: widget.tournament.tournamentSkills ?? {},
+                worldSkills: snapshot.data?[0] as List<WorldSkillsStats>,
+                vda: snapshot.data?[1] as List<VDAStats>,
+              );
+          }
+        }
       ),
       SkillsPage(
           skills: widget.tournament.tournamentSkills!,
