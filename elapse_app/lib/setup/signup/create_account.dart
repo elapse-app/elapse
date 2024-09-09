@@ -20,12 +20,12 @@ class _CreateAccountState extends State<CreateAccount> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 191, 231, 237),
+      backgroundColor: Theme.of(context).colorScheme.primary,
       appBar: PreferredSize(
         preferredSize: MediaQuery.of(context).size * 0.07,
         child: AppBar(
           automaticallyImplyLeading: false,
-          backgroundColor: Color.fromARGB(255, 191, 231, 237),
+          backgroundColor: Theme.of(context).colorScheme.primary,
           title: GestureDetector(
             onTap: () {
               Navigator.pop(context);
@@ -51,7 +51,7 @@ class _CreateAccountState extends State<CreateAccount> {
         height: double.infinity,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.tertiary,
           borderRadius: BorderRadius.only(
             topLeft: Radius.circular(20),
             topRight: Radius.circular(20),
