@@ -1,3 +1,4 @@
+import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/setup/configure/join_team.dart';
 import 'package:elapse_app/setup/deprecated/team_setup.dart';
 import 'package:elapse_app/setup/signup/verify_account.dart';
@@ -16,43 +17,75 @@ class EnterDetailsPage extends StatelessWidget {
     final TextEditingController _ageController = TextEditingController();
 
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 191, 231, 237),
-      appBar: PreferredSize(
-        preferredSize: MediaQuery.of(context).size * 0.07,
-        child: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Color.fromARGB(255, 191, 231, 237),
-          title: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: const Row(
-              children: [
-                Icon(Icons.arrow_back),
-                SizedBox(width: 12),
-                Text('Create account',
-                  style: TextStyle(
-                fontSize: 24,
-                fontFamily: 'Manrope',
-                fontWeight: FontWeight.w600,
-                color: Color.fromARGB(255, 0, 0, 0),
-              ),
+      // backgroundColor: Color.fromARGB(255, 191, 231, 237),
+      // appBar: PreferredSize(
+      //   preferredSize: MediaQuery.of(context).size * 0.07,
+      //   child: AppBar(
+      //     automaticallyImplyLeading: false,
+      //     backgroundColor: Color.fromARGB(255, 191, 231, 237),
+      //     title: GestureDetector(
+      //       onTap: () {
+      //         Navigator.pop(context);
+      //       },
+      //       child: const Row(
+      //         children: [
+      //           Icon(Icons.arrow_back),
+      //           SizedBox(width: 12),
+      //           Text('Create account',
+      //             style: TextStyle(
+      //           fontSize: 24,
+      //           fontFamily: 'Manrope',
+      //           fontWeight: FontWeight.w600,
+      //           color: Color.fromARGB(255, 0, 0, 0),
+      //         ),
+      //           ),
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // ),
+      
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      body: CustomScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        slivers: [
+          ElapseAppBar(
+            title: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Icon(Icons.arrow_back),
+                      ),
+                      const SizedBox(width: 12),
+                      Text('Sign up',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontFamily: 'Manrope',
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ]
                 ),
-              ],
-            ),
+            maxHeight: 60,
           ),
-        ),
-      ),
-      body: Container(
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Container(
         height: double.infinity,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
           ),
         ),
+        child: Container(
+        height: double.infinity,
+        width: double.infinity,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -224,6 +257,10 @@ class EnterDetailsPage extends StatelessWidget {
           ],
         ),
       ),
+      ),
+      ),
+        ]
+      )
     );
   }
 }

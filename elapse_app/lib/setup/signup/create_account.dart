@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:elapse_app/setup/welcome/first_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/main.dart';
+import '../../screens/widgets/app_bar.dart';
 
 class CreateAccount extends StatefulWidget {
   const CreateAccount({super.key, });
@@ -21,40 +22,67 @@ class _CreateAccountState extends State<CreateAccount> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.primary,
-      appBar: PreferredSize(
-        preferredSize: MediaQuery.of(context).size * 0.07,
-        child: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          title: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: const Row(
-              children: [
-                Icon(Icons.arrow_back),
-                SizedBox(width: 12),
-                Text('Create account',
-                  style: TextStyle(
-                fontSize: 24,
-                fontFamily: 'Manrope',
-                fontWeight: FontWeight.w600,
-                color: Color.fromARGB(255, 0, 0, 0),
-              ),
+      // appBar: PreferredSize(
+      //   preferredSize: MediaQuery.of(context).size * 0.07,
+      //   child: AppBar(
+      //     automaticallyImplyLeading: false,
+      //     backgroundColor: Theme.of(context).colorScheme.primary,
+      //     title: GestureDetector(
+      //       onTap: () {
+      //         Navigator.pop(context);
+      //       },
+      //       child: const Row(
+      //         children: [
+      //           Icon(Icons.arrow_back),
+      //           SizedBox(width: 12),
+      //           Text('Create account',
+      //             style: TextStyle(
+      //           fontSize: 24,
+      //           fontFamily: 'Manrope',
+      //           fontWeight: FontWeight.w600,
+      //           color: Color.fromARGB(255, 0, 0, 0),
+      //         ),
+      //           ),
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // ),
+      body: CustomScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        slivers: [
+          ElapseAppBar(
+            title: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Icon(Icons.arrow_back),
+                      ),
+                      const SizedBox(width: 12),
+                      Text('Sign up',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontFamily: 'Manrope',
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ]
                 ),
-              ],
-            ),
+            maxHeight: 60,
           ),
-        ),
-      ),
-      body: Container(
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Container(
         height: double.infinity,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.tertiary,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
           ),
         ),
         child: Form(
@@ -129,7 +157,7 @@ class _CreateAccountState extends State<CreateAccount> {
                     ),
                     labelText: 'Email',
                     labelStyle: TextStyle(
-                      color: Color.fromARGB(255, 35, 35, 35),
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.w400,
                       fontFamily: "Manrope",
                       fontSize: 16,
@@ -176,7 +204,7 @@ class _CreateAccountState extends State<CreateAccount> {
                     ),
                     labelText: 'Password',
                     labelStyle: TextStyle(
-                      color: Color.fromARGB(255, 35, 35, 35),
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.w400,
                       fontFamily: "Manrope",
                       fontSize: 16,
@@ -204,7 +232,7 @@ class _CreateAccountState extends State<CreateAccount> {
                         fontWeight: FontWeight.w300,
                         fontFamily: "Manrope",
                         fontSize: 10,
-                        color: Color.fromARGB(255, 35, 35, 35),
+                        color: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
                   ),
@@ -273,6 +301,9 @@ class _CreateAccountState extends State<CreateAccount> {
           ),
         ),
       ),
+      ),
+        ]
+      )
     );
   }
 }
