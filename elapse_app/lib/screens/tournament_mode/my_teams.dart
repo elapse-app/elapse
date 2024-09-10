@@ -56,7 +56,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
     selectedTeamPreview = savedTeamPreview;
     super.initState();
     team = fetchTeam(savedTeamPreview.teamID);
-    teamStats = getTrueSkillDataForTeam(savedTeamPreview.teamNumber);
+    teamStats = getTrueSkillDataForTeam(seasonID, savedTeamPreview.teamNumber);
     teamTournaments = fetchTeamTournaments(savedTeamPreview.teamID, seasonID);
     teamAwards = getAwards(savedTeamPreview.teamID, seasonID);
 
@@ -68,7 +68,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
       setState(() {
         selectedTeamPreview = value;
         team = fetchTeam(value.teamID);
-        teamStats = getTrueSkillDataForTeam(value.teamNumber);
+        teamStats = getTrueSkillDataForTeam(seasonID, value.teamNumber);
         teamTournaments = fetchTeamTournaments(value.teamID, seasonID);
         teamAwards = getAwards(value.teamID, seasonID);
       });
@@ -76,7 +76,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
   }
 
   Future<Team>? team;
-  Future<VDAStats>? teamStats;
+  Future<VDAStats?>? teamStats;
   Future<List<TournamentPreview>>? teamTournaments;
   Future<List<Award>>? teamAwards;
   @override
@@ -264,7 +264,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                         if (snapshot.hasData) {
                           Team team = snapshot.data as Team;
                           return TeamBio(
-                            grade: team.grade ?? "",
+                            grade: team.grade?.name ?? "",
                             location: team.location ?? Location(),
                             teamName: team.teamName ?? "",
                             organization: team.organization ?? "",
@@ -378,7 +378,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(18.0),
-                  child: FutureBuilder<Object>(
+                  child: FutureBuilder<Object?>(
                     future: teamStats,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
@@ -492,7 +492,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                 ),
                 child: Padding(
                   padding: const EdgeInsets.all(18.0),
-                  child: FutureBuilder<Object>(
+                  child: FutureBuilder<Object?>(
                     future: teamStats,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {

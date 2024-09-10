@@ -7,6 +7,7 @@ import 'package:elapse_app/providers/tournament_mode_provider.dart';
 import 'package:elapse_app/screens/explore/explore.dart';
 import 'package:elapse_app/screens/home/home.dart';
 import 'package:elapse_app/screens/my_team/my_team.dart';
+import 'package:elapse_app/screens/scout/cloud_scout.dart';
 import 'package:elapse_app/screens/tournament_mode/home.dart';
 import 'package:elapse_app/screens/tournament_mode/my_teams.dart';
 import 'package:elapse_app/screens/tournament_mode/tournament.dart';
@@ -28,7 +29,7 @@ void main() async {
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
-  
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
@@ -138,6 +139,7 @@ class MyAppState extends State<MyApp> {
               teamID: teamID,
               teamNumber: teamNumber,
             ),
+            CloudScoutScreen(),
             TMTournamentScreen(
               tournamentID: widget.prefs.getInt("tournamentID"),
               isPreview: false,
@@ -152,6 +154,7 @@ class MyAppState extends State<MyApp> {
               teamID: savedTeam.teamID,
               key: PageStorageKey<String>("home"),
             ),
+            CloudScoutScreen(),
             MyTeams(
               key: PageStorageKey<String>("my-teams"),
             ),
@@ -181,6 +184,11 @@ class MyAppState extends State<MyApp> {
                   Icon(Icons.home_rounded, color: chosenTheme.secondary),
               icon: const Icon(Icons.home_outlined),
               label: "Home"),
+          NavigationDestination(
+              selectedIcon:
+                  Icon(Icons.bubble_chart, color: chosenTheme.secondary),
+              icon: const Icon(Icons.bubble_chart_outlined),
+              label: "Scout"),
           NavigationDestination(
             selectedIcon:
                 Icon(Icons.people_alt_rounded, color: chosenTheme.secondary),

@@ -6,13 +6,15 @@ import 'package:elapse_app/extras/token.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 
+import '../Filters/gradeLevel.dart';
+
 class Team {
   int id;
   String? teamName;
   String? teamNumber;
   String? organization;
   Location? location;
-  String? grade;
+  GradeLevel? grade;
   TeamStats? tournamentStats;
 
   Team(
@@ -36,7 +38,7 @@ class Team {
           address1: (json["location"] as Map)["address_1"],
           address2: (json["location"] as Map)["address_2"],
           country: (json["location"] as Map)["country"]),
-      grade: json["grade"],
+      grade: getGradeLevel(json["grade"]),
     );
   }
 
@@ -47,7 +49,7 @@ class Team {
       "number": teamNumber,
       "organization": organization,
       "location": location?.toJson(),
-      "grade": grade,
+      "grade": grade?.name,
     };
   }
 }
@@ -59,7 +61,7 @@ Team loadTeam(team) {
     teamNumber: team["number"],
     organization: team["organization"],
     location: loadLocation(team["location"]),
-    grade: team["grade"],
+    grade: getGradeLevel(team["grade"]),
   );
 }
 
@@ -124,7 +126,7 @@ Future<Team> fetchTeam(int teamId) async {
   String teamName = parsed["team_name"];
   String teamNumber = parsed["number"];
   String organization = parsed["organization"];
-  String grade = parsed["grade"];
+  GradeLevel grade = gradeLevels[parsed["grade"]]!;
   Location location = Location(
       address1: parsedLocation["address_1"],
       address2: parsedLocation["address_2"],

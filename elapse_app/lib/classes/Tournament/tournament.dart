@@ -192,12 +192,12 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
 
 Future<Tournament> TMTournamentDetails(int tournamentID) async {
   Tournament tournament;
-  if (prefs.getString("savedTournament") == null) {
+  if (prefs.getString("TMSavedTournament") == null) {
     tournament = await getTournamentDetails(tournamentID);
-    prefs.setString("savedTournament", jsonEncode(tournament.toJson()));
+    prefs.setString("TMSavedTournament", jsonEncode(tournament.toJson()));
     return tournament;
   } else {
-    tournament = loadTournament(prefs.getString("savedTournament")!);
+    tournament = loadTournament(prefs.getString("TMSavedTournament")!);
 
     DateTime? updateTime =
         DateTime.tryParse(prefs.getString("updateTime") ?? "");
@@ -209,7 +209,9 @@ Future<Tournament> TMTournamentDetails(int tournamentID) async {
       // Update every minute
     }
 
-    prefs.setString("savedTournament", jsonEncode(tournament.toJson()));
+    prefs.setString("TMSavedTournament", jsonEncode(tournament.toJson()));
+    prefs.setString(
+        "recently-opened-tournament", jsonEncode(tournament.toJson()));
     return tournament;
   }
 }

@@ -71,12 +71,12 @@ class Award {
 Award loadAward(award) {
   List<TeamPreview> teamWinners = [];
   for (var a in award["teamWinners"]) {
-    teamWinners.add(loadTeamPreview(a));
+    teamWinners.add(loadTeamPreview(jsonEncode(a)));
   }
 
   List<TeamPreview> individualWinners = [];
   for (var a in award["individualWinners"]) {
-    individualWinners.add(loadTeamPreview(a));
+    individualWinners.add(loadTeamPreview(jsonEncode(a)));
   }
 
   List<String> qualifications = [];

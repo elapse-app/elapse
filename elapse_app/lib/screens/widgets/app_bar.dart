@@ -8,6 +8,7 @@ class ElapseAppBar extends StatelessWidget {
     required this.title,
     this.includeSettings = false,
     this.backNavigation = false,
+    this.returnData,
     this.prefs,
     this.background,
     this.maxHeight = 125,
@@ -16,16 +17,17 @@ class ElapseAppBar extends StatelessWidget {
   final Widget? background;
   final bool includeSettings;
   final bool backNavigation;
+  final Object? returnData;
   final SharedPreferences? prefs;
   final double maxHeight;
 
   @override
   Widget build(BuildContext context) {
     Widget? appBarBackground = background;
-    if (includeSettings) {
+    if (includeSettings && background == null) {
       appBarBackground = SafeArea(
         child: Padding(
-          padding: EdgeInsets.only(left: 23, right: 12, bottom: 20),
+          padding: EdgeInsets.only(left: 23, right: 12, bottom: 20, top: 10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -36,7 +38,7 @@ class ElapseAppBar extends StatelessWidget {
                   backNavigation
                       ? GestureDetector(
                           onTap: () {
-                            Navigator.pop(context);
+                            Navigator.pop(context, returnData);
                           },
                           child: Icon(Icons.arrow_back,
                               color: Theme.of(context).colorScheme.onSurface),
@@ -53,7 +55,7 @@ class ElapseAppBar extends StatelessWidget {
     } else if (backNavigation && background == null) {
       appBarBackground = SafeArea(
         child: Padding(
-          padding: EdgeInsets.only(left: 23),
+          padding: EdgeInsets.only(left: 23, top: 10),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,7 +63,7 @@ class ElapseAppBar extends StatelessWidget {
               backNavigation
                   ? GestureDetector(
                       onTap: () {
-                        Navigator.pop(context);
+                        Navigator.pop(context, returnData);
                       },
                       child: Icon(Icons.arrow_back,
                           color: Theme.of(context).colorScheme.onSurface),
@@ -79,10 +81,10 @@ class ElapseAppBar extends StatelessWidget {
       flexibleSpace: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           double leftPadding = backNavigation
-              ? -0.5 *
+              ? (-0.5 *
                   (constraints.maxHeight -
                       MediaQuery.of(context).padding.top -
-                      125)
+                      125)).clamp(0, double.infinity)
               : 0;
           return FlexibleSpaceBar(
               expandedTitleScale: 1.25,
@@ -101,17 +103,17 @@ class ElapseAppBar extends StatelessWidget {
                   backNavigation
                       ? GestureDetector(
                           onTap: () {
-                            Navigator.pop(context);
+                            Navigator.pop(context, returnData);
                           },
                           child: Icon(
                             Icons.arrow_back,
                             color: Theme.of(context)
                                 .colorScheme
                                 .onSurface
-                                .withOpacity((constraints.maxHeight -
+                                .withOpacity(((constraints.maxHeight -
                                         MediaQuery.of(context).padding.top -
                                         125) /
-                                    -62),
+                                    -62).clamp(0, 1)),
                           ),
                         )
                       : Container(
