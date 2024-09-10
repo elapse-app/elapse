@@ -7,22 +7,30 @@ import 'package:elapse_app/classes/Team/vdaStats.dart';
 import 'package:elapse_app/extras/token.dart';
 import 'package:http/http.dart' as http;
 
+import '../Filters/gradeLevel.dart';
+import '../Filters/season.dart';
+
 class TeamPreview {
   String teamNumber;
   int teamID;
   Location? location;
   String? teamName;
+  GradeLevel? gradeLevel;
 
   TeamPreview(
       {required this.teamNumber,
       required this.teamID,
       this.location,
-      this.teamName});
+      this.teamName,
+      this.gradeLevel,});
 
   Map<String, dynamic> toJson() {
     return {
       'teamNumber': teamNumber,
       'teamID': teamID,
+      'location': location?.toJson(),
+      'teamName': teamName,
+      'grade': gradeLevel?.name,
     };
   }
 
@@ -37,9 +45,14 @@ class TeamPreview {
 }
 
 TeamPreview loadTeamPreview(teamPreview) {
+  dynamic preview = jsonDecode(teamPreview);
   return TeamPreview(
-    teamNumber: teamPreview["teamNumber"],
-    teamID: teamPreview["teamID"],
+    teamNumber: preview["teamNumber"],
+    teamID: preview["teamID"],
+    location:
+        preview["location"] != null ? loadLocation(preview["location"]) : null,
+    teamName: preview["teamName"],
+    gradeLevel: gradeLevels[preview["grade"]],
   );
 }
 
@@ -69,7 +82,9 @@ Future<List<TeamPreview>> fetchTeamPreview(String searchQuery) async {
               region: responseData[0]["location"]["region"],
               country: responseData[0]["location"]["country"],
               venue: responseData[0]["location"]["venue"],
-            )));
+            ),
+            gradeLevel: gradeLevels[responseData[0]["grade"]],
+        ));
 
         if (!vdaStatsCompleter.isCompleted) {
           vdaStatsCompleter.complete();
@@ -83,7 +98,7 @@ Future<List<TeamPreview>> fetchTeamPreview(String searchQuery) async {
     }
   });
 
-  getTrueSkillData().then((value) {
+  getTrueSkillData(seasons[0].vrcId).then((value) {
     if (!vdaStatsCompleter.isCompleted) {
       List<TeamPreview> vdaTeams = value.where((element) {
         if (searchQuery.isEmpty) {
@@ -104,7 +119,9 @@ Future<List<TeamPreview>> fetchTeamPreview(String searchQuery) async {
             teamNumber: e.teamNum,
             teamID: e.id,
             location: e.location,
-            teamName: e.teamName);
+            teamName: e.teamName,
+            gradeLevel: e.gradeLevel,
+        );
       }).toList();
 
       teams.addAll(vdaTeams);

@@ -8,14 +8,22 @@ import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/screens/tournament/pages/info/info.dart';
 import 'package:elapse_app/screens/tournament/pages/main/search_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings.dart';
+import 'package:elapse_app/screens/tournament/pages/rankings/rankings_filter.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/qualification_matches.dart';
 import 'package:elapse_app/screens/tournament/pages/skills/skills.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
+import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+
+import '../../../../classes/Filters/gradeLevel.dart';
+import '../../../../classes/Filters/season.dart';
+import '../../../../classes/Team/vdaStats.dart';
+import '../../../../classes/Team/world_skills.dart';
+import '../../../../classes/Tournament/tskills.dart';
 
 class TournamentLoadedScreen extends StatefulWidget {
   final Tournament tournament;
@@ -33,9 +41,10 @@ class TournamentLoadedScreen extends StatefulWidget {
 class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
     with TickerProviderStateMixin {
   late int selectedIndex;
-  int filterIndex = 0;
+  int sortIndex = 0;
   List<String> titles = ["Schedule", "Rankings", "Skills", "Info"];
-  List<String> filters = ["rank", "opr", "dpr", "ccwm", "ap", "sp"];
+  List<String> sorts = ["Rank", "AP", "SP", "AWP", "OPR", "DPR", "CCWM", "Skills", "World Skills", "TrueSkill"];
+  TournamentRankingsFilter filter = TournamentRankingsFilter();
 
   bool showPractice = true;
   bool showQualification = true;
@@ -52,13 +61,15 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
   List<Team> rankingsTeams = [];
   List<TeamPreview> savedTeams = [];
   bool useSavedTeams = false;
-  bool useLiveTiming = true;
 
   List<Game> practice = [];
   List<Game> qualifications = [];
   List<Game> eliminations = [];
 
   List<Widget> widgets = [SliverToBoxAdapter(), SliverToBoxAdapter()];
+
+  late Future<List<WorldSkillsStats>> worldSkillsStats;
+  late Future<List<VDAStats>> vdaStats;
 
   void savedPress() {
     setState(() {
@@ -95,6 +106,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
     savedQuery = "";
     _scrollController = ScrollController();
 
+    worldSkillsStats = getWorldSkillsRankings(seasons[0].vrcId, getGradeLevel(prefs.getString("defaultGrade")));
+    vdaStats = getTrueSkillData(seasons[0].vrcId);
+
     if (widget.tournament.divisions[0].games == null ||
         widget.tournament.divisions[0].games!.isEmpty) {
       selectedIndex = 3;
@@ -122,11 +136,30 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
 
     List<Widget> pages = [
       SliverToBoxAdapter(),
-      RankingsPage(
-        searchQuery: searchQuery,
-        sort: filters[filterIndex],
-        divisionIndex: division.order - 1,
-        useSavedTeams: useSavedTeams,
+      FutureBuilder(
+        future: Future.wait([worldSkillsStats, vdaStats]),
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
+            case ConnectionState.none:
+            case ConnectionState.waiting:
+            case ConnectionState.active:
+              return const SliverToBoxAdapter(child: LinearProgressIndicator());
+            case ConnectionState.done:
+              if (snapshot.hasError) {
+                return const BigErrorMessage(icon: Icons.list_outlined, message: "Unable to load rankings");
+              }
+
+              return RankingsPage(
+                searchQuery: searchQuery,
+                sort: sorts[sortIndex],
+                divisionIndex: division.order - 1,
+                filter: filter,
+                skills: widget.tournament.tournamentSkills ?? {},
+                worldSkills: snapshot.data?[0] as List<WorldSkillsStats>,
+                vda: snapshot.data?[1] as List<VDAStats>,
+              );
+          }
+        }
       ),
       SkillsPage(
           skills: widget.tournament.tournamentSkills!,
@@ -458,34 +491,87 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
                       direction: Axis.horizontal,
                       children: [
                         Flexible(
-                          flex: 1,
-                          child: IconButton(
-                            icon: Icon(
-                              useSavedTeams
-                                  ? Icons.bookmark
-                                  : Icons.bookmark_outline,
-                              size: 30,
-                            ),
-                            onPressed: savedPress,
-                          ),
-                        ),
-                        Flexible(
-                          flex: 4,
-                          child: ListView(
-                            scrollDirection: Axis.horizontal,
+                          flex: 6,
+                          child: Stack(
                             children: [
-                              SizedBox(
-                                width: 13,
+                              ListView(
+                                scrollDirection: Axis.horizontal,
+                                children: List<Widget>.generate(sorts.length,
+                                    (int index) {
+                                  return Container(
+                                    padding: const EdgeInsets.only(right: 5),
+                                    child: ChoiceChip(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 5),
+                                      label: Text(sorts[index],
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface,
+                                          )),
+                                      selected: sortIndex == index,
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                              width: 1.5),
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      selectedColor:
+                                          Theme.of(context).colorScheme.primary,
+                                      chipAnimationStyle: ChipAnimationStyle(
+                                          enableAnimation: AnimationStyle(
+                                              duration: Duration.zero),
+                                          selectAnimation: AnimationStyle(
+                                              duration: Duration.zero)),
+                                      onSelected: (bool selected) {
+                                        setState(() {
+                                          sortIndex = index;
+                                        });
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
                               ),
-                              _buildFilterButton(context, "Rank", 0),
-                              _buildFilterButton(context, "OPR", 1),
-                              _buildFilterButton(context, "DPR", 2),
-                              _buildFilterButton(context, "CCWM", 3),
-                              _buildFilterButton(context, "AP", 4),
-                              _buildFilterButton(context, "SP", 5),
+                              IgnorePointer(
+                                ignoring: true,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Theme.of(context)
+                                            .colorScheme
+                                            .surface
+                                            .withOpacity(0),
+                                        Theme.of(context).colorScheme.surface,
+                                      ],
+                                      stops: const [0.9, 1.0],
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ),
+                        Flexible(
+                            flex: 1,
+                            child: IconButton(
+                                icon: const Icon(
+                                  Icons.filter_list,
+                                  size: 30,
+                                ),
+                                onPressed: () async {
+                                  TournamentRankingsFilter updatedFilter =
+                                      await worldRankingsFilter(
+                                    context,
+                                    filter,
+                                    prefs.getBool("inTournamentMode") ?? false,
+                                  );
+                                  setState(() {
+                                    filter = updatedFilter;
+                                  });
+                                })),
                       ],
                     ),
                   ),
@@ -583,7 +669,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
                     });
                   }, showPractice),
                   sliver: showPractice
-                      ? MatchesView(games: practice, useLiveTiming: true)
+                      ? MatchesView(games: practice)
                       : SliverToBoxAdapter(),
                 )
               : SliverToBoxAdapter(),
@@ -598,7 +684,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
                     });
                   }, showQualification),
                   sliver: showQualification
-                      ? MatchesView(games: qualifications, useLiveTiming: true)
+                      ? MatchesView(games: qualifications)
                       : SliverToBoxAdapter(),
                 )
               : SliverToBoxAdapter(),
@@ -613,8 +699,16 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
                     });
                   }, showElimination),
                   sliver: showElimination
-                      ? MatchesView(games: eliminations, useLiveTiming: true)
+                      ? MatchesView(games: eliminations)
                       : SliverToBoxAdapter(),
+                )
+              : SliverToBoxAdapter(),
+
+          selectedIndex == 0 &&
+                  (division.games == null || division.games!.isEmpty)
+              ? SliverToBoxAdapter(
+                  child: BigErrorMessage(
+                      icon: Icons.schedule, message: "Schedule Not Available"),
                 )
               : SliverToBoxAdapter(),
 
@@ -688,30 +782,6 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
           },
         ),
       ],
-    );
-  }
-
-  TextButton _buildFilterButton(BuildContext context, String name, int index) {
-    Color backgroundColor = index == filterIndex
-        ? Theme.of(context).colorScheme.primary
-        : Theme.of(context).colorScheme.surface;
-    return TextButton(
-      style: TextButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 4)),
-      child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-          decoration: BoxDecoration(
-              color: backgroundColor,
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Theme.of(context).colorScheme.primary)),
-          child: Text(name,
-              style:
-                  TextStyle(color: Theme.of(context).colorScheme.onSurface))),
-      onPressed: () {
-        setState(() {
-          filterIndex = index;
-        });
-      },
     );
   }
 }

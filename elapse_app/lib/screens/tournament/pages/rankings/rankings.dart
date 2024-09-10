@@ -5,21 +5,35 @@ import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/main.dart';
+import 'package:elapse_app/screens/tournament/pages/rankings/rankings_filter.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dart';
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../classes/Team/vdaStats.dart';
+import '../../../../classes/Team/world_skills.dart';
+import '../../../../classes/Tournament/tskills.dart';
+
 class RankingsPage extends StatelessWidget {
   const RankingsPage(
       {super.key,
-      required this.searchQuery,
-      required this.sort,
-      required this.divisionIndex,
-      required this.useSavedTeams});
+        required this.searchQuery,
+        required this.sort,
+        required this.divisionIndex,
+        required this.filter,
+        required this.skills,
+        required this.worldSkills,
+        required this.vda,
+      });
+
   final String searchQuery;
   final int divisionIndex;
   final String sort;
-  final bool useSavedTeams;
+  final TournamentRankingsFilter filter;
+  final Map<int, TournamentSkills> skills;
+  final List<WorldSkillsStats> worldSkills;
+  final List<VDAStats> vda;
+
   @override
   Widget build(BuildContext context) {
     Tournament tournament =
@@ -27,7 +41,7 @@ class RankingsPage extends StatelessWidget {
 
     List<Team> teams = tournament.teams;
     List<TeamPreview> savedTeams = [];
-    if (useSavedTeams) {
+    if (filter.saved) {
       final String savedTeam = prefs.getString("savedTeam") ?? "";
       TeamPreview savedTeamPreview = TeamPreview(
           teamID: jsonDecode(savedTeam)["teamID"],
@@ -46,34 +60,61 @@ class RankingsPage extends StatelessWidget {
     } else {
       teams = tournament.teams;
     }
+
+    List<TeamPreview> scoutedTeams = [];
+    if (filter.scouted) {
+      teams = tournament.teams.where((e) => scoutedTeams.any((e2) => e2.teamID == e.id)).toList();
+    }
+
+    List<TeamPreview> pickListTeams = [];
+    if (filter.onPickList) {
+      teams = tournament.teams.where((e) => pickListTeams.any((e2) => e2.teamID == e.id)).toList();
+    }
+
     Map<int, TeamStats> rankings =
         tournament.divisions[divisionIndex].teamStats!;
 
     List<Team> divisionTeams =
         teams.where((e) => rankings[e.id] != null).toList();
-    if (sort == "rank") {
+    if (sort == "Rank") {
       divisionTeams.sort((a, b) {
         return rankings[a.id]!.rank.compareTo(rankings[b.id]!.rank);
       });
-    } else if (sort == "ap") {
+    } else if (sort == "AP") {
       divisionTeams.sort((a, b) {
         return rankings[b.id]!.ap.compareTo(rankings[a.id]!.ap);
       });
-    } else if (sort == "opr") {
-      divisionTeams.sort((a, b) {
-        return rankings[b.id]!.opr.compareTo(rankings[a.id]!.opr);
-      });
-    } else if (sort == "dpr") {
-      divisionTeams.sort((a, b) {
-        return rankings[b.id]!.dpr.compareTo(rankings[a.id]!.dpr) * -1;
-      });
-    } else if (sort == "sp") {
+    } else if (sort == "SP") {
       divisionTeams.sort((a, b) {
         return rankings[b.id]!.sp.compareTo(rankings[a.id]!.sp);
       });
-    } else if (sort == "ccwm") {
+    } else if (sort == "AWP") {
+      divisionTeams.sort((a, b) {
+        return rankings[b.id]!.awp.compareTo(rankings[a.id]!.awp);
+      });
+    } else if (sort == "OPR") {
+      divisionTeams.sort((a, b) {
+        return rankings[b.id]!.opr.compareTo(rankings[a.id]!.opr);
+      });
+    } else if (sort == "DPR") {
+      divisionTeams.sort((a, b) {
+        return rankings[b.id]!.dpr.compareTo(rankings[a.id]!.dpr) * -1;
+      });
+    } else if (sort == "CCWM") {
       divisionTeams.sort((a, b) {
         return rankings[b.id]!.ccwm.compareTo(rankings[a.id]!.ccwm);
+      });
+    } else if (sort == "Skills") {
+      divisionTeams.sort((a, b) {
+        return skills[b.id]?.score.compareTo(skills[a.id]?.score ?? 0) ?? 0;
+      });
+    } else if (sort == "World Skills") {
+      divisionTeams.sort((a, b) {
+        return worldSkills.singleWhere((e) => e.teamId == b.id, orElse: () { return WorldSkillsStats(teamId: b.id, teamNum: b.teamNumber ?? ""); }).score.compareTo(worldSkills.singleWhere((e) => e.teamId == a.id, orElse: () { return WorldSkillsStats(teamId: b.id, teamNum: b.teamNumber ?? ""); }).score);
+      });
+    } else if (sort == "TrueSkill") {
+      divisionTeams.sort((a, b) {
+        return vda.singleWhere((e) => e.id == b.id).trueSkill?.compareTo(vda.singleWhere((e) => e.id == a.id).trueSkill ?? 0) ?? 0;
       });
     }
 
@@ -103,7 +144,7 @@ class RankingsPage extends StatelessWidget {
           if (teamStats == null) {
             return const SizedBox();
           }
-          if (sort == "opr" || sort == "dpr" || sort == "ccwm") {
+          if (sort == "OPR" || sort == "DPR" || sort == "CCWM") {
             return Column(
               children: [
                 OPRRanking(

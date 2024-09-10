@@ -1,9 +1,14 @@
 import 'package:elapse_app/screens/explore/search.dart';
 import 'package:elapse_app/screens/explore/worldRankings.dart';
 import 'package:elapse_app/screens/explore/worldRankings/skills/world_skills.dart';
+import 'package:elapse_app/screens/explore/upcoming_tournaments.dart';
+import 'package:elapse_app/screens/explore/worldRankings/topWorldSkills.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
+
+import '../../classes/Filters/levelClass.dart';
+import 'filters.dart';
 
 class ExploreScreen extends StatelessWidget {
   const ExploreScreen({super.key});
@@ -169,83 +174,156 @@ class ExploreScreen extends StatelessWidget {
           SliverToBoxAdapter(
             child: Container(
               margin: const EdgeInsets.symmetric(horizontal: 23),
+              padding: EdgeInsets.symmetric(horizontal: 10),
               height: 64,
               decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.tertiary,
                   borderRadius: BorderRadius.circular(18)),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              child: TextButton(
+                style: TextButton.styleFrom(overlayColor: Colors.transparent),
+                onPressed: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              const WorldRankingsScreen(initIndex: 0)));
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      "World Rankings",
+                      style: TextStyle(
+                        fontSize: 16,
+                        height: 1,
+                        color: Theme.of(context).colorScheme.onPrimary,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Icon(
+                      Icons.arrow_forward,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SliverToBoxAdapter(
+            child: SizedBox(
+              height: 35,
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 23),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Flexible(
-                    flex: 10,
-                  fit: FlexFit.tight,
-                  child: Container(
-                    padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(
-                        minHeight: 50,
-                        minWidth: 150,
+                  const Text(
+                    "Upcoming Signature Events",
+                    style: TextStyle(fontSize: 24),
+                  ),
+                  Container(
+                      width: MediaQuery.sizeOf(context).width,
+                      height: 200,
+                      margin: const EdgeInsets.only(top: 18),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            color: Theme.of(context).colorScheme.primary),
+                        borderRadius: BorderRadius.circular(18),
                       ),
-                      child: TextButton(
-                        style: TextButton.styleFrom(overlayColor: Colors.transparent),
-                        onPressed: () {
-                          Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      const WorldRankingsScreen(initIndex: 0)));
+                      child: ShaderMask(
+                        shaderCallback: (Rect rect) {
+                          return LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Theme.of(context).colorScheme.surface,
+                              Theme.of(context)
+                                  .colorScheme
+                                  .surface
+                                  .withOpacity(0),
+                              Theme.of(context)
+                                  .colorScheme
+                                  .surface
+                                  .withOpacity(0),
+                              Theme.of(context).colorScheme.surface
+                            ],
+                            stops: const [
+                              0.0,
+                              0.1,
+                              0.9,
+                              1.0
+                            ], // 10% purple, 80% transparent, 10% purple
+                          ).createShader(rect);
                         },
-                        child: Text(
-                            "World Skills",
-                            style: TextStyle(
-                                fontSize: 16,
-                                height: 1,
-                                color: Theme.of(context).colorScheme.onPrimary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ),
+                        blendMode: BlendMode.dstOut,
+                        child: UpcomingTournaments(
+                            filter: ExploreSearchFilter(
+                                levelClass: levelClasses[4],
+                                startDate: DateTime.now(),
+                                endDate: DateTime.now()
+                                    .add(const Duration(days: 30)))),
+                      ))
+                ],
+              ),
+            ),
+          ),
+          const SliverToBoxAdapter(
+            child: SizedBox(
+              height: 35,
+            ),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 23),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Top 10 World Skills",
+                    style: TextStyle(fontSize: 24),
+                  ),
+                  Container(
+                      width: MediaQuery.sizeOf(context).width,
+                      height: 300,
+                      margin: const EdgeInsets.only(top: 18),
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            color: Theme.of(context).colorScheme.primary),
+                        borderRadius: BorderRadius.circular(18),
                       ),
-                  ),
-                  Flexible(
-                      flex: 1,
-                      fit: FlexFit.tight,
-                      child: VerticalDivider(
-                        width: 1,
-                        thickness: 1,
-                        indent: 10,
-                        endIndent: 10,
-                        color: Theme.of(context).colorScheme.surfaceDim,
-                      )),
-                  Flexible(
-                    flex: 10,
-                  fit: FlexFit.tight,
-                  child: Container(
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(
-                      minHeight: 50,
-                      minWidth: 150,
-                    ),
-                    child: TextButton(
-                      style: TextButton.styleFrom(overlayColor: Colors.transparent),
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                const WorldRankingsScreen(initIndex: 1)));
-                      },
-                      child: Text(
-                        "World TrueSkill",
-                        style: TextStyle(
-                          fontSize: 16,
-                          height: 1,
-                          color: Theme.of(context).colorScheme.onPrimary,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ),
-                  ),
-                  ),
+                      child: ShaderMask(
+                        shaderCallback: (Rect rect) {
+                          return LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Theme.of(context).colorScheme.surface,
+                              Theme.of(context)
+                                  .colorScheme
+                                  .surface
+                                  .withOpacity(0),
+                              Theme.of(context)
+                                  .colorScheme
+                                  .surface
+                                  .withOpacity(0),
+                              Theme.of(context).colorScheme.surface
+                            ],
+                            stops: const [
+                              0.0,
+                              0.1,
+                              0.9,
+                              1.0
+                            ], // 10% purple, 80% transparent, 10% purple
+                          ).createShader(rect);
+                        },
+                        blendMode: BlendMode.dstOut,
+                        child: TopWorldSkills(),
+                      ))
                 ],
               ),
             ),

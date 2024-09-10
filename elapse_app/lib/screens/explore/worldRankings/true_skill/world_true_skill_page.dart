@@ -42,7 +42,8 @@ Future<void> worldTrueSkillPage(
                             fontWeight: FontWeight.w500,
                           ),
                         ),
-                        TextButton(
+                        teamID != 0
+                            ? TextButton(
                           iconAlignment: IconAlignment.end,
                           onPressed: () {
                             Navigator.push(
@@ -68,6 +69,7 @@ Future<void> worldTrueSkillPage(
                             ],
                           ),
                         )
+                            : TextButton(onPressed: () {}, child: const SizedBox(),),
                       ],
                     ),
                     const SizedBox(
@@ -111,7 +113,7 @@ Future<void> worldTrueSkillPage(
                           Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("${stats.trueSkill}",
+                                Text(stats.trueSkill?.toStringAsFixed(1) ?? "N/A",
                                     style: const TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.w500,
@@ -129,7 +131,7 @@ Future<void> worldTrueSkillPage(
                           Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("${stats.trueSkillRegionRank}",
+                                Text("${stats.trueSkillRegionRank == 0 ? "N/A" : stats.trueSkillRegionRank}",
                                     style: const TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.w500,
@@ -147,7 +149,7 @@ Future<void> worldTrueSkillPage(
                           Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("${stats.winPercent} %",
+                                Text("${stats.winPercent?.toStringAsFixed(1)} %",
                                     style: const TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.w500,

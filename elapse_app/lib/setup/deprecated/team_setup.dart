@@ -1,19 +1,18 @@
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/providers/color_provider.dart';
-import 'package:elapse_app/setup/configure/theme_setup.dart';
+import 'package:elapse_app/setup/theme_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/main.dart';
 
-class TeamSetupPage extends StatefulWidget {
-  const TeamSetupPage({super.key, required this.prefs});
-  final SharedPreferences prefs;
+class FirstSetupPage extends StatefulWidget {
+  const FirstSetupPage({super.key});
 
   @override
-  State<TeamSetupPage> createState() => _TeamSetupPageState();
+  State<FirstSetupPage> createState() => _FirstSetupPageState();
 }
 
-class _TeamSetupPageState extends State<TeamSetupPage> {
+class _FirstSetupPageState extends State<FirstSetupPage> {
   String teamName = "";
   Future<List<TeamPreview>>? teamSearch;
 
@@ -26,13 +25,11 @@ class _TeamSetupPageState extends State<TeamSetupPage> {
   }
 
   void saveTeam(TeamPreview team) {
-    widget.prefs.setString("savedTeam",
-        '{"teamID": ${team.teamID}, "teamNumber": "${team.teamNumber}"}');
+    prefs.setString("savedTeam",
+        '{"teamID": ${team.teamID}, "teamNumber": "${team.teamNumber}", "grade": "${team.gradeLevel?.name}"}');
+    prefs.setString("defaultGrade", "Main Team");
     Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => ThemeSetup(
-                )));
+        context, MaterialPageRoute(builder: (context) => ThemeSetup()));
   }
 
   @override
@@ -40,7 +37,7 @@ class _TeamSetupPageState extends State<TeamSetupPage> {
     return Consumer<ColorProvider>(builder: (context, colorProvider, snapshot) {
       return Scaffold(
         body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          padding: const EdgeInsets.symmetric(horizontal: 23.0),
           child: SafeArea(
             child: Center(
               child: Column(

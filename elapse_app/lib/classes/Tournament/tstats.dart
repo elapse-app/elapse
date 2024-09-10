@@ -10,13 +10,18 @@ import "dart:io";
 
 class TeamStats {
   int rank = 0;
+
   int wins = 0;
   int losses = 0;
   int ties = 0;
+  int totalMatches = 0;
 
   int wp = 0;
   int ap = 0;
   int sp = 0;
+
+  int awp = 0;
+  double awpRate = 0;
 
   double opr = 0;
   double dpr = 0;
@@ -36,9 +41,12 @@ class TeamStats {
       "wins": wins,
       "losses": losses,
       "ties": ties,
+      "totalMatches": totalMatches,
       "wp": wp,
       "ap": ap,
       "sp": sp,
+      "awp": awp,
+      "awpRate": awpRate,
       "opr": opr,
       "dpr": dpr,
       "ccwm": ccwm,
@@ -59,6 +67,8 @@ TeamStats loadTeamStats(stats) {
     ..wp = stats["wp"]
     ..ap = stats["ap"]
     ..sp = stats["sp"]
+    ..awp = stats["awp"]
+    ..awpRate = stats["awpRate"]
     ..opr = stats["opr"]
     ..dpr = stats["dpr"]
     ..ccwm = stats["ccwm"]
@@ -105,20 +115,29 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
       parsedRankings.map((v) => MapEntry(v["team"]["id"], TeamStats()))));
   for (final t in parsedRankings) {
     int teamId = t["team"]["id"];
+    TeamStats? stat = stats[teamId];
+    if (stat == null) continue;
 
-    stats[teamId]?.rank = t["rank"] ?? 0;
+    stat.rank = t["rank"] ?? 0;
 
-    stats[teamId]?.wins = t["wins"] ?? 0;
-    stats[teamId]?.losses = t["losses"] ?? 0;
-    stats[teamId]?.ties = t["ties"] ?? 0;
+    stat.wins = t["wins"] ?? 0;
+    stat.losses = t["losses"] ?? 0;
+    stat.ties = t["ties"] ?? 0;
+    stat.totalMatches = stat.wins + stat.losses + stat.ties;
 
-    stats[teamId]?.wp = t["wp"];
-    stats[teamId]?.ap = t["ap"];
-    stats[teamId]?.sp = t["sp"];
+    stat.wp = t["wp"];
+    stat.ap = t["ap"];
+    stat.sp = t["sp"];
 
-    stats[teamId]?.highScore = t["high_score"] ?? 0;
-    stats[teamId]?.avgScore = (t["average_points"] ?? 0).toDouble();
-    stats[teamId]?.totalScore = t["total_points"] ?? 0;
+    stat.awp = stat.wp - 2 * stat.wins;
+    while (stat.awp > stat.totalMatches) {
+      stat.awp -= 2;
+    }
+    stat.awpRate = stat.awp / (stat.totalMatches == 0 ? 1 : stat.totalMatches);
+
+    stat.highScore = t["high_score"] ?? 0;
+    stat.avgScore = (t["average_points"] ?? 0).toDouble();
+    stat.totalScore = t["total_points"] ?? 0;
 
     stats[teamId]?.tournamentSkills = skills[teamId];
   }

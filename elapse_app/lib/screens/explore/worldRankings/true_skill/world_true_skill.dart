@@ -3,67 +3,25 @@ import 'package:flutter/material.dart';
 
 import '../../../../classes/Team/teamPreview.dart';
 import '../../../../classes/Team/vdaStats.dart';
+import '../../../../classes/Tournament/tournament.dart';
 import '../../../widgets/big_error_message.dart';
 import '../world_rankings_filter.dart';
 
-class WorldTrueSkillPage extends StatefulWidget {
-  final Future<List<VDAStats>> vdaStats;
-  final int sort;
-  final WorldRankingsFilter filter;
-  final Future<List<TeamPreview>> savedTeams;
-
+class WorldTrueSkillPage extends StatelessWidget {
   const WorldTrueSkillPage({
-    super.key,
-    required this.vdaStats,
-    required this.sort,
-    required this.filter,
-    required this.savedTeams,
-  });
-
-  @override
-  State<WorldTrueSkillPage> createState() => _WorldTrueSkillState();
-}
-
-class _WorldTrueSkillState extends State<WorldTrueSkillPage> {
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: Future.wait([widget.vdaStats, widget.savedTeams]),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SliverToBoxAdapter(
-              child: LinearProgressIndicator(),
-            );
-          } else if (snapshot.hasData) {
-            return WorldTrueSkillLoadedPage(
-              stats: snapshot.data?[0] as List<VDAStats>,
-              sort: widget.sort,
-              filter: widget.filter,
-              savedTeams: snapshot.data?[1] as List<TeamPreview>,
-            );
-          } else {
-            return const SliverToBoxAdapter(
-                child: Center(
-              child: Text("Failed to load world rankings"),
-            ));
-          }
-        });
-  }
-}
-
-class WorldTrueSkillLoadedPage extends StatelessWidget {
-  const WorldTrueSkillLoadedPage({
     super.key,
     required this.stats,
     required this.sort,
     required this.filter,
     required this.savedTeams,
+    required this.tournament,
   });
 
   final List<VDAStats> stats;
   final int sort;
   final WorldRankingsFilter filter;
   final List<TeamPreview> savedTeams;
+  final Tournament? tournament;
 
   @override
   Widget build(BuildContext context) {
@@ -71,13 +29,20 @@ class WorldTrueSkillLoadedPage extends StatelessWidget {
 
     if (filter.regions!.isNotEmpty) {
       teams = teams
-          .where((e) => filter.regions!.any((e2) => e2 == (e.eventRegion ?? "")))
+          .where(
+              (e) => filter.regions!.any((e2) => e2 == (e.eventRegion ?? "")))
           .toList();
     }
 
     if (filter.saved) {
       teams = teams
           .where((e) => savedTeams.any((e2) => e2.teamID == e.id))
+          .toList();
+    }
+
+    if (filter.atTournament && tournament != null) {
+      teams = teams
+          .where((e) => tournament!.teams.any((e2) => e2.id == e.id))
           .toList();
     }
 
@@ -106,7 +71,7 @@ class WorldTrueSkillLoadedPage extends StatelessWidget {
     if (teams.isEmpty) {
       return const SliverToBoxAdapter(
         child: BigErrorMessage(
-            icon: Icons.list_outlined, message: "True Skill not available"),
+            icon: Icons.list_outlined, message: "TrueSkill ranking not available"),
       );
     }
 

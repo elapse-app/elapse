@@ -1,8 +1,12 @@
 import 'dart:convert';
 
+import 'package:elapse_app/classes/Team/team.dart';
+import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Filters/gradeLevel.dart';
 import '../Filters/region.dart';
+import '../Filters/season.dart';
 import '../Miscellaneous/location.dart';
 import "package:http/http.dart" as http;
 
@@ -53,32 +57,45 @@ class WorldSkillsStats {
           region: json["team"]["region"],
           country: json["team"]["country"],
         ),
-      eventRegion: Region(
-        name: json["team"]["eventRegion"] == "British Columbia" ? "British Columbia (BC)" : json["team"]["eventRegion"],
-        id: json["team"]["eventRegionId"],
-      )
-    );
+        eventRegion: Region(
+          name: json["team"]["eventRegion"] == "British Columbia"
+              ? "British Columbia (BC)"
+              : json["team"]["eventRegion"],
+          id: json["team"]["eventRegionId"],
+        ));
   }
 }
 
-Future<List<WorldSkillsStats>> getWorldSkillsRankings(int seasonID) async {
+Future<List<WorldSkillsStats>> getWorldSkillsRankings(int seasonID, GradeLevel grade) async {
   final SharedPreferences prefs = await SharedPreferences.getInstance();
   final String? worldSkillsData = prefs.getString("worldSkillsData");
   final String? expiryDate = prefs.getString("worldSkillsExpiry");
+  final String? cachedGrade = prefs.getString("worldSkillsGrade");
 
   List<dynamic> parsed = [];
 
-  if (worldSkillsData == null ||
-      expiryDate == null ||
-      DateTime.parse(expiryDate).isBefore(DateTime.now())) {
+  if (seasonID < 115) { // Starstruck season ID (earliest season that had world skills data)
+    return List<WorldSkillsStats>.empty();
+  }
+
+  if (seasonID != (grade == gradeLevels["College"] ? seasons[0].vexUId : seasons[0].vrcId) || grade != getGradeLevel(prefs.getString("defaultGrade"))) {
     final response = await http.get(
-      Uri.parse("https://www.robotevents.com/api/seasons/$seasonID/skills"),
+      Uri.parse("https://www.robotevents.com/api/seasons/$seasonID/skills?grade_level=${grade.name.replaceAll(" ", "%20")}"),
+    );
+
+    parsed = jsonDecode(response.body) as List;
+  } else if (worldSkillsData == null ||
+      expiryDate == null || cachedGrade == null ||
+      DateTime.parse(expiryDate).isBefore(DateTime.now()) || grade != gradeLevels[cachedGrade]) {
+    final response = await http.get(
+      Uri.parse("https://www.robotevents.com/api/seasons/$seasonID/skills?grade_level=${grade.name.replaceAll(" ", "%20")}"),
     );
 
     parsed = jsonDecode(response.body) as List;
     prefs.setString("worldSkillsData", response.body);
     prefs.setString("worldSkillsExpiry",
         DateTime.now().add(const Duration(hours: 2)).toString());
+    prefs.setString("worldSkillsGrade", grade.name);
   } else {
     parsed = jsonDecode(worldSkillsData) as List;
   }
@@ -86,4 +103,10 @@ Future<List<WorldSkillsStats>> getWorldSkillsRankings(int seasonID) async {
   List<WorldSkillsStats> ranking =
       parsed.map((e) => WorldSkillsStats.fromJson(e)).toList();
   return ranking;
+}
+
+Future<WorldSkillsStats> getWorldSkillsForTeam(int seasonID, int teamID) async {
+  GradeLevel grade = (await fetchTeam(teamID)).grade!;
+  List<WorldSkillsStats> rankings = await getWorldSkillsRankings(seasonID, grade);
+  return rankings.singleWhere((e) => e.teamId == teamID);
 }

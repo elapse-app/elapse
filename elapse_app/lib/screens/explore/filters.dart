@@ -1,209 +1,300 @@
-import 'package:elapse_app/classes/Filters/eventSearchFilters.dart';
 import 'package:elapse_app/classes/Filters/season.dart';
+import 'package:elapse_app/classes/Filters/levelClass.dart';
+import '../../classes/Filters/gradeLevel.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
-class FiltersPage extends StatefulWidget {
-  const FiltersPage({super.key, required this.filters});
-  final EventSearchFilters filters;
+import '../../main.dart';
 
-  @override
-  State<FiltersPage> createState() => _FiltersPageState();
+class ExploreSearchFilter {
+  Season season;
+  LevelClass levelClass;
+  GradeLevel gradeLevel;
+  DateTime startDate;
+  DateTime endDate;
+
+  ExploreSearchFilter({
+    Season? season,
+    LevelClass? levelClass,
+    GradeLevel? gradeLevel,
+    DateTime? startDate,
+    DateTime? endDate,
+  })  : this.season = season ?? seasons[0],
+        this.levelClass = levelClass ?? levelClasses[0],
+        this.gradeLevel = gradeLevel ?? getGradeLevel(prefs.getString("defaultGrade")),
+        this.startDate =
+            startDate ?? DateTime((season ?? seasons[0]).startYear.year, 5, 1),
+        this.endDate =
+            endDate ?? DateTime((season ?? seasons[0]).endYear.year, 4, 30);
 }
 
-class _FiltersPageState extends State<FiltersPage> {
-  List<Season> seasons = [
-    Season(id: 190, name: "24-25 High Stakes", programID: 1),
-    Season(id: 181, name: "23-24 Over Under", programID: 1),
-    Season(id: 173, name: "22-23 Spin Up", programID: 1),
-    Season(id: 154, name: "21-22 Tipping Point", programID: 1),
-    Season(id: 139, name: "20-21 Change Up", programID: 1),
-    Season(id: 130, name: "19-20 Tower Takeover", programID: 1),
-    Season(id: 125, name: "18-19 Turning Point", programID: 1),
-    Season(id: 119, name: "17-18 In The Zone", programID: 1),
-    Season(id: 115, name: "16-17 Starstruck", programID: 1),
-    Season(id: 110, name: "15-16 Nothing but Net", programID: 1),
-    Season(id: 102, name: "14-15 Skyrise", programID: 1),
-    Season(id: 92, name: "13-14 Toss Up", programID: 1),
-    Season(id: 85, name: "12-13 Sack Attack", programID: 1),
-    Season(id: 73, name: "11-12 Gateway", programID: 1),
-    Season(id: 7, name: "10-11 Round Up", programID: 1),
-    Season(id: 1, name: "9-10 Clean Sweep", programID: 1),
-  ];
-  late int levelClassID;
+Future<ExploreSearchFilter> exploreFilter(
+    BuildContext context, ExploreSearchFilter filter) async {
+  final DraggableScrollableController dra = DraggableScrollableController();
 
-  late Season season;
-  late EventSearchFilters returnFilters;
-  late DateTime startDate;
-  late DateTime endDate;
+  List<GradeLevel> gradeFilters = gradeLevels.values.toList();
+  gradeFilters.insert(0, GradeLevel(id: 0, name: "Middle and High School"));
 
-  @override
-  void initState() {
-    super.initState();
-    levelClassID = 1;
-    season = seasons[0];
-    returnFilters = widget.filters;
-    startDate = DateTime.parse(widget.filters.startDate);
-    endDate = DateTime.parse(widget.filters.endDate);
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Filters",
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500),
-              ),
-              SizedBox(
-                height: 16,
-              ),
-              Text(
-                "Season",
-                style: TextStyle(fontSize: 24),
-              ),
-              DropdownButton<Season>(
-                value: season,
-                items: seasons.map((season) {
-                  return DropdownMenuItem(
-                    child: Text(
-                      season.name,
-                      style: TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    value: season,
-                  );
-                }).toList(),
-                onChanged: (Season? value) => {
-                  setState(() {
-                    season = value!;
-                    returnFilters.seasonID = value.id;
-                  })
-                },
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                "Dates",
-                style: TextStyle(fontSize: 24),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        padding:
-                            EdgeInsets.only(right: 10, top: 10, bottom: 10),
-                        foregroundColor:
-                            Theme.of(context).colorScheme.secondary,
+  return await showModalBottomSheet<ExploreSearchFilter>(
+      context: context,
+      isScrollControlled: true,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return DraggableScrollableSheet(
+                initialChildSize: 0.45,
+                maxChildSize: 0.45,
+                minChildSize: 0,
+                expand: false,
+                shouldCloseOnMinExtent: true,
+                snapAnimationDuration: const Duration(milliseconds: 250),
+                controller: dra,
+                builder:
+                    (BuildContext context, ScrollController scrollController) {
+                  return Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 23, vertical: 24),
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
                       ),
-                      onPressed: () async {
-                        final DateTime? picked = await showDatePicker(
-                          context: context,
-                          initialDate: startDate,
-                          firstDate: DateTime(2010, 1, 1),
-                          lastDate: DateTime(2030),
-                        );
-                        if (picked != null && picked != startDate) {
-                          setState(() {
-                            startDate = picked;
-                            returnFilters.startDate =
-                                DateFormat("yyyy-MM-dd").format(picked);
-                          });
-                        }
-                      },
-                      child: Text(
-                        "Start Date: ${startDate.month}/${startDate.day}/${startDate.year}",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    child: TextButton(
-                      style: TextButton.styleFrom(
-                        padding:
-                            EdgeInsets.only(top: 10, bottom: 10, right: 10),
-                        foregroundColor:
-                            Theme.of(context).colorScheme.secondary,
-                      ),
-                      onPressed: () async {
-                        final DateTime? picked = await showDatePicker(
-                          context: context,
-                          initialDate: endDate,
-                          firstDate: DateTime(2010, 1, 1),
-                          lastDate: DateTime(2030),
-                        );
-                        if (picked != null && picked != endDate) {
-                          setState(() {
-                            endDate = picked;
-                            returnFilters.endDate =
-                                DateFormat("yyyy-MM-dd").format(picked);
-                          });
-                        }
-                      },
-                      child: Text(
-                        "End Date: ${endDate.month}/${endDate.day}/${endDate.year}",
-                        textAlign: TextAlign.end,
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                height: 20,
-              ),
-              Text(
-                "Level Class",
-                style: TextStyle(fontSize: 24),
-              ),
-              DropdownButton(
-                value: levelClassID,
-                items: const [
-                  DropdownMenuItem(
-                      value: 1, child: Text("Event Region Championship")),
-                  DropdownMenuItem(
-                      value: 2, child: Text("National Championship")),
-                  DropdownMenuItem(value: 3, child: Text("World Championship")),
-                  DropdownMenuItem(value: 9, child: Text("Signature Event")),
-                  DropdownMenuItem(
-                      value: 12, child: Text("JROTC Brigade Championship")),
-                  DropdownMenuItem(
-                      value: 13, child: Text("JROTC National Championship")),
-                  DropdownMenuItem(value: 16, child: Text("Showcase Event")),
-                ],
-                onChanged: (int? value) => {
-                  setState(() {
-                    levelClassID = value!;
-                    returnFilters.levelClassID = value.toString();
-                  })
-                },
-              ),
-              TextButton(
-                style: TextButton.styleFrom(
-                  foregroundColor: Theme.of(context).colorScheme.secondary,
-                  alignment: Alignment.centerLeft,
-                  padding: EdgeInsets.only(top: 20, right: 20, bottom: 20),
-                ),
-                child: Text(
-                  "Save Filters",
-                  textAlign: TextAlign.left,
-                ),
-                onPressed: () {
-                  Navigator.pop(context, returnFilters);
-                },
-              )
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+                      child: ListView(controller: scrollController, children: [
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            // crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              const Text(
+                                "Filter",
+                                style: TextStyle(
+                                  fontSize: 24,
+                                  height: 1,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              filter.season != seasons[0] ||
+                                      filter.levelClass != levelClasses[0] ||
+                                      filter.startDate !=
+                                          DateTime(filter.season.startYear.year,
+                                              5, 1) ||
+                                      filter.endDate !=
+                                          DateTime(
+                                              filter.season.endYear.year, 4, 30)
+                                  ? TextButton(
+                                      child: Text("Reset",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            height: 1,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondary,
+                                            fontWeight: FontWeight.w400,
+                                          )),
+                                      onPressed: () {
+                                        setModalState(() {
+                                          filter = ExploreSearchFilter();
+                                        });
+                                      },
+                                    )
+                                  : TextButton(
+                                      child: const SizedBox(),
+                                      onPressed: () {},
+                                    ),
+                            ]),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          height: 50,
+                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            border: Border.all(
+                                color: Theme.of(context).colorScheme.primary),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(100)),
+                          ),
+                          child: InkWell(
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.event_note),
+                                  const SizedBox(width: 10),
+                                  Text(filter.season.name,
+                                      style: const TextStyle(fontSize: 16)),
+                                  const Spacer(),
+                                  const Icon(Icons.arrow_right),
+                                ]),
+                            onTap: () async {
+                              Season updated = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SeasonFilterPage(
+                                    selected: filter.season,
+                                  ),
+                                ),
+                              );
+                              setModalState(() {
+                                filter.season = updated;
+                                filter.startDate = DateTime(
+                                    filter.season.startYear.year, 5, 1);
+                                filter.endDate =
+                                    DateTime(filter.season.endYear.year, 4, 30);
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Container(
+                          height: 50,
+                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            border: Border.all(
+                                color: Theme.of(context).colorScheme.primary),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(100)),
+                          ),
+                          child: InkWell(
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.language),
+                                  const SizedBox(width: 10),
+                                  Text(filter.levelClass.name,
+                                      style: const TextStyle(fontSize: 16)),
+                                  const Spacer(),
+                                  const Icon(Icons.arrow_right),
+                                ]),
+                            onTap: () async {
+                              LevelClass updated = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => LevelClassFilterPage(
+                                    selected: filter.levelClass,
+                                  ),
+                                ),
+                              );
+                              setModalState(() {
+                                filter.levelClass = updated;
+                              });
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                            height: 50,
+                            padding: const EdgeInsets.only(left: 20, right: 20),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.surface,
+                              border: Border.all(
+                                  color: Theme.of(context).colorScheme.primary),
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(100)),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                const Icon(Icons.school),
+                                const SizedBox(width: 10),
+                                DropdownButton<GradeLevel>(
+                                  value: filter.gradeLevel,
+                                  items: gradeFilters.map((grade) {
+                                    return DropdownMenuItem(
+                                      value: grade,
+                                      child: Text(grade.name,
+                                          overflow: TextOverflow.fade,
+                                          style: const TextStyle(fontSize: 16)),
+                                    );
+                                  }).toList(),
+                                  onChanged: (GradeLevel? value) => {
+                                    setModalState(() {
+                                      filter.gradeLevel = value!;
+                                    })
+                                  },
+                                ),
+                              ],
+                            )),
+                        const SizedBox(height: 12),
+                        Container(
+                          height: 50,
+                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            border: Border.all(
+                                color: Theme.of(context).colorScheme.primary),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(100)),
+                          ),
+                          child: InkWell(
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.calendar_month),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                      "Start Date: ${filter.startDate.month}/${filter.startDate.day}/${filter.startDate.year}",
+                                      style: const TextStyle(fontSize: 16)),
+                                ]),
+                            onTap: () async {
+                              final DateTime? date = await showDatePicker(
+                                context: context,
+                                initialDate: filter.startDate,
+                                firstDate: DateTime(2010, 1, 1),
+                                lastDate: DateTime(2030),
+                              );
+                              if (date != null && date != filter.startDate) {
+                                setModalState(() {
+                                  filter.startDate = date;
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        Container(
+                          height: 50,
+                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surface,
+                            border: Border.all(
+                                color: Theme.of(context).colorScheme.primary),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(100)),
+                          ),
+                          child: InkWell(
+                            child: Row(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  const Icon(Icons.calendar_month),
+                                  const SizedBox(width: 10),
+                                  Text(
+                                      "End Date: ${filter.endDate.month}/${filter.endDate.day}/${filter.endDate.year}",
+                                      style: const TextStyle(fontSize: 16)),
+                                ]),
+                            onTap: () async {
+                              final DateTime? date = await showDatePicker(
+                                context: context,
+                                initialDate: filter.endDate,
+                                firstDate: DateTime(2010, 1, 1),
+                                lastDate: DateTime(2030),
+                              );
+                              if (date != null && date != filter.endDate) {
+                                setModalState(() {
+                                  filter.endDate = date;
+                                });
+                              }
+                            },
+                          ),
+                        ),
+                      ]));
+                });
+          },
+        );
+      }).then((_) {
+    return filter;
+  });
 }
