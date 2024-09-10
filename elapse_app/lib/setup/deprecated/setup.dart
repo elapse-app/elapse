@@ -33,7 +33,7 @@ class SetupScreen extends StatelessWidget {
           highlightColor: Colors.transparent,
           fontFamily: "Manrope",
         ),
-        home: TeamSetupPage(prefs: prefs),
+        //home: TeamSetupPage(prefs: prefs),
       );
     });
   }

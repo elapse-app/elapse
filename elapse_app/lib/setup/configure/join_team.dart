@@ -1,3 +1,4 @@
+import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/setup/configure/theme_setup.dart';
 import 'package:elapse_app/setup/signup/enter_details.dart';
 import 'package:flutter/material.dart';
@@ -53,41 +54,46 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 191, 231, 237),
-      appBar: PreferredSize(
-        preferredSize: MediaQuery.of(context).size * 0.07,
-        child: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Color.fromARGB(255, 191, 231, 237),
-          title: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: const Row(
-              children: [
-                Icon(Icons.arrow_back),
-                SizedBox(width: 12),
-                Text('Setup',
-                  style: TextStyle(
-                fontSize: 24,
-                fontFamily: 'Manrope',
-                fontWeight: FontWeight.w600,
-                color: Color.fromARGB(255, 0, 0, 0),
-              ),
+
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      body: CustomScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        slivers: [
+          ElapseAppBar(
+            title: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Icon(Icons.arrow_back),
+                      ),
+                      const SizedBox(width: 12),
+                      Text('Sign up',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontFamily: 'Manrope',
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ]
                 ),
-              ],
-            ),
+            maxHeight: 60,
           ),
-        ),
-      ),
-      body: Container(
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Container(
+        height: double.infinity,
+        width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
           ),
         ),
+        child: Container(
         child: Padding(
           padding: const EdgeInsets.all(0.0),
           child: Column(
@@ -158,7 +164,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                     ),
                     labelText: 'Team Number',
                     labelStyle: TextStyle(
-                    color: Color.fromARGB(255, 73, 69, 79),
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.w400,
                     fontFamily: "Manrope",
                     fontSize: 16,
@@ -227,6 +233,10 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
           ),
         ),
       ),
+      ),
+      ),
+        ]
+      )
     );
   }
 }

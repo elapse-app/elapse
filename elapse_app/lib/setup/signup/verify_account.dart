@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:elapse_app/setup/welcome/first_page.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/setup/signup/create_account.dart';
+import '../../screens/widgets/app_bar.dart';
 
 class VerifyAccount extends StatelessWidget {
   const VerifyAccount({super.key,});
@@ -12,43 +13,73 @@ class VerifyAccount extends StatelessWidget {
     final TextEditingController _codeController = TextEditingController();
 
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 191, 231, 237),
-      appBar: PreferredSize(
-        preferredSize: MediaQuery.of(context).size * 0.07,
-        child: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Color.fromARGB(255, 191, 231, 237),
-          title: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: const Row(
-              children: [
-                Icon(Icons.arrow_back),
-                SizedBox(width: 12),
-                Text('Sign up',
-                  style: TextStyle(
-                fontSize: 24,
-                fontFamily: 'Manrope',
-                fontWeight: FontWeight.w600,
-                color: Color.fromARGB(255, 0, 0, 0),
-              ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      // appBar: PreferredSize(
+      //   preferredSize: MediaQuery.of(context).size * 0.07,
+      //   child: AppBar(
+      //     automaticallyImplyLeading: false,
+      //     backgroundColor: Theme.of(context).colorScheme.primary,
+      //     title: GestureDetector(
+      //       onTap: () {
+      //         Navigator.pop(context);
+      //       },
+      //       child: const Row(
+      //         children: [
+      //           Icon(Icons.arrow_back),
+      //           SizedBox(width: 12),
+      //           Text('Create account',
+      //             style: TextStyle(
+      //           fontSize: 24,
+      //           fontFamily: 'Manrope',
+      //           fontWeight: FontWeight.w600,
+      //           color: Color.fromARGB(255, 0, 0, 0),
+      //         ),
+      //           ),
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // ),
+      body: CustomScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        slivers: [
+          ElapseAppBar(
+            title: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Icon(Icons.arrow_back),
+                      ),
+                      const SizedBox(width: 12),
+                      Text('Sign up',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontFamily: 'Manrope',
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ]
                 ),
-              ],
-            ),
+            maxHeight: 60,
           ),
-        ),
-      ),
-      body: Container(
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Container(
         height: double.infinity,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
           ),
         ),
+        child: Container(
+        height: double.infinity,
+        width: double.infinity,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -124,7 +155,7 @@ class VerifyAccount extends StatelessWidget {
                     ),
                       labelText: 'XXXXXX',
                       labelStyle: TextStyle(
-                        color: Color.fromARGB(255, 73, 69, 79),
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.w400,
                         fontFamily: "Manrope",
                         fontSize: 16,
@@ -185,6 +216,10 @@ class VerifyAccount extends StatelessWidget {
           ],
         ),
       ),
+      ),
+      ),
+        ]
+      )
     );
   }
 }
