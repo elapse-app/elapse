@@ -153,7 +153,7 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
                         child: Container(
                           decoration: BoxDecoration(
                           border: GradientBoxBorder(
-                            gradient: LinearGradient(colors: [Theme.of(context).colorScheme.primary, Color.fromARGB(255, 221, 245, 255)]),
+                            gradient: LinearGradient(colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary]),
                             width: 1,
                           ),
                           gradient: RadialGradient(
