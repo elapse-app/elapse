@@ -1,5 +1,6 @@
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/providers/color_provider.dart';
+import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/setup/configure/tournament_mode_setup.dart';
 import 'package:elapse_app/setup/configure/join_team.dart';
 import 'package:flutter/material.dart';
@@ -21,41 +22,46 @@ class _ThemeSetupState extends State<ThemeSetup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 191, 231, 237),
-      appBar: PreferredSize(
-        preferredSize: MediaQuery.of(context).size * 0.07,
-        child: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Color.fromARGB(255, 191, 231, 237),
-          title: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: const Row(
-              children: [
-                Icon(Icons.arrow_back),
-                SizedBox(width: 12),
-                Text('Theme',
-                  style: TextStyle(
-                fontSize: 24,
-                fontFamily: 'Manrope',
-                fontWeight: FontWeight.w600,
-                color: Color.fromARGB(255, 0, 0, 0),
-              ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      
+      body: CustomScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        slivers: [
+          ElapseAppBar(
+            title: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Icon(Icons.arrow_back),
+                      ),
+                      const SizedBox(width: 12),
+                      Text('Sign up',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontFamily: 'Manrope',
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ]
                 ),
-              ],
-            ),
+            maxHeight: 60,
           ),
-        ),
-      ),
-      body: Container(
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Container(
+        height: double.infinity,
+        width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
           ),
         ),
+        child: Container(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 23.0),
           child: SafeArea(
@@ -63,7 +69,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
               child: Column(
                 children: [
                   const SizedBox(
-                    height: 46,
+                    height: 0,
                   ),
                   Padding(
                 padding: const EdgeInsets.fromLTRB(12, 0, 12, 0),
@@ -112,7 +118,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                           child: TextButton(
                             style: TextButton.styleFrom(
                     foregroundColor: const Color.fromARGB(255, 12, 77, 86),
-                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     textStyle: const TextStyle(
                       fontSize: 16,
                       color: Color.fromARGB(255, 117, 117, 117),
@@ -120,7 +126,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                       fontWeight: FontWeight.w400,
                     ),
                     side: BorderSide(
-                      color: const Color.fromARGB(255, 191, 231, 237),
+                      color: Theme.of(context).colorScheme.primary,
                       width: 1.0,
                       )
                     ),
@@ -157,7 +163,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                           child: TextButton(
                             style: TextButton.styleFrom(
                     foregroundColor: const Color.fromARGB(255, 12, 77, 86),
-                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     textStyle: const TextStyle(
                       fontSize: 16,
                       color: Color.fromARGB(255, 117, 117, 117),
@@ -165,7 +171,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                       fontWeight: FontWeight.w400,
                     ),
                     side: BorderSide(
-                      color: const Color.fromARGB(255, 191, 231, 237),
+                      color: Theme.of(context).colorScheme.primary,
                       width: 1.0,
                       )
                     ),
@@ -202,7 +208,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                           child: TextButton(
                             style: TextButton.styleFrom(
                     foregroundColor: const Color.fromARGB(255, 12, 77, 86),
-                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     textStyle: const TextStyle(
                       fontSize: 16,
                       color: Color.fromARGB(255, 117, 117, 117),
@@ -210,7 +216,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                       fontWeight: FontWeight.w400,
                     ),
                     side: BorderSide(
-                      color: const Color.fromARGB(255, 191, 231, 237),
+                      color: Theme.of(context).colorScheme.primary,
                       width: 1.0,
                       )
                     ),
@@ -255,7 +261,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                       child: TextButton(
                         style: TextButton.styleFrom(
                     foregroundColor: const Color.fromARGB(255, 12, 77, 86),
-                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     textStyle: const TextStyle(
                       fontSize: 16,
                       color: Color.fromARGB(255, 117, 117, 117),
@@ -263,7 +269,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                       fontWeight: FontWeight.w400,
                     ),
                     side: BorderSide(
-                      color: const Color.fromARGB(255, 191, 231, 237),
+                      color: Theme.of(context).colorScheme.primary,
                       width: 1.0,
                       )
                     ),
@@ -298,6 +304,10 @@ class _ThemeSetupState extends State<ThemeSetup> {
           ),
         ),
       ),
+      ),
+      ),
+        ]
+      )
     );
   }
 }

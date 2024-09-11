@@ -1,6 +1,7 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/providers/color_provider.dart';
+import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/setup/configure/cloudscout_setup.dart';
 import 'package:elapse_app/setup/configure/theme_setup.dart';
 import 'package:elapse_app/setup/welcome/first_page.dart';
@@ -17,43 +18,73 @@ class TournamentModeSetupPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 191, 231, 237),
-      appBar: PreferredSize(
-        preferredSize: MediaQuery.of(context).size * 0.07,
-        child: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Color.fromARGB(255, 191, 231, 237),
-          title: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: const Row(
-              children: [
-                Icon(Icons.arrow_back),
-                SizedBox(width: 12),
-                Text('Info',
-                  style: TextStyle(
-                fontSize: 24,
-                fontFamily: 'Manrope',
-                fontWeight: FontWeight.w600,
-                color: Color.fromARGB(255, 0, 0, 0),
-              ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      // appBar: PreferredSize(
+      //   preferredSize: MediaQuery.of(context).size * 0.07,
+      //   child: AppBar(
+      //     automaticallyImplyLeading: false,
+      //     backgroundColor: Theme.of(context).colorScheme.primary,
+      //     title: GestureDetector(
+      //       onTap: () {
+      //         Navigator.pop(context);
+      //       },
+      //       child: const Row(
+      //         children: [
+      //           Icon(Icons.arrow_back),
+      //           SizedBox(width: 12),
+      //           Text('Create account',
+      //             style: TextStyle(
+      //           fontSize: 24,
+      //           fontFamily: 'Manrope',
+      //           fontWeight: FontWeight.w600,
+      //           color: Color.fromARGB(255, 0, 0, 0),
+      //         ),
+      //           ),
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // ),
+      body: CustomScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        slivers: [
+          ElapseAppBar(
+            title: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Icon(Icons.arrow_back),
+                      ),
+                      const SizedBox(width: 12),
+                      Text('Sign up',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontFamily: 'Manrope',
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ]
                 ),
-              ],
-            ),
+            maxHeight: 60,
           ),
-        ),
-      ),
-      body: Container(
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Container(
         height: double.infinity,
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
           ),
         ),
+        child: Container(
+        height: double.infinity,
+        width: double.infinity,
         child: Column(children: [
         Padding(
           padding: EdgeInsets.symmetric(horizontal: 23, vertical: 0),
@@ -73,13 +104,13 @@ class TournamentModeSetupPage extends StatelessWidget {
               SizedBox(height: 8),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 20),
-                child: const Text(
+                child: Text(
                   'Get a streamlined view of matches, rankings, and more',
                   style: TextStyle(
                     fontWeight: FontWeight.w400,
                     fontFamily: "Manrope",
                     fontSize: 16,
-                    color: Color.fromARGB(255, 35, 35, 35),
+                    color: Theme.of(context).colorScheme.onSurface,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -98,12 +129,12 @@ class TournamentModeSetupPage extends StatelessWidget {
               SizedBox(
                 height: 24,
               ),
-              const Text(
+              Text(
                 'Tournament mode enables the Events tab, where you can find matches and live stats.',
                 style: TextStyle(
                   fontSize: 13,
                   fontWeight: FontWeight.w400,
-                  color: Color.fromARGB(255, 117, 117, 117),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontFamily: "Manrope",
                 ),
                 textAlign: TextAlign.center,
@@ -111,11 +142,11 @@ class TournamentModeSetupPage extends StatelessWidget {
               SizedBox(
                 height: 12,
               ),
-              const Text(
+              Text(
                 'Tournament mode can be activated the day of the event, and will be automatically deactivated afterwards.',
                 style: TextStyle(
                   fontSize: 13,
-                  color: Color.fromARGB(255, 117, 117, 117),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontWeight: FontWeight.w400,
                   fontFamily: "Manrope",
                 ),                
@@ -124,12 +155,12 @@ class TournamentModeSetupPage extends StatelessWidget {
               SizedBox(
                 height: 28,
               ),
-              const Text(
+              Text(
                 'Live Timing helps you stay in sync',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
-                  color: Color.fromARGB(255, 117, 117, 117),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontFamily: "Manrope",
                 ),
                 textAlign: TextAlign.center,
@@ -137,10 +168,10 @@ class TournamentModeSetupPage extends StatelessWidget {
               SizedBox(
                 height: 12,
               ),
-              const Text(
+              Text(
                 'Live timing detects if matches are delayed or early and updates the in app schedule automatically.',
                 style: TextStyle(
-                  color: Color.fromARGB(255, 117, 117, 117),
+                  color: Theme.of(context).colorScheme.onSurfaceVariant,
                   fontSize: 13,
                   fontWeight: FontWeight.w400,
                   fontFamily: "Manrope",
@@ -167,7 +198,7 @@ class TournamentModeSetupPage extends StatelessWidget {
             child: TextButton(
               style: TextButton.styleFrom(
                     foregroundColor: const Color.fromARGB(255, 12, 77, 86),
-                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     textStyle: const TextStyle(
                       fontSize: 16,
                       color: Color.fromARGB(255, 117, 117, 117),
@@ -175,7 +206,7 @@ class TournamentModeSetupPage extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                     ),
                     side: BorderSide(
-                      color: const Color.fromARGB(255, 191, 231, 237),
+                      color: Theme.of(context).colorScheme.primary,
                       width: 1.0,
                       )
                     ),
@@ -199,6 +230,10 @@ class TournamentModeSetupPage extends StatelessWidget {
               ],
         ),
       ),
+      ),
+      ),
+        ]
+      )
     );
   }
 }
@@ -224,18 +259,14 @@ class _ToggleableButtonState extends State<ToggleableButton> {
       width: double.infinity,
       child: TextButton(
         style: TextButton.styleFrom(
-                    foregroundColor: const Color.fromARGB(255, 12, 77, 86),
-                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-                    textStyle: const TextStyle(
+                    foregroundColor: Theme.of(context).colorScheme.primary,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
+                    textStyle: TextStyle(
                       fontSize: 16,
-                      color: Color.fromARGB(255, 117, 117, 117),
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontFamily: "Manrope",
                       fontWeight: FontWeight.w400,
                     ),
-                    side: BorderSide(
-                      color: const Color.fromARGB(255, 255, 255, 255),
-                      width: 1.0,
-                      )
                     ),
         onPressed: () {
           _toggleButton();
@@ -247,15 +278,16 @@ class _ToggleableButtonState extends State<ToggleableButton> {
             Text(
               ' Use Live Timing',
               style: TextStyle(
-                color: Color.fromARGB(255, 35, 35, 35),
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w400,
                 fontFamily: "Manrope",
                 fontSize: 16,
               ),
             ),
             Spacer(),
-            Image.asset(_isEnabled ? "assets/enabled.png" : "assets/disabled.png"),
-            
+            Icon(_isEnabled ? Icons.toggle_on_outlined : Icons.toggle_off_outlined, 
+            color: _isEnabled ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.tertiary, 
+            size: 42),
           ],
         ),
       ),

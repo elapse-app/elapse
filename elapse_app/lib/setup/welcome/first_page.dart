@@ -208,10 +208,10 @@ class FirstSetupPage extends StatelessWidget {
                             width: double.infinity,
                             child: TextButton(
                               style: TextButton.styleFrom(
-                                foregroundColor: const Color.fromARGB(255, 255, 255, 255),
-                                backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                                foregroundColor: Theme.of(context).colorScheme.primary,
+                                backgroundColor: Theme.of(context).colorScheme.surface,
                                 side: BorderSide(
-                                  color: const Color.fromARGB(255, 255, 255, 255),
+                                  color: Theme.of(context).colorScheme.tertiary,
                                   width: 2.0,
                                 ),
                               ),

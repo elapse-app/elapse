@@ -1,6 +1,7 @@
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/providers/tournament_mode_provider.dart';
+import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/setup/configure/cloudscout_setup.dart';
 import 'package:elapse_app/setup/configure/theme_setup.dart';
 import 'package:elapse_app/setup/signup/enter_details.dart';
@@ -27,44 +28,71 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 191, 231, 237),
-      appBar: PreferredSize(
-        preferredSize: MediaQuery.of(context).size * 0.07,
-        child: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: Color.fromARGB(255, 191, 231, 237),
-          title: GestureDetector(
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => MyApp(prefs: context,)),
-              );
-            },
-            child: const Row(
-              children: [
-                Icon(Icons.arrow_back),
-                SizedBox(width: 12),
-                Text('Complete',
-                  style: TextStyle(
-                fontSize: 24,
-                fontFamily: 'Manrope',
-                fontWeight: FontWeight.w600,
-                color: Color.fromARGB(255, 0, 0, 0),
-              ),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      // appBar: PreferredSize(
+      //   preferredSize: MediaQuery.of(context).size * 0.07,
+      //   child: AppBar(
+      //     automaticallyImplyLeading: false,
+      //     backgroundColor: Theme.of(context).colorScheme.primary,
+      //     title: GestureDetector(
+      //       onTap: () {
+      //         Navigator.pop(context);
+      //       },
+      //       child: const Row(
+      //         children: [
+      //           Icon(Icons.arrow_back),
+      //           SizedBox(width: 12),
+      //           Text('Create account',
+      //             style: TextStyle(
+      //           fontSize: 24,
+      //           fontFamily: 'Manrope',
+      //           fontWeight: FontWeight.w600,
+      //           color: Color.fromARGB(255, 0, 0, 0),
+      //         ),
+      //           ),
+      //         ],
+      //       ),
+      //     ),
+      //   ),
+      // ),
+      body: CustomScrollView(
+        physics: const NeverScrollableScrollPhysics(),
+        slivers: [
+          ElapseAppBar(
+            title: Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Icon(Icons.arrow_back),
+                      ),
+                      const SizedBox(width: 12),
+                      Text('Sign up',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontFamily: 'Manrope',
+                          fontWeight: FontWeight.w600,
+                          color: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ]
                 ),
-              ],
-            ),
+            maxHeight: 60,
           ),
-        ),
-      ),
-      body: Container(
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Container(
+        height: double.infinity,
+        width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+            topLeft: Radius.circular(30),
+            topRight: Radius.circular(30),
           ),
         ),
+        child: Container(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 23.0),
           child: Column(
@@ -124,8 +152,8 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
                         width: double.infinity,
                         child: Container(
                           decoration: BoxDecoration(
-                          border: const GradientBoxBorder(
-                            gradient: LinearGradient(colors: [Color.fromARGB(255, 191, 231, 237), Color.fromARGB(255, 221, 245, 255)]),
+                          border: GradientBoxBorder(
+                            gradient: LinearGradient(colors: [Theme.of(context).colorScheme.primary, Color.fromARGB(255, 221, 245, 255)]),
                             width: 1,
                           ),
                           gradient: RadialGradient(
@@ -190,6 +218,10 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
           ),
         ),
       ),
+      ),
+      ),
+        ]
+      )
     );
   }
 }
