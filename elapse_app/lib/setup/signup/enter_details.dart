@@ -214,7 +214,7 @@ class EnterDetailsPage extends StatelessWidget {
                 child: TextButton(
                   style: TextButton.styleFrom(
                     foregroundColor: const Color.fromARGB(255, 19, 19, 19),
-                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     textStyle: const TextStyle(
                       fontSize: 16,
                       color: Color.fromARGB(255, 12, 77, 86),
@@ -222,7 +222,7 @@ class EnterDetailsPage extends StatelessWidget {
                       fontWeight: FontWeight.w400,
                     ),
                     side: BorderSide(
-                      color: const Color.fromARGB(255, 191, 231, 237),
+                      color: Theme.of(context).colorScheme.primary,
                       width: 1.0,
                       )
                     ),

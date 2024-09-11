@@ -194,9 +194,9 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                   child: TextButton(
                     style: TextButton.styleFrom(
                       foregroundColor: const Color.fromARGB(255, 76, 81, 175),
-                      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                      backgroundColor: Theme.of(context).colorScheme.surface,
                       side: BorderSide(
-                        color: const Color.fromARGB(255, 191, 231, 237),
+                        color: Theme.of(context).colorScheme.primary,
                         width: 1.0,
                       ),
                     ),
@@ -205,7 +205,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                         searchTeam();
                       } else if (buttonLabel == "Confirm" && selectedTeam != null) {
                         saveTeam(selectedTeam!);
-                        prefs.setString('savedTeam', _teamController.text);
+                        //prefs.setString('savedTeam', _teamController.text);
                         Navigator.push(
                             context,
                             MaterialPageRoute(

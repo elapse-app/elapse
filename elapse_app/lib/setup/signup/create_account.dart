@@ -119,7 +119,7 @@ class _CreateAccountState extends State<CreateAccount> {
                         fontWeight: FontWeight.w400,
                         fontFamily: "Manrope",
                         fontSize: 16,
-                        color: Color.fromARGB(255, 117, 117, 117),
+                        color: Theme.of(context).colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ),
@@ -246,8 +246,8 @@ class _CreateAccountState extends State<CreateAccount> {
                   width: double.infinity,
                   child: TextButton(
                     style: TextButton.styleFrom(
-                    foregroundColor: const Color.fromARGB(255, 19, 19, 19),
-                    backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+                    foregroundColor: Theme.of(context).colorScheme.primary,
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     textStyle: const TextStyle(
                       fontSize: 16,
                       color: Color.fromARGB(255, 19, 19, 19),
@@ -255,7 +255,7 @@ class _CreateAccountState extends State<CreateAccount> {
                       fontWeight: FontWeight.w400,
                     ),
                     side: BorderSide(
-                      color: const Color.fromARGB(255, 191, 231, 237),
+                      color: Theme.of(context).colorScheme.primary,
                       width: 1.0,
                       )
                     ),
@@ -279,11 +279,7 @@ class _CreateAccountState extends State<CreateAccount> {
                                 mainAxisAlignment: MainAxisAlignment.start, // Aligns the content to the left
                                 children: [
                                   SizedBox(width: 5), 
-                                  Container(
-                                    height: 20,
-                                    width: 20,
-                                    child: Image.asset('assets/darkMail.png'),
-                                  ),  // Prefix icon
+                                  Icon(Icons.mail_outline, color: Color.fromARGB(255, 12, 77, 86)),
                                   SizedBox(width: 10), // Space between icon and text
                                   Text('Create with email'),
                                   Spacer(), // Pushes the suffix icon to the end
