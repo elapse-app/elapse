@@ -151,7 +151,7 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
         returnDivision.teamStats = teamStats[1];
         returnDivision.games = teamStats[0];
       }));
-      ;
+
       await Future.wait(divisionDetails);
       return returnDivision;
     }).toList());
