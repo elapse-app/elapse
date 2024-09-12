@@ -127,7 +127,6 @@ class VDAStats {
 
 Future<List<VDAStats>> getTrueSkillData(int seasonId) async {
   final String? vdaData = prefs.getString("vdaData");
-  final String? expiryDate = prefs.getString("vdaExpiry");
 
   List<dynamic> parsed = [];
 
@@ -143,9 +142,7 @@ Future<List<VDAStats>> getTrueSkillData(int seasonId) async {
 
     List<VDAStats> vdaStats = parsed.map<VDAStats>((json) => VDAStats.fromHistorical(json)).toList();
     return vdaStats;
-  } else if (vdaData == null ||
-      expiryDate == null ||
-      DateTime.parse(expiryDate).isBefore(DateTime.now())) {
+  } else if (!hasCachedTrueSkillData()) {
     final response = await http.get(
         Uri.parse("https://vrc-data-analysis.com/v1/allteams"),
       );
@@ -155,7 +152,7 @@ Future<List<VDAStats>> getTrueSkillData(int seasonId) async {
     prefs.setString(
         "vdaExpiry", DateTime.now().add(const Duration(hours: 2)).toString());
   } else {
-    parsed = jsonDecode(vdaData) as List;
+    parsed = jsonDecode(vdaData!) as List;
   }
 
   List<VDAStats> vdaStats =
@@ -167,4 +164,13 @@ Future<VDAStats?> getTrueSkillDataForTeam(int seasonId, String teamNum) async {
   final response = await getTrueSkillData(seasonId);
   if (response.isEmpty) return null;
   return response.firstWhere((element) => element.teamName == teamNum || element.teamNum == teamNum);
+}
+
+bool hasCachedTrueSkillData() {
+  final String? vdaData = prefs.getString("vdaData");
+  final String? expiryDate = prefs.getString("vdaExpiry");
+
+  return vdaData != null &&
+      expiryDate != null &&
+      DateTime.parse(expiryDate).isAfter(DateTime.now());
 }

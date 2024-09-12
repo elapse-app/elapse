@@ -475,6 +475,29 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                       ),
                     )
                   : const SliverToBoxAdapter(),
+          hasCachedWorldSkillsRankings() && hasCachedTrueSkillData() && (!inTM || hasCachedTMTournamentDetails()) ?
+          Builder(
+              builder: (context) {
+            List<Widget> pages = [
+              WorldSkillsPage(
+                rankings: jsonDecode(prefs.getString("worldSkillsData")!).map<WorldSkillsStats>((e) => WorldSkillsStats.fromJson(e)).toList(),
+                sort: sortIndex,
+                filter: filter,
+                savedTeams: savedTeams,
+                pickListTeams: const [],
+                tournament: inTM ? loadTournament(prefs.getString("TMSavedTournament")) : null,
+                scoutedTeams: const [],
+              ),
+              WorldTrueSkillPage(
+                stats: jsonDecode(prefs.getString("vdaData")!).map<VDAStats>((json) => VDAStats.fromJson(json)).toList(),
+                sort: sortIndex,
+                filter: filter,
+                savedTeams: savedTeams,
+                tournament: inTM ? loadTournament(prefs.getString("TMSavedTournament")) : null,
+              ),
+            ];
+            return pages[selectedIndex];
+          }) :
           FutureBuilder(
                   future: Future.wait(futures),
                   builder: (context, snapshot) {

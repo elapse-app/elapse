@@ -4,6 +4,7 @@ import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../main.dart';
 import '../Filters/gradeLevel.dart';
 import '../Filters/region.dart';
 import '../Filters/season.dart';
@@ -67,9 +68,7 @@ class WorldSkillsStats {
 }
 
 Future<List<WorldSkillsStats>> getWorldSkillsRankings(int seasonID, GradeLevel grade) async {
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
   final String? worldSkillsData = prefs.getString("worldSkillsData");
-  final String? expiryDate = prefs.getString("worldSkillsExpiry");
   final String? cachedGrade = prefs.getString("worldSkillsGrade");
 
   List<dynamic> parsed = [];
@@ -84,9 +83,7 @@ Future<List<WorldSkillsStats>> getWorldSkillsRankings(int seasonID, GradeLevel g
     );
 
     parsed = jsonDecode(response.body) as List;
-  } else if (worldSkillsData == null ||
-      expiryDate == null || cachedGrade == null ||
-      DateTime.parse(expiryDate).isBefore(DateTime.now()) || grade != gradeLevels[cachedGrade]) {
+  } else if (!hasCachedWorldSkillsRankings() || grade != gradeLevels[cachedGrade]) {
     final response = await http.get(
       Uri.parse("https://www.robotevents.com/api/seasons/$seasonID/skills?grade_level=${grade.name.replaceAll(" ", "%20")}"),
     );
@@ -97,7 +94,7 @@ Future<List<WorldSkillsStats>> getWorldSkillsRankings(int seasonID, GradeLevel g
         DateTime.now().add(const Duration(hours: 2)).toString());
     prefs.setString("worldSkillsGrade", grade.name);
   } else {
-    parsed = jsonDecode(worldSkillsData) as List;
+    parsed = jsonDecode(worldSkillsData!) as List;
   }
 
   List<WorldSkillsStats> ranking =
@@ -109,4 +106,14 @@ Future<WorldSkillsStats> getWorldSkillsForTeam(int seasonID, int teamID) async {
   GradeLevel grade = (await fetchTeam(teamID)).grade!;
   List<WorldSkillsStats> rankings = await getWorldSkillsRankings(seasonID, grade);
   return rankings.singleWhere((e) => e.teamId == teamID);
+}
+
+bool hasCachedWorldSkillsRankings() {
+  final String? worldSkillsData = prefs.getString("worldSkillsData");
+  final String? expiryDate = prefs.getString("worldSkillsExpiry");
+  final String? cachedGrade = prefs.getString("worldSkillsGrade");
+
+  return worldSkillsData != null &&
+      expiryDate != null && cachedGrade != null &&
+      DateTime.parse(expiryDate).isAfter(DateTime.now());
 }
