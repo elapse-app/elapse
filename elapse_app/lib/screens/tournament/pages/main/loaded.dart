@@ -154,7 +154,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
                 sort: sorts[sortIndex],
                 divisionIndex: division.order - 1,
                 filter: filter,
-                skills: widget.tournament.tournamentSkills ?? {},
+                skills: widget.tournament.tournamentSkills!,
                 worldSkills: snapshot.data?[0] as List<WorldSkillsStats>,
                 vda: snapshot.data?[1] as List<VDAStats>,
               );
