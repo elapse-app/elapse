@@ -145,43 +145,24 @@ class RankingsPage extends StatelessWidget {
           if (teamStats == null) {
             return const SizedBox();
           }
-          if (sort == "OPR" || sort == "DPR" || sort == "CCWM") {
-            return Column(
-              children: [
-                RankingsWidget(
-                    teamID: team.id,
-                    teamNumber: team.teamNumber!,
-                    sort: sort,
-                    allianceColor: Theme.of(context).colorScheme.onSurface,
-                    skills: skills[team.id],
-                    worldSkills: worldSkills.firstWhereOrNull((e) => e.teamId == team.id),
-                    vda: vda.firstWhereOrNull((e) => e.id == team.id),
-                ),
-                Divider(
-                  color: Theme.of(context).colorScheme.surfaceDim,
-                  height: 3,
-                )
-              ],
-            );
-          } else {
-            return Column(
-              children: [
-                RankingsWidget(
-                    teamID: team.id,
-                    teamNumber: team.teamNumber!,
-                    sort: sort,
-                    allianceColor: Theme.of(context).colorScheme.onSurface,
-                    skills: skills[team.id],
-                    worldSkills: worldSkills.firstWhereOrNull((e) => e.teamId == team.id),
-                    vda: vda.firstWhereOrNull((e) => e.id == team.id),
-                ),
-                Divider(
-                  color: Theme.of(context).colorScheme.surfaceDim,
-                  height: 3,
-                )
-              ],
-            );
-          }
+
+          return Column(
+            children: [
+              RankingsWidget(
+                  teamID: team.id,
+                  teamNumber: team.teamNumber!,
+                  sort: sort,
+                  allianceColor: Theme.of(context).colorScheme.onSurface,
+                  skills: skills[team.id],
+                  worldSkills: worldSkills.firstWhereOrNull((e) => e.teamId == team.id),
+                  vda: vda.firstWhereOrNull((e) => e.id == team.id),
+              ),
+              Divider(
+                color: Theme.of(context).colorScheme.surfaceDim,
+                height: 3,
+              )
+            ],
+          );
         }, childCount: divisionTeams.length),
       ),
     );
