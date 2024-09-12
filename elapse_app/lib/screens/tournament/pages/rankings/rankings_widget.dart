@@ -124,7 +124,7 @@ class RankingsWidget extends StatelessWidget {
               ),
             ),
             Flexible(
-              flex: 42,
+              flex: 45,
               fit: FlexFit.tight,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -152,7 +152,7 @@ class RankingsWidget extends StatelessWidget {
                   )),
             ),
             Flexible(
-              flex: 42,
+              flex: 45,
               fit: FlexFit.tight,
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
