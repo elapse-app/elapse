@@ -16,7 +16,7 @@ class RankingsWidget extends StatelessWidget {
     required this.teamID,
     required this.teamNumber,
     required this.allianceColor,
-    required this.sort,
+    this.sort = "Rank",
     this.skills,
     this.worldSkills,
     this.vda,
@@ -174,6 +174,46 @@ class RankingsWidget extends StatelessWidget {
           ]
         )
       )
+    );
+  }
+}
+
+class EmptyRanking extends StatelessWidget {
+  const EmptyRanking(
+      {super.key,
+        required this.teamName,
+        required this.teamID,
+        required this.allianceColor});
+
+  final String teamName;
+  final int teamID;
+  final Color allianceColor;
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TeamScreen(
+              teamID: teamID,
+              teamName: teamName,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        alignment: Alignment.centerLeft,
+        height: 72,
+        child: Text(
+          teamName,
+          style: TextStyle(
+              fontSize: 40,
+              height: 1,
+              fontWeight: FontWeight.w400,
+              color: allianceColor),
+        ),
+      ),
     );
   }
 }
