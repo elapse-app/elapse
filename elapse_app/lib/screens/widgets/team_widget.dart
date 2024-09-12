@@ -84,6 +84,7 @@ class TeamWidget extends StatelessWidget {
                       )),
                   Text(
                       '${location?.city ?? ""}${location?.city != null ? "," : ""} ${location?.region ?? ""}',
+                      textAlign: TextAlign.end,
                       style: TextStyle(
                         fontSize: 16,
                         color: Theme.of(context)
