@@ -136,7 +136,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
 
     List<Widget> pages = [
       SliverToBoxAdapter(),
-      hasCachedWorldSkillsRankings() && hasCachedTrueSkillData() ?
+      hasCachedWorldSkillsRankings(getGradeLevel(prefs.getString("defaultGrade")) == gradeLevels["College"] ? seasons[0].vexUId! : seasons[0].vrcId, getGradeLevel(prefs.getString("defaultGrade"))) && hasCachedTrueSkillData() ?
           RankingsPage(
             searchQuery: searchQuery,
             sort: sorts[sortIndex],

@@ -67,25 +67,32 @@ class WorldSkillsStats {
   }
 }
 
-Future<List<WorldSkillsStats>> getWorldSkillsRankings(int seasonID, GradeLevel grade) async {
+Future<List<WorldSkillsStats>> getWorldSkillsRankings(
+    int seasonID, GradeLevel grade) async {
   final String? worldSkillsData = prefs.getString("worldSkillsData");
-  final String? cachedGrade = prefs.getString("worldSkillsGrade");
 
   List<dynamic> parsed = [];
 
-  if (seasonID < 115) { // Starstruck season ID (earliest season that had world skills data)
+  if (seasonID < 115) {
+    // Starstruck season ID (earliest season that had world skills data)
     return List<WorldSkillsStats>.empty();
   }
 
-  if (seasonID != (grade == gradeLevels["College"] ? seasons[0].vexUId : seasons[0].vrcId) || grade != getGradeLevel(prefs.getString("defaultGrade"))) {
+  if (seasonID !=
+          (grade == gradeLevels["College"]
+              ? seasons[0].vexUId
+              : seasons[0].vrcId) ||
+      grade != getGradeLevel(prefs.getString("defaultGrade"))) {
     final response = await http.get(
-      Uri.parse("https://www.robotevents.com/api/seasons/$seasonID/skills?grade_level=${grade.name.replaceAll(" ", "%20")}"),
+      Uri.parse(
+          "https://www.robotevents.com/api/seasons/$seasonID/skills?grade_level=${grade.name.replaceAll(" ", "%20")}"),
     );
 
     parsed = jsonDecode(response.body) as List;
-  } else if (!hasCachedWorldSkillsRankings() || grade != gradeLevels[cachedGrade]) {
+  } else if (!hasCachedWorldSkillsRankings(seasonID, grade)) {
     final response = await http.get(
-      Uri.parse("https://www.robotevents.com/api/seasons/$seasonID/skills?grade_level=${grade.name.replaceAll(" ", "%20")}"),
+      Uri.parse(
+          "https://www.robotevents.com/api/seasons/$seasonID/skills?grade_level=${grade.name.replaceAll(" ", "%20")}"),
     );
 
     parsed = jsonDecode(response.body) as List;
@@ -104,16 +111,25 @@ Future<List<WorldSkillsStats>> getWorldSkillsRankings(int seasonID, GradeLevel g
 
 Future<WorldSkillsStats> getWorldSkillsForTeam(int seasonID, int teamID) async {
   GradeLevel grade = (await fetchTeam(teamID)).grade!;
-  List<WorldSkillsStats> rankings = await getWorldSkillsRankings(seasonID, grade);
+  List<WorldSkillsStats> rankings =
+      await getWorldSkillsRankings(seasonID, grade);
   return rankings.singleWhere((e) => e.teamId == teamID);
 }
 
-bool hasCachedWorldSkillsRankings() {
+bool hasCachedWorldSkillsRankings(int seasonID, GradeLevel grade) {
+  if (seasonID !=
+          (grade == gradeLevels["College"]
+              ? seasons[0].vexUId
+              : seasons[0].vrcId) ||
+      grade != getGradeLevel(prefs.getString("defaultGrade"))) return false;
+
   final String? worldSkillsData = prefs.getString("worldSkillsData");
   final String? expiryDate = prefs.getString("worldSkillsExpiry");
   final String? cachedGrade = prefs.getString("worldSkillsGrade");
 
   return worldSkillsData != null &&
-      expiryDate != null && cachedGrade != null &&
-      DateTime.parse(expiryDate).isAfter(DateTime.now());
+      expiryDate != null &&
+      cachedGrade != null &&
+      DateTime.parse(expiryDate).isAfter(DateTime.now()) &&
+      grade == gradeLevels[cachedGrade];
 }
