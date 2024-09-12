@@ -215,3 +215,10 @@ Future<Tournament> TMTournamentDetails(int tournamentID) async {
     return tournament;
   }
 }
+
+bool hasCachedTMTournamentDetails() {
+  DateTime? updateTime = DateTime.tryParse(prefs.getString("updateTime") ?? "");
+  return prefs.getString("TMSavedTournament") != null &&
+      updateTime != null &&
+      DateTime.now().isBefore(updateTime);
+}
