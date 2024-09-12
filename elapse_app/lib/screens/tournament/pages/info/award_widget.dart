@@ -13,7 +13,7 @@ class AwardWidget extends StatelessWidget {
     } else if (award.individualWinners != null && award.individualWinners!.isNotEmpty) {
       winnersString = award.individualWinners!.join(", ");
     } else {
-      winnersString = "NA";
+      winnersString = "N/A";
     }
     return Container(
       padding: EdgeInsets.symmetric(vertical: 10),
