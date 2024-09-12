@@ -9,7 +9,7 @@ class Award {
   List<String> qualifications;
   String? tournamentName;
   List<TeamPreview>? teamWinners;
-  List<TeamPreview>? individualWinners;
+  List<String>? individualWinners;
 
   Award({
     required this.name,
@@ -24,13 +24,6 @@ class Award {
     for (var a in json["teamWinners"]) {
       Map<String, dynamic> team = a["team"] as Map<String, dynamic>;
       teamWinners
-          .add(TeamPreview(teamNumber: team["name"], teamID: team["id"]));
-    }
-
-    List<TeamPreview> individualWinners = [];
-    for (var a in json["individualWinners"]) {
-      Map<String, dynamic> team = a["team"] as Map<String, dynamic>;
-      individualWinners
           .add(TeamPreview(teamNumber: team["name"], teamID: team["id"]));
     }
 
@@ -53,7 +46,7 @@ class Award {
       qualifications: qualifications,
       tournamentName: json["event"]["name"],
       teamWinners: teamWinners,
-      individualWinners: individualWinners,
+      individualWinners: json["individualWinners"].isEmpty ? null : json["individualWinners"].cast<String>(),
     );
   }
 
@@ -63,7 +56,7 @@ class Award {
       "qualifications": qualifications,
       "tournamentName": tournamentName,
       "teamWinners": teamWinners?.map((e) => e.toJson()).toList(),
-      "individualWinners": individualWinners?.map((e) => e.toJson()).toList(),
+      "individualWinners": individualWinners,
     };
   }
 }
@@ -72,11 +65,6 @@ Award loadAward(award) {
   List<TeamPreview> teamWinners = [];
   for (var a in award["teamWinners"]) {
     teamWinners.add(loadTeamPreview(jsonEncode(a)));
-  }
-
-  List<TeamPreview> individualWinners = [];
-  for (var a in award["individualWinners"]) {
-    individualWinners.add(loadTeamPreview(jsonEncode(a)));
   }
 
   List<String> qualifications = [];
@@ -89,7 +77,7 @@ Award loadAward(award) {
     qualifications: qualifications,
     tournamentName: award["tournamentName"],
     teamWinners: teamWinners,
-    individualWinners: individualWinners,
+    individualWinners: award["individualWinners"]?.cast<String>(),
   );
 }
 

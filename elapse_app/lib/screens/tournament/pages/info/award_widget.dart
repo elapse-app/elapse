@@ -8,11 +8,10 @@ class AwardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String winnersString;
-    if (award.teamWinners != null) {
+    if (award.teamWinners != null && award.teamWinners!.isNotEmpty) {
       winnersString = award.teamWinners!.map((e) => e.teamNumber).join(", ");
-    } else if (award.individualWinners != null) {
-      winnersString =
-          award.individualWinners!.map((e) => e.teamNumber).join(", ");
+    } else if (award.individualWinners != null && award.individualWinners!.isNotEmpty) {
+      winnersString = award.individualWinners!.join(", ");
     } else {
       winnersString = "NA";
     }
