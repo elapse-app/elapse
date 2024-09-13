@@ -1,8 +1,5 @@
 import 'package:elapse_app/setup/signup/enter_details.dart';
 import 'package:flutter/material.dart';
-import 'package:elapse_app/setup/welcome/first_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:elapse_app/setup/signup/create_account.dart';
 import '../../screens/widgets/app_bar.dart';
 
 class VerifyAccount extends StatelessWidget {

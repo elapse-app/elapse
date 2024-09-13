@@ -3,9 +3,7 @@ import 'package:elapse_app/setup/configure/theme_setup.dart';
 import 'package:elapse_app/setup/signup/enter_details.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:elapse_app/main.dart';
-import 'package:elapse_app/setup/signup/enter_details.dart';
 
 class JoinTeamPage extends StatefulWidget {
   const JoinTeamPage({super.key,});
