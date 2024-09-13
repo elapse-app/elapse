@@ -151,7 +151,7 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
         returnDivision.teamStats = teamStats[1];
         returnDivision.games = teamStats[0];
       }));
-      ;
+
       await Future.wait(divisionDetails);
       return returnDivision;
     }).toList());
@@ -214,4 +214,11 @@ Future<Tournament> TMTournamentDetails(int tournamentID) async {
         "recently-opened-tournament", jsonEncode(tournament.toJson()));
     return tournament;
   }
+}
+
+bool hasCachedTMTournamentDetails() {
+  DateTime? updateTime = DateTime.tryParse(prefs.getString("updateTime") ?? "");
+  return prefs.getString("TMSavedTournament") != null &&
+      updateTime != null &&
+      DateTime.now().isBefore(updateTime);
 }

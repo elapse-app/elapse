@@ -244,7 +244,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                     teamID: team.id,
                                     allianceColor:
                                         Theme.of(context).colorScheme.onSurface)
-                                : StandardRanking(
+                                : RankingsWidget(
                                     teamNumber: team.teamNumber!,
                                     teamID: team.id,
                                     allianceColor:

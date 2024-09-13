@@ -36,6 +36,11 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
   late Future<Tournament?> futureTournament;
   List<Future<dynamic>> futures = [];
 
+  late bool isSkillsLoaded;
+  late List<WorldSkillsStats> loadedSkills;
+  late bool isVDALoaded;
+  late List<VDAStats> loadedVDA;
+
   int selectedIndex = 0;
   List<String> pageTitles = ["Skills", "TrueSkill"];
 
@@ -59,9 +64,13 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
     super.initState();
     selectedIndex = widget.initIndex;
 
-    futureSkillsStats = getWorldSkillsRankings((grade == gradeLevels["College"] ? season.vexUId! : season.vrcId), grade);
+    isSkillsLoaded = false;
+    isVDALoaded = false;
+    futureSkillsStats = getWorldSkillsRankings(
+        (grade == gradeLevels["College"] ? season.vexUId! : season.vrcId),
+        grade).whenComplete(() => isSkillsLoaded = true);
     futures.add(futureSkillsStats);
-    futureVDAStats = getTrueSkillData(season.vrcId);
+    futureVDAStats = getTrueSkillData(season.vrcId).whenComplete(() => isVDALoaded = true);
     futures.add(futureVDAStats);
     savedTeams = _getSavedTeams();
     inTM = prefs.getBool("isTournamentMode") ?? false;
@@ -139,64 +148,82 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                       Navigator.pop(context);
                     },
                     child: Icon(Icons.arrow_back,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface),
+                        color: Theme.of(context).colorScheme.onSurface),
                   ),
                   const Spacer(),
-                  Row(
-                      children: [
-                        const Icon(Icons.school),
-                        const SizedBox(width: 4),
-                        DropdownButton<GradeLevel>(
+                  Row(children: [
+                    const Icon(Icons.school),
+                    const SizedBox(width: 4),
+                    DropdownButton<GradeLevel>(
+                      value: grade,
+                      items: gradeLevels.values.map((grade) {
+                        return DropdownMenuItem(
                           value: grade,
-                          items: gradeLevels.values.map((grade) {
-                            return DropdownMenuItem(
-                              value: grade,
-                              child: Text(getGrade(grade.name),
-                                  overflow: TextOverflow.fade,
-                                  style: const TextStyle(fontSize: 16)),
-                            );
-                          }).toList(),
-                          onChanged: (GradeLevel? value) => {
-                            setState(() {
-                              grade = value!;
-                              futureSkillsStats = getWorldSkillsRankings(grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade);
-                              futures[0] = futureSkillsStats;
-                            })
-                          },
-                        ),
-                      ]
-                  ),
+                          child: Text(getGrade(grade.name),
+                              overflow: TextOverflow.fade,
+                              style: const TextStyle(fontSize: 16)),
+                        );
+                      }).toList(),
+                      onChanged: (GradeLevel? value) => {
+                        setState(() {
+                          grade = value!;
+                          isSkillsLoaded = false;
+                          futureSkillsStats = getWorldSkillsRankings(
+                              grade == gradeLevels["College"]
+                                  ? season.vexUId!
+                                  : season.vrcId,
+                              grade).then((data) {
+                                isSkillsLoaded = true;
+                                return loadedSkills = data;
+                              });
+                          futures[0] = futureSkillsStats;
+                        })
+                      },
+                    ),
+                  ]),
                   const SizedBox(width: 15),
                   GestureDetector(
                       onTap: () async {
                         Season updated = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SeasonFilterPage(selected: season, seasonsList: seasons.sublist(0, seasons.indexWhere((e) => e.vrcId == 115) + 1)),
+                            builder: (context) => SeasonFilterPage(
+                                selected: season,
+                                seasonsList: seasons.sublist(
+                                    0,
+                                    seasons.indexWhere((e) => e.vrcId == 115) +
+                                        1)),
                           ),
                         );
                         setState(() {
                           season = updated;
-                          futureSkillsStats = getWorldSkillsRankings(grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade);
-                          futureVDAStats = getTrueSkillData(season.vrcId);
+                          isSkillsLoaded = false;
+                          futureSkillsStats = getWorldSkillsRankings(
+                              grade == gradeLevels["College"]
+                                  ? season.vexUId!
+                                  : season.vrcId,
+                              grade).then((data) {
+                            isSkillsLoaded = true;
+                            return loadedSkills = data;
+                          });
+                          isVDALoaded = false;
+                          futureVDAStats = getTrueSkillData(season.vrcId).then((data) {
+                            isVDALoaded = true;
+                            return loadedVDA = data;
+                          });
                           futures[0] = futureSkillsStats;
                           futures[1] = futureVDAStats;
                         });
                       },
-                      child: Row(
-                          children: [
-                            const Icon(Icons.event_note),
-                            const SizedBox(width: 4),
-                            Text(
-                              season.name.substring(10),
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            const Icon(Icons.arrow_right)
-                          ]
-                      )
-                  )
+                      child: Row(children: [
+                        const Icon(Icons.event_note),
+                        const SizedBox(width: 4),
+                        Text(
+                          season.name.substring(10),
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const Icon(Icons.arrow_right)
+                      ]))
                 ],
               ),
             ),
@@ -475,7 +502,33 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                       ),
                     )
                   : const SliverToBoxAdapter(),
-          FutureBuilder(
+          isSkillsLoaded && isVDALoaded
+              ? Builder(builder: (context) {
+                  List<Widget> pages = [
+                    WorldSkillsPage(
+                      rankings: loadedSkills,
+                      sort: sortIndex,
+                      filter: filter,
+                      savedTeams: savedTeams,
+                      pickListTeams: const [],
+                      tournament: inTM
+                          ? loadTournament(prefs.getString("TMSavedTournament"))
+                          : null,
+                      scoutedTeams: const [],
+                    ),
+                    WorldTrueSkillPage(
+                      stats: loadedVDA,
+                      sort: sortIndex,
+                      filter: filter,
+                      savedTeams: savedTeams,
+                      tournament: inTM
+                          ? loadTournament(prefs.getString("TMSavedTournament"))
+                          : null,
+                    ),
+                  ];
+                  return pages[selectedIndex];
+                })
+              : FutureBuilder(
                   future: Future.wait(futures),
                   builder: (context, snapshot) {
                     switch (snapshot.connectionState) {
@@ -490,19 +543,24 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                           print(snapshot.error);
                           return const SliverToBoxAdapter(
                               child: BigErrorMessage(
-                                icon: Icons.list,
-                                message: "Failed to load world rankings",
-                              ));
+                            icon: Icons.list,
+                            message: "Failed to load world rankings",
+                          ));
                         }
+
+                        loadedSkills = snapshot.data![0] as List<WorldSkillsStats>;
+                        loadedVDA = snapshot.data![1] as List<VDAStats>;
 
                         List<Widget> pages = [
                           WorldSkillsPage(
-                            rankings: snapshot.data![0] as List<WorldSkillsStats>,
+                            rankings:
+                                snapshot.data![0] as List<WorldSkillsStats>,
                             sort: sortIndex,
                             filter: filter,
                             savedTeams: savedTeams,
                             pickListTeams: const [],
-                            tournament: inTM ? snapshot.data![2] as Tournament? : null,
+                            tournament:
+                                inTM ? snapshot.data![2] as Tournament? : null,
                             scoutedTeams: const [],
                           ),
                           WorldTrueSkillPage(
@@ -510,7 +568,8 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                             sort: sortIndex,
                             filter: filter,
                             savedTeams: savedTeams,
-                            tournament: inTM ? snapshot.data![2] as Tournament? : null,
+                            tournament:
+                                inTM ? snapshot.data![2] as Tournament? : null,
                           ),
                         ];
                         return pages[selectedIndex];
