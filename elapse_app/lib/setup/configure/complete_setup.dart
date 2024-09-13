@@ -1,16 +1,7 @@
 import 'package:elapse_app/main.dart';
-import 'package:elapse_app/providers/color_provider.dart';
-import 'package:elapse_app/providers/tournament_mode_provider.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
-import 'package:elapse_app/setup/configure/cloudscout_setup.dart';
-import 'package:elapse_app/setup/configure/theme_setup.dart';
-import 'package:elapse_app/setup/signup/enter_details.dart';
 import 'package:flutter/material.dart';
-import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:gradient_borders/box_borders/gradient_box_border.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:elapse_app/screens/home/home.dart';
 
 class CompleteSetupPage extends StatefulWidget {
   const CompleteSetupPage({super.key, });

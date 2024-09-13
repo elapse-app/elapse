@@ -1,11 +1,6 @@
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/setup/configure/complete_setup.dart';
-import 'package:elapse_app/setup/configure/theme_setup.dart';
-import 'package:elapse_app/setup/configure/tournament_mode_setup.dart';
-import 'package:elapse_app/setup/signup/enter_details.dart';
 import 'package:flutter/material.dart';
-import 'package:elapse_app/classes/Team/teamPreview.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class CloudScoutSetupPage extends StatefulWidget {
   const CloudScoutSetupPage({super.key, });

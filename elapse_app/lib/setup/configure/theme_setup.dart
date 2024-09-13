@@ -1,11 +1,8 @@
-import 'package:elapse_app/main.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/setup/configure/tournament_mode_setup.dart';
-import 'package:elapse_app/setup/configure/join_team.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ThemeSetup extends StatefulWidget {
   const ThemeSetup({super.key, });
