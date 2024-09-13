@@ -190,7 +190,7 @@ class _VerifyAccount extends State<VerifyAccountPage>{
                       onPressed: () {
                         final code = _codeController.text;
                         // Use the collected code here
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(
                             builder: (context) => EnterDetailsPage(),
