@@ -9,6 +9,7 @@ import 'package:elapse_app/screens/tournament/pages/rankings/rankings_filter.dar
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dart';
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:flutter/material.dart';
+import 'package:collection/collection.dart';
 
 import '../../../../classes/Team/vdaStats.dart';
 import '../../../../classes/Team/world_skills.dart';
@@ -144,34 +145,24 @@ class RankingsPage extends StatelessWidget {
           if (teamStats == null) {
             return const SizedBox();
           }
-          if (sort == "OPR" || sort == "DPR" || sort == "CCWM") {
-            return Column(
-              children: [
-                OPRRanking(
-                    teamNumber: team.teamNumber!,
-                    stat: sort.toUpperCase(),
-                    teamID: team.id,
-                    allianceColor: Theme.of(context).colorScheme.onSurface),
-                Divider(
-                  color: Theme.of(context).colorScheme.surfaceDim,
-                  height: 3,
-                )
-              ],
-            );
-          } else {
-            return Column(
-              children: [
-                StandardRanking(
-                    teamID: team.id,
-                    teamNumber: team.teamNumber!,
-                    allianceColor: Theme.of(context).colorScheme.onSurface),
-                Divider(
-                  color: Theme.of(context).colorScheme.surfaceDim,
-                  height: 3,
-                )
-              ],
-            );
-          }
+
+          return Column(
+            children: [
+              RankingsWidget(
+                  teamID: team.id,
+                  teamNumber: team.teamNumber!,
+                  sort: sort,
+                  allianceColor: Theme.of(context).colorScheme.onSurface,
+                  skills: skills[team.id],
+                  worldSkills: worldSkills.firstWhereOrNull((e) => e.teamId == team.id),
+                  vda: vda.firstWhereOrNull((e) => e.id == team.id),
+              ),
+              Divider(
+                color: Theme.of(context).colorScheme.surfaceDim,
+                height: 3,
+              )
+            ],
+          );
         }, childCount: divisionTeams.length),
       ),
     );

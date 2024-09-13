@@ -136,6 +136,16 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
 
     List<Widget> pages = [
       SliverToBoxAdapter(),
+      hasCachedWorldSkillsRankings(getGradeLevel(prefs.getString("defaultGrade")) == gradeLevels["College"] ? seasons[0].vexUId! : seasons[0].vrcId, getGradeLevel(prefs.getString("defaultGrade"))) && hasCachedTrueSkillData() ?
+          RankingsPage(
+            searchQuery: searchQuery,
+            sort: sorts[sortIndex],
+            divisionIndex: division.order - 1,
+            filter: filter,
+            skills: widget.tournament.tournamentSkills!,
+            worldSkills: jsonDecode(prefs.getString("worldSkillsData")!).map<WorldSkillsStats>((e) => WorldSkillsStats.fromJson(e)).toList(),
+            vda: jsonDecode(prefs.getString("vdaData")!).map<VDAStats>((json) => VDAStats.fromJson(json)).toList(),
+          ) :
       FutureBuilder(
         future: Future.wait([worldSkillsStats, vdaStats]),
         builder: (context, snapshot) {
@@ -154,7 +164,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
                 sort: sorts[sortIndex],
                 divisionIndex: division.order - 1,
                 filter: filter,
-                skills: widget.tournament.tournamentSkills ?? {},
+                skills: widget.tournament.tournamentSkills!,
                 worldSkills: snapshot.data?[0] as List<WorldSkillsStats>,
                 vda: snapshot.data?[1] as List<VDAStats>,
               );
