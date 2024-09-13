@@ -137,7 +137,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                 mainAxisAlignment: MainAxisAlignment.start, // Aligns the content to the left
                                 children: [
                                   SizedBox(width: 5), 
-                                  Image.asset((theme == "system" ? 'assets/radio_button_checked.png': 'assets/radio_button_unchecked.png')), // Prefix icon
+                                  theme == "system" ? Icon(Icons.radio_button_checked, color: Color.fromARGB(255, 12, 77, 86)) : Icon(Icons.radio_button_unchecked, color: Color.fromARGB(255, 12, 77, 86)), 
                                   SizedBox(width: 10), // Space between icon and text
                                   Text('Follow System', 
                                     style: const TextStyle(
@@ -147,7 +147,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                     fontWeight: FontWeight.w400,
                                   ),), 
                                   Spacer(), // Pushes the suffix icon to the end
-                                  Image.asset('assets/system.png'), // Suffix icon
+                                  Icon(Icons.brightness_medium, color: Color.fromARGB(255, 12, 77, 86)),
                                   SizedBox(width: 5), 
                                 ],
                               ),
@@ -182,7 +182,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                 mainAxisAlignment: MainAxisAlignment.start, // Aligns the content to the left
                                 children: [
                                   SizedBox(width: 5), 
-                                  Image.asset((theme == "light" ? 'assets/radio_button_checked.png': 'assets/radio_button_unchecked.png')), // Prefix icon
+                                  theme == "light" ? Icon(Icons.radio_button_checked, color: Color.fromARGB(255, 12, 77, 86)) : Icon(Icons.radio_button_unchecked, color: Color.fromARGB(255, 12, 77, 86)), 
                                   SizedBox(width: 10), // Space between icon and text
                                   Text('Light', 
                                     style: const TextStyle(
@@ -192,7 +192,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                     fontWeight: FontWeight.w400,
                                   ),), 
                                   Spacer(), // Pushes the suffix icon to the end
-                                  Image.asset('assets/lightMode.png'), // Suffix icon
+                                  Icon(Icons.brightness_high, color: Color.fromARGB(255, 12, 77, 86)),
                                   SizedBox(width: 5), 
                                 ],
                               ),
@@ -227,7 +227,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                 mainAxisAlignment: MainAxisAlignment.start, // Aligns the content to the left
                                 children: [
                                   SizedBox(width: 5), 
-                                  Image.asset((theme == "dark" ? 'assets/radio_button_checked.png': 'assets/radio_button_unchecked.png')), // Prefix icon
+                                  theme == "dark" ? Icon(Icons.radio_button_checked, color: Color.fromARGB(255, 12, 77, 86)) : Icon(Icons.radio_button_unchecked, color: Color.fromARGB(255, 12, 77, 86)), 
                                   SizedBox(width: 10), // Space between icon and text
                                   Text('Dark', 
                                     style: const TextStyle(
@@ -237,7 +237,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                     fontWeight: FontWeight.w400,
                                   ),), 
                                   Spacer(), // Pushes the suffix icon to the end
-                                  Image.asset('assets/darkMode.png'), // Suffix icon
+                                  Icon(Icons.brightness_low, color: Color.fromARGB(255, 12, 77, 86)),
                                   SizedBox(width: 5), 
                                 ],
                               ),
