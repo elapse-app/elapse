@@ -2,8 +2,14 @@ import 'package:elapse_app/setup/signup/enter_details.dart';
 import 'package:flutter/material.dart';
 import '../../screens/widgets/app_bar.dart';
 
-class VerifyAccount extends StatelessWidget {
-  const VerifyAccount({super.key,});
+class VerifyAccountPage extends StatefulWidget{
+  const VerifyAccountPage({super.key,});
+
+  @override
+  State<VerifyAccountPage> createState() => _VerifyAccount();
+}
+
+class _VerifyAccount extends State<VerifyAccountPage>{
 
   @override
   Widget build(BuildContext context) {

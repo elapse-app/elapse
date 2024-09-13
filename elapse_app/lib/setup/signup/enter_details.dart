@@ -3,8 +3,14 @@ import 'package:elapse_app/setup/configure/join_team.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
 
-class EnterDetailsPage extends StatelessWidget {
-  const EnterDetailsPage({super.key, });
+class EnterDetailsPage extends StatefulWidget{
+  const EnterDetailsPage({super.key,});
+
+  @override
+  State<EnterDetailsPage> createState() => _EnterDetailsPageState();
+}
+
+class _EnterDetailsPageState extends State<EnterDetailsPage> {
 
   @override
   Widget build(BuildContext context) {
