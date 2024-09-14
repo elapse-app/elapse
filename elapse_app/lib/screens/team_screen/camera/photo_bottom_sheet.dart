@@ -8,8 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
-// File? image;
-// XFile? ImageData;
 
 Future<File?> getPhoto(BuildContext context) async {
   Color redColor = Theme.of(context).brightness == Brightness.light
@@ -19,7 +17,6 @@ Future<File?> getPhoto(BuildContext context) async {
   File? image;
   XFile? ImageData;
 
-  // File? image;
   return await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -132,6 +129,7 @@ Future<File?> getPhoto(BuildContext context) async {
                           final returnedImage = await ImagePicker()
                               .pickImage(source: ImageSource.camera);
                           if (returnedImage != null) {
+                            image = File(returnedImage.path);
                             setState(() {
                               ImageData = returnedImage;
                               image = File(returnedImage.path);
@@ -146,8 +144,10 @@ Future<File?> getPhoto(BuildContext context) async {
                         onPressed: () async {
                           print({FirebaseAuth.instance.currentUser?.uid});
                           final returnedImage = await ImagePicker()
-                              .pickImage(source: ImageSource.gallery); ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                              .pickImage(source: ImageSource.gallery);
+
                           if (returnedImage != null) {
+                            image = File(returnedImage.path);
                             setState(() {
                               ImageData = returnedImage;
                               image = File(returnedImage.path);
