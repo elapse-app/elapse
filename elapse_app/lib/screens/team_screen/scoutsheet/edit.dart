@@ -6,13 +6,15 @@ import 'package:elapse_app/screens/team_screen/camera/photo_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 
 List<Widget> EditState(
-    BuildContext context,
     String teamNumber,
-    void Function(File) addPhoto,
-    void Function(int) removePhoto,
-    List<File> photos,
-    void Function(String property, String value) updateProperty,
-    ScoutSheetUI sheet) {
+  BuildContext context,
+  String teamNumber,
+  void Function(File) addPhoto,
+  void Function(int) removePhoto,
+  List<File> photos,
+  void Function(String property, String value) updateProperty,
+  ScoutSheetUI sheet,
+) {
   InputDecoration ElapseInputDecoration(String label) {
     return InputDecoration(
       labelText: label,
