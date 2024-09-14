@@ -20,7 +20,7 @@ List<Widget> EmptyState(BuildContext context, void Function() onPressed) {
     ),
     SliverToBoxAdapter(
       child: SizedBox(
-        height: 15,
+        height: 30,
       ),
     ),
     SliverToBoxAdapter(
