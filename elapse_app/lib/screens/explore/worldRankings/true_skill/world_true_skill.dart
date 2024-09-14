@@ -14,6 +14,7 @@ class WorldTrueSkillPage extends StatelessWidget {
     required this.sort,
     required this.filter,
     required this.savedTeams,
+    required this.picklistTeams,
     required this.tournament,
   });
 
@@ -21,6 +22,7 @@ class WorldTrueSkillPage extends StatelessWidget {
   final int sort;
   final WorldRankingsFilter filter;
   final List<TeamPreview> savedTeams;
+  final List<TeamPreview> picklistTeams;
   final Tournament? tournament;
 
   @override
@@ -38,6 +40,10 @@ class WorldTrueSkillPage extends StatelessWidget {
       teams = teams
           .where((e) => savedTeams.any((e2) => e2.teamID == e.id))
           .toList();
+    }
+
+    if (filter.onPicklist && picklistTeams.isNotEmpty) {
+      teams = teams.where((e) => picklistTeams.any((e2) => e2.teamID == e.id)).toList();
     }
 
     if (filter.atTournament && tournament != null) {

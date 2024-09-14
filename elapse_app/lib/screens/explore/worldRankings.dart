@@ -32,6 +32,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
   late Future<List<WorldSkillsStats>> futureSkillsStats;
   late Future<List<VDAStats>> futureVDAStats;
   late List<TeamPreview> savedTeams;
+  late List<TeamPreview> picklistTeams;
   late bool inTM;
   late Future<Tournament?> futureTournament;
   List<Future<dynamic>> futures = [];
@@ -73,6 +74,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
     futureVDAStats = getTrueSkillData(season.vrcId).whenComplete(() => isVDALoaded = true);
     futures.add(futureVDAStats);
     savedTeams = _getSavedTeams();
+    picklistTeams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
     inTM = prefs.getBool("isTournamentMode") ?? false;
 
     int? tournamentId = prefs.getInt("tournamentID");
@@ -510,7 +512,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                       sort: sortIndex,
                       filter: filter,
                       savedTeams: savedTeams,
-                      pickListTeams: const [],
+                      picklistTeams: picklistTeams,
                       tournament: inTM
                           ? loadTournament(prefs.getString("TMSavedTournament"))
                           : null,
@@ -521,6 +523,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                       sort: sortIndex,
                       filter: filter,
                       savedTeams: savedTeams,
+                      picklistTeams: picklistTeams,
                       tournament: inTM
                           ? loadTournament(prefs.getString("TMSavedTournament"))
                           : null,
@@ -558,7 +561,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                             sort: sortIndex,
                             filter: filter,
                             savedTeams: savedTeams,
-                            pickListTeams: const [],
+                            picklistTeams: picklistTeams,
                             tournament:
                                 inTM ? snapshot.data![2] as Tournament? : null,
                             scoutedTeams: const [],
@@ -568,6 +571,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                             sort: sortIndex,
                             filter: filter,
                             savedTeams: savedTeams,
+                            picklistTeams: picklistTeams,
                             tournament:
                                 inTM ? snapshot.data![2] as Tournament? : null,
                           ),

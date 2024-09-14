@@ -90,6 +90,7 @@ class MyAppState extends State<MyApp> {
       }
     } else {
       isTournamentMode = false;
+      prefs.setStringList("picklist", []);
     }
   }
 

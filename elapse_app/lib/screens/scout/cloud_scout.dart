@@ -7,6 +7,8 @@ import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/team_widget.dart';
 import 'package:flutter/material.dart';
 
+import '../tournament_mode/picklist/picklist.dart';
+
 class CloudScoutScreen extends StatefulWidget {
   const CloudScoutScreen({super.key});
 
@@ -143,7 +145,12 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
                                   .onSurface
                                   .withOpacity(0.05),
                               onTap: () {
-                                print("clicked2");
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const PicklistPage(),
+                                  )
+                                );
                               },
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,

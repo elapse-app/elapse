@@ -7,14 +7,14 @@ import '../../../classes/Team/world_skills.dart';
 class WorldRankingsFilter {
   List<String>? regions;
   bool saved;
-  bool onPickList;
+  bool onPicklist;
   bool atTournament;
   bool scouted;
 
   WorldRankingsFilter({
     List<String>? regions,
     this.saved = false,
-    this.onPickList = false,
+    this.onPicklist = false,
     this.atTournament = false,
     this.scouted = false,
   }) : this.regions = regions ?? [];
@@ -70,7 +70,7 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                               ),
                               filter.regions!.isNotEmpty ||
                                       filter.saved ||
-                                      filter.onPickList ||
+                                      filter.onPicklist ||
                                       filter.atTournament ||
                                       filter.scouted
                                   ? TextButton(
@@ -191,7 +191,7 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                                 padding:
                                     const EdgeInsets.only(left: 20, right: 20),
                                 decoration: BoxDecoration(
-                                  color: filter.onPickList
+                                  color: filter.onPicklist
                                       ? Theme.of(context).colorScheme.primary
                                       : Theme.of(context).colorScheme.surface,
                                   border: Border.all(
@@ -212,10 +212,10 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                                           children: [
                                             Icon(Icons.person_add_alt),
                                             SizedBox(width: 10),
-                                            Text("On Pick list",
+                                            Text("On Picklist",
                                                 style: TextStyle(fontSize: 16)),
                                           ]),
-                                      filter.onPickList
+                                      filter.onPicklist
                                           ? const Row(children: [
                                               Icon(Icons.check),
                                             ])
@@ -224,7 +224,7 @@ Future<WorldRankingsFilter> worldRankingsFilter(
                                   ),
                                   onTap: () {
                                     setModalState(() {
-                                      filter.onPickList = !filter.onPickList;
+                                      filter.onPicklist = !filter.onPicklist;
                                     });
                                   },
                                 ),
