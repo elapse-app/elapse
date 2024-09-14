@@ -6,7 +6,7 @@ class ScoutSheetUI {
   String RPM;
   String otherNotes;
 
-  List<File> photos;
+  List<String> photos;
 
   String autonNotes;
 
@@ -18,4 +18,15 @@ class ScoutSheetUI {
     required this.photos,
     required this.autonNotes,
   });
+
+  Map<String, dynamic> toMap() {
+    return {
+      "intakeType": intakeType,
+      "numMotors": numMotors,
+      "RPM": RPM,
+      "otherNotes": otherNotes,
+      "photos": photos,
+      "autonNotes": autonNotes
+    };
+  }
 }

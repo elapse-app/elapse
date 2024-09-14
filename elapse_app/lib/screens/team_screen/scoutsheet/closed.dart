@@ -1,8 +1,16 @@
 import 'package:elapse_app/classes/ScoutSheet/scoutSheetUi.dart';
+import 'package:elapse_app/extras/database.dart';
 import 'package:flutter/material.dart';
 
 List<Widget> ClosedState(
-    BuildContext context, String teamNumber, ScoutSheetUI sheet) {
+    BuildContext context,
+    String teamNumber,
+    ScoutSheetUI sheet,
+    String teamID,
+    String teamGroupID,
+    String tournamentID,
+    void Function() updateIndex) {
+  Database database = Database();
   Widget photosDisplay = Container(
     decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(9)),
@@ -19,46 +27,46 @@ List<Widget> ClosedState(
     ),
   );
 
-  if (sheet.photos.length == 1) {
-    photosDisplay = ClipRRect(
-      borderRadius: BorderRadius.circular(9),
-      child: Image.file(
-        sheet.photos[0],
-        height: 175,
-        width: double.infinity,
-        fit: BoxFit.cover,
-      ),
-    );
-  } else if (sheet.photos.length == 2) {
-    photosDisplay = Flex(
-      direction: Axis.horizontal,
-      children: [
-        Flexible(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(9),
-            child: Image.file(
-              sheet.photos[0],
-              height: 175,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-        SizedBox(width: 9),
-        Flexible(
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(9),
-            child: Image.file(
-              sheet.photos[1],
-              height: 175,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
+  // if (sheet.photos.length == 1) {
+  //   photosDisplay = ClipRRect(
+  //     borderRadius: BorderRadius.circular(9),
+  //     child: Image.file(
+  //       sheet.photos[0],
+  //       height: 175,
+  //       width: double.infinity,
+  //       fit: BoxFit.cover,
+  //     ),
+  //   );
+  // } else if (sheet.photos.length == 2) {
+  //   photosDisplay = Flex(
+  //     direction: Axis.horizontal,
+  //     children: [
+  //       Flexible(
+  //         child: ClipRRect(
+  //           borderRadius: BorderRadius.circular(9),
+  //           child: Image.file(
+  //             sheet.photos[0],
+  //             height: 175,
+  //             width: double.infinity,
+  //             fit: BoxFit.cover,
+  //           ),
+  //         ),
+  //       ),
+  //       SizedBox(width: 9),
+  //       Flexible(
+  //         child: ClipRRect(
+  //           borderRadius: BorderRadius.circular(9),
+  //           child: Image.file(
+  //             sheet.photos[1],
+  //             height: 175,
+  //             width: double.infinity,
+  //             fit: BoxFit.cover,
+  //           ),
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
   return [
     SliverToBoxAdapter(
       child: Container(
@@ -195,6 +203,48 @@ List<Widget> ClosedState(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [Text("All Matches", style: TextStyle(fontSize: 24))],
         ),
+      ),
+    ),
+    SliverToBoxAdapter(
+      child: Container(
+        margin: EdgeInsets.only(top: 15, left: 23, right: 23),
+        child: TextButton(
+            child: Text(
+              "Delete ScoutSheet",
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+            onPressed: () {
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text("Confirm Deletion"),
+                    content: Text(
+                        "Are you sure you want to delete this scoutsheet?"),
+                    actions: [
+                      TextButton(
+                        onPressed: updateIndex,
+                        child: Text(
+                          "Delete",
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.error),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                        child: Text(
+                          "Cancel",
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.secondary),
+                        ),
+                      )
+                    ],
+                  );
+                },
+              );
+            }),
       ),
     ),
     SliverToBoxAdapter(
