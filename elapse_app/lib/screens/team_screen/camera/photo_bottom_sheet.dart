@@ -1,9 +1,15 @@
 import 'dart:io';
 
 import 'package:elapse_app/aesthetics/color_schemes.dart';
+import 'package:elapse_app/extras/database.dart';
 import 'package:elapse_app/screens/widgets/long_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+
+// File? image;
+// XFile? ImageData;
 
 Future<File?> getPhoto(BuildContext context) async {
   Color redColor = Theme.of(context).brightness == Brightness.light
@@ -11,6 +17,9 @@ Future<File?> getPhoto(BuildContext context) async {
       : darkPallete.redAllianceText;
 
   File? image;
+  XFile? ImageData;
+
+  // File? image;
   return await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -107,6 +116,7 @@ Future<File?> getPhoto(BuildContext context) async {
                                       ),
                                       onPressed: () {
                                         Navigator.pop(context);
+                                        uploadFile(ImageData);
                                       },
                                       icon: Icon(Icons.upload_outlined),
                                       label: Text("Upload"),
@@ -123,6 +133,7 @@ Future<File?> getPhoto(BuildContext context) async {
                               .pickImage(source: ImageSource.camera);
                           if (returnedImage != null) {
                             setState(() {
+                              ImageData = returnedImage;
                               image = File(returnedImage.path);
                             });
                           }
@@ -133,10 +144,12 @@ Future<File?> getPhoto(BuildContext context) async {
                       SizedBox(height: 18),
                       LongButton(
                         onPressed: () async {
+                          print({FirebaseAuth.instance.currentUser?.uid});
                           final returnedImage = await ImagePicker()
-                              .pickImage(source: ImageSource.gallery);
+                              .pickImage(source: ImageSource.gallery); ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                           if (returnedImage != null) {
                             setState(() {
+                              ImageData = returnedImage;
                               image = File(returnedImage.path);
                             });
                           }
@@ -153,4 +166,25 @@ Future<File?> getPhoto(BuildContext context) async {
       }).then((_) {
     return image;
   });
+}
+
+
+Future uploadFile(XFile? pic) async {
+  
+
+  final path = await 'images/${FirebaseAuth.instance.currentUser?.uid}/scoutsheet/images/${pic!.name}';
+  // final path = await 'images/${pic!.name}';
+  final file = File(pic.path);
+
+  final ref = await FirebaseStorage.instance.ref().child(path);
+  
+  var uploadtask = ref.putFile(file);
+
+  final snapshot = await uploadtask.whenComplete(() {});
+
+  final URL = await snapshot.ref.getDownloadURL();
+
+  // Database().addPhoto("", "", "", URL);
+
+  
 }
