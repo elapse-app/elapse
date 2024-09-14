@@ -6,7 +6,6 @@ import 'package:elapse_app/screens/team_screen/camera/photo_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 
 List<Widget> EditState(
-    String teamNumber,
   BuildContext context,
   String teamNumber,
   void Function(File) addPhoto,
