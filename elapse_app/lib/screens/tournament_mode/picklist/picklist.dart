@@ -41,8 +41,7 @@ class _PicklistPageState extends State<PicklistPage> {
   void initState() {
     super.initState();
     refreshTeams();
-    tournament = getTournamentDetails(55557);
-    // tournament = TMTournamentDetails(prefs.getInt("tournamentID") ?? 0);
+    tournament = TMTournamentDetails(prefs.getInt("tournamentID") ?? 0);
   }
 
   @override

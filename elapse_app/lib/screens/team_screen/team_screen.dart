@@ -59,10 +59,9 @@ class _TeamScreenState extends State<TeamScreen> {
     isSaved = alreadySaved();
     displaySave = !isMainTeam();
 
-    tournament = TMTournamentDetails(55557);
-    // if (prefs.getBool("isTournamentMode") ?? false) {
-    //   tournament = TMTournamentDetails(prefs.getInt("tournamentID") ?? 0);
-    // }
+    if (prefs.getBool("isTournamentMode") ?? false) {
+      tournament = TMTournamentDetails(prefs.getInt("tournamentID") ?? 0);
+    }
   }
 
   bool alreadySaved() {
