@@ -364,7 +364,7 @@ class _TeamScreenState extends State<TeamScreen> {
           const SliverToBoxAdapter(
             child: SizedBox(height: 28),
           ),
-          // (prefs.getBool("isTournamentMode") ?? false) &&
+          (prefs.getBool("isTournamentMode") ?? false) &&
           teamSave != loadTeamPreview(prefs.getString("savedTeam") ?? "") &&
                   tournament != null
               ?

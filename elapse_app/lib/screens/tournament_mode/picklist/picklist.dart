@@ -7,7 +7,6 @@ import 'package:elapse_app/screens/tournament_mode/picklist/picklist_widget.dart
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:collection/collection.dart';
 
 import '../../../classes/Team/teamPreview.dart';
 import '../../../classes/Tournament/tournament.dart';
@@ -61,39 +60,14 @@ class _PicklistPageState extends State<PicklistPage> {
             backNavigation: true,
           ),
           const RoundedTop(),
-          // prefs.getBool("isTournamentMode") ?? false ?
-          true ?
-          FutureBuilder(
-              future: tournament,
-              builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.none:
-                  case ConnectionState.waiting:
-                  case ConnectionState.active:
-                    return const SliverToBoxAdapter(
-                        child: LinearProgressIndicator());
-                  case ConnectionState.done:
-                    if (snapshot.hasError) {
-                      print(snapshot.error);
-                      return const SliverToBoxAdapter(
-                          child: BigErrorMessage(
-                              icon: Icons.list_alt_outlined,
-                              message: "Picklist Unavailable"));
-                    }
-
-                    return SliverToBoxAdapter(
+          prefs.getBool("isTournamentMode") ?? false ?
+          SliverToBoxAdapter(
                       child: ReorderableListView(
                           padding: const EdgeInsets.symmetric(horizontal: 23),
                           shrinkWrap: true,
                           children: teams
                               .asMap()
                               .map<int, Widget>((i, e) {
-                                TeamStats stats = (snapshot.data as Tournament)
-                                    .divisions
-                                    .firstWhereOrNull((e2) =>
-                                        e2.teamStats?.containsKey(e.teamID) ??
-                                        false)!
-                                    .teamStats![e.teamID]!;
                                 return MapEntry(
                                     i,
                                     Column(
@@ -104,7 +78,7 @@ class _PicklistPageState extends State<PicklistPage> {
                                           PicklistWidget(
                                               index: i,
                                               team: e,
-                                              stats: stats,
+                                              tournament: tournament,
                                               carouselControllers:
                                                   carouselControllers,
                                               refresh: refreshTeams),
@@ -151,9 +125,7 @@ class _PicklistPageState extends State<PicklistPage> {
                                 ),
                                 child: child,
                               )),
-                    );
-                }
-              })
+                    )
           : const SliverToBoxAdapter(child: BigErrorMessage(icon: Icons.list_alt_outlined, message: "Picklist is only available during tournament mode")),
         ]));
   }
