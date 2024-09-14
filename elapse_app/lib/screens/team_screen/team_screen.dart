@@ -11,9 +11,12 @@ import 'package:elapse_app/screens/widgets/custom_tab_bar.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
+import 'package:collection/collection.dart';
 
 import '../../classes/Filters/season.dart';
 import '../../classes/Team/world_skills.dart';
+import '../../classes/Tournament/tournament.dart';
+import '../tournament_mode/picklist/picklist.dart';
 
 class TeamScreen extends StatefulWidget {
   const TeamScreen(
@@ -29,6 +32,9 @@ class TeamScreen extends StatefulWidget {
 class _TeamScreenState extends State<TeamScreen> {
   late TeamPreview teamSave;
   bool locationLoaded = false;
+
+  Future<Tournament>? tournament;
+
   @override
   void initState() {
     super.initState();
@@ -53,6 +59,11 @@ class _TeamScreenState extends State<TeamScreen> {
     teamAwards = getAwards(widget.teamID, season.vrcId);
     isSaved = alreadySaved();
     displaySave = !isMainTeam();
+
+    tournament = TMTournamentDetails(55557);
+    // if (prefs.getBool("isTournamentMode") ?? false) {
+    //   tournament = TMTournamentDetails(prefs.getInt("tournamentID") ?? 0);
+    // }
   }
 
   bool alreadySaved() {
@@ -118,9 +129,7 @@ class _TeamScreenState extends State<TeamScreen> {
                       Navigator.pop(context);
                     },
                     child: Icon(Icons.arrow_back,
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface),
+                        color: Theme.of(context).colorScheme.onSurface),
                   ),
                   const Spacer(),
                   GestureDetector(
@@ -128,29 +137,30 @@ class _TeamScreenState extends State<TeamScreen> {
                         Season updated = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SeasonFilterPage(selected: season),
+                            builder: (context) =>
+                                SeasonFilterPage(selected: season),
                           ),
                         );
                         setState(() {
                           season = updated;
-                          skillsStats = getWorldSkillsForTeam(season.vrcId, widget.teamID);
-                          teamStats = getTrueSkillDataForTeam(season.vrcId, widget.teamName);
-                          teamTournaments = fetchTeamTournaments(widget.teamID, season.vrcId);
+                          skillsStats = getWorldSkillsForTeam(
+                              season.vrcId, widget.teamID);
+                          teamStats = getTrueSkillDataForTeam(
+                              season.vrcId, widget.teamName);
+                          teamTournaments =
+                              fetchTeamTournaments(widget.teamID, season.vrcId);
                           teamAwards = getAwards(widget.teamID, season.vrcId);
                         });
                       },
-                      child: Row(
-                          children: [
-                            const Icon(Icons.event_note),
-                            const SizedBox(width: 4),
-                            Text(
-                              season.name.substring(10),
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            const Icon(Icons.arrow_right)
-                          ]
-                      )
-                  )
+                      child: Row(children: [
+                        const Icon(Icons.event_note),
+                        const SizedBox(width: 4),
+                        Text(
+                          season.name.substring(10),
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const Icon(Icons.arrow_right)
+                      ]))
                 ],
               ),
             ),
@@ -354,6 +364,125 @@ class _TeamScreenState extends State<TeamScreen> {
           const SliverToBoxAdapter(
             child: SizedBox(height: 28),
           ),
+          // (prefs.getBool("isTournamentMode") ?? false) &&
+          teamSave != loadTeamPreview(prefs.getString("savedTeam") ?? "") &&
+                  tournament != null
+              ?
+              FutureBuilder(
+                  future: tournament,
+                  builder: (context, snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.none:
+                      case ConnectionState.waiting:
+                      case ConnectionState.active:
+                        return const SliverToBoxAdapter(
+                          child: Padding(
+                              padding: EdgeInsets.only(bottom: 28),
+                              child: Center(child: CircularProgressIndicator())),
+                        );
+                      case ConnectionState.done:
+                        if (snapshot.hasError) {
+                          return const SliverToBoxAdapter(
+                              child: SizedBox.shrink());
+                        }
+
+                        if ((snapshot.data as Tournament)
+                                .teams
+                                .firstWhereOrNull(
+                                    (e) => e.id == teamSave.teamID) ==
+                            null) {
+                          return const SliverToBoxAdapter(
+                              child: SizedBox.shrink());
+                        }
+
+                        return SliverToBoxAdapter(
+                            child: Column(children: [
+                          GestureDetector(
+                              onTap: () {
+                                List<String> picklist =
+                                    prefs.getStringList("picklist") ?? [];
+                                if ((prefs.getStringList("picklist") ?? [])
+                                    .contains(jsonEncode(teamSave.toJson()))) {
+                                  picklist
+                                      .remove(jsonEncode(teamSave.toJson()));
+                                } else {
+                                  picklist.add(jsonEncode(teamSave.toJson()));
+                                }
+                                prefs.setStringList(
+                                    "picklist", picklist.toSet().toList());
+                                setState(() {});
+                              },
+                              onDoubleTap: () async {
+                                await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const PicklistPage(),
+                                    ));
+                                setState(() {});
+                              },
+                              child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 23),
+                                  child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .tertiary,
+                                        borderRadius: BorderRadius.circular(18),
+                                        border: Border.all(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .tertiary,
+                                          width: 2,
+                                        ),
+                                      ),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 24, vertical: 21),
+                                      child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: (prefs.getStringList(
+                                                          "picklist") ??
+                                                      [])
+                                                  .contains(jsonEncode(
+                                                      teamSave.toJson()))
+                                              ? [
+                                                  Text(
+                                                      "Rank ${prefs.getStringList("picklist")!.indexOf(jsonEncode(teamSave.toJson())) + 1} on Picklist",
+                                                      style: TextStyle(
+                                                        fontSize: 18,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .onSurface,
+                                                      )),
+                                                  Icon(Icons.playlist_add_check,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .secondary,
+                                                      size: 24),
+                                                ]
+                                              : [
+                                                  Text("Add to Picklist",
+                                                      style: TextStyle(
+                                                        fontSize: 18,
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .onSurface,
+                                                      )),
+                                                  Icon(Icons.playlist_add,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .secondary,
+                                                      size: 24),
+                                                ])))),
+                          const SizedBox(height: 28),
+                        ]));
+                    }
+                  })
+              : const SliverToBoxAdapter(child: SizedBox.shrink()),
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 23),
             sliver: SliverToBoxAdapter(
@@ -386,7 +515,8 @@ class _TeamScreenState extends State<TeamScreen> {
                             return const Text("Skills Data Unavailable");
                           }
 
-                          WorldSkillsStats stats = snapshot.data as WorldSkillsStats;
+                          WorldSkillsStats stats =
+                              snapshot.data as WorldSkillsStats;
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -408,7 +538,8 @@ class _TeamScreenState extends State<TeamScreen> {
                               Row(
                                 children: [
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         stats.score.toString(),
@@ -424,7 +555,8 @@ class _TeamScreenState extends State<TeamScreen> {
                                     width: 18,
                                   ),
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         stats.driver.toString(),
@@ -440,7 +572,8 @@ class _TeamScreenState extends State<TeamScreen> {
                                     width: 18,
                                   ),
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         stats.auton.toString(),
@@ -528,7 +661,8 @@ class _TeamScreenState extends State<TeamScreen> {
                               Row(
                                 children: [
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         stats.trueSkill.toString(),
@@ -544,7 +678,8 @@ class _TeamScreenState extends State<TeamScreen> {
                                     width: 18,
                                   ),
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         stats.trueSkillRegionRank.toString(),
@@ -567,7 +702,8 @@ class _TeamScreenState extends State<TeamScreen> {
                               Row(
                                 children: [
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         stats.opr.toString(),
@@ -583,7 +719,8 @@ class _TeamScreenState extends State<TeamScreen> {
                                     width: 18,
                                   ),
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         stats.dpr.toString(),
@@ -599,7 +736,8 @@ class _TeamScreenState extends State<TeamScreen> {
                                     width: 18,
                                   ),
                                   Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         stats.ccwm.toString(),
@@ -798,9 +936,9 @@ class _TeamScreenState extends State<TeamScreen> {
                                       height: 60,
                                       child: Column(
                                         crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                            CrossAxisAlignment.start,
                                         mainAxisAlignment:
-                                        MainAxisAlignment.center,
+                                            MainAxisAlignment.center,
                                         children: [
                                           Text(
                                             e.name,
@@ -816,7 +954,8 @@ class _TeamScreenState extends State<TeamScreen> {
                                             overflow: TextOverflow.ellipsis,
                                             textAlign: TextAlign.start,
                                             e.tournamentName ?? "",
-                                            style: const TextStyle(fontSize: 16),
+                                            style:
+                                                const TextStyle(fontSize: 16),
                                           )
                                         ],
                                       ),
@@ -876,13 +1015,13 @@ class _TeamScreenState extends State<TeamScreen> {
                           }
 
                           List<TournamentPreview> tournaments =
-                          snapshot.data as List<TournamentPreview>;
+                              snapshot.data as List<TournamentPreview>;
                           return Column(
                             children: tournaments
                                 .map(
                                   (e) => TournamentPreviewWidget(
-                                  tournamentPreview: e),
-                            )
+                                      tournamentPreview: e),
+                                )
                                 .toList(),
                           );
                       }
