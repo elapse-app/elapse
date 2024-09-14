@@ -35,6 +35,8 @@ class _TeamScreenState extends State<TeamScreen> {
   bool isEditing = false;
   int pageIndex = 0;
   int scoutSheetStateIndex = 0;
+  int selectedTournamentIndex = 0;
+  String selectedTournamentName = "";
   ScoutSheetUI activeScoutSheet = ScoutSheetUI(
     intakeType: "",
     numMotors: "",
@@ -62,7 +64,16 @@ class _TeamScreenState extends State<TeamScreen> {
       },
     );
     teamStats = getTrueSkillDataForTeam(widget.teamNumber);
-    teamTournaments = fetchTeamTournaments(widget.teamID, 181);
+    teamTournaments = fetchTeamTournaments(widget.teamID, 181).then(
+      (value) {
+        if (value.isNotEmpty) {
+          setState(() {
+            selectedTournamentName = value[0].name;
+          });
+        }
+        return value;
+      },
+    );
     teamAwards = getAwards(widget.teamID, 181);
     isSaved = alreadySaved();
     displaySave = !isMainTeam();
@@ -258,41 +269,84 @@ class _TeamScreenState extends State<TeamScreen> {
                   padding: const EdgeInsets.only(left: 9),
                   alignment: Alignment.centerLeft,
                   child: scoutSheetStateIndex == 1 || scoutSheetStateIndex == 0
-                      ? DropdownButton(
-                          borderRadius: BorderRadius.circular(18),
-                          isExpanded: true,
-                          value: "Caution Tape",
-                          menuMaxHeight: 250,
-                          style: TextStyle(
-                              overflow: TextOverflow.ellipsis,
-                              fontFamily: "Manrope",
-                              fontSize: 16.25,
-                              fontWeight: FontWeight.w500,
-                              color: Theme.of(context).colorScheme.onSurface),
-                          items: [
-                            DropdownMenuItem(
-                                value: "Caution Tape",
-                                child:
-                                    Text("Caution Tape Halloween Qualifier")),
-                            DropdownMenuItem(
-                                value: "Caution Tap",
-                                child: Text("Caution Tape")),
-                            DropdownMenuItem(
-                                value: "Caution Ta",
-                                child: Text("Caution Tape")),
-                            DropdownMenuItem(
-                                value: "Caution Ta",
-                                child: Text("Caution Tape")),
-                            DropdownMenuItem(
-                                value: "Caution T",
-                                child: Text("Caution Tape")),
-                            DropdownMenuItem(
-                                value: "Caution ", child: Text("Caution Tape")),
-                          ],
-                          onChanged: (value) => {},
-                        )
+                      ? FutureBuilder<Object>(
+                          future: teamTournaments,
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Text(
+                                "Loading...",
+                                style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    fontFamily: "Manrope",
+                                    fontSize: 15.9,
+                                    fontWeight: FontWeight.w500),
+                              );
+                            }
+                            if (snapshot.hasError) {
+                              return Text(
+                                "Error occured",
+                                style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    fontFamily: "Manrope",
+                                    fontSize: 15.9,
+                                    fontWeight: FontWeight.w500),
+                              );
+                            }
+                            List<TournamentPreview> tournaments =
+                                snapshot.data as List<TournamentPreview>;
+                            if (tournaments.isEmpty) {
+                              return Text(
+                                "No Tournaments",
+                                style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    fontFamily: "Manrope",
+                                    fontSize: 15.9,
+                                    fontWeight: FontWeight.w500),
+                              );
+                            }
+                            return DropdownButton(
+                              borderRadius: BorderRadius.circular(18),
+                              isExpanded: true,
+                              value: tournaments[selectedTournamentIndex].id,
+                              menuMaxHeight: 250,
+                              style: TextStyle(
+                                  overflow: TextOverflow.ellipsis,
+                                  fontFamily: "Manrope",
+                                  fontSize: 15.9,
+                                  letterSpacing: 0.25,
+                                  fontWeight: FontWeight.w500,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface),
+                              items: tournaments.map((tournament) {
+                                return DropdownMenuItem(
+                                  child: Text(
+                                    tournament.name,
+                                    style: TextStyle(
+                                        overflow: TextOverflow.ellipsis,
+                                        fontFamily: "Manrope",
+                                        fontSize: 15.9,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                  value: tournament.id,
+                                );
+                              }).toList(),
+                              onChanged: (value) => {
+                                setState(
+                                  () {
+                                    selectedTournamentIndex =
+                                        tournaments.indexWhere(
+                                            (element) => element.id == value);
+                                    selectedTournamentName =
+                                        tournaments[selectedTournamentIndex]
+                                            .name;
+                                  },
+                                )
+                              },
+                            );
+                          })
                       : Text(
-                          "Caution Tape",
+                          selectedTournamentName,
                           style: TextStyle(
                               overflow: TextOverflow.ellipsis,
                               fontFamily: "Manrope",
