@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 List<Widget> EditState(
   BuildContext context,
   String teamNumber,
-  void Function(File) addPhoto,
+  void Function(String) addPhoto,
   void Function(int) removePhoto,
   List<File> photos,
   void Function(String property, String value) updateProperty,
@@ -35,9 +35,8 @@ List<Widget> EditState(
   Widget photosDisplay = GestureDetector(
     onTap: () async {
       final result = await getPhoto(context);
-      print(result);
       if (result != null) {
-        addPhoto(result);
+        // addPhoto(result);
         print(photos.length);
       }
     },

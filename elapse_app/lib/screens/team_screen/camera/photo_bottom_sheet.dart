@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:elapse_app/aesthetics/color_schemes.dart';
+import 'package:elapse_app/extras/database.dart';
 import 'package:elapse_app/screens/widgets/long_button.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,6 +12,7 @@ Future<File?> getPhoto(BuildContext context) async {
       : darkPallete.redAllianceText;
 
   File? image;
+  Database database = Database();
   return await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -122,6 +124,8 @@ Future<File?> getPhoto(BuildContext context) async {
                           final returnedImage = await ImagePicker()
                               .pickImage(source: ImageSource.camera);
                           if (returnedImage != null) {
+                            image = File(returnedImage.path);
+                            await database.uploadPhoto(image!);
                             setState(() {
                               image = File(returnedImage.path);
                             });
@@ -135,7 +139,10 @@ Future<File?> getPhoto(BuildContext context) async {
                         onPressed: () async {
                           final returnedImage = await ImagePicker()
                               .pickImage(source: ImageSource.gallery);
+
                           if (returnedImage != null) {
+                            image = File(returnedImage.path);
+                            await database.uploadPhoto(image!);
                             setState(() {
                               image = File(returnedImage.path);
                             });
