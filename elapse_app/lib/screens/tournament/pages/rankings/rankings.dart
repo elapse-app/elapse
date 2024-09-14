@@ -67,8 +67,8 @@ class RankingsPage extends StatelessWidget {
       teams = tournament.teams.where((e) => scoutedTeams.any((e2) => e2.teamID == e.id)).toList();
     }
 
-    List<TeamPreview> pickListTeams = [];
-    if (filter.onPickList) {
+    List<TeamPreview> pickListTeams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
+    if (filter.onPicklist) {
       teams = tournament.teams.where((e) => pickListTeams.any((e2) => e2.teamID == e.id)).toList();
     }
 

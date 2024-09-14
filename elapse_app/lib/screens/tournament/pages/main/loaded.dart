@@ -576,7 +576,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
                                       await worldRankingsFilter(
                                     context,
                                     filter,
-                                    prefs.getBool("inTournamentMode") ?? false,
+                                    prefs.getBool("isTournamentMode") ?? false,
                                   );
                                   setState(() {
                                     filter = updatedFilter;
