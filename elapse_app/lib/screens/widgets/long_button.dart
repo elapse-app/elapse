@@ -7,12 +7,16 @@ class LongButton extends StatelessWidget {
       this.gradient = false,
       required this.text,
       this.icon,
-      this.useForwardArrow = true});
+      this.useForwardArrow = true,
+      this.centerAlign = false,
+      this.isGray = false});
   final void Function()? onPressed;
   final bool gradient;
   final String text;
   final IconData? icon;
   final bool useForwardArrow;
+  final bool centerAlign;
+  final bool isGray;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +38,9 @@ class LongButton extends StatelessWidget {
                 : null,
             border: Border.all(
               width: 1,
-              color: Theme.of(context).colorScheme.primary,
+              color: isGray
+                  ? Theme.of(context).colorScheme.surfaceDim
+                  : Theme.of(context).colorScheme.primary,
             ),
           ),
         ),
@@ -53,13 +59,16 @@ class LongButton extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 18),
               child: Row(
                 children: [
+                  centerAlign ? Spacer() : Container(),
                   if (icon != null)
                     Icon(icon, color: Theme.of(context).colorScheme.secondary),
                   if (icon != null) const SizedBox(width: 18),
                   Text(
                     text,
                     style: TextStyle(
-                      color: Theme.of(context).colorScheme.secondary,
+                      color: isGray
+                          ? Theme.of(context).colorScheme.onSurface
+                          : Theme.of(context).colorScheme.secondary,
                       fontSize: 16,
                     ),
                   ),
@@ -67,7 +76,9 @@ class LongButton extends StatelessWidget {
                   if (useForwardArrow)
                     Icon(
                       Icons.arrow_forward,
-                      color: Theme.of(context).colorScheme.secondary,
+                      color: isGray
+                          ? Theme.of(context).colorScheme.onSurface
+                          : Theme.of(context).colorScheme.secondary,
                     ),
                 ],
               ),

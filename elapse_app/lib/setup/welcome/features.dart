@@ -1,4 +1,5 @@
 import 'package:dots_indicator/dots_indicator.dart';
+import 'package:elapse_app/screens/widgets/long_button.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
@@ -24,6 +25,15 @@ class _FeaturesState extends State<Features> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = false;
+    if (Theme.of(context).brightness == Brightness.dark) {
+      isDarkMode = true;
+    }
+
+    String imageStringAddition = "";
+    if (isDarkMode) {
+      imageStringAddition = "Dark";
+    }
     List<Widget> featurePages = [
       Column(children: [
         Text(
@@ -44,11 +54,8 @@ class _FeaturesState extends State<Features> {
           ),
         ),
         const SizedBox(height: 20),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.50,
-          width: MediaQuery.of(context).size.height * 0.50 / (452 / 240),
-          child: Image.asset('assets/onboardingHome.png'),
-        ),
+        PhotoPreview(
+            imageLocation: 'assets/onboardingHome$imageStringAddition.png')
       ]),
       Column(children: [
         Text(
@@ -69,11 +76,8 @@ class _FeaturesState extends State<Features> {
           ),
         ),
         const SizedBox(height: 20),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.50,
-          width: MediaQuery.of(context).size.height * 0.50 / (452 / 240),
-          child: Image.asset('assets/onboardingSchedule.png'),
-        ),
+        PhotoPreview(
+            imageLocation: "assets/onboardingSchedule$imageStringAddition.png")
       ]),
       Column(children: [
         Text(
@@ -94,11 +98,8 @@ class _FeaturesState extends State<Features> {
           ),
         ),
         const SizedBox(height: 20),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.50,
-          width: MediaQuery.of(context).size.height * 0.50 / (452 / 240),
-          child: Image.asset('assets/onboardingRankings.png'),
-        ),
+        PhotoPreview(
+            imageLocation: 'assets/onboardingRankings$imageStringAddition.png')
       ]),
       Column(children: [
         Text(
@@ -119,11 +120,8 @@ class _FeaturesState extends State<Features> {
           ),
         ),
         const SizedBox(height: 20),
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.50,
-          width: MediaQuery.of(context).size.height * 0.50 / (452 / 240),
-          child: Image.asset('assets/onboardingMyTeam.png'),
-        ),
+        PhotoPreview(
+            imageLocation: 'assets/onboardingMyTeam$imageStringAddition.png')
       ]),
     ];
 
@@ -161,30 +159,28 @@ class _FeaturesState extends State<Features> {
           physics: const NeverScrollableScrollPhysics(),
           slivers: [
             ElapseAppBar(
-                title: Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              if (currIndex == 0) {
-                                Navigator.pop(context);
-                              } else {
-                                carouselController.previousPage(
-                                    duration: const Duration(milliseconds: 500),
-                                    curve: Curves.fastOutSlowIn);
-                              }
-                            },
-                            child: const Icon(Icons.arrow_back),
-                          ),
-                          const SizedBox(width: 12),
-                          Text('Welcome',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontFamily: 'Manrope',
-                                fontWeight: FontWeight.w600,
-                                color: Theme.of(context).colorScheme.onSurface,
-                              )),
-                        ]),
+              title: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                GestureDetector(
+                  onTap: () {
+                    if (currIndex == 0) {
+                      Navigator.pop(context);
+                    } else {
+                      carouselController.previousPage(
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.fastOutSlowIn);
+                    }
+                  },
+                  child: const Icon(Icons.arrow_back),
+                ),
+                const SizedBox(width: 12),
+                Text('Welcome',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontFamily: 'Manrope',
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    )),
+              ]),
               maxHeight: 60,
             ),
             SliverFillRemaining(
@@ -232,74 +228,25 @@ class _FeaturesState extends State<Features> {
                       ),
                     ),
                     Container(
-                      alignment: Alignment.bottomCenter,
-                      padding: const EdgeInsets.only(bottom: 23),
-                      child: Padding(
-                        padding: const EdgeInsets.fromLTRB(23.0, 0, 23.0, 23.0),
-                        child: SizedBox(
-                          height: 59.0,
-                          width: double.infinity,
-                          child: TextButton(
-                            style: TextButton.styleFrom(
-                                foregroundColor:
-                                    Theme.of(context).colorScheme.primary,
-                                backgroundColor:
-                                    Theme.of(context).colorScheme.surface,
-                                textStyle: TextStyle(
-                                  fontSize: 16,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface,
-                                  fontFamily: "Manrope",
-                                  fontWeight: FontWeight.w400,
+                      margin: EdgeInsets.fromLTRB(23, 15, 23, 80),
+                      child: LongButton(
+                          centerAlign: true,
+                          useForwardArrow: false,
+                          onPressed: () {
+                            if (currIndex == 3) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SignUpPage(),
                                 ),
-                                side: BorderSide(
-                                  color:
-                                      Theme.of(context).colorScheme.primary,
-                                  width: 1.0,
-                                )),
-                            onPressed: () {
-                              // Navigate to the next page
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => ThemeSetup(
-                              //       prefs: widget.prefs,
-                              //     ),
-                              //   ),
-                              // );
-                              // Navigator.push(
-                              //   context,
-                              //   PageRouteBuilder(
-                              //     pageBuilder: (_, __, ___) => SecondFeature(),
-                              //     transitionDuration: Duration(milliseconds: 100),
-                              //     transitionsBuilder: (_, a, __, c) => FadeTransition(opacity: a, child: c),
-                              //   ),
-                              // );
-                              if (currIndex == 3) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => SignUpPage(),
-                                  ),
-                                );
-                              } else {
-                                carouselController.nextPage(
-                                    duration: const Duration(milliseconds: 500),
-                                    curve: Curves.fastOutSlowIn);
-                              }
-                            },
-                            child: Text(
-                              'Next',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                color: Color.fromARGB(255, 12, 77, 86),
-                                fontFamily: "Manrope",
-                                fontWeight: FontWeight.w400,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
+                              );
+                            } else {
+                              carouselController.nextPage(
+                                  duration: const Duration(milliseconds: 500),
+                                  curve: Curves.fastOutSlowIn);
+                            }
+                          },
+                          text: "Next"),
                     ),
                   ],
                 ),
@@ -307,5 +254,24 @@ class _FeaturesState extends State<Features> {
             ),
           ],
         ));
+  }
+}
+
+class PhotoPreview extends StatelessWidget {
+  const PhotoPreview({super.key, required this.imageLocation});
+  final String imageLocation;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.50,
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+              width: 1, color: Theme.of(context).colorScheme.onSurface)),
+      child: ClipRRect(
+          borderRadius: BorderRadius.circular(18),
+          child: Image.asset(imageLocation)),
+    );
   }
 }
