@@ -66,6 +66,9 @@ class NextGame extends StatelessWidget {
       }
     }
 
+    Game currGame = games.lastWhere((e) => e.startedTime != null);
+    int gamesLeft = game.gameNum - currGame.gameNum;
+
     return GestureDetector(
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
@@ -166,6 +169,18 @@ class NextGame extends StatelessWidget {
                   ),
                   Text(
                     "Time",
+                    style: TextStyle(fontSize: 16),
+                  ),
+                ]),
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(
+                    "$gamesLeft",
+                    style: const TextStyle(
+                      fontSize: 24,
+                    ),
+                  ),
+                  const Text(
+                    "Matches Remaining",
                     style: TextStyle(fontSize: 16),
                   ),
                 ])
