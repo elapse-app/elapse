@@ -22,6 +22,7 @@ class Game {
 
   DateTime? scheduledTime;
   DateTime? startedTime;
+  DateTime? adjustedTime;
 
   Game({
     this.redAlliancePreview,
@@ -33,6 +34,7 @@ class Game {
     this.fieldName,
     this.scheduledTime,
     this.startedTime,
+    this.adjustedTime,
     this.redScore,
     this.blueScore,
   });
@@ -103,6 +105,7 @@ class Game {
       fieldName: json["field"],
       scheduledTime: DateTime.tryParse(json["scheduled"] ?? ""),
       startedTime: DateTime.tryParse(json["started"] ?? ""),
+      adjustedTime: null,
     );
   }
 
@@ -125,6 +128,7 @@ class Game {
       "fieldName": fieldName,
       "scheduledTime": scheduledTime?.toIso8601String(),
       "startedTime": startedTime?.toIso8601String(),
+      "adjustedTime": adjustedTime?.toIso8601String(),
     };
   }
 }
@@ -221,5 +225,6 @@ Game loadGame(game) {
     fieldName: game["fieldName"],
     scheduledTime: DateTime.tryParse(game["scheduledTime"].toString()),
     startedTime: DateTime.tryParse(game["startedTime"].toString()),
+    adjustedTime: DateTime.tryParse(game["adjustedTime"].toString()),
   );
 }
