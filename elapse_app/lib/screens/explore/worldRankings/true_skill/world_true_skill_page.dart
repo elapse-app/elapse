@@ -51,7 +51,7 @@ Future<void> worldTrueSkillPage(
                               MaterialPageRoute(
                                 builder: (context) => TeamScreen(
                                   teamID: teamID,
-                                  teamName: teamNum,
+                                  teamNumber: teamNum,
                                 ),
                               ),
                             );

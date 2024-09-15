@@ -171,7 +171,7 @@ class _LoadedTopWorldSkills extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (context) => TeamScreen(
                                 teamID: rankings[index].teamId,
-                                teamName: rankings[index].teamNum),
+                                teamNumber: rankings[index].teamNum),
                           ));
                     }),
                 index != 10
