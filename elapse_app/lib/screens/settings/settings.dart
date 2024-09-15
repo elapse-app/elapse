@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/settings/theme.dart';
 import 'package:elapse_app/screens/settings/set_team.dart';
