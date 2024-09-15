@@ -1,4 +1,11 @@
 import 'dart:convert';
+import 'package:elapse_app/main.dart';
+import 'package:elapse_app/screens/settings/theme.dart';
+import 'package:elapse_app/screens/settings/set_team.dart';
+import 'package:elapse_app/screens/settings/signin.dart';
+import 'package:elapse_app/screens/settings/authemail.dart';
+import 'package:elapse_app/screens/settings/authpass.dart';
+import 'package:elapse_app/screens/settings/authdel.dart';
 
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
@@ -45,140 +52,179 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 children: [
                   Container(
-                    height: 280,
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Theme.of(context).colorScheme.secondary),
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                    padding: const EdgeInsets.all(18),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
+                      height: 280,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            color: Theme.of(context).colorScheme.secondary),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      padding: const EdgeInsets.all(18),
+                      child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text("Account Name", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
-                                Text("example.email@gmail.com", style: const TextStyle(fontSize: 16)),
-                              ]
-                            ),
-                            CircleAvatar(
-                              radius: 40,
-                              child: const Icon(Icons.person, size: 40),
-                            )
-                          ]
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Theme.of(context).colorScheme.secondary),
-                            borderRadius: BorderRadius.circular(100),),
-                          child: Row(
-                            children: [
-                              Icon(Icons.group, color: Theme.of(context).colorScheme.secondary),
-                              const SizedBox(width: 15),
-                              Expanded(
-                                child: DropdownButtonHideUnderline(
-                                  child: DropdownButton(
-                                    isExpanded: true,
-                                    value: mainTeamId,
-                                    items: getSavedTeams().map((e) => DropdownMenuItem(value: e.teamID, child: Text("Team ${e.teamNumber}"))).toList(),
-                                    onChanged: (int? value) {
-                                      final String savedTeam = prefs.getString("savedTeam") ?? "";
-                                      final List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
-                                      String selected = savedTeams.where((e) => jsonDecode(e)["teamID"] == value).toList()[0];
-                                      savedTeams.removeWhere((e) => jsonDecode(e)["teamID"] == value);
-                                      savedTeams.add(savedTeam);
-                                      prefs.setStringList("savedTeams", savedTeams);
-                                      prefs.setString("savedTeam", selected);
+                            Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text("Account Name",
+                                            style: const TextStyle(
+                                                fontSize: 24,
+                                                fontWeight: FontWeight.w600)),
+                                        Text("example.email@gmail.com",
+                                            style:
+                                                const TextStyle(fontSize: 16)),
+                                      ]),
+                                  CircleAvatar(
+                                    radius: 40,
+                                    child: const Icon(Icons.person, size: 40),
+                                  )
+                                ]),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 20, vertical: 5),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary),
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              child: Row(children: [
+                                Icon(Icons.group,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary),
+                                const SizedBox(width: 15),
+                                Expanded(
+                                  child: DropdownButtonHideUnderline(
+                                    child: DropdownButton(
+                                      isExpanded: true,
+                                      value: mainTeamId,
+                                      items: getSavedTeams()
+                                          .map((e) => DropdownMenuItem(
+                                              value: e.teamID,
+                                              child:
+                                                  Text("Team ${e.teamNumber}")))
+                                          .toList(),
+                                      onChanged: (int? value) {
+                                        final String savedTeam =
+                                            prefs.getString("savedTeam") ?? "";
+                                        final List<String> savedTeams =
+                                            prefs.getStringList("savedTeams") ??
+                                                [];
+                                        String selected = savedTeams
+                                            .where((e) =>
+                                                jsonDecode(e)["teamID"] ==
+                                                value)
+                                            .toList()[0];
+                                        savedTeams.removeWhere((e) =>
+                                            jsonDecode(e)["teamID"] == value);
+                                        savedTeams.add(savedTeam);
+                                        prefs.setStringList(
+                                            "savedTeams", savedTeams);
+                                        prefs.setString("savedTeam", selected);
 
-                                      setState(() {
-                                        mainTeamId = value!;
-                                      });
-                                    },
-                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, color: Theme.of(context).colorScheme.secondary),
-                                    borderRadius: BorderRadius.circular(10),
+                                        setState(() {
+                                          mainTeamId = value!;
+                                        });
+                                      },
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w400,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .secondary),
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                   ),
+                                )
+                              ]),
+                            ),
+                            Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(18),
+                                  color: Theme.of(context).colorScheme.tertiary,
                                 ),
-                              )
-                            ]
-                          ),
-                        ),
-                        Container(
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(18),
-                            color: Theme.of(context).colorScheme.tertiary,
-                          ),
-                          padding: const EdgeInsets.all(10),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Flexible(
-                                fit: FlexFit.tight,
-                                flex: 10,
-                                child: GestureDetector(
-                                  child: const Text("Add Team", textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
-                                  onTap: () {},
-                                ),
-                              ),
-                              const Flexible(
-                                fit: FlexFit.tight,
-                                flex: 1,
-                                child: SizedBox(
-                                  height: 50,
-                                  child: VerticalDivider(width: 3, thickness: 0.5),
-                                ),
-                              ),
-                              Flexible(
-                                fit: FlexFit.tight,
-                                flex: 10,
-                                child: GestureDetector(
-                                  child: const Text("Edit Profile", textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
-                                  onTap: () {},
-                                ),
-                              ),
-                            ]
-                          )
-                        )
-                      ]
-                    )
-                  ),
+                                padding: const EdgeInsets.all(10),
+                                child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Flexible(
+                                        fit: FlexFit.tight,
+                                        flex: 10,
+                                        child: GestureDetector(
+                                          child: const Text("Add Team",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(fontSize: 18)),
+                                          onTap: () {},
+                                        ),
+                                      ),
+                                      const Flexible(
+                                        fit: FlexFit.tight,
+                                        flex: 1,
+                                        child: SizedBox(
+                                          height: 50,
+                                          child: VerticalDivider(
+                                              width: 3, thickness: 0.5),
+                                        ),
+                                      ),
+                                      Flexible(
+                                        fit: FlexFit.tight,
+                                        flex: 10,
+                                        child: GestureDetector(
+                                          child: const Text("Edit Profile",
+                                              textAlign: TextAlign.center,
+                                              style: TextStyle(fontSize: 18)),
+                                          onTap: () {},
+                                        ),
+                                      ),
+                                    ]))
+                          ])),
                   const SizedBox(height: 32),
                   const SizedBox(
                     width: double.infinity,
-                    child: Text("Tournament Settings", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                    child: Text("Tournament Settings",
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.w600)),
                   ),
                   const SizedBox(height: 25),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text("Use Live Timing", style: TextStyle(fontSize: 18)),
-                      Switch(
-                        value: useLiveTiming,
-                        activeColor: Theme.of(context).colorScheme.secondary,
-                        onChanged: (bool? value) {
-                          prefs.setBool("useLiveTiming", value!);
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text("Use Live Timing",
+                            style: TextStyle(fontSize: 18)),
+                        Switch(
+                          value: useLiveTiming,
+                          activeColor: Theme.of(context).colorScheme.secondary,
+                          onChanged: (bool? value) {
+                            prefs.setBool("useLiveTiming", value!);
                             setState(() {
                               useLiveTiming = value;
                             });
                           },
-                      )
-                    ]
-                  ),
+                        )
+                      ]),
                   Divider(
                     color: Theme.of(context).colorScheme.surfaceDim,
                   ),
                   const SizedBox(height: 32),
                   const SizedBox(
                     width: double.infinity,
-                    child: Text("General Settings", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                    child: Text("General Settings",
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.w600)),
                   ),
                   const SizedBox(height: 25),
-                  Consumer<ColorProvider>(builder: (context, colorProvider, snapshot) {
+                  Consumer<ColorProvider>(
+                      builder: (context, colorProvider, snapshot) {
                     return Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -186,7 +232,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           DropdownButtonHideUnderline(
                               child: DropdownButton(
                             value: theme,
-                            items: const [DropdownMenuItem(value: "system", child: Align(alignment: Alignment.centerRight, child: Text("Follow system"))), DropdownMenuItem(value: "dark", child: Align(alignment: Alignment.centerRight, child: Text("Dark"))), DropdownMenuItem(value: "light", child: Align(alignment: Alignment.centerRight, child: Text("Light")))],
+                            items: const [
+                              DropdownMenuItem(
+                                  value: "system",
+                                  child: Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text("Follow system"))),
+                              DropdownMenuItem(
+                                  value: "dark",
+                                  child: Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text("Dark"))),
+                              DropdownMenuItem(
+                                  value: "light",
+                                  child: Align(
+                                      alignment: Alignment.centerRight,
+                                      child: Text("Light")))
+                            ],
                             onChanged: (String? value) {
                               switch (value) {
                                 case "system":
@@ -207,13 +269,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 theme = value!;
                               });
                             },
-                            style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 18),
-                                icon: const SizedBox.shrink(),
-                                borderRadius: BorderRadius.circular(10),
-                                alignment: Alignment.centerRight,
+                            style: TextStyle(
+                                color: Theme.of(context).colorScheme.secondary,
+                                fontSize: 18),
+                            icon: const SizedBox.shrink(),
+                            borderRadius: BorderRadius.circular(10),
+                            alignment: Alignment.centerRight,
                           ))
-                        ]
-                    );
+                        ]);
                   }),
                   Divider(
                     color: Theme.of(context).colorScheme.surfaceDim,
@@ -221,32 +284,57 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text("Default grade", style: TextStyle(fontSize: 18)),
+                        const Text("Default grade",
+                            style: TextStyle(fontSize: 18)),
                         DropdownButtonHideUnderline(
                             child: DropdownButton(
-                              value: defaultGrade,
-                              items: const [DropdownMenuItem(value: "Main Team", child: Align(alignment: Alignment.centerRight, child: Text("Main Team"))), DropdownMenuItem(value: "Middle School", child: Align(alignment: Alignment.centerRight, child: Text("Middle School"))), DropdownMenuItem(value: "High School", child: Align(alignment: Alignment.centerRight, child: Text("High School"))), DropdownMenuItem(value: "College", child: Align(alignment: Alignment.centerRight, child: Text("College")))],
-                              onChanged: (String? value) {
-                                prefs.setString("defaultGrade", value!);
+                          value: defaultGrade,
+                          items: const [
+                            DropdownMenuItem(
+                                value: "Main Team",
+                                child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Text("Main Team"))),
+                            DropdownMenuItem(
+                                value: "Middle School",
+                                child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Text("Middle School"))),
+                            DropdownMenuItem(
+                                value: "High School",
+                                child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Text("High School"))),
+                            DropdownMenuItem(
+                                value: "College",
+                                child: Align(
+                                    alignment: Alignment.centerRight,
+                                    child: Text("College")))
+                          ],
+                          onChanged: (String? value) {
+                            prefs.setString("defaultGrade", value!);
 
-                                setState(() {
-                                  defaultGrade = value;
-                                });
-                              },
-                              style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 18),
-                              icon: const SizedBox.shrink(),
-                              borderRadius: BorderRadius.circular(10),
-                              alignment: Alignment.centerRight,
-                            )),
-                      ]
-                  ),
+                            setState(() {
+                              defaultGrade = value;
+                            });
+                          },
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.secondary,
+                              fontSize: 18),
+                          icon: const SizedBox.shrink(),
+                          borderRadius: BorderRadius.circular(10),
+                          alignment: Alignment.centerRight,
+                        )),
+                      ]),
                   Divider(
                     color: Theme.of(context).colorScheme.surfaceDim,
                   ),
                   const SizedBox(height: 32),
                   const SizedBox(
                     width: double.infinity,
-                    child: Text("Other", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                    child: Text("Other",
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.w600)),
                   ),
                   const SizedBox(height: 25),
                   Padding(
@@ -255,9 +343,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const Text("Version", style: TextStyle(fontSize: 18)),
-                          Text("1.0.0", style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.onSurfaceVariant))
-                        ]
-                    ),
+                          Text("1.0.0",
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant))
+                        ]),
                   ),
                   Divider(
                     color: Theme.of(context).colorScheme.surfaceDim,
@@ -268,7 +360,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       onTap: () {},
                       child: SizedBox(
                         width: double.infinity,
-                        child: const Text("Send Feedback", style: TextStyle(fontSize: 18)),
+                        child: const Text("Send Feedback",
+                            style: TextStyle(fontSize: 18)),
                       ),
                     ),
                   ),
@@ -288,10 +381,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
 List<TeamPreview> getSavedTeams() {
   final String savedTeam = prefs.getString("savedTeam") ?? "";
   final parsed = jsonDecode(savedTeam);
-  List<TeamPreview> savedTeamsList = [TeamPreview(teamID: parsed["teamID"], teamNumber: parsed["teamNumber"])];
+  List<TeamPreview> savedTeamsList = [
+    TeamPreview(teamID: parsed["teamID"], teamNumber: parsed["teamNumber"])
+  ];
 
   final List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
-  savedTeamsList.addAll(savedTeams.map((e) => TeamPreview(teamID: jsonDecode(e)["teamID"], teamNumber: jsonDecode(e)["teamNumber"])));
+  savedTeamsList.addAll(savedTeams.map((e) => TeamPreview(
+      teamID: jsonDecode(e)["teamID"],
+      teamNumber: jsonDecode(e)["teamNumber"])));
 
   return savedTeamsList;
 }
