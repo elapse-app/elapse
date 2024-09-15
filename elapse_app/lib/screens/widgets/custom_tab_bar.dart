@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 
 class CustomTabBar extends StatefulWidget {
-  const CustomTabBar({super.key, required this.tabs, required this.onPressed, this.initIndex = 0});
+  const CustomTabBar(
+      {super.key,
+      required this.tabs,
+      required this.onPressed,
+      this.initIndex = 0});
   final List<String> tabs;
   final void Function(int value) onPressed;
   final int initIndex;
@@ -18,7 +22,7 @@ class _CustomTabBarState extends State<CustomTabBar> {
     super.initState();
     selectedItem = widget.initIndex;
   }
-  
+
   @override
   Widget build(BuildContext context) {
     return SliverPersistentHeader(
@@ -90,9 +94,7 @@ class _CustomTabBarState extends State<CustomTabBar> {
                 ).toList(),
               ),
             ),
-            Divider(
-              color: Theme.of(context).colorScheme.surfaceDim,
-            ),
+            Divider(color: Theme.of(context).colorScheme.surfaceDim),
           ],
         ),
       ),

@@ -115,11 +115,13 @@ class _AuthSignInState extends State<AuthSignIn> {
       email: emailController.text,
       password: passwordController.text,
     );
-
     final User? user = credential.user;
+
     // Add to the Database
-    await Database().createUser(user);
+    // await Database().createUser(user); // Change to check user
     print('authSucc - signed in user with uuid: ${user?.uid}');
+
+    // Other Stuff
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text('Success! You have been signed in.'),
@@ -189,10 +191,12 @@ class _AuthSignInState extends State<AuthSignIn> {
       password: passwordController.text,
     );
     final User? user = credential.user;
+
     // Add to the Database
     await Database().createUser(user);
-
     print('authSucc - signed up user with uuid: ${user?.uid}');
+
+    // Other Stuff
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: const Text(

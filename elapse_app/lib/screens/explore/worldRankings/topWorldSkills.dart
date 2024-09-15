@@ -23,7 +23,8 @@ class _TopWorldSkillsState extends State<TopWorldSkills> {
   @override
   void initState() {
     super.initState();
-    widget.rankings = getWorldSkillsRankings(seasons[0].vrcId, getGradeLevel(prefs.getString("defaultGrade")));
+    widget.rankings = getWorldSkillsRankings(
+        seasons[0].vrcId, getGradeLevel(prefs.getString("defaultGrade")));
   }
 
   @override
@@ -133,35 +134,35 @@ class _LoadedTopWorldSkills extends StatelessWidget {
                                           .surfaceDim)),
                             ),
                             Flexible(
-                              fit: FlexFit.tight,
-                              flex: 2,
-                              child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  Text("${rankings[index].driver}",
-                                      style: const TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w400)),
-                                  const Icon(Icons.sports_esports_outlined),
-                                ]
-                              )
-                            ),
+                                fit: FlexFit.tight,
+                                flex: 2,
+                                child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text("${rankings[index].driver}",
+                                          style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w400)),
+                                      const Icon(Icons.sports_esports_outlined),
+                                    ])),
                             Flexible(
                                 fit: FlexFit.tight,
                                 flex: 2,
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text("${rankings[index].auton}",
                                           style: const TextStyle(
                                               fontSize: 18,
                                               fontWeight: FontWeight.w400)),
                                       const Icon(Icons.data_object),
-                                    ]
-                                )
-                            ),
+                                    ])),
                           ]),
                     ),
                     onTap: () {
@@ -170,7 +171,7 @@ class _LoadedTopWorldSkills extends StatelessWidget {
                           MaterialPageRoute(
                             builder: (context) => TeamScreen(
                                 teamID: rankings[index].teamId,
-                                teamName: rankings[index].teamNum),
+                                teamNumber: rankings[index].teamNum),
                           ));
                     }),
                 index != 10
