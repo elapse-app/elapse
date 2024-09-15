@@ -3,21 +3,22 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ElapseAppBar extends StatelessWidget {
-  const ElapseAppBar({
-    super.key,
-    required this.title,
-    this.includeSettings = false,
-    this.backNavigation = false,
-    this.returnData,
-    this.prefs,
-    this.background,
-  });
+  const ElapseAppBar(
+      {super.key,
+      required this.title,
+      this.includeSettings = false,
+      this.backNavigation = false,
+      this.returnData,
+      this.prefs,
+      this.background,
+      this.backBehavior = null});
   final Widget title;
   final Widget? background;
   final bool includeSettings;
   final bool backNavigation;
   final Object? returnData;
   final SharedPreferences? prefs;
+  final void Function()? backBehavior;
 
   @override
   Widget build(BuildContext context) {
@@ -71,6 +72,16 @@ class ElapseAppBar extends StatelessWidget {
           ),
         ),
       );
+    }
+
+    late void Function() backBehaviorFunction;
+
+    if (backBehavior == null) {
+      backBehaviorFunction = () {
+        Navigator.pop(context);
+      };
+    } else {
+      backBehaviorFunction = backBehavior!;
     }
     return SliverAppBar.large(
       automaticallyImplyLeading: false,

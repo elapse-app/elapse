@@ -44,7 +44,7 @@ class TeamWidget extends StatelessWidget {
           MaterialPageRoute(
             builder: (context) => TeamScreen(
               teamID: teamID,
-              teamName: teamNumber,
+              teamNumber: teamNumber,
             ),
           ),
         );

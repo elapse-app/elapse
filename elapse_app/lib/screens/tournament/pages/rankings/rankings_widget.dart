@@ -197,7 +197,7 @@ class EmptyRanking extends StatelessWidget {
           MaterialPageRoute(
             builder: (context) => TeamScreen(
               teamID: teamID,
-              teamName: teamName,
+              teamNumber: teamName,
             ),
           ),
         );
