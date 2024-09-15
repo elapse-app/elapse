@@ -10,13 +10,14 @@ List<Widget> EditState(
   String teamNumber,
   void Function(String) addPhoto,
   void Function(int) removePhoto,
-  List<File> photos,
+  List<dynamic> photos,
   void Function(String property, String value) updateProperty,
   ScoutSheetUI sheet,
 ) {
   InputDecoration ElapseInputDecoration(String label) {
     return InputDecoration(
       labelText: label,
+      labelStyle: TextStyle(fontWeight: FontWeight.w500),
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(9)),
         borderSide: BorderSide(
@@ -25,9 +26,8 @@ List<Widget> EditState(
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.all(Radius.circular(9)),
-        borderSide: BorderSide(
-          color: Theme.of(context).colorScheme.primary,
-        ),
+        borderSide:
+            BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
       ),
     );
   }
@@ -36,7 +36,7 @@ List<Widget> EditState(
     onTap: () async {
       final result = await getPhoto(context);
       if (result != null) {
-        // addPhoto(result);
+        addPhoto(result);
         print(photos.length);
       }
     },
@@ -70,7 +70,7 @@ List<Widget> EditState(
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(9),
-                child: Image.file(
+                child: Image.network(
                   photos[0],
                   height: 175,
                   width: double.infinity,
@@ -113,7 +113,7 @@ List<Widget> EditState(
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(9),
-                child: Image.file(
+                child: Image.network(
                   photos[0],
                   height: 175,
                   width: double.infinity,
@@ -149,7 +149,7 @@ List<Widget> EditState(
             children: [
               ClipRRect(
                 borderRadius: BorderRadius.circular(9),
-                child: Image.file(
+                child: Image.network(
                   photos[1],
                   height: 175,
                   width: double.infinity,
@@ -218,7 +218,7 @@ List<Widget> EditState(
                   flex: 2,
                   fit: FlexFit.tight,
                   child: TextFormField(
-                    decoration: ElapseInputDecoration("# of Motors"),
+                    decoration: ElapseInputDecoration("# of DT Motors"),
                     onChanged: (value) {
                       updateProperty("numMotors", value);
                     },
@@ -230,7 +230,7 @@ List<Widget> EditState(
                   flex: 2,
                   fit: FlexFit.tight,
                   child: TextFormField(
-                    decoration: ElapseInputDecoration("RPM"),
+                    decoration: ElapseInputDecoration("DT RPM"),
                     onChanged: (value) {
                       updateProperty("RPM", value);
                     },
