@@ -152,17 +152,17 @@ class FirstSetupPage extends StatelessWidget {
                             width: double.infinity,
                             child: Container(
                               decoration: BoxDecoration(
-                                border: const GradientBoxBorder(
-                                  gradient: LinearGradient(colors: [Color.fromARGB(255, 191, 231, 237), Color.fromARGB(255, 221, 245, 255)]),
+                                border: GradientBoxBorder(
+                                  gradient: LinearGradient(colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.primary]),
                                   width: 1,
                                 ),
                                 gradient: RadialGradient(
-                                  colors: [Theme.of(context).colorScheme.primary.withOpacity(0.05), Theme.of(context).colorScheme.primary],
-                                  center: Alignment.center,
-                                  radius: 3,
-                                  stops: const [0.0, 1.0],
-                                ),
-                                borderRadius: BorderRadius.circular(30),
+                                    colors: [ Color.fromARGB(25, 221, 245, 255), Color.fromARGB(50, 191, 231, 237),],
+                                    center: Alignment.center,
+                                    radius: 3,
+                                    stops: [0.0, 1.0],
+                                  ),
+                                borderRadius: BorderRadius.circular(30)
                               ),
                               child: TextButton(
                                 style: TextButton.styleFrom(

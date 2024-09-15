@@ -14,7 +14,6 @@ class FirstSetupPage extends StatefulWidget {
 class _FirstSetupPageState extends State<FirstSetupPage> {
   String teamName = "";
   Future<List<TeamPreview>>? teamSearch;
-
   String searchQuery = "";
 
   void searchTeam() {
