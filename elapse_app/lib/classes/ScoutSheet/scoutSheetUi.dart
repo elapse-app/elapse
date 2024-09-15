@@ -6,7 +6,7 @@ class ScoutSheetUI {
   String RPM;
   String otherNotes;
 
-  List<String> photos;
+  List<dynamic> photos;
 
   String autonNotes;
 

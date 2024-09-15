@@ -92,7 +92,7 @@ class _TeamScreenState extends State<TeamScreen> {
                       numMotors: specs["numMotors"] ?? "",
                       RPM: specs["RPM"] ?? "",
                       otherNotes: specs["otherNotes"] ?? "",
-                      photos: [],
+                      photos: specs["photos"],
                       autonNotes: specs["numMotors"] ?? "");
                 });
                 return value;
@@ -149,10 +149,14 @@ class _TeamScreenState extends State<TeamScreen> {
   void addPhoto(String photo) {
     setState(() {
       activeScoutSheet.photos.add(photo);
+      database.addPhoto(teamGroupID, widget.teamID.toString(),
+          selectedTournament.id.toString(), photo);
     });
   }
 
-  void removePhoto(int index) {
+  void removePhoto(int index) async {
+    await database.deletePhoto(teamGroupID, widget.teamID.toString(),
+        selectedTournament.id.toString(), activeScoutSheet.photos[index]);
     setState(() {
       activeScoutSheet.photos.removeAt(index);
     });
@@ -270,11 +274,20 @@ class _TeamScreenState extends State<TeamScreen> {
         widget.teamNumber,
         addPhoto,
         removePhoto,
-        // activeScoutSheet.photos,
-        [],
+        activeScoutSheet.photos,
         updateSheet,
         activeScoutSheet);
     List<Widget> ScoutSheetEmpty = EmptyState(context, () async {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text("Creating Scoutsheet"),
+            content:
+                Text("You will be able to edit once the scoutsheet is created"),
+          );
+        },
+      );
       await database
           .createTeamScoutSheet(teamGroupID, widget.teamID.toString(),
               selectedTournament.id.toString())
@@ -283,6 +296,7 @@ class _TeamScreenState extends State<TeamScreen> {
           await database.updateMemberEditing(teamGroupID,
               widget.teamID.toString(), selectedTournament.id.toString(), true);
           print(id);
+          Navigator.pop(context);
           setState(() {
             scoutsheetID = id;
             scoutSheetStateIndex = 2;
@@ -290,6 +304,12 @@ class _TeamScreenState extends State<TeamScreen> {
         },
       );
     });
+
+    List<Widget> ScoutSheetCurrentlyEditing = [
+      SliverToBoxAdapter(
+          child:
+              Text("ScoutSheet is currently being edited from another member"))
+    ];
 
     List<List<Widget>> ScoutSheetScreens = [
       ScoutSheetEmpty,
@@ -317,7 +337,12 @@ class _TeamScreenState extends State<TeamScreen> {
         break;
       case 2:
         button = IconButton(
-          onPressed: () {
+          onPressed: () async {
+            await database.updateMemberEditing(
+                teamGroupID,
+                widget.teamID.toString(),
+                selectedTournament.id.toString(),
+                false);
             setState(() {
               scoutSheetStateIndex = 1;
             });
@@ -495,6 +520,11 @@ class _TeamScreenState extends State<TeamScreen> {
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
         ),
         backNavigation: true,
+        backBehavior: () {
+          database.updateMemberEditing(teamGroupID, widget.teamID.toString(),
+              selectedTournament.id.toString(), true);
+          Navigator.pop(context);
+        },
       ),
       CustomTabBar(
           tabs: ["Details", "Scoutsheet"],

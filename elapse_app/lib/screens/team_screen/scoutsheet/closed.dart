@@ -27,46 +27,46 @@ List<Widget> ClosedState(
     ),
   );
 
-  // if (sheet.photos.length == 1) {
-  //   photosDisplay = ClipRRect(
-  //     borderRadius: BorderRadius.circular(9),
-  //     child: Image.file(
-  //       sheet.photos[0],
-  //       height: 175,
-  //       width: double.infinity,
-  //       fit: BoxFit.cover,
-  //     ),
-  //   );
-  // } else if (sheet.photos.length == 2) {
-  //   photosDisplay = Flex(
-  //     direction: Axis.horizontal,
-  //     children: [
-  //       Flexible(
-  //         child: ClipRRect(
-  //           borderRadius: BorderRadius.circular(9),
-  //           child: Image.file(
-  //             sheet.photos[0],
-  //             height: 175,
-  //             width: double.infinity,
-  //             fit: BoxFit.cover,
-  //           ),
-  //         ),
-  //       ),
-  //       SizedBox(width: 9),
-  //       Flexible(
-  //         child: ClipRRect(
-  //           borderRadius: BorderRadius.circular(9),
-  //           child: Image.file(
-  //             sheet.photos[1],
-  //             height: 175,
-  //             width: double.infinity,
-  //             fit: BoxFit.cover,
-  //           ),
-  //         ),
-  //       ),
-  //     ],
-  //   );
-  // }
+  if (sheet.photos.length == 1) {
+    photosDisplay = ClipRRect(
+      borderRadius: BorderRadius.circular(9),
+      child: Image.network(
+        sheet.photos[0],
+        height: 175,
+        width: double.infinity,
+        fit: BoxFit.cover,
+      ),
+    );
+  } else if (sheet.photos.length == 2) {
+    photosDisplay = Flex(
+      direction: Axis.horizontal,
+      children: [
+        Flexible(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(9),
+            child: Image.network(
+              sheet.photos[0],
+              height: 175,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+        SizedBox(width: 9),
+        Flexible(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(9),
+            child: Image.network(
+              sheet.photos[1],
+              height: 175,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
   return [
     SliverToBoxAdapter(
       child: Container(

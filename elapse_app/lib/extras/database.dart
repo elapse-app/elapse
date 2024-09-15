@@ -193,6 +193,7 @@ class Database {
             "intakeType": "",
             "otherNotes": ""
           },
+          "photos": []
         },
         // Notes about the team & match
         'teamNotes': "",
@@ -286,12 +287,8 @@ class Database {
     return null;
   }
 
-  Future<Map<String, dynamic>?> updateProperty(
-      String teamGroupId,
-      String teamID,
-      String tournamentID,
-      String property,
-      Map<String, dynamic> val) async {
+  Future<Map<String, dynamic>?> updateProperty(String teamGroupId,
+      String teamID, String tournamentID, String property, dynamic val) async {
     // Will probably need to be changed
     try {
       var scoutSheetCollection = await _firestore
@@ -356,7 +353,7 @@ class Database {
     return null;
   }
 
-  Future<Map<String, dynamic>?> removePhoto(String teamGroupId, String teamID,
+  Future<Map<String, dynamic>?> deletePhoto(String teamGroupId, String teamID,
       String tournamentID, String URL) async {
     // Will probably need to be changed
     try {
@@ -370,7 +367,7 @@ class Database {
           .get();
       DocumentSnapshot? collection = scoutSheetCollection.docs.first;
       collection.reference.update({
-        'photos': FieldValue.arrayRemove([URL]),
+        'properties.Specs.photos': FieldValue.arrayRemove([URL]),
       });
     } catch (e) {
       print(e);
@@ -378,13 +375,14 @@ class Database {
     return null;
   }
 
-  Future<void> uploadPhoto(File image) async {
+  Future<String?> uploadPhoto(File image) async {
     final imagesRef = storage.ref().child(
         "elapse-images/${DateTime.now().millisecondsSinceEpoch}.jpg"); // add a unique name for each file
     try {
       final uploadTask = await imagesRef.putFile(image);
       final downloadUrl = await uploadTask.ref.getDownloadURL();
       print('File uploaded at: $downloadUrl');
+      return downloadUrl;
     } catch (e) {
       print('Upload error: $e');
     }

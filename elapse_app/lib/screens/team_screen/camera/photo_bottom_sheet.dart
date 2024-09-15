@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/extras/database.dart';
 import 'package:elapse_app/screens/widgets/long_button.dart';
@@ -8,14 +7,16 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+const int maxFileSize = 5 * 1024 * 1024; // 5 MB
 
-Future<File?> getPhoto(BuildContext context) async {
+Future<String?> getPhoto(BuildContext context) async {
   Color redColor = Theme.of(context).brightness == Brightness.light
       ? lightPallete.redAllianceText
       : darkPallete.redAllianceText;
 
   File? image;
-  XFile? ImageData;
+  XFile? imageData;
+  String? imageURL;
 
   return await showModalBottomSheet(
       context: context,
@@ -111,9 +112,20 @@ Future<File?> getPhoto(BuildContext context) async {
                                               BorderRadius.circular(30),
                                         ),
                                       ),
-                                      onPressed: () {
+                                      onPressed: () async {
+                                        showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              title: Text("Uploading Photo"),
+                                              content: Text(
+                                                  "You will be navigated back once the photo is uploaded"),
+                                            );
+                                          },
+                                        );
+                                        imageURL = await uploadFile(imageData);
                                         Navigator.pop(context);
-                                        uploadFile(ImageData);
+                                        Navigator.pop(context);
                                       },
                                       icon: Icon(Icons.upload_outlined),
                                       label: Text("Upload"),
@@ -129,11 +141,15 @@ Future<File?> getPhoto(BuildContext context) async {
                           final returnedImage = await ImagePicker()
                               .pickImage(source: ImageSource.camera);
                           if (returnedImage != null) {
-                            image = File(returnedImage.path);
-                            setState(() {
-                              ImageData = returnedImage;
-                              image = File(returnedImage.path);
-                            });
+                            if (await File(returnedImage.path).length() <=
+                                maxFileSize) {
+                              setState(() {
+                                imageData = returnedImage;
+                                image = File(returnedImage.path);
+                              });
+                            } else {
+                              _showSizeError(context);
+                            }
                           }
                         },
                         text: "Take Photo",
@@ -142,16 +158,18 @@ Future<File?> getPhoto(BuildContext context) async {
                       SizedBox(height: 18),
                       LongButton(
                         onPressed: () async {
-                          print({FirebaseAuth.instance.currentUser?.uid});
                           final returnedImage = await ImagePicker()
                               .pickImage(source: ImageSource.gallery);
-
                           if (returnedImage != null) {
-                            image = File(returnedImage.path);
-                            setState(() {
-                              ImageData = returnedImage;
-                              image = File(returnedImage.path);
-                            });
+                            if (await File(returnedImage.path).length() <=
+                                maxFileSize) {
+                              setState(() {
+                                imageData = returnedImage;
+                                image = File(returnedImage.path);
+                              });
+                            } else {
+                              _showSizeError(context);
+                            }
                           }
                         },
                         text: "Select from Gallery",
@@ -164,27 +182,36 @@ Future<File?> getPhoto(BuildContext context) async {
           );
         });
       }).then((_) {
-    return image;
+    return imageURL;
   });
 }
 
+void _showSizeError(BuildContext context) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(
+        'File size exceeds 5 MB. Please select a smaller image.',
+        style: TextStyle(color: Colors.white),
+      ),
+      backgroundColor: Colors.red,
+    ),
+  );
+}
 
-Future uploadFile(XFile? pic) async {
-  
-
-  final path = await 'images/${FirebaseAuth.instance.currentUser?.uid}/scoutsheet/images/${pic!.name}';
-  // final path = await 'images/${pic!.name}';
+Future<String?> uploadFile(XFile? pic) async {
+  final path =
+      'images/${FirebaseAuth.instance.currentUser?.uid}/scoutsheet/images/${pic!.name}';
   final file = File(pic.path);
 
-  final ref = await FirebaseStorage.instance.ref().child(path);
-  
-  var uploadtask = ref.putFile(file);
+  final ref = FirebaseStorage.instance.ref().child(path);
 
-  final snapshot = await uploadtask.whenComplete(() {});
+  var uploadTask = ref.putFile(file);
+
+  final snapshot = await uploadTask.whenComplete(() {});
 
   final URL = await snapshot.ref.getDownloadURL();
 
-  // Database().addPhoto("", "", "", URL);
+  return URL;
 
-  
+  // Database().addPhoto("", "", "", URL);
 }
