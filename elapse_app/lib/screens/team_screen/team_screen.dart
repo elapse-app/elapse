@@ -3,12 +3,15 @@ import 'dart:ffi';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:elapse_app/classes/Filters/season.dart';
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/classes/ScoutSheet/scoutSheetUi.dart';
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Team/vdaStats.dart';
+import 'package:elapse_app/classes/Team/world_skills.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
+import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
 import 'package:elapse_app/extras/database.dart';
 import 'package:elapse_app/screens/team_screen/details/details.dart';
@@ -33,6 +36,7 @@ class TeamScreen extends StatefulWidget {
 
 class _TeamScreenState extends State<TeamScreen> {
   late TeamPreview teamSave;
+
   bool locationLoaded = false;
   bool isEditing = false;
   int pageIndex = 0;
@@ -49,6 +53,18 @@ class _TeamScreenState extends State<TeamScreen> {
     photos: [],
     autonNotes: "",
   );
+
+  Future<Tournament>? tournament;
+  Future<Team>? team;
+  Future<VDAStats?>? teamStats;
+  Future<WorldSkillsStats>? skillsStats;
+  Future<List<TournamentPreview>>? teamTournaments;
+  Future<List<Award>>? teamAwards;
+  Future<DocumentSnapshot<Object?>?>? scoutSheet;
+
+  late Season season;
+  Database database = Database();
+  String scoutsheetID = "";
 
   @override
   void initState() {
@@ -67,8 +83,12 @@ class _TeamScreenState extends State<TeamScreen> {
         return value;
       },
     );
-    teamStats = getTrueSkillDataForTeam(widget.teamNumber);
-    teamTournaments = fetchTeamTournaments(widget.teamID, 181).then(
+    season = seasons[0];
+    teamStats = getTrueSkillDataForTeam(season.vrcId, widget.teamNumber);
+    skillsStats = getWorldSkillsForTeam(season.vrcId, widget.teamID);
+    teamAwards = getAwards(widget.teamID, season.vrcId);
+
+    teamTournaments = fetchTeamTournaments(widget.teamID, season.vrcId).then(
       (value) {
         if (value.isNotEmpty) {
           setState(() {
@@ -111,6 +131,10 @@ class _TeamScreenState extends State<TeamScreen> {
     teamAwards = getAwards(widget.teamID, 181);
     isSaved = alreadySaved();
     displaySave = !isMainTeam();
+
+    if (prefs.getBool("isTournamentMode") ?? false) {
+      tournament = TMTournamentDetails(prefs.getInt("tournamentID") ?? 0);
+    }
   }
 
   bool alreadySaved() {
@@ -222,30 +246,15 @@ class _TeamScreenState extends State<TeamScreen> {
     }
   }
 
-  Future<Team>? team;
-  Future<VDAStats>? teamStats;
-  Future<List<TournamentPreview>>? teamTournaments;
-  Future<List<Award>>? teamAwards;
-  Future<DocumentSnapshot<Object?>?>? scoutSheet;
-
-  Database database = Database();
-  String scoutsheetID = "";
-
   late bool isSaved;
   late bool displaySave;
   @override
   Widget build(BuildContext context) {
-    List<Widget> DetailsScreen = Details(
-        context,
-        widget.teamNumber,
-        displaySave,
-        isSaved,
-        toggleSaveTeam,
-        widget.team,
-        team,
-        teamStats,
-        teamAwards,
-        teamTournaments);
+    List<Widget> DetailsScreen = Details(context, widget.teamNumber, teamSave,
+        displaySave, isSaved, toggleSaveTeam, () {
+      setState(() {});
+    }, widget.team, team, teamStats, teamAwards, teamTournaments, tournament,
+        skillsStats);
 
     List<Widget> ScoutSheetClosedScreen = ClosedState(
         context,
@@ -515,16 +524,56 @@ class _TeamScreenState extends State<TeamScreen> {
 
     List<Widget> MainSlivers = [
       ElapseAppBar(
-        title: Text(
+        title: const Text(
           "Team Info",
           style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
         ),
         backNavigation: true,
-        backBehavior: () {
-          database.updateMemberEditing(teamGroupID, widget.teamID.toString(),
-              selectedTournament.id.toString(), true);
-          Navigator.pop(context);
-        },
+        background: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.5),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Icon(Icons.arrow_back,
+                    color: Theme.of(context).colorScheme.onSurface),
+              ),
+              const Spacer(),
+              GestureDetector(
+                  onTap: () async {
+                    Season updated = await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            SeasonFilterPage(selected: season),
+                      ),
+                    );
+                    setState(() {
+                      season = updated;
+                      skillsStats =
+                          getWorldSkillsForTeam(season.vrcId, widget.teamID);
+                      teamStats = getTrueSkillDataForTeam(
+                          season.vrcId, widget.teamNumber);
+                      teamTournaments =
+                          fetchTeamTournaments(widget.teamID, season.vrcId);
+                      teamAwards = getAwards(widget.teamID, season.vrcId);
+                    });
+                  },
+                  child: Row(children: [
+                    const Icon(Icons.event_note),
+                    const SizedBox(width: 4),
+                    Text(
+                      season.name.substring(10),
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                    const Icon(Icons.arrow_right)
+                  ]))
+            ],
+          ),
+        ),
       ),
       CustomTabBar(
           tabs: ["Details", "Scoutsheet"],
