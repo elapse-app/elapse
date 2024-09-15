@@ -72,7 +72,7 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                           MaterialPageRoute(
                             builder: (context) => TeamScreen(
                               teamID: teamID,
-                              teamName: teamNumber,
+                              teamNumber: teamNumber,
                             ),
                           ),
                         );
