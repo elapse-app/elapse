@@ -45,9 +45,7 @@ class GameWidget extends StatelessWidget {
     if (game.scheduledTime != null && game.startedTime == null) {
       DateTime start;
       if (useLiveTiming == true) {
-        start = game.scheduledTime!
-            .toLocal()
-            .add(Duration(minutes: getCurrentDelay(games).toInt()));
+        start = (game.adjustedTime ?? game.scheduledTime!).toLocal();
         time = DateFormat.Hm().format(start);
       } else {
         start = game.scheduledTime!.toLocal();

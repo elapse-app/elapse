@@ -5,6 +5,7 @@ import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
+import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
 import 'package:elapse_app/screens/tournament/pages/info/info.dart';
 import 'package:elapse_app/screens/tournament/pages/main/search_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings.dart';
@@ -127,6 +128,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
   @override
   Widget build(BuildContext context) {
     if (division.games != null && division.games!.isNotEmpty) {
+      adjustMatchTiming(division.games!);
       practice = division.games!.where((game) => game.roundNum == 1).toList();
       qualifications =
           division.games!.where((game) => game.roundNum == 2).toList();

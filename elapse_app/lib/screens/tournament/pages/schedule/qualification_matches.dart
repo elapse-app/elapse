@@ -2,6 +2,7 @@ import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../classes/Tournament/tournament_mode_functions.dart';
 import '../../../../main.dart';
 
 class MatchesView extends StatelessWidget {
