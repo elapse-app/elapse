@@ -52,6 +52,7 @@ dependencies:
   path: ^1.9.0
   image_picker: ^1.1.2
   firebase_storage: ^11.6.5
+  carousel_slider: ^5.0.0
 
 dev_dependencies:
   flutter_test:

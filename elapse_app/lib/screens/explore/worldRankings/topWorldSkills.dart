@@ -132,22 +132,27 @@ class _LoadedTopWorldSkills extends StatelessWidget {
                             ),
                             Flexible(
                                 fit: FlexFit.tight,
-                                flex: 3,
-                                child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.start,
+                                flex: 2,
+                                child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text("${rankings[index].driver}",
                                           style: const TextStyle(
-                                              fontSize: 20,
+                                              fontSize: 18,
                                               fontWeight: FontWeight.w400)),
-                                      const SizedBox(width: 2),
                                       const Icon(Icons.sports_esports_outlined),
                                     ])),
                             Flexible(
                                 fit: FlexFit.tight,
-                                flex: 3,
-                                child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
+                                flex: 2,
+                                child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     children: [
                                       Text("${rankings[index].auton}",
                                           style: const TextStyle(
