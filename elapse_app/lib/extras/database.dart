@@ -41,10 +41,28 @@ class Database {
     return null;
   }
 
+  Future<String?> deleteUser(String uid) async {
+    try {
+      await _firestore.collection('users').doc(uid).delete();
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  Future<String?> deleteCurrentUser() async {
+    try {
+      await _firestore.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).delete();
+    } catch (e) {
+      print(e);
+    }
+    return "";
+  }
+
 /* Team Groups */
 
   // String AdminID, String groupName
-  Future<String> createTeamGroup(String adminID, String gname) async {
+  Future<String> createTeamGroup(String adminID, String gname, String teamid) async {
     String returnVal = 'hello';
     try {
       var alphanumericGenerator = RandomStringGenerator(
@@ -56,9 +74,7 @@ class Database {
         mustHaveAtLeastOneOfEach: true,
       );
 
-      String joinCode = alphanumericGenerator.generate() +
-          '-' +
-          alphanumericGenerator.generate();
+      String joinCode = '${alphanumericGenerator.generate()}-${alphanumericGenerator.generate()}';
       Map<String, String> members = {adminID: "Change to Full Name"};
       var group = await _firestore.collection('teamGroups').add({
         'adminId': adminID,
