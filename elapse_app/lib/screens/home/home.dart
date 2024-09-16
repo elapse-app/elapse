@@ -51,7 +51,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             background: SafeArea(
               child: Padding(
-                padding: EdgeInsets.only(left: 20, right: 12, bottom: 20),
+                padding:
+                    EdgeInsets.only(left: 20, right: 12, bottom: 20, top: 10),
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
