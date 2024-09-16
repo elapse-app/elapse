@@ -1,5 +1,6 @@
 import 'package:elapse_app/screens/widgets/long_button.dart';
 import 'package:elapse_app/setup/signup/enter_details.dart';
+import 'package:elapse_app/setup/signup/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/setup/welcome/first_page.dart';
 import 'package:elapse_app/setup/signup/create_account.dart';
@@ -196,7 +197,14 @@ class SignUpPage extends StatelessWidget {
                                     useForwardArrow: false,
                                     centerAlign: true,
                                     isGray: true,
-                                    onPressed: () {},
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => LoginPage(),
+                                        ),
+                                      );
+                                    },
                                   )),
                               const SizedBox(height: 64),
                             ],
