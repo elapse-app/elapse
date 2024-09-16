@@ -47,6 +47,7 @@ dependencies:
   firebase_core: ^2.24.2
   random_string_generator: ^2.0.0
   flutter_sticky_header: ^0.6.5
+  gradient_borders: ^1.0.1
   camera: ^0.11.0+2
   path_provider: ^2.1.4
   path: ^1.9.0
