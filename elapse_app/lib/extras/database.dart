@@ -1,3 +1,4 @@
+import 'package:elapse_app/classes/Users/user.dart';
 import 'package:random_string_generator/random_string_generator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,15 +9,15 @@ class Database {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
 /* Users */
-  Future<String> createUser(User? newUser) async {
+  Future<String> createUser(ElapseUser? newUser) async {
     String returnVal = 'monke';
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
       final String savedTeam = prefs.getString("savedTeam") ?? "";
       await _firestore.collection("users").doc(newUser?.uid).set({
         'email': newUser?.email,
-        'firstName': newUser?.displayName, // Changed to first name field later
-        'lastName': newUser?.displayName, // Changed to last name field later
+        'firstName': newUser?.fname, // Changed to first name field later
+        'lastName': newUser?.lname, // Changed to last name field later
         'team': jsonDecode(savedTeam)["teamNumber"],
         'groupId': []
       });
@@ -39,8 +40,8 @@ class Database {
 /* Team Groups */
 
   // String AdminID, String groupName
-  Future<String> createTeamGroup(String adminID, String gname) async {
-    String returnVal = 'hello';
+  Future<String> createTeamGroup(
+      String adminID, String gname, String firstName, String lastName) async {
     try {
       var alphanumericGenerator = RandomStringGenerator(
         fixedLength: 4,
@@ -54,7 +55,7 @@ class Database {
       String joinCode = alphanumericGenerator.generate() +
           '-' +
           alphanumericGenerator.generate();
-      Map<String, String> members = {adminID: "Change to Full Name"};
+      Map<String, String> members = {adminID: "$firstName $lastName"};
       var group = await _firestore.collection('teamGroups').add({
         'adminId': adminID,
         'joinCode': joinCode,
@@ -66,10 +67,11 @@ class Database {
       await _firestore.collection('users').doc(adminID).update({
         'groupId': FieldValue.arrayUnion([group.id]),
       });
+      return group.id;
     } catch (e) {
       print(e);
     }
-    return returnVal;
+    return "unable to create";
   }
 
   Future<String> joinTeamGroup(String joinCode, String uid) async {

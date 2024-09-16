@@ -51,20 +51,7 @@ void main() async {
         ),
         ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
       ],
-      child: prefs.getString("savedTeam") == null
-          ? Consumer<ColorProvider>(
-        builder: (context, colorProvider, child) {
-          return MaterialApp(home: const FirstSetupPage(), theme: ThemeData(
-            colorScheme:  MediaQuery.of(context).platformBrightness == Brightness.dark
-                ? darkScheme
-                : lightScheme,
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            fontFamily: "Manrope",
-          ));
-        }
-      )
-          : MyApp(key: myAppKey, prefs: prefs),
+      child: MyApp(key: myAppKey, prefs: prefs),
     ),
   );
 }
@@ -114,24 +101,41 @@ class MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    // if(!isLoggedIn) {
-      return MaterialApp(
-        home: const FirstSetupPage(),
-        theme: ThemeData(
-          colorScheme:  MediaQuery.of(context).platformBrightness == Brightness.dark
-              ? darkScheme
-              : lightScheme,
-          splashColor: Colors.transparent,
-          highlightColor: Colors.transparent,
-          fontFamily: "Manrope",
-        ));
-    // }
+    if (prefs.getString("currentUser") == null) {
+      return Consumer<ColorProvider>(
+        builder: (context, value, child) {
+          bool systemDefined = false;
+          ColorScheme systemTheme =
+              MediaQuery.of(context).platformBrightness == Brightness.dark
+                  ? darkScheme
+                  : lightScheme;
+
+          if (widget.prefs.getString("theme") == "system") {
+            systemDefined = true;
+            print("is system defined");
+          }
+
+          ColorScheme chosenTheme =
+              systemDefined ? systemTheme : value.colorScheme;
+
+          return MaterialApp(
+            home: const FirstSetupPage(),
+            theme: ThemeData(
+              colorScheme: chosenTheme,
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              fontFamily: "Manrope",
+            ),
+          );
+        },
+      );
+    }
     TeamPreview savedTeam = TeamPreview(
         teamNumber:
             jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"],
         teamID: jsonDecode(widget.prefs.getString("savedTeam"))["teamID"]);
     List<Widget> screens;
-    
+
     isTournamentMode
         ? screens = [
             TMHomePage(

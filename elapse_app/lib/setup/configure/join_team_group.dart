@@ -1,21 +1,27 @@
+import 'package:elapse_app/classes/Users/user.dart';
+import 'package:elapse_app/extras/database.dart';
+import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/long_button.dart';
 import 'package:elapse_app/setup/configure/complete_setup.dart';
-import 'package:elapse_app/setup/configure/create_team_group.dart';
-import 'package:elapse_app/setup/configure/join_team_group.dart';
+import 'package:elapse_app/setup/configure/theme_setup.dart';
+import 'package:elapse_app/setup/configure/tournament_mode_setup.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class CloudScoutSetupPage extends StatefulWidget {
-  const CloudScoutSetupPage({
+class JoinTeamGroup extends StatefulWidget {
+  const JoinTeamGroup({
     super.key,
   });
 
   @override
-  State<CloudScoutSetupPage> createState() => _CloudScoutSetupPageState();
+  State<JoinTeamGroup> createState() => _JoinTeamGroupState();
 }
 
-class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
-  _CloudScoutSetupPageState();
+class _JoinTeamGroupState extends State<JoinTeamGroup> {
+  _JoinTeamGroupState();
+
+  String joinCode = "";
 
   @override
   Widget build(BuildContext context) {
@@ -95,7 +101,7 @@ class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
                               child: RichText(
                                 textAlign: TextAlign.center,
                                 text: TextSpan(
-                                  text: 'You’ve got CloudScout',
+                                  text: 'Join a group.',
                                   style: TextStyle(
                                     fontFamily: "Manrope",
                                     fontSize: 32,
@@ -115,7 +121,7 @@ class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
                                 textAlign: TextAlign.center,
                                 text: TextSpan(
                                   text:
-                                      'Thanks for signing in! Enjoy CloudScout Picklist, Scoutsheets, and Saved Teams',
+                                      'Enter the join code. Make sure to include all characters including the hyphen',
                                   style: TextStyle(
                                     fontWeight: FontWeight.w400,
                                     fontFamily: "Manrope",
@@ -127,77 +133,99 @@ class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
                             ),
                           ),
                           SizedBox(height: 24),
-                          Center(
-                            child: Container(
-                              height: MediaQuery.of(context).size.height *
-                                  0.1, // Fixed height
-                              width: MediaQuery.of(context).size.height *
-                                  0.1 *
-                                  306 /
-                                  90, // Fixed width (9:18 aspect ratio)
-                              child: Container(
-                                alignment: Alignment.center,
-                                child: Image.asset(
-                                    Theme.of(context).brightness ==
-                                            Brightness.dark
-                                        ? 'assets/cloudScoutDark.png'
-                                        : 'assets/cloudScout.png'),
+                          TextField(
+                            onChanged: ((value) {
+                              setState(() {
+                                joinCode = value;
+                              });
+                            }),
+                            decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(9),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withOpacity(0.25),
+                                  width: 2.0,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(9),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 2.0,
+                                ),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.error,
+                                  width: 1.0,
+                                ),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.error,
+                                  width: 2.0,
+                                ),
+                              ),
+                              labelText: 'Join Code',
+                              labelStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.w400,
+                                fontFamily: "Manrope",
+                                fontSize: 16,
                               ),
                             ),
                           ),
-                          SizedBox(height: 24),
-                          const Text(
-                            'CloudScout allows you to sync scouting data with other devices and share seamlessly with your teammates and coaches.',
-                            style: TextStyle(
-                              fontSize: 13,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: "Manrope",
-                              color: Color.fromARGB(255, 117, 117, 117),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          SizedBox(height: 40),
-                          const Text(
-                            'To use CloudScout, join a group or create your own',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w400,
-                              fontFamily: "Manrope",
-                              color: Color.fromARGB(255, 117, 117, 117),
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
                           Spacer(),
+                          SizedBox(
+                            height: 32,
+                          ),
                           LongButton(
-                              centerAlign: true,
-                              useForwardArrow: false,
-                              onPressed: () {
+                            text: "Continue",
+                            onPressed: () async {
+                              Database database = Database();
+                              final currentUser =
+                                  FirebaseAuth.instance.currentUser;
+                              await database
+                                  .joinTeamGroup(joinCode, currentUser!.uid)
+                                  .then((value) {
+                                prefs.setString("teamGroup", value);
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => CreateTeamGroup(),
+                                    builder: (context) => CompleteSetupPage(),
                                   ),
                                 );
-                              },
-                              text: "Create a Group"),
-                          SizedBox(
-                            height: 15,
+                              }).catchError((onError) {
+                                showDialog(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text("Error Occured"),
+                                        content: Text(
+                                            "An error occured when creating your account, please try again"),
+                                        actions: [
+                                          TextButton(
+                                              onPressed: () {
+                                                Navigator.pop(context);
+                                              },
+                                              child: Text(
+                                                "Cancel",
+                                                style: TextStyle(
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .secondary),
+                                              ))
+                                        ],
+                                      );
+                                    });
+                              });
+                            },
                           ),
-                          LongButton(
-                              centerAlign: true,
-                              useForwardArrow: false,
-                              onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => JoinTeamGroup(),
-                                  ),
-                                );
-                              },
-                              text: "Join a Group"),
-                          SizedBox(
-                            height: 38,
-                          ),
+                          SizedBox(height: 38),
                         ],
                       ),
                     ),

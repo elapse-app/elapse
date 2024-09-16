@@ -1,3 +1,4 @@
+import 'package:elapse_app/classes/Users/user.dart';
 import 'package:elapse_app/extras/database.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -122,7 +123,10 @@ class _AuthSignInState extends State<AuthSignIn> {
 
     final User? user = credential.user;
     // Add to the Database
-    await Database().createUser(user);
+    await Database().createUser(ElapseUser(
+      uid: user!.uid,
+      email: user!.email,
+    ));
     print('authSucc - signed in user with uuid: ${user?.uid}');
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(

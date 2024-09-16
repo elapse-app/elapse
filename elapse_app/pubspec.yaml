@@ -84,6 +84,7 @@ flutter:
     - assets/tournamentMode.png
     - assets/cloudScout.png
     - assets/allDone.png
+    - assets/allDoneDark.png
 
     - assets/onboardingHomeDark.png
     - assets/onboardingMyTeamDark.png

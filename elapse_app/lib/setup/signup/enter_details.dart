@@ -1,6 +1,10 @@
+import 'dart:convert';
+
+import 'package:elapse_app/classes/Users/user.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/long_button.dart';
 import 'package:elapse_app/setup/configure/join_team.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
 
@@ -15,10 +19,19 @@ class EnterDetailsPage extends StatefulWidget {
 
 class _EnterDetailsPageState extends State<EnterDetailsPage> {
   @override
-  Widget build(BuildContext context) {
-    final TextEditingController _nameController = TextEditingController();
-    final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _firstNameController = TextEditingController();
+  final TextEditingController _lastNameController = TextEditingController();
+  final TextEditingController _ageController = TextEditingController();
+  final firebaseUser = FirebaseAuth.instance.currentUser;
+  ElapseUser currentUser = ElapseUser(uid: "", email: "");
+  void initState() {
+    currentUser = ElapseUser(
+      uid: firebaseUser!.uid,
+      email: firebaseUser!.email,
+    );
+  }
 
+  Widget build(BuildContext context) {
     return Scaffold(
         // backgroundColor: Color.fromARGB(255, 191, 231, 237),
         // appBar: PreferredSize(
@@ -125,7 +138,12 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                         Padding(
                           padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
                           child: TextFormField(
-                            controller: _nameController,
+                            controller: _firstNameController,
+                            onChanged: (value) {
+                              setState(() {
+                                currentUser.fname = value;
+                              });
+                            },
                             decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(9),
@@ -156,7 +174,57 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                                   width: 2.0,
                                 ),
                               ),
-                              labelText: 'Name',
+                              labelText: 'First Name',
+                              labelStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.w400,
+                                fontFamily: "Manrope",
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
+                          child: TextFormField(
+                            controller: _lastNameController,
+                            onChanged: (value) {
+                              setState(() {
+                                currentUser.lname = value;
+                              });
+                            },
+                            decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(9),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withOpacity(0.25),
+                                  width: 2.0,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(9),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 2.0,
+                                ),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.error,
+                                  width: 1.0,
+                                ),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.error,
+                                  width: 2.0,
+                                ),
+                              ),
+                              labelText: 'Last Name',
                               labelStyle: TextStyle(
                                 color: Theme.of(context).colorScheme.onSurface,
                                 fontWeight: FontWeight.w400,
@@ -171,6 +239,11 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                           padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
                           child: TextFormField(
                             controller: _ageController,
+                            onChanged: (value) {
+                              setState(() {
+                                currentUser.age = value;
+                              });
+                            },
                             keyboardType: TextInputType.number,
                             decoration: InputDecoration(
                               enabledBorder: OutlineInputBorder(
@@ -218,11 +291,12 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                           child: LongButton(
                             text: "Continue",
                             onPressed: () {
+                              prefs.setString("currentUser",
+                                  jsonEncode(currentUser.toJson()));
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) =>
-                                      const EnterDetailsPage(),
+                                  builder: (context) => const JoinTeamPage(),
                                 ),
                               );
                             },
