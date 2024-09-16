@@ -87,7 +87,7 @@ class ElapseAppBar extends StatelessWidget {
     }
     return SliverAppBar.large(
       automaticallyImplyLeading: false,
-      expandedHeight: 125,
+      expandedHeight: maxHeight,
       centerTitle: false,
       flexibleSpace: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {

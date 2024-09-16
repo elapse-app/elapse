@@ -1,6 +1,5 @@
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/providers/color_provider.dart';
-import 'package:elapse_app/setup/theme_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:elapse_app/main.dart';
@@ -15,7 +14,6 @@ class FirstSetupPage extends StatefulWidget {
 class _FirstSetupPageState extends State<FirstSetupPage> {
   String teamName = "";
   Future<List<TeamPreview>>? teamSearch;
-
   String searchQuery = "";
 
   void searchTeam() {
@@ -28,8 +26,8 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
     prefs.setString("savedTeam",
         '{"teamID": ${team.teamID}, "teamNumber": "${team.teamNumber}", "grade": "${team.gradeLevel?.name}"}');
     prefs.setString("defaultGrade", "Main Team");
-    Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) => ThemeSetup()));
+    // Navigator.pushReplacement(
+    //     context, MaterialPageRoute(builder: (context) => ThemeSetup()));
   }
 
   @override
