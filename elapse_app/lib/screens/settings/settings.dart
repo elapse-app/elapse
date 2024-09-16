@@ -46,7 +46,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const RoundedTop(),
           SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 23),
+            padding: const EdgeInsets.only(left: 23, right: 23, bottom: 23),
             sliver: SliverToBoxAdapter(
               child: Column(
                 children: [
