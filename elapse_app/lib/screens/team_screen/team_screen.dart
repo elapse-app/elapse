@@ -43,7 +43,7 @@ class _TeamScreenState extends State<TeamScreen> {
   int scoutSheetStateIndex = 0;
   int selectedTournamentIndex = 0;
   String selectedTournamentName = "";
-  String teamGroupID = "icsPuzQi31W9ecQE91VN";
+  String teamGroupID = prefs.getString("teamGroup")!;
   TournamentPreview selectedTournament = TournamentPreview(id: 0, name: "");
   ScoutSheetUI activeScoutSheet = ScoutSheetUI(
     intakeType: "",

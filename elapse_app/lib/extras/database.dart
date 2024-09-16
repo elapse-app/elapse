@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:elapse_app/classes/Team/teamPreview.dart';
+import 'package:elapse_app/classes/Users/user.dart';
 import 'package:flutter/rendering.dart';
 import 'package:random_string_generator/random_string_generator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,16 +15,15 @@ class Database {
   final storage = FirebaseStorage.instance;
 
 /* Users */
-  Future<String> createUser(User? newUser) async {
+  Future<String> createUser(ElapseUser? newUser, TeamPreview savedTeam) async {
     String returnVal = 'monke';
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      final String savedTeam = prefs.getString("savedTeam") ?? "";
       await _firestore.collection("users").doc(newUser?.uid).set({
         'email': newUser?.email,
-        'firstName': newUser?.displayName, // Changed to first name field later
-        'lastName': newUser?.displayName, // Changed to last name field later
-        'team': jsonDecode(savedTeam)["teamNumber"],
+        'firstName': newUser?.fname, // Changed to first name field later
+        'lastName': newUser?.lname, // Changed to last name field later
+        'team': savedTeam.toJson(),
         'groupId': []
       });
     } catch (e) {

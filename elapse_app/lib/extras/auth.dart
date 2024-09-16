@@ -99,4 +99,5 @@ Future<void> signIN(String email, String password) async {
 
   prefs.setString("currentUser", jsonEncode(currentUser.toJson()));
   prefs.setString("teamGroup", userInfo["groupId"][0]);
+  prefs.setString("savedTeam", jsonEncode(userInfo["savedTeam"]));
 }
