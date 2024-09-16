@@ -43,8 +43,6 @@ void main() async {
 
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-  prefs.setBool("isTournamentMode", true);
-
   runApp(
     MultiProvider(
       providers: [
@@ -142,8 +140,6 @@ class MyAppState extends State<MyApp> {
             jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"],
         teamID: jsonDecode(widget.prefs.getString("savedTeam"))["teamID"]);
     List<Widget> screens;
-
-    isTournamentMode = true;
 
     isTournamentMode
         ? screens = [
