@@ -52,7 +52,10 @@ class Database {
 
   Future<String?> deleteCurrentUser() async {
     try {
-      await _firestore.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).delete();
+      await _firestore
+          .collection('users')
+          .doc(FirebaseAuth.instance.currentUser?.uid)
+          .delete();
     } catch (e) {
       print(e);
     }
@@ -62,7 +65,8 @@ class Database {
 /* Team Groups */
 
   // String AdminID, String groupName
-  Future<String> createTeamGroup(String adminID, String gname, String teamid, String fullName) async {
+  Future<String> createTeamGroup(
+      String adminID, String gname, String teamid, String fullName) async {
     String returnVal = 'hello';
     try {
       var alphanumericGenerator = RandomStringGenerator(
@@ -74,7 +78,8 @@ class Database {
         mustHaveAtLeastOneOfEach: true,
       );
 
-      String joinCode = '${alphanumericGenerator.generate()}-${alphanumericGenerator.generate()}';
+      String joinCode =
+          '${alphanumericGenerator.generate()}-${alphanumericGenerator.generate()}';
       Map<String, String> members = {adminID: fullName};
       var group = await _firestore.collection('teamGroups').add({
         'adminId': adminID,
@@ -151,7 +156,8 @@ class Database {
     return returnVal;
   }
 
-  Future<String> promoteNewAdmin(String groupID, String uid, String memberID) async {
+  Future<String> promoteNewAdmin(
+      String groupID, String uid, String memberID) async {
     String returnVal = 'hello';
     try {
       await _firestore.collection('teamGroups').doc(groupID).update({
@@ -165,7 +171,8 @@ class Database {
 
   Future<Map<String, dynamic>?> getGroupInfo(String groupid) async {
     try {
-      var collection =  await _firestore.collection('teamGroups').doc(groupid).get();
+      var collection =
+          await _firestore.collection('teamGroups').doc(groupid).get();
       return collection.data();
     } catch (e) {
       print(e);
@@ -184,7 +191,11 @@ class Database {
       String teamGroupID, String teamid, String tournamentID) async {
     String returnVal = '';
     try {
-      await _firestore.collection('teamGroups').doc(teamGroupID).collection('scoutsheets').add({
+      await _firestore
+          .collection('teamGroups')
+          .doc(teamGroupID)
+          .collection('scoutsheets')
+          .add({
         /* Made with creation */
         // Comp Specific stuff
         'teamID': teamid,
@@ -222,7 +233,8 @@ class Database {
     return returnVal;
   }
 
-  Future<String> removeTeamScoutSheet(String teamid, String teamGroupID, String tournamentID) async {
+  Future<String> removeTeamScoutSheet(
+      String teamid, String teamGroupID, String tournamentID) async {
     String returnVal = 'hello';
     try {
       var scoutSheetCollection = await _firestore
@@ -401,10 +413,16 @@ class Database {
 /*         User ScoutSheet        */
 /* ------------------------------ */
 
-Future<String> createUserScoutSheet(String uid, String teamid, String tournamentID) async {
+  Future<String> createUserScoutSheet(
+      String uid, String teamid, String tournamentID) async {
     String returnVal = 'hello';
     try {
-      await _firestore.collection('Users').doc(uid).collection('scoutsheets').doc().set({
+      await _firestore
+          .collection('Users')
+          .doc(uid)
+          .collection('scoutsheets')
+          .doc()
+          .set({
         /* Made with creation */
         // Comp Specific stuff
         'teamID': teamid,
@@ -431,9 +449,17 @@ Future<String> createUserScoutSheet(String uid, String teamid, String tournament
     return returnVal;
   }
 
-  Future<Map<String, dynamic>?> getUserScoutSheetInfo(String uid, String teamID, String tournamentID) async {
+  Future<Map<String, dynamic>?> getUserScoutSheetInfo(
+      String uid, String teamID, String tournamentID) async {
     try {
-      var collection = await _firestore.collection('Users').doc(uid).collection('scoutsheets').where('teamID', isEqualTo: teamID).where('tournamentID', isEqualTo: tournamentID).limit(1).get();
+      var collection = await _firestore
+          .collection('Users')
+          .doc(uid)
+          .collection('scoutsheets')
+          .where('teamID', isEqualTo: teamID)
+          .where('tournamentID', isEqualTo: tournamentID)
+          .limit(1)
+          .get();
       return collection.docs.first.data();
     } catch (e) {
       print(e);
