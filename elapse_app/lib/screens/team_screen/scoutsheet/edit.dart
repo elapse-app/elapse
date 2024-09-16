@@ -14,23 +14,6 @@ List<Widget> EditState(
   void Function(String property, String value) updateProperty,
   ScoutSheetUI sheet,
 ) {
-  InputDecoration ElapseInputDecoration(String label) {
-    return InputDecoration(
-      labelText: label,
-      labelStyle: TextStyle(fontWeight: FontWeight.w500),
-      enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(9)),
-        borderSide: BorderSide(
-          color: Theme.of(context).colorScheme.surfaceDim,
-        ),
-      ),
-      focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.all(Radius.circular(9)),
-        borderSide:
-            BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
-      ),
-    );
-  }
 
   Widget photosDisplay = GestureDetector(
     onTap: () async {
@@ -204,7 +187,7 @@ List<Widget> EditState(
             ),
             SizedBox(height: 18),
             TextFormField(
-              decoration: ElapseInputDecoration("Intake Type"),
+              decoration: ElapseInputDecoration(context, "Intake Type"),
               onChanged: (value) {
                 updateProperty("intakeType", value);
               },
@@ -218,7 +201,7 @@ List<Widget> EditState(
                   flex: 2,
                   fit: FlexFit.tight,
                   child: TextFormField(
-                    decoration: ElapseInputDecoration("# of DT Motors"),
+                    decoration: ElapseInputDecoration(context, "# of DT Motors"),
                     onChanged: (value) {
                       updateProperty("numMotors", value);
                     },
@@ -230,7 +213,7 @@ List<Widget> EditState(
                   flex: 2,
                   fit: FlexFit.tight,
                   child: TextFormField(
-                    decoration: ElapseInputDecoration("DT RPM"),
+                    decoration: ElapseInputDecoration(context, "DT RPM"),
                     onChanged: (value) {
                       updateProperty("RPM", value);
                     },
@@ -244,7 +227,7 @@ List<Widget> EditState(
             ),
             TextFormField(
               maxLines: 5,
-              decoration: ElapseInputDecoration("Other Notes"),
+              decoration: ElapseInputDecoration(context, "Other Notes"),
               onChanged: (value) {
                 updateProperty("otherNotes", value);
               },
@@ -303,7 +286,7 @@ List<Widget> EditState(
             ),
             TextFormField(
               maxLines: 8,
-              decoration: ElapseInputDecoration("Enter Notes"),
+              decoration: ElapseInputDecoration(context, "Enter Notes"),
               onChanged: (value) {
                 updateProperty("autonNotes", value);
               },
@@ -337,4 +320,22 @@ List<Widget> EditState(
       ),
     )
   ];
+}
+
+InputDecoration ElapseInputDecoration(BuildContext context, String label) {
+  return InputDecoration(
+    labelText: label,
+    labelStyle: TextStyle(fontWeight: FontWeight.w500),
+    enabledBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.all(Radius.circular(9)),
+      borderSide: BorderSide(
+        color: Theme.of(context).colorScheme.surfaceDim,
+      ),
+    ),
+    focusedBorder: OutlineInputBorder(
+      borderRadius: BorderRadius.all(Radius.circular(9)),
+      borderSide:
+      BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+    ),
+  );
 }

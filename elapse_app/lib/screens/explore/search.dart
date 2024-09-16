@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:elapse_app/classes/Filters/eventSearchFilters.dart';
 import 'package:elapse_app/classes/Miscellaneous/recent_search.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
@@ -12,8 +11,6 @@ import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/team_widget.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:side_sheet/side_sheet.dart';
 import 'package:elapse_app/main.dart';
 
 class ExploreSearch extends StatefulWidget {
