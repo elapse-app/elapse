@@ -34,6 +34,18 @@ class GameWidget extends StatelessWidget {
     if (game.blueAlliancePreview != null) {
       divisionIndex = getTeamDivisionIndex(
           tournament.divisions, game.blueAlliancePreview![0].teamID);
+      if (divisionIndex == -1) {
+        divisionIndex = getTeamDivisionIndex(
+            tournament.divisions, game.blueAlliancePreview![1].teamID);
+      }
+      if (divisionIndex == -1) {
+        divisionIndex = getTeamDivisionIndex(
+            tournament.divisions, game.redAlliancePreview![0].teamID);
+      }
+      if (divisionIndex == -1) {
+        divisionIndex = getTeamDivisionIndex(
+            tournament.divisions, game.redAlliancePreview![1].teamID);
+      }
     }
 
     List<Game> games = tournament.divisions[divisionIndex].games!;
