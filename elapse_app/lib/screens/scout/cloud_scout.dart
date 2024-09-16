@@ -19,7 +19,7 @@ class CloudScoutScreen extends StatefulWidget {
 class _CloudScoutScreenState extends State<CloudScoutScreen> {
   @override
   Widget build(BuildContext context) {
-    bool teamSync = false;
+    bool teamSync = true;
     List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
     List<TeamPreview> savedTeamPreview =
         savedTeams.map((e) => loadTeamPreview(e)).toList();
@@ -69,58 +69,58 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
               : SliverToBoxAdapter(),
           SliverToBoxAdapter(
             child: prefs.getBool("isTournamentMode") ?? false
-                ? Column(children: [Container(
-              margin: EdgeInsets.symmetric(horizontal: 23),
-              height: 64,
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.all(
-                    Radius.circular(18),
-                  ),
-                  color: Theme.of(context).colorScheme.tertiary),
-              child: Material(
-                color: Colors.transparent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18),
-                ),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(18),
-                  splashColor: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withOpacity(0.05),
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const PicklistPage(),
-                        )
-                    );
-                  },
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(
-                            Icons.list_alt_outlined,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .secondary,
+                ? Column(children: [
+                    Container(
+                      margin: EdgeInsets.symmetric(horizontal: 23),
+                      height: 64,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(18),
                           ),
-                          SizedBox(width: 12),
-                          Text("My Picklist")
-                        ],
+                          color: Theme.of(context).colorScheme.tertiary),
+                      child: Material(
+                        color: Colors.transparent,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(18),
+                          splashColor: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withOpacity(0.05),
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const PicklistPage(),
+                                ));
+                          },
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.list_alt_outlined,
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                  ),
+                                  SizedBox(width: 12),
+                                  Text("My Picklist")
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
                       ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-              const SizedBox(
-                  height: 18,
-                ),
-            ]) : const SizedBox.shrink(),
+                    ),
+                    const SizedBox(
+                      height: 18,
+                    ),
+                  ])
+                : const SizedBox.shrink(),
           ),
           SliverToBoxAdapter(
             child: Padding(
