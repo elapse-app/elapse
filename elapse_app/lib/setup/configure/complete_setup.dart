@@ -152,13 +152,13 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
                               icon: Icons.send_rounded,
                               gradient: true,
                               onPressed: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => MyApp(
-                                        prefs: prefs), // Navigate to main app
-                                  ),
-                                );
+                                Navigator.pushAndRemoveUntil(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => MyApp(
+                                          prefs: prefs), // Navigate to main app
+                                    ),
+                                    ModalRoute.withName("/Home"));
                               },
                               text: "Take me to the app"),
                           SizedBox(
