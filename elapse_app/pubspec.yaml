@@ -49,6 +49,11 @@ dependencies:
   flutter_sticky_header: ^0.6.5
   dots_indicator: ^2.1.1
   gradient_borders: ^1.0.1
+  camera: ^0.11.0+2
+  path_provider: ^2.1.4
+  path: ^1.9.0
+  image_picker: ^1.1.2
+  firebase_storage: ^11.6.5
   carousel_slider: ^5.0.0
 
 dev_dependencies:
