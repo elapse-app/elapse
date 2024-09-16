@@ -197,11 +197,10 @@ class _AddTeamPageState extends State<AddTeamPage> {
 
 List<TeamPreview> getSavedTeams() {
   final String savedTeam = prefs.getString("savedTeam") ?? "";
-  final parsed = jsonDecode(savedTeam);
-  List<TeamPreview> savedTeamsList = [TeamPreview(teamID: parsed["teamID"], teamNumber: parsed["teamNumber"])];
+  List<TeamPreview> savedTeamsList = [loadTeamPreview(savedTeam)];
 
   final List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
-  savedTeamsList.addAll(savedTeams.map((e) => TeamPreview(teamID: jsonDecode(e)["teamID"], teamNumber: jsonDecode(e)["teamNumber"])));
+  savedTeamsList.addAll(savedTeams.map((e) => loadTeamPreview(e)));
 
   return savedTeamsList;
 }
