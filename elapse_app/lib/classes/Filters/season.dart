@@ -39,7 +39,7 @@ List<Season> seasons = [
   Season(vrcId: 85, vexUId: 88, name: "2012-2013 Sack Attack", programID: 1, startYear: DateTime(2012), endYear: DateTime(2013)),
   Season(vrcId: 73, vexUId: 76, name: "2011-2012 Gateway", programID: 1, startYear: DateTime(2011), endYear: DateTime(2012)),
   Season(vrcId: 7, vexUId: 10, name: "2010-2011 Round Up", programID: 1, startYear: DateTime(2010), endYear: DateTime(2011)),
-  Season(vrcId: 1, vexUId: 4, name: "209-2010 Clean Sweep", programID: 1, startYear: DateTime(2009), endYear: DateTime(2010)),
+  Season(vrcId: 1, vexUId: 4, name: "2009-2010 Clean Sweep", programID: 1, startYear: DateTime(2009), endYear: DateTime(2010)),
 ];
 
 class SeasonFilterPage extends StatefulWidget {
