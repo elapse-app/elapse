@@ -30,7 +30,9 @@ Map<String, GradeLevel> gradeLevels = Map.fromEntries([
 
 GradeLevel getGradeLevel(String? grade) {
   if (grade == "Main Team") {
-      return loadTeamPreview(prefs.getString("savedTeam") ?? "").gradeLevel!;
+    return gradeLevels[
+            jsonDecode(prefs.getString("savedTeam") ?? "")["grade"]] ??
+        GradeLevel(id: 3, name: "High School");
   }
   return gradeLevels[grade] ?? gradeLevels["High School"]!;
 }
