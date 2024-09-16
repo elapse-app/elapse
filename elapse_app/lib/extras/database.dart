@@ -62,7 +62,7 @@ class Database {
 /* Team Groups */
 
   // String AdminID, String groupName
-  Future<String> createTeamGroup(String adminID, String gname, String teamid) async {
+  Future<String> createTeamGroup(String adminID, String gname, String teamid, String fullName) async {
     String returnVal = 'hello';
     try {
       var alphanumericGenerator = RandomStringGenerator(
@@ -75,11 +75,11 @@ class Database {
       );
 
       String joinCode = '${alphanumericGenerator.generate()}-${alphanumericGenerator.generate()}';
-      Map<String, String> members = {adminID: "Change to Full Name"};
+      Map<String, String> members = {adminID: fullName};
       var group = await _firestore.collection('teamGroups').add({
         'adminId': adminID,
         'joinCode': joinCode,
-        'team': "", // needs to be updated
+        'team': teamid, // needs to be updated
         'members': members,
         'groupName': gname,
       });
@@ -109,7 +109,7 @@ class Database {
           .get();
       DocumentSnapshot? userDoc = teamDoc.docs.first;
       userDoc.reference.update({
-        'members.$uid': firstName + " " + lastName,
+        'members.$uid': "$firstName $lastName",
       });
       // Update the users list of team groups
       await _firestore.collection('users').doc(uid).update({
@@ -151,8 +151,7 @@ class Database {
     return returnVal;
   }
 
-  Future<String> promoteNewAdmin(
-      String groupID, String uid, String memberID) async {
+  Future<String> promoteNewAdmin(String groupID, String uid, String memberID) async {
     String returnVal = 'hello';
     try {
       await _firestore.collection('teamGroups').doc(groupID).update({
@@ -166,8 +165,7 @@ class Database {
 
   Future<Map<String, dynamic>?> getGroupInfo(String groupid) async {
     try {
-      var collection =
-          await _firestore.collection('teamGroups').doc(groupid).get();
+      var collection =  await _firestore.collection('teamGroups').doc(groupid).get();
       return collection.data();
     } catch (e) {
       print(e);
@@ -186,11 +184,7 @@ class Database {
       String teamGroupID, String teamid, String tournamentID) async {
     String returnVal = '';
     try {
-      await _firestore
-          .collection('teamGroups')
-          .doc(teamGroupID)
-          .collection('scoutsheets')
-          .add({
+      await _firestore.collection('teamGroups').doc(teamGroupID).collection('scoutsheets').add({
         /* Made with creation */
         // Comp Specific stuff
         'teamID': teamid,
@@ -228,8 +222,7 @@ class Database {
     return returnVal;
   }
 
-  Future<String> removeTeamScoutSheet(
-      String teamid, String teamGroupID, String tournamentID) async {
+  Future<String> removeTeamScoutSheet(String teamid, String teamGroupID, String tournamentID) async {
     String returnVal = 'hello';
     try {
       var scoutSheetCollection = await _firestore
@@ -408,43 +401,43 @@ class Database {
 /*         User ScoutSheet        */
 /* ------------------------------ */
 
-// Future<String> createUserScoutSheet(String uid, String teamid, String tournamentID) async {
-//     String returnVal = 'hello';
-//     try {
-//       await _firestore.collection('Users').doc(uid).collection('scoutsheets').doc().set({
-//         /* Made with creation */
-//         // Comp Specific stuff
-//         'teamID': teamid,
-//         'tournamentID': tournamentID,
+Future<String> createUserScoutSheet(String uid, String teamid, String tournamentID) async {
+    String returnVal = 'hello';
+    try {
+      await _firestore.collection('Users').doc(uid).collection('scoutsheets').doc().set({
+        /* Made with creation */
+        // Comp Specific stuff
+        'teamID': teamid,
+        'tournamentID': tournamentID,
 
-//         // Timestamp Stuff
-//         'createTime': DateTime.now(),
+        // Timestamp Stuff
+        'createTime': DateTime.now(),
 
-//         /* Updated with Editing */
-//         'latestUpdate': DateTime,
-//         // List of the properties of the scouted robot
-//         'properties': {},
-//         // Notes about the team & match
-//         'teamNotes': "",
-//         'gameNotes': {},
-//         // List of the URLs for any pictures
-//         'photos': [],
-//         // Bool For currently Editing // Not Necesary since only 1 user
-//         // 'isEditing': false,
-//       });
-//     } catch (e) {
-//       print(e);
-//     }
-//     return returnVal;
-//   }
+        /* Updated with Editing */
+        'latestUpdate': DateTime,
+        // List of the properties of the scouted robot
+        'properties': {},
+        // Notes about the team & match
+        'teamNotes': "",
+        'gameNotes': {},
+        // List of the URLs for any pictures
+        'photos': [],
+        // Bool For currently Editing // Not Necesary since only 1 user
+        // 'isEditing': false,
+      });
+    } catch (e) {
+      print(e);
+    }
+    return returnVal;
+  }
 
-//   Future<Map<String, dynamic>?> getUserScoutSheetInfo(String uid, String teamID, String tournamentID) async {
-//     try {
-//       var collection = await _firestore.collection('Users').doc(uid).collection('scoutsheets').where('teamID', isEqualTo: teamID).where('tournamentID', isEqualTo: tournamentID).limit(1).get();
-//       return collection.docs.first.data();
-//     } catch (e) {
-//       print(e);
-//     }
-//     return null;
-//   }
+  Future<Map<String, dynamic>?> getUserScoutSheetInfo(String uid, String teamID, String tournamentID) async {
+    try {
+      var collection = await _firestore.collection('Users').doc(uid).collection('scoutsheets').where('teamID', isEqualTo: teamID).where('tournamentID', isEqualTo: tournamentID).limit(1).get();
+      return collection.docs.first.data();
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
 }
