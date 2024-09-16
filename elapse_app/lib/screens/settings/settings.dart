@@ -1,13 +1,17 @@
 import 'dart:convert';
 
+import 'package:elapse_app/screens/settings/edit_profile.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../classes/Team/teamPreview.dart';
 import '../../main.dart';
+import 'add_teams.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -40,12 +44,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
           const RoundedTop(),
           SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 23),
+            padding: const EdgeInsets.only(left: 23, right: 23, bottom: 23),
             sliver: SliverToBoxAdapter(
               child: Column(
                 children: [
                   Container(
-                    height: 280,
+                    height: FirebaseAuth.instance.currentUser != null ? 280 : 190,
                     decoration: BoxDecoration(
                       border: Border.all(color: Theme.of(context).colorScheme.secondary),
                       borderRadius: BorderRadius.circular(18),
@@ -55,6 +59,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        FirebaseAuth.instance.currentUser != null ?
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -62,16 +67,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("Account Name", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
-                                Text("example.email@gmail.com", style: const TextStyle(fontSize: 16)),
+                                Text(FirebaseAuth.instance.currentUser!.displayName!, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                                Text(FirebaseAuth.instance.currentUser!.email!, style: const TextStyle(fontSize: 16)),
                               ]
                             ),
                             CircleAvatar(
                               radius: 40,
-                              child: const Icon(Icons.person, size: 40),
+                              child: Image.network(FirebaseAuth.instance.currentUser!.photoURL!),
                             )
                           ]
-                        ),
+                        ) : const SizedBox.shrink(),
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                           decoration: BoxDecoration(
@@ -121,8 +126,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 fit: FlexFit.tight,
                                 flex: 10,
                                 child: GestureDetector(
-                                  child: const Text("Add Team", textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
-                                  onTap: () {},
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Icon(Icons.add),
+                                      Text("Add Teams", textAlign: TextAlign.center, style: TextStyle(fontSize: 18))
+                                    ]
+                                  ),
+                                  onTap: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const AddTeamPage(),
+                                      )
+                                    );
+                                    setState(() {});
+                                  },
                                 ),
                               ),
                               const Flexible(
@@ -136,9 +155,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               Flexible(
                                 fit: FlexFit.tight,
                                 flex: 10,
-                                child: GestureDetector(
-                                  child: const Text("Edit Profile", textAlign: TextAlign.center, style: TextStyle(fontSize: 18)),
-                                  onTap: () {},
+                                child: FirebaseAuth.instance.currentUser != null ? GestureDetector(
+                                  child: const Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      Icon(Icons.edit),
+                                      Text("Edit Profile", textAlign: TextAlign.center, style: TextStyle(fontSize: 18))
+                                    ]
+                                  ),
+                                  onTap: () async {
+                                    await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const EditProfilePage(),
+                                        )
+                                    );
+                                    setState(() {});
+                                  },
+                                ) : GestureDetector(
+                                  child: const Row(
+                                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Icon(Icons.login),
+                                        Text("Login", textAlign: TextAlign.center, style: TextStyle(fontSize: 18))
+                                      ]
+                                  ),
+                                  onTap: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const EditProfilePage(), // Temporary, later change to login/sign up page
+                                      )
+                                    );
+                                    setState(() {});
+                                  },
                                 ),
                               ),
                             ]
@@ -265,33 +315,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 9),
                     child: GestureDetector(
-                      onTap: () {},
-                      child: SizedBox(
+                      onTap: () {
+                        launchUrl(Uri.parse("https://forms.gle/rsL2pmLsjXa7GeNT6"));
+                      },
+                      child: const SizedBox(
                         width: double.infinity,
-                        child: const Text("Send Feedback", style: TextStyle(fontSize: 18)),
+                        child: Text("Send Feedback", style: TextStyle(fontSize: 18)),
                       ),
                     ),
-                  ),
-                  Divider(
-                    color: Theme.of(context).colorScheme.surfaceDim,
                   ),
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
 }
 
-List<TeamPreview> getSavedTeams() {
-  final String savedTeam = prefs.getString("savedTeam") ?? "";
-  final parsed = jsonDecode(savedTeam);
-  List<TeamPreview> savedTeamsList = [TeamPreview(teamID: parsed["teamID"], teamNumber: parsed["teamNumber"])];
-
-  final List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
-  savedTeamsList.addAll(savedTeams.map((e) => TeamPreview(teamID: jsonDecode(e)["teamID"], teamNumber: jsonDecode(e)["teamNumber"])));
-
-  return savedTeamsList;
-}
