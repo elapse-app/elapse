@@ -82,6 +82,34 @@ flutter:
   assets:
     - assets/lg4x.png
     - assets/dg4x.png
+    - assets/onboardingHome.png
+    - assets/onboardingMyTeam.png
+    - assets/onboardingRankings.png
+    - assets/onboardingSchedule.png
+    - assets/tournamentMode.png
+    - assets/cloudScout.png
+    - assets/allDone.png
+    - assets/allDoneDark.png
+
+    - assets/onboardingHomeDark.png
+    - assets/onboardingMyTeamDark.png
+    - assets/onboardingRankingsDark.png
+    - assets/onboardingScheduleDark.png
+    - assets/cloudScoutDark.png
+
+    - assets/darkIcon.png
+    - assets/apple.png
+    - assets/google.png
+    - assets/mail.png
+    - assets/radio_button_unchecked.png
+    - assets/radio_button_checked.png
+    - assets/darkMail.png
+    - assets/system.png
+    - assets/lightMode.png
+    - assets/darkMode.png
+    - assets/enabled.png
+    - assets/disabled.png
+
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -11,7 +11,8 @@ import 'package:elapse_app/screens/scout/cloud_scout.dart';
 import 'package:elapse_app/screens/tournament_mode/home.dart';
 import 'package:elapse_app/screens/tournament_mode/my_teams.dart';
 import 'package:elapse_app/screens/tournament_mode/tournament.dart';
-import 'package:elapse_app/setup/setup.dart';
+import 'package:elapse_app/setup/welcome/first_page.dart';
+import 'package:elapse_app/setup/deprecated/setup.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
@@ -50,9 +51,7 @@ void main() async {
         ),
         ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
       ],
-      child: prefs.getString("savedTeam") == null
-          ? SetupScreen()
-          : MyApp(key: myAppKey, prefs: prefs),
+      child: MyApp(key: myAppKey, prefs: prefs),
     ),
   );
 }
@@ -69,6 +68,7 @@ class MyAppState extends State<MyApp> {
   // This widget is the root of your application.
   int selectedIndex = 0;
   bool isTournamentMode = false;
+  bool isLoggedIn = false;
   late int teamID;
   late String teamNumber;
 
@@ -102,11 +102,41 @@ class MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    if (prefs.getString("currentUser") == null) {
+      return Consumer<ColorProvider>(
+        builder: (context, value, child) {
+          bool systemDefined = false;
+          ColorScheme systemTheme =
+              MediaQuery.of(context).platformBrightness == Brightness.dark
+                  ? darkScheme
+                  : lightScheme;
+
+          if (widget.prefs.getString("theme") == "system") {
+            systemDefined = true;
+            print("is system defined");
+          }
+
+          ColorScheme chosenTheme =
+              systemDefined ? systemTheme : value.colorScheme;
+
+          return MaterialApp(
+            home: const FirstSetupPage(),
+            theme: ThemeData(
+              colorScheme: chosenTheme,
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              fontFamily: "Manrope",
+            ),
+          );
+        },
+      );
+    }
     TeamPreview savedTeam = TeamPreview(
         teamNumber:
             jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"],
         teamID: jsonDecode(widget.prefs.getString("savedTeam"))["teamID"]);
     List<Widget> screens;
+
     isTournamentMode
         ? screens = [
             TMHomePage(
