@@ -11,6 +11,7 @@ class ElapseAppBar extends StatelessWidget {
       this.returnData,
       this.prefs,
       this.background,
+      this.maxHeight = 125,
       this.backBehavior = null});
   final Widget title;
   final Widget? background;
@@ -18,6 +19,7 @@ class ElapseAppBar extends StatelessWidget {
   final bool backNavigation;
   final Object? returnData;
   final SharedPreferences? prefs;
+  final double maxHeight;
   final void Function()? backBehavior;
 
   @override
@@ -91,9 +93,10 @@ class ElapseAppBar extends StatelessWidget {
         builder: (BuildContext context, BoxConstraints constraints) {
           double leftPadding = backNavigation
               ? (-0.5 *
-                  (constraints.maxHeight -
-                      MediaQuery.of(context).padding.top -
-                      125)).clamp(0, double.infinity)
+                      (constraints.maxHeight -
+                          MediaQuery.of(context).padding.top -
+                          125))
+                  .clamp(0, double.infinity)
               : 0;
           return FlexibleSpaceBar(
               expandedTitleScale: 1.25,
@@ -120,9 +123,10 @@ class ElapseAppBar extends StatelessWidget {
                                 .colorScheme
                                 .onSurface
                                 .withOpacity(((constraints.maxHeight -
-                                        MediaQuery.of(context).padding.top -
-                                        125) /
-                                    -62).clamp(0, 1)),
+                                            MediaQuery.of(context).padding.top -
+                                            125) /
+                                        -62)
+                                    .clamp(0, 1)),
                           ),
                         )
                       : Container(
