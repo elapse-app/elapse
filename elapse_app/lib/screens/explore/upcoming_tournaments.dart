@@ -8,12 +8,11 @@ import '../widgets/big_error_message.dart';
 import 'filters.dart';
 
 class UpcomingTournaments extends StatefulWidget {
-  UpcomingTournaments({
+  const UpcomingTournaments({
     super.key,
     required this.filter,
   });
 
-  late Future<TournamentList> upcomingTournaments;
   final ExploreSearchFilter filter;
 
   @override
@@ -21,16 +20,18 @@ class UpcomingTournaments extends StatefulWidget {
 }
 
 class _UpcomingTournamentsState extends State<UpcomingTournaments> {
+  late Future<TournamentList> upcomingTournaments;
+
   @override
   void initState() {
     super.initState();
-    widget.upcomingTournaments = getTournaments("", widget.filter);
+    upcomingTournaments = getTournaments("", widget.filter);
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: widget.upcomingTournaments,
+        future: upcomingTournaments,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const SizedBox(
