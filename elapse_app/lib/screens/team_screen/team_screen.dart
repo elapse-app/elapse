@@ -286,33 +286,38 @@ class _TeamScreenState extends State<TeamScreen> {
         activeScoutSheet.photos,
         updateSheet,
         activeScoutSheet);
-    List<Widget> ScoutSheetEmpty = EmptyState(context, () async {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            title: Text("Creating Scoutsheet"),
-            content:
-                Text("You will be able to edit once the scoutsheet is created"),
-          );
-        },
-      );
-      await database
-          .createTeamScoutSheet(teamGroupID, widget.teamID.toString(),
-              selectedTournament.id.toString())
-          .then(
-        (id) async {
-          await database.updateMemberEditing(teamGroupID,
-              widget.teamID.toString(), selectedTournament.id.toString(), true);
-          print(id);
-          Navigator.pop(context);
-          setState(() {
-            scoutsheetID = id;
-            scoutSheetStateIndex = 2;
-          });
-        },
-      );
-    });
+    List<Widget> ScoutSheetEmpty = selectedTournament.id != 0
+        ? EmptyState(context, () async {
+            showDialog(
+              context: context,
+              builder: (context) {
+                return AlertDialog(
+                  title: Text("Creating Scoutsheet"),
+                  content: Text(
+                      "You will be able to edit once the scoutsheet is created"),
+                );
+              },
+            );
+            await database
+                .createTeamScoutSheet(teamGroupID, widget.teamID.toString(),
+                    selectedTournament.id.toString())
+                .then(
+              (id) async {
+                await database.updateMemberEditing(
+                    teamGroupID,
+                    widget.teamID.toString(),
+                    selectedTournament.id.toString(),
+                    true);
+                print(id);
+                Navigator.pop(context);
+                setState(() {
+                  scoutsheetID = id;
+                  scoutSheetStateIndex = 2;
+                });
+              },
+            );
+          })
+        : [];
 
     List<Widget> ScoutSheetCurrentlyEditing = [
       SliverToBoxAdapter(
