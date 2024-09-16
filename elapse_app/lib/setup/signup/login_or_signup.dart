@@ -1,8 +1,6 @@
 import 'package:elapse_app/screens/widgets/long_button.dart';
-import 'package:elapse_app/setup/signup/enter_details.dart';
 import 'package:elapse_app/setup/signup/login_page.dart';
 import 'package:flutter/material.dart';
-import 'package:elapse_app/setup/welcome/first_page.dart';
 import 'package:elapse_app/setup/signup/create_account.dart';
 import '../../screens/widgets/app_bar.dart';
 

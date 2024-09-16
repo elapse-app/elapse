@@ -86,6 +86,7 @@ Future<void> signIN(String email, String password) async {
   print('authSucc - signed in user with uuid: ${user?.uid}');
   Database database = Database();
   Map<String, dynamic>? userInfo = await database.getUserInfo(user!.uid);
+  print(userInfo);
   if (userInfo == null) {
     throw Exception("No user in database");
   }
@@ -95,9 +96,9 @@ Future<void> signIN(String email, String password) async {
       email: userInfo["email"],
       fname: userInfo["firstName"],
       lname: userInfo["lastName"],
-      teamNumber: userInfo["team"]);
+      teamNumber: userInfo["team"]["teamNumber"]);
 
   prefs.setString("currentUser", jsonEncode(currentUser.toJson()));
   prefs.setString("teamGroup", userInfo["groupId"][0]);
-  prefs.setString("savedTeam", jsonEncode(userInfo["savedTeam"]));
+  prefs.setString("savedTeam", jsonEncode(userInfo["team"]));
 }

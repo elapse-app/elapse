@@ -9,28 +9,28 @@ import '../../team_screen/team_screen.dart';
 import '../../widgets/big_error_message.dart';
 
 class TopWorldSkills extends StatefulWidget {
-  TopWorldSkills({
+  const TopWorldSkills({
     super.key,
   });
-
-  late Future<List<WorldSkillsStats>> rankings;
 
   @override
   State<TopWorldSkills> createState() => _TopWorldSkillsState();
 }
 
 class _TopWorldSkillsState extends State<TopWorldSkills> {
+  late Future<List<WorldSkillsStats>> rankings;
+
   @override
   void initState() {
     super.initState();
-    widget.rankings = getWorldSkillsRankings(
+    rankings = getWorldSkillsRankings(
         seasons[0].vrcId, getGradeLevel(prefs.getString("defaultGrade")));
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: widget.rankings,
+        future: rankings,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const SizedBox(
