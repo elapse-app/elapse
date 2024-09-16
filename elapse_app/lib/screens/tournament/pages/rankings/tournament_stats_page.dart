@@ -230,7 +230,7 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "${awpRate * 100} %",
+                                    "${(awpRate * 100).toStringAsFixed(2)} %",
                                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                   ),
                                   const Text(
