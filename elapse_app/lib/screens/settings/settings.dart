@@ -9,7 +9,6 @@ import 'package:elapse_app/providers/color_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../classes/Team/teamPreview.dart';
 import '../../main.dart';
 import 'add_teams.dart';
 

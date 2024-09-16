@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import '../../main.dart';
+import '../Team/teamPreview.dart';
 
 class GradeLevel {
   int id;
@@ -29,7 +30,7 @@ Map<String, GradeLevel> gradeLevels = Map.fromEntries([
 
 GradeLevel getGradeLevel(String? grade) {
   if (grade == "Main Team") {
-      return gradeLevels[jsonDecode(prefs.getString("savedTeam") ?? "")["grade"]]!;
+      return loadTeamPreview(prefs.getString("savedTeam") ?? "").gradeLevel!;
   }
   return gradeLevels[grade] ?? gradeLevels["High School"]!;
 }
