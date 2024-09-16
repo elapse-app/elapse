@@ -1,7 +1,11 @@
 import 'dart:convert';
 
+import 'package:elapse_app/classes/Users/user.dart';
+import 'package:elapse_app/screens/settings/add_teams.dart';
+import 'package:elapse_app/screens/settings/edit_profile.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:provider/provider.dart';
@@ -24,6 +28,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int mainTeamId = jsonDecode(prefs.getString("savedTeam") ?? "")["teamID"];
   bool useLiveTiming = prefs.getBool("useLiveTiming") ?? true;
   String defaultGrade = prefs.getString("defaultGrade") ?? "Main Team";
+
+  ElapseUser currentUser = elapseUserDecode(prefs.getString("currentUser")!);
 
   @override
   Widget build(BuildContext context) {
@@ -57,29 +63,32 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text("Account Name",
-                                            style: const TextStyle(
-                                                fontSize: 24,
-                                                fontWeight: FontWeight.w600)),
-                                        Text("example.email@gmail.com",
-                                            style:
-                                                const TextStyle(fontSize: 16)),
-                                      ]),
-                                  CircleAvatar(
-                                    radius: 32,
-                                    child: const Icon(Icons.person, size: 40),
-                                  )
-                                ]),
+                            FirebaseAuth.instance.currentUser != null
+                                ? Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                        Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                  '${currentUser.fname!} ${currentUser.lname!}',
+                                                  style: const TextStyle(
+                                                      fontSize: 24,
+                                                      fontWeight:
+                                                          FontWeight.w600)),
+                                              Text(currentUser.email!,
+                                                  style: const TextStyle(
+                                                      fontSize: 16)),
+                                            ]),
+                                        CircleAvatar(
+                                          radius: 32,
+                                        )
+                                      ])
+                                : const SizedBox.shrink(),
                             Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 20, vertical: 5),
@@ -91,25 +100,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 borderRadius: BorderRadius.circular(100),
                               ),
                               child: Row(children: [
+                                Icon(Icons.group,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .secondary),
+                                const SizedBox(width: 15),
                                 Expanded(
                                   child: DropdownButtonHideUnderline(
                                     child: DropdownButton(
                                       isExpanded: true,
                                       value: mainTeamId,
-                                      menuMaxHeight: 250,
                                       items: getSavedTeams()
                                           .map((e) => DropdownMenuItem(
                                               value: e.teamID,
-                                              child: Row(
-                                                children: [
-                                                  Icon(Icons.group,
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .secondary),
-                                                  const SizedBox(width: 15),
-                                                  Text("Team ${e.teamNumber}"),
-                                                ],
-                                              )))
+                                              child:
+                                                  Text("Team ${e.teamNumber}")))
                                           .toList(),
                                       onChanged: (int? value) {
                                         final String savedTeam =
@@ -146,110 +151,103 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ]),
                             ),
                             Container(
-                              height: 64,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(18),
-                                  ),
-                                  color:
-                                      Theme.of(context).colorScheme.tertiary),
-                              child: Flex(
-                                direction: Axis.horizontal,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Flexible(
-                                    flex: 4,
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(18),
-                                      ),
-                                      child: InkWell(
-                                        borderRadius: BorderRadius.circular(18),
-                                        splashColor: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface
-                                            .withOpacity(0.05),
-                                        onTap: () {
-                                          print("clicked1");
-                                        },
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Row(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(18),
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                ),
+                                padding: const EdgeInsets.all(10),
+                                child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Flexible(
+                                        fit: FlexFit.tight,
+                                        flex: 10,
+                                        child: GestureDetector(
+                                          child: const Row(
                                               mainAxisAlignment:
-                                                  MainAxisAlignment.center,
+                                                  MainAxisAlignment.spaceEvenly,
                                               children: [
-                                                Icon(
-                                                  Icons.add,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .secondary,
-                                                ),
-                                                SizedBox(width: 12),
-                                                Text("More Teams")
-                                              ],
-                                            ),
-                                          ],
+                                                Icon(Icons.add),
+                                                Text("Add Teams",
+                                                    textAlign: TextAlign.center,
+                                                    style:
+                                                        TextStyle(fontSize: 18))
+                                              ]),
+                                          onTap: () async {
+                                            await Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      const AddTeamPage(),
+                                                ));
+                                            setState(() {});
+                                          },
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                  Flexible(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          vertical: 8.0),
-                                      child: VerticalDivider(
-                                        width: 1,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface
-                                            .withOpacity(0.1),
-                                      ),
-                                    ),
-                                  ),
-                                  Flexible(
-                                    flex: 4,
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(18),
-                                      ),
-                                      child: InkWell(
-                                        borderRadius: BorderRadius.circular(18),
-                                        splashColor: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface
-                                            .withOpacity(0.05),
-                                        onTap: () {},
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              children: [
-                                                Icon(
-                                                  Icons.edit,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .secondary,
-                                                ),
-                                                SizedBox(width: 12),
-                                                Text("Edit Profile")
-                                              ],
-                                            ),
-                                          ],
+                                      const Flexible(
+                                        fit: FlexFit.tight,
+                                        flex: 1,
+                                        child: SizedBox(
+                                          height: 50,
+                                          child: VerticalDivider(
+                                              width: 3, thickness: 0.5),
                                         ),
                                       ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            )
+                                      Flexible(
+                                        fit: FlexFit.tight,
+                                        flex: 10,
+                                        child: FirebaseAuth
+                                                    .instance.currentUser !=
+                                                null
+                                            ? GestureDetector(
+                                                child: const Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    children: [
+                                                      Icon(Icons.edit),
+                                                      Text("Edit Profile",
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style: TextStyle(
+                                                              fontSize: 18))
+                                                    ]),
+                                                onTap: () async {
+                                                  await Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const EditProfilePage(),
+                                                      ));
+                                                  setState(() {});
+                                                },
+                                              )
+                                            : GestureDetector(
+                                                child: const Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceEvenly,
+                                                    children: [
+                                                      Icon(Icons.login),
+                                                      Text("Login",
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                          style: TextStyle(
+                                                              fontSize: 18))
+                                                    ]),
+                                                onTap: () async {
+                                                  await Navigator.push(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            const EditProfilePage(), // Temporary, later change to login/sign up page
+                                                      ));
+                                                  setState(() {});
+                                                },
+                                              ),
+                                      ),
+                                    ]))
                           ])),
                   const SizedBox(height: 32),
                   const SizedBox(
