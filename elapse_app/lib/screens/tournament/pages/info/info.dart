@@ -1,4 +1,3 @@
-import 'package:chaleno/chaleno.dart';
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';

@@ -42,6 +42,7 @@ void adjustMatchTiming(List<Game> games) {
       if (timeSinceLastMatch > 30) break;
     }
 
+    if (games[i].startedTime == null || games[i].scheduledTime == null) continue;
     delay += games[i].startedTime!.difference(games[i].scheduledTime!).inMinutes;
     n++;
   }

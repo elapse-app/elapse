@@ -19,8 +19,7 @@ class CloudScoutScreen extends StatefulWidget {
 class _CloudScoutScreenState extends State<CloudScoutScreen> {
   @override
   Widget build(BuildContext context) {
-    bool teamSync = true;
-    bool isTournamentMode = true;
+    bool teamSync = false;
     List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
     List<TeamPreview> savedTeamPreview =
         savedTeams.map((e) => loadTeamPreview(e)).toList();
@@ -69,7 +68,8 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
                 ))
               : SliverToBoxAdapter(),
           SliverToBoxAdapter(
-            child: Container(
+            child: prefs.getBool("isTournamentMode") ?? false
+                ? Column(children: [Container(
               margin: EdgeInsets.symmetric(horizontal: 23),
               height: 64,
               decoration: BoxDecoration(
@@ -77,152 +77,50 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
                     Radius.circular(18),
                   ),
                   color: Theme.of(context).colorScheme.tertiary),
-              child: isTournamentMode
-                  ? Flex(
-                      direction: Axis.horizontal,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Flexible(
-                          flex: 4,
-                          child: Material(
-                            color: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(18),
-                              splashColor: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withOpacity(0.05),
-                              onTap: () {
-                                print("clicked1");
-                              },
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.contact_page_outlined,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary,
-                                      ),
-                                      SizedBox(width: 12),
-                                      Text("ScoutSheets")
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
+              child: Material(
+                color: Colors.transparent,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(18),
+                  splashColor: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withOpacity(0.05),
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const PicklistPage(),
+                        )
+                    );
+                  },
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.list_alt_outlined,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .secondary,
                           ),
-                        ),
-                        Flexible(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: VerticalDivider(
-                              width: 1,
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withOpacity(0.1),
-                            ),
-                          ),
-                        ),
-                        Flexible(
-                          flex: 4,
-                          child: Material(
-                            color: Colors.transparent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            child: InkWell(
-                              borderRadius: BorderRadius.circular(18),
-                              splashColor: Theme.of(context)
-                                  .colorScheme
-                                  .onSurface
-                                  .withOpacity(0.05),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const PicklistPage(),
-                                  )
-                                );
-                              },
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.list_alt_outlined,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary,
-                                      ),
-                                      SizedBox(width: 12),
-                                      Text("My Picklist")
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    )
-                  : Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 23.0),
-                      child: Material(
-                        color: Colors.transparent,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(18),
-                          splashColor: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacity(0.05),
-                          onTap: () {
-                            print("clicked1");
-                          },
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.contact_page_outlined,
-                                    color:
-                                        Theme.of(context).colorScheme.secondary,
-                                  ),
-                                  SizedBox(width: 12),
-                                  Text("ScoutSheets"),
-                                  Spacer(),
-                                  Icon(
-                                    Icons.arrow_forward,
-                                    color:
-                                        Theme.of(context).colorScheme.secondary,
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
+                          SizedBox(width: 12),
+                          Text("My Picklist")
+                        ],
                       ),
-                    ),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          ),
-          SliverToBoxAdapter(
-            child: SizedBox(
-              height: 18,
-            ),
+              const SizedBox(
+                  height: 18,
+                ),
+            ]) : const SizedBox.shrink(),
           ),
           SliverToBoxAdapter(
             child: Padding(
