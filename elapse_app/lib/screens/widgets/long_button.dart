@@ -7,16 +7,12 @@ class LongButton extends StatelessWidget {
       this.gradient = false,
       required this.text,
       this.icon,
-      this.useForwardArrow = true,
-      this.centerAlign = false,
-      this.isGray = false});
+      this.trailingIcon = Icons.arrow_forward});
   final void Function()? onPressed;
   final bool gradient;
   final String text;
   final IconData? icon;
-  final bool useForwardArrow;
-  final bool centerAlign;
-  final bool isGray;
+  final IconData trailingIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -37,10 +33,8 @@ class LongButton extends StatelessWidget {
                   )
                 : null,
             border: Border.all(
-              width: 1,
-              color: isGray
-                  ? Theme.of(context).colorScheme.surfaceDim
-                  : Theme.of(context).colorScheme.primary,
+              width: 2,
+              color: Theme.of(context).colorScheme.primary,
             ),
           ),
         ),
@@ -59,27 +53,21 @@ class LongButton extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 18),
               child: Row(
                 children: [
-                  centerAlign ? Spacer() : Container(),
                   if (icon != null)
                     Icon(icon, color: Theme.of(context).colorScheme.secondary),
                   if (icon != null) const SizedBox(width: 18),
                   Text(
                     text,
                     style: TextStyle(
-                      color: isGray
-                          ? Theme.of(context).colorScheme.onSurface
-                          : Theme.of(context).colorScheme.secondary,
+                      color: Theme.of(context).colorScheme.secondary,
                       fontSize: 16,
                     ),
                   ),
                   const Spacer(),
-                  if (useForwardArrow)
-                    Icon(
-                      Icons.arrow_forward,
-                      color: isGray
-                          ? Theme.of(context).colorScheme.onSurface
-                          : Theme.of(context).colorScheme.secondary,
-                    ),
+                  Icon(
+                    trailingIcon,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
                 ],
               ),
             ),
