@@ -107,8 +107,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
     savedQuery = "";
     _scrollController = ScrollController();
 
-    worldSkillsStats = getWorldSkillsRankings(seasons[0].vrcId, getGradeLevel(prefs.getString("defaultGrade")));
-    vdaStats = getTrueSkillData(seasons[0].vrcId);
+    worldSkillsStats = getWorldSkillsRankings(widget.tournament.seasonID, getGradeLevel(prefs.getString("defaultGrade")));
+    vdaStats = getTrueSkillData(widget.tournament.seasonID);
 
     if (widget.tournament.divisions[0].games == null ||
         widget.tournament.divisions[0].games!.isEmpty) {
