@@ -1,11 +1,13 @@
 import 'dart:convert';
 
+import 'package:elapse_app/classes/Users/user.dart';
 import 'package:elapse_app/screens/settings/edit_profile.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/providers/color_provider.dart';
+import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -27,6 +29,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int mainTeamId = jsonDecode(prefs.getString("savedTeam") ?? "")["teamID"];
   bool useLiveTiming = prefs.getBool("useLiveTiming") ?? true;
   String defaultGrade = prefs.getString("defaultGrade") ?? "Main Team";
+
+  ElapseUser currentUser = elapseUserDecode(prefs.getString("currentUser")!);
 
   @override
   Widget build(BuildContext context) {
@@ -72,24 +76,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                 CrossAxisAlignment.start,
                                             children: [
                                               Text(
-                                                  FirebaseAuth
-                                                      .instance
-                                                      .currentUser!
-                                                      .displayName!,
+                                                  '${currentUser.fname!} ${currentUser.lname!}',
                                                   style: const TextStyle(
                                                       fontSize: 24,
                                                       fontWeight:
                                                           FontWeight.w600)),
-                                              Text(
-                                                  FirebaseAuth.instance
-                                                      .currentUser!.email!,
+                                              Text(currentUser.email!,
                                                   style: const TextStyle(
                                                       fontSize: 16)),
                                             ]),
                                         CircleAvatar(
-                                          radius: 40,
-                                          child: Image.network(FirebaseAuth
-                                              .instance.currentUser!.photoURL!),
+                                          radius: 32,
                                         )
                                       ])
                                 : const SizedBox.shrink(),

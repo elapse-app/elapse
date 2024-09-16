@@ -7,12 +7,18 @@ class LongButton extends StatelessWidget {
       this.gradient = false,
       required this.text,
       this.icon,
-      this.trailingIcon = Icons.arrow_forward});
+      this.trailingIcon = Icons.arrow_forward,
+      this.useForwardArrow = true,
+      this.centerAlign = false,
+      this.isGray = false});
   final void Function()? onPressed;
   final bool gradient;
   final String text;
   final IconData? icon;
   final IconData trailingIcon;
+  final bool useForwardArrow;
+  final bool centerAlign;
+  final bool isGray;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +40,9 @@ class LongButton extends StatelessWidget {
                 : null,
             border: Border.all(
               width: 2,
-              color: Theme.of(context).colorScheme.primary,
+              color: isGray
+                  ? Theme.of(context).colorScheme.surfaceDim
+                  : Theme.of(context).colorScheme.primary,
             ),
           ),
         ),
@@ -53,6 +61,7 @@ class LongButton extends StatelessWidget {
               padding: const EdgeInsets.symmetric(horizontal: 18),
               child: Row(
                 children: [
+                  centerAlign ? Spacer() : Container(),
                   if (icon != null)
                     Icon(icon, color: Theme.of(context).colorScheme.secondary),
                   if (icon != null) const SizedBox(width: 18),
@@ -64,10 +73,13 @@ class LongButton extends StatelessWidget {
                     ),
                   ),
                   const Spacer(),
-                  Icon(
-                    trailingIcon,
-                    color: Theme.of(context).colorScheme.secondary,
-                  ),
+                  if (useForwardArrow)
+                    Icon(
+                      trailingIcon,
+                      color: isGray
+                          ? Theme.of(context).colorScheme.onSurface
+                          : Theme.of(context).colorScheme.secondary,
+                    )
                 ],
               ),
             ),

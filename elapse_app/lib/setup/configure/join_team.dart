@@ -218,7 +218,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                                       jsonEncode(currentUser.toJson()));
                                   Database database = Database();
                                   await database
-                                      .createUser(currentUser)
+                                      .createUser(currentUser, selectedTeam!)
                                       .then((value) {
                                     Navigator.push(
                                       context,

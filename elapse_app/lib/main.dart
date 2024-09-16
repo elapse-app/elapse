@@ -74,9 +74,12 @@ class MyAppState extends State<MyApp> {
 
   void initState() {
     super.initState();
-    teamID = jsonDecode(widget.prefs.getString("savedTeam"))["teamID"];
-    teamNumber = jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"];
-    initializeTournamentMode();
+    if (widget.prefs.getString("savedTeam") != null) {
+      teamID = jsonDecode(widget.prefs.getString("savedTeam"))["teamID"];
+      teamNumber =
+          jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"];
+      initializeTournamentMode();
+    }
   }
 
   void initializeTournamentMode() {

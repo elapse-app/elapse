@@ -193,7 +193,6 @@ class _AuthSignInState extends State<AuthSignIn> {
     final User? user = credential.user;
 
     // Add to the Database
-    await Database().createUser(user);
     print('authSucc - signed up user with uuid: ${user?.uid}');
 
     // Other Stuff
