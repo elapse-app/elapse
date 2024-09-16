@@ -128,7 +128,7 @@ class _TeamScreenState extends State<TeamScreen> {
         return value;
       },
     );
-    teamAwards = getAwards(widget.teamID, 181);
+    teamAwards = getAwards(widget.teamID, season.vrcId);
     isSaved = alreadySaved();
     displaySave = !isMainTeam();
 
