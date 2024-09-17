@@ -66,8 +66,8 @@ class Database {
 /* Team Groups */
 
   // String AdminID, String groupName
-  Future<String> createTeamGroup(
-      String adminID, String gname, String teamid, String fullName) async {
+  Future<String> createTeamGroup(String adminID, String gname, String teamid,
+      String fname, String lname) async {
     String returnVal = 'hello';
     try {
       var alphanumericGenerator = RandomStringGenerator(
@@ -81,7 +81,7 @@ class Database {
 
       String joinCode =
           '${alphanumericGenerator.generate()}-${alphanumericGenerator.generate()}';
-      Map<String, String> members = {adminID: fullName};
+      Map<String, String> members = {adminID: "$fname $lname"};
       var group = await _firestore.collection('teamGroups').add({
         'adminId': adminID,
         'joinCode': joinCode,
