@@ -151,6 +151,7 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
                               icon: Icons.send_rounded,
                               gradient: true,
                               onPressed: () {
+                                prefs.setBool("isSetUp", true);
                                 Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(

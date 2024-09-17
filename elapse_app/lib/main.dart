@@ -74,11 +74,7 @@ class MyAppState extends State<MyApp> {
 
   void initState() {
     super.initState();
-    if (widget.prefs.getString("currentUser") == null ||
-        widget.prefs.getString("savedTeam") == null ||
-        FirebaseAuth.instance.currentUser == null) {
-      return;
-    } else {
+    if (widget.prefs.getBool("isSetUp") ?? false) {
       teamID = jsonDecode(widget.prefs.getString("savedTeam"))["teamID"];
       teamNumber =
           jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"];
