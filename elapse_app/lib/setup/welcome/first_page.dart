@@ -47,7 +47,7 @@ class FirstSetupPage extends StatelessWidget {
                       ),
                     ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height * 0.13,
+                      height: MediaQuery.of(context).size.height * 0.12,
                     ),
                     Center(
                       child: RichText(
@@ -94,7 +94,7 @@ class FirstSetupPage extends StatelessWidget {
             ),
             Spacer(),
             Container(
-              height: 300,
+              height: 350,
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
                 borderRadius: const BorderRadius.only(
@@ -174,7 +174,7 @@ class FirstSetupPage extends StatelessWidget {
                         text: "Existing User? Sign in"),
                   ),
                   SizedBox(
-                    height: 23.0,
+                    height: 75.0,
                   ),
                 ],
               ),
