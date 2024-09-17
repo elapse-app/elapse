@@ -2,7 +2,6 @@ import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/long_button.dart';
 import 'package:flutter/material.dart';
-import 'package:gradient_borders/box_borders/gradient_box_border.dart';
 
 class CompleteSetupPage extends StatefulWidget {
   const CompleteSetupPage({
