@@ -1,125 +1,258 @@
+import 'dart:convert';
+
+import 'package:elapse_app/aesthetics/color_schemes.dart';
+import 'package:elapse_app/classes/Team/teamPreview.dart';
+import 'package:elapse_app/providers/color_provider.dart';
+import 'package:elapse_app/providers/tournament_mode_provider.dart';
+import 'package:elapse_app/screens/explore/explore.dart';
+import 'package:elapse_app/screens/home/home.dart';
+import 'package:elapse_app/screens/my_team/my_team.dart';
+import 'package:elapse_app/screens/scout/cloud_scout.dart';
+import 'package:elapse_app/screens/tournament_mode/home.dart';
+import 'package:elapse_app/screens/tournament_mode/my_teams.dart';
+import 'package:elapse_app/screens/tournament_mode/tournament.dart';
+import 'package:elapse_app/setup/welcome/first_page.dart';
+import 'package:elapse_app/setup/deprecated/setup.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter/services.dart';
 
-void main() {
-  runApp(const MyApp());
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'firebase_options.dart';
+
+final GlobalKey<MyAppState> myAppKey = GlobalKey<MyAppState>();
+late SharedPreferences prefs;
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  prefs = await SharedPreferences.getInstance();
+
+  // Set android system navbar colour
+  SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
+    systemNavigationBarColor: Colors.transparent, // Navigation bar color
+  ));
+
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => ColorProvider(),
+        ),
+        ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
+      ],
+      child: MyApp(key: myAppKey, prefs: prefs),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  final prefs;
+  const MyApp({super.key, required this.prefs});
 
+  @override
+  State<MyApp> createState() => MyAppState();
+}
+
+class MyAppState extends State<MyApp> {
   // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a blue toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+  int selectedIndex = 0;
+  bool isTournamentMode = false;
+  bool isLoggedIn = false;
+  late int teamID;
+  late String teamNumber;
+
+  void initState() {
+    super.initState();
+    if (widget.prefs.getString("savedTeam") != null ||
+        FirebaseAuth.instance.currentUser != null) {
+      teamID = jsonDecode(widget.prefs.getString("savedTeam"))["teamID"];
+      teamNumber =
+          jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"];
+      initializeTournamentMode();
+    }
   }
-}
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+  void initializeTournamentMode() {
+    if (widget.prefs.getBool("isTournamentMode") ?? false) {
+      int? tournamentID = widget.prefs.getInt("tournamentID");
+      teamID = jsonDecode(widget.prefs.getString("savedTeam"))["teamID"];
+      teamNumber =
+          jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"];
+      if (tournamentID != null) {
+        isTournamentMode = true;
+      }
+    } else {
+      isTournamentMode = false;
+      prefs.setStringList("picklist", []);
+    }
+  }
 
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
+  void reloadApp() {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      initializeTournamentMode();
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
-    return Scaffold(
-      appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
+    if (prefs.getString("currentUser") == null) {
+      return Consumer<ColorProvider>(
+        builder: (context, value, child) {
+          bool systemDefined = false;
+          ColorScheme systemTheme =
+              MediaQuery.of(context).platformBrightness == Brightness.dark
+                  ? darkScheme
+                  : lightScheme;
+
+          if (widget.prefs.getString("theme") == "system") {
+            systemDefined = true;
+            print("is system defined");
+          }
+
+          ColorScheme chosenTheme =
+              systemDefined ? systemTheme : value.colorScheme;
+
+          return MaterialApp(
+            home: const FirstSetupPage(),
+            theme: ThemeData(
+              colorScheme: chosenTheme,
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+              fontFamily: "Manrope",
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
+          );
+        },
+      );
+    }
+    TeamPreview savedTeam = TeamPreview(
+        teamNumber:
+            jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"],
+        teamID: jsonDecode(widget.prefs.getString("savedTeam"))["teamID"]);
+    List<Widget> screens;
+
+    isTournamentMode
+        ? screens = [
+            TMHomePage(
+              tournamentID: widget.prefs.getInt("tournamentID") ?? 0,
+              teamID: teamID,
+              teamNumber: teamNumber,
             ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+            TMTournamentScreen(
+              tournamentID: widget.prefs.getInt("tournamentID") ?? 0,
+              isPreview: false,
+            ),
+            CloudScoutScreen(),
+            TMMyTeams(
+              tournamentID: widget.prefs.getInt("tournamentID") ?? 0,
+            ),
+            ExploreScreen()
+          ]
+        : screens = [
+            HomeScreen(
+              teamID: savedTeam.teamID,
+              key: PageStorageKey<String>("home"),
+            ),
+            CloudScoutScreen(),
+            MyTeams(
+              key: PageStorageKey<String>("my-teams"),
+            ),
+            ExploreScreen(
+              key: PageStorageKey<String>("explore"),
+            ),
+          ];
+    return Consumer2<ColorProvider, TournamentModeProvider>(
+      builder: (context, colorProvider, tournamentModeProvider, child) {
+        bool systemDefined = false;
+        ColorScheme systemTheme =
+            MediaQuery.of(context).platformBrightness == Brightness.dark
+                ? darkScheme
+                : lightScheme;
+
+        if (widget.prefs.getString("theme") == "system") {
+          systemDefined = true;
+        }
+
+        ColorScheme chosenTheme =
+            systemDefined ? systemTheme : colorProvider.colorScheme;
+
+        // Build the list of destinations dynamically
+        List<NavigationDestination> destinations = [
+          NavigationDestination(
+              selectedIcon:
+                  Icon(Icons.home_rounded, color: chosenTheme.secondary),
+              icon: const Icon(Icons.home_outlined),
+              label: "Home"),
+          NavigationDestination(
+              selectedIcon:
+                  Icon(Icons.bubble_chart, color: chosenTheme.secondary),
+              icon: const Icon(Icons.bubble_chart_outlined),
+              label: "Scout"),
+          NavigationDestination(
+            selectedIcon:
+                Icon(Icons.people_alt_rounded, color: chosenTheme.secondary),
+            icon: const Icon(Icons.people_alt_outlined),
+            label: "My Team",
+          ),
+          NavigationDestination(
+            selectedIcon:
+                Icon(Icons.explore_rounded, color: chosenTheme.secondary),
+            icon: const Icon(Icons.explore_outlined),
+            label: "Explore",
+          ),
+        ];
+
+        final PageStorageBucket _bucket = PageStorageBucket();
+
+        // Add the tournament destination if tournament mode is enabled
+        if (isTournamentMode) {
+          destinations.insert(
+            1, // Add it to the second position
+            NavigationDestination(
+              selectedIcon: Icon(Icons.emoji_events_rounded,
+                  color: chosenTheme.secondary),
+              icon: const Icon(Icons.emoji_events_outlined),
+              label: "Tournament",
+            ),
+          );
+        }
+
+        return MaterialApp(
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            colorScheme: chosenTheme,
+            splashColor: Colors.transparent,
+            highlightColor: Colors.transparent,
+            fontFamily: "Manrope",
+          ),
+          home: Scaffold(
+            body: PageStorage(
+              bucket: _bucket,
+              child: screens[selectedIndex],
+            ),
+            bottomNavigationBar: NavigationBar(
+              selectedIndex: selectedIndex,
+              indicatorColor: chosenTheme.primary,
+              animationDuration: const Duration(milliseconds: 500),
+              labelBehavior:
+                  NavigationDestinationLabelBehavior.onlyShowSelected,
+              onDestinationSelected: (value) =>
+                  setState(() => selectedIndex = value),
+              destinations: destinations,
+            ),
+          ),
+        );
+      },
     );
   }
 }

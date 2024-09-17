@@ -9,6 +9,7 @@
 .history
 .svn/
 migrate_working_dir/
+.vscode
 
 # IntelliJ related
 *.iml
@@ -31,6 +32,9 @@ migrate_working_dir/
 .pub-cache/
 .pub/
 /build/
+linux/flutter/*
+windows/flutter/*
+pubspec.lock
 
 # Symbolication related
 app.*.symbols
@@ -42,3 +46,5 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+/token.txt
