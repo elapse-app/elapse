@@ -144,17 +144,17 @@ class MyAppState extends State<MyApp> {
     isTournamentMode
         ? screens = [
             TMHomePage(
-              tournamentID: widget.prefs.getInt("tournamentID"),
+              tournamentID: widget.prefs.getInt("tournamentID") ?? 0,
               teamID: teamID,
               teamNumber: teamNumber,
             ),
-            CloudScoutScreen(),
             TMTournamentScreen(
-              tournamentID: widget.prefs.getInt("tournamentID"),
+              tournamentID: widget.prefs.getInt("tournamentID") ?? 0,
               isPreview: false,
             ),
+            CloudScoutScreen(),
             TMMyTeams(
-              tournamentID: widget.prefs.getInt("tournamentID"),
+              tournamentID: widget.prefs.getInt("tournamentID") ?? 0,
             ),
             ExploreScreen()
           ]

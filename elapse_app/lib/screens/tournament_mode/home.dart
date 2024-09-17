@@ -90,7 +90,8 @@ class _TMHomePageState extends State<TMHomePage> {
                   centerTitle: false,
                   background: SafeArea(
                     child: Padding(
-                      padding: EdgeInsets.only(left: 23, right: 12, bottom: 10),
+                      padding: EdgeInsets.only(
+                          left: 23, right: 12, bottom: 10, top: 10),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
