@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/setup/welcome/features.dart';
-import 'package:gradient_borders/gradient_borders.dart';
 
 // class FirstSetupPage extends StatefulWidget {
 //   const FirstSetupPage({super.key});

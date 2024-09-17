@@ -216,7 +216,7 @@ class _FeaturesState extends State<Features> {
                     ),
                     DotsIndicator(
                       dotsCount: featurePages.length,
-                      position: currIndex.toDouble(),
+                      position: currIndex,
                       mainAxisSize: MainAxisSize.min,
                       decorator: DotsDecorator(
                         color: Theme.of(context)
@@ -237,7 +237,8 @@ class _FeaturesState extends State<Features> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => const SignUpPage(onboarding: true),
+                                  builder: (context) =>
+                                      const SignUpPage(onboarding: true),
                                 ),
                               );
                             } else {
