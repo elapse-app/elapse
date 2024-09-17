@@ -7,7 +7,10 @@ import '../../screens/widgets/app_bar.dart';
 class SignUpPage extends StatelessWidget {
   const SignUpPage({
     super.key,
+    this.onboarding = false,
   });
+
+  final bool onboarding;
 
   @override
   Widget build(BuildContext context) {
@@ -44,13 +47,17 @@ class SignUpPage extends StatelessWidget {
             slivers: [
               ElapseAppBar(
                 title: Row(children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Icon(Icons.arrow_back),
-                  ),
-                  const SizedBox(width: 12),
+                  onboarding ? Row(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pop(context);
+                        },
+                        child: const Icon(Icons.arrow_back),
+                      ),
+                      const SizedBox(width: 12),
+                    ]
+                  ) : const SizedBox.shrink(),
                   Text(
                     'Sign up',
                     style: TextStyle(
@@ -199,7 +206,7 @@ class SignUpPage extends StatelessWidget {
                                       Navigator.push(
                                         context,
                                         MaterialPageRoute(
-                                          builder: (context) => LoginPage(),
+                                          builder: (context) => LoginPage(onboarding: onboarding),
                                         ),
                                       );
                                     },

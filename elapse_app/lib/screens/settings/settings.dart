@@ -2,9 +2,10 @@ import 'dart:convert';
 
 import 'package:elapse_app/classes/Users/user.dart';
 import 'package:elapse_app/screens/settings/add_teams.dart';
-import 'package:elapse_app/screens/settings/edit_profile.dart';
+import 'package:elapse_app/screens/settings/edit_account.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
+import 'package:elapse_app/setup/signup/login_or_signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/providers/color_provider.dart';
@@ -51,7 +52,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 children: [
                   Container(
-                      height: 280,
+                      height: FirebaseAuth.instance.currentUser != null ? 280 : 200,
                       decoration: BoxDecoration(
                         border: Border.all(
                             color: Theme.of(context).colorScheme.primary,
@@ -172,7 +173,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                 Text("Add Teams",
                                                     textAlign: TextAlign.center,
                                                     style:
-                                                        TextStyle(fontSize: 18))
+                                                        TextStyle(fontSize: 16))
                                               ]),
                                           onTap: () async {
                                             await Navigator.push(
@@ -207,18 +208,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                             .spaceEvenly,
                                                     children: [
                                                       Icon(Icons.edit),
-                                                      Text("Edit Profile",
+                                                      Text("Edit Account",
                                                           textAlign:
                                                               TextAlign.center,
                                                           style: TextStyle(
-                                                              fontSize: 18))
+                                                              fontSize: 16))
                                                     ]),
                                                 onTap: () async {
                                                   await Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
                                                         builder: (context) =>
-                                                            const EditProfilePage(),
+                                                            const EditAccountPage(),
                                                       ));
                                                   setState(() {});
                                                 },
@@ -234,14 +235,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                           textAlign:
                                                               TextAlign.center,
                                                           style: TextStyle(
-                                                              fontSize: 18))
+                                                              fontSize: 16))
                                                     ]),
                                                 onTap: () async {
                                                   await Navigator.push(
                                                       context,
                                                       MaterialPageRoute(
                                                         builder: (context) =>
-                                                            const EditProfilePage(), // Temporary, later change to login/sign up page
+                                                            const SignUpPage(),
                                                       ));
                                                   setState(() {});
                                                 },

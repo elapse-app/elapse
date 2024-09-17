@@ -237,7 +237,7 @@ class _FeaturesState extends State<Features> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => SignUpPage(),
+                                  builder: (context) => const SignUpPage(onboarding: true),
                                 ),
                               );
                             } else {

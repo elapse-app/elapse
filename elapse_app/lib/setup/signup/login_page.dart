@@ -11,7 +11,10 @@ import '../../screens/widgets/app_bar.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({
     super.key,
+    this.onboarding = false,
   });
+
+  final bool onboarding;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -208,12 +211,12 @@ class _LoginPageState extends State<LoginPage> {
                               await signIN(_emailController.text,
                                       _passwordController.text)
                                   .then((a) {
-                                Navigator.push(
+                                widget.onboarding ? Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => CompleteSetupPage(),
+                                    builder: (context) => const CompleteSetupPage(),
                                   ),
-                                );
+                                ): Navigator.popUntil(context, ModalRoute.withName("/"));
                               }).catchError((onError) {
                                 showDialog(
                                     barrierDismissible: false,

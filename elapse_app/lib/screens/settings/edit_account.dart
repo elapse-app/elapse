@@ -1,5 +1,6 @@
 import 'package:elapse_app/classes/Users/user.dart';
 import 'package:elapse_app/main.dart';
+import 'package:elapse_app/setup/signup/login_or_signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -8,14 +9,14 @@ import '../team_screen/scoutsheet/edit.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/rounded_top.dart';
 
-class EditProfilePage extends StatefulWidget {
-  const EditProfilePage({super.key});
+class EditAccountPage extends StatefulWidget {
+  const EditAccountPage({super.key});
 
   @override
-  State<EditProfilePage> createState() => _EditProfilePageState();
+  State<EditAccountPage> createState() => _EditAccountPageState();
 }
 
-class _EditProfilePageState extends State<EditProfilePage> {
+class _EditAccountPageState extends State<EditAccountPage> {
   late String displayName, email;
 
   @override
@@ -33,7 +34,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         body: CustomScrollView(slivers: [
           const ElapseAppBar(
             title: Text(
-              "Profile",
+              "Account",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
             backNavigation: true,
@@ -41,7 +42,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
           const RoundedTop(),
           SliverToBoxAdapter(
               child: Container(
-                  height: 300,
+                  height: 370,
                   decoration: BoxDecoration(
                     border: Border.all(
                         color: Theme.of(context).colorScheme.secondary),
@@ -52,7 +53,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Edit Profile",
+                        const Text("Edit Account",
                             style: TextStyle(fontSize: 24)),
                         const SizedBox(height: 18),
                         TextFormField(
@@ -90,7 +91,29 @@ class _EditProfilePageState extends State<EditProfilePage> {
                               child: const Center(
                                   child: Text("Save",
                                       style: TextStyle(fontSize: 18))),
-                            ))
+                            )),
+                        const SizedBox(height: 18),
+                        GestureDetector(
+                            onTap: () {
+                              FirebaseAuth.instance.signOut();
+                              Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const SignUpPage(onboarding: false)),
+                                  ModalRoute.withName("/"),
+                              );
+                            },
+                            child: Container(
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                    color: Colors.redAccent),
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                              padding: const EdgeInsets.all(15),
+                              child: const Center(
+                                  child: Text("Sign out",
+                                      style: TextStyle(fontSize: 18))),
+                            )),
                       ])))
         ]));
   }
