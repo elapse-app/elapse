@@ -42,7 +42,7 @@ class _EditAccountPageState extends State<EditAccountPage> {
           const RoundedTop(),
           SliverToBoxAdapter(
               child: Container(
-                  height: 370,
+                  height: 300,
                   decoration: BoxDecoration(
                     border: Border.all(
                         color: Theme.of(context).colorScheme.secondary),
@@ -90,28 +90,6 @@ class _EditAccountPageState extends State<EditAccountPage> {
                               padding: const EdgeInsets.all(15),
                               child: const Center(
                                   child: Text("Save",
-                                      style: TextStyle(fontSize: 18))),
-                            )),
-                        const SizedBox(height: 18),
-                        GestureDetector(
-                            onTap: () {
-                              FirebaseAuth.instance.signOut();
-                              Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const SignUpPage(onboarding: false)),
-                                  ModalRoute.withName("/"),
-                              );
-                            },
-                            child: Container(
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                    color: Colors.redAccent),
-                                borderRadius: BorderRadius.circular(100),
-                              ),
-                              padding: const EdgeInsets.all(15),
-                              child: const Center(
-                                  child: Text("Sign out",
                                       style: TextStyle(fontSize: 18))),
                             )),
                       ])))
