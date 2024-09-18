@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:collection/collection.dart';
 
 import '../../classes/Team/teamPreview.dart';
 import '../../main.dart';
@@ -53,7 +54,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 children: [
                   Container(
-                      height: FirebaseAuth.instance.currentUser != null ? 350 : 270,
+                      height: FirebaseAuth.instance.currentUser != null ? 320 : 200,
                       decoration: BoxDecoration(
                         border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
                         borderRadius: BorderRadius.circular(18),
@@ -87,13 +88,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                 return AlertDialog(
                                                   title: const Text("Sign out"),
                                                   content: const Text("Are you sure you want to sign out?"),
+                                                  contentPadding:
+                                                      const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                                                   actions: [
                                                     ElevatedButton(
-                                                      child: Text("Cancel", style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                                                      child: Text("Cancel",
+                                                          style: TextStyle(
+                                                              color: Theme.of(context).colorScheme.secondary)),
                                                       onPressed: () => Navigator.pop(context),
                                                     ),
                                                     ElevatedButton(
-                                                        child: const Text("Sign out", style: TextStyle(color: Colors.redAccent)),
+                                                        child: const Text("Sign out",
+                                                            style: TextStyle(color: Colors.redAccent)),
                                                         onPressed: () {
                                                           FirebaseAuth.instance.signOut();
                                                           prefs.remove("currentUser");
@@ -107,6 +113,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                           );
                                                         })
                                                   ],
+                                                  actionsPadding: const EdgeInsets.only(bottom: 8),
                                                   shape: RoundedRectangleBorder(
                                                       side: BorderSide(color: Theme.of(context).colorScheme.primary),
                                                       borderRadius: BorderRadius.circular(18)),
@@ -119,7 +126,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                             border: Border.all(color: Colors.redAccent),
                                             borderRadius: BorderRadius.circular(100),
                                           ),
-                                          padding: const EdgeInsets.all(15),
+                                          padding: const EdgeInsets.all(8),
                                           child: const Center(child: Text("Sign out", style: TextStyle(fontSize: 18))),
                                         )),
                                   ])
@@ -146,8 +153,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                             onChanged: (int? value) {
                                               final String savedTeam = prefs.getString("savedTeam") ?? "";
                                               final List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
-                                              String selected =
-                                                  savedTeams.where((e) => jsonDecode(e)["teamID"] == value).toList()[0];
+                                              String? selected =
+                                                  savedTeams.firstWhereOrNull((e) => jsonDecode(e)["teamID"] == value);
+                                              if (selected == null) return;
                                               savedTeams.removeWhere((e) => jsonDecode(e)["teamID"] == value);
                                               savedTeams.add(savedTeam);
                                               prefs.setStringList("savedTeams", savedTeams);
