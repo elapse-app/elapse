@@ -111,9 +111,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 Icon(Icons.group, color: Theme.of(context).colorScheme.secondary),
                                 const SizedBox(width: 15),
                                 Expanded(
-                                  child: DropdownButtonHideUnderline(
-                                    child: getSavedTeams().length > 1
-                                        ? DropdownButton(
+                                  child: getSavedTeams().length > 1
+                                      ? DropdownButtonHideUnderline(
+                                          child: DropdownButton(
                                             isExpanded: true,
                                             value: mainTeamId,
                                             items: getSavedTeams()
@@ -139,15 +139,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                 fontWeight: FontWeight.w400,
                                                 color: Theme.of(context).colorScheme.secondary),
                                             borderRadius: BorderRadius.circular(10),
-                                          )
-                                        : Padding(
-                                            padding: const EdgeInsets.all(10),
-                                            child: Text("Team ${getSavedTeams()[0].teamNumber}",
-                                                style: TextStyle(
-                                                    fontSize: 18,
-                                                    fontWeight: FontWeight.w400,
-                                                    color: Theme.of(context).colorScheme.secondary))),
-                                  ),
+                                          ),
+                                        )
+                                      : Padding(
+                                          padding: const EdgeInsets.all(10),
+                                          child: Text("Team ${getSavedTeams()[0].teamNumber}",
+                                              style: TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Theme.of(context).colorScheme.secondary))),
                                 )
                               ]),
                             ),
