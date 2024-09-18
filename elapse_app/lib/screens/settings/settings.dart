@@ -112,33 +112,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 const SizedBox(width: 15),
                                 Expanded(
                                   child: DropdownButtonHideUnderline(
-                                    child: DropdownButton(
-                                      isExpanded: true,
-                                      value: mainTeamId,
-                                      items: getSavedTeams()
-                                          .map((e) =>
-                                              DropdownMenuItem(value: e.teamID, child: Text("Team ${e.teamNumber}")))
-                                          .toList(),
-                                      onChanged: (int? value) {
-                                        final String savedTeam = prefs.getString("savedTeam") ?? "";
-                                        final List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
-                                        String selected =
-                                            savedTeams.where((e) => jsonDecode(e)["teamID"] == value).toList()[0];
-                                        savedTeams.removeWhere((e) => jsonDecode(e)["teamID"] == value);
-                                        savedTeams.add(savedTeam);
-                                        prefs.setStringList("savedTeams", savedTeams);
-                                        prefs.setString("savedTeam", selected);
+                                    child: getSavedTeams().length > 1
+                                        ? DropdownButton(
+                                            isExpanded: true,
+                                            value: mainTeamId,
+                                            items: getSavedTeams()
+                                                .map((e) => DropdownMenuItem(
+                                                    value: e.teamID, child: Text("Team ${e.teamNumber}")))
+                                                .toList(),
+                                            onChanged: (int? value) {
+                                              final String savedTeam = prefs.getString("savedTeam") ?? "";
+                                              final List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
+                                              String selected =
+                                                  savedTeams.where((e) => jsonDecode(e)["teamID"] == value).toList()[0];
+                                              savedTeams.removeWhere((e) => jsonDecode(e)["teamID"] == value);
+                                              savedTeams.add(savedTeam);
+                                              prefs.setStringList("savedTeams", savedTeams);
+                                              prefs.setString("savedTeam", selected);
 
-                                        setState(() {
-                                          mainTeamId = value!;
-                                        });
-                                      },
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w400,
-                                          color: Theme.of(context).colorScheme.secondary),
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
+                                              setState(() {
+                                                mainTeamId = value!;
+                                              });
+                                            },
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w400,
+                                                color: Theme.of(context).colorScheme.secondary),
+                                            borderRadius: BorderRadius.circular(10),
+                                          )
+                                        : Padding(
+                                            padding: const EdgeInsets.all(10),
+                                            child: Text("Team ${getSavedTeams()[0].teamNumber}",
+                                                style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Theme.of(context).colorScheme.secondary))),
                                   ),
                                 )
                               ]),
