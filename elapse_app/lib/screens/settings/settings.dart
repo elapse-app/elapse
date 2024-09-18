@@ -10,7 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../classes/Team/teamPreview.dart';
 import '../../main.dart';
@@ -363,10 +363,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 9),
                     child: GestureDetector(
-                      onTap: () {},
-                      child: SizedBox(
+                      onTap: () {
+                        launchUrl(Uri.parse("https://forms.gle/MF3K7JYG572AQvKh8"));
+                      },
+                      child: const SizedBox(
                         width: double.infinity,
-                        child: const Text("Send Feedback", style: TextStyle(fontSize: 18)),
+                        child: Text("Send Feedback", style: TextStyle(fontSize: 18)),
                       ),
                     ),
                   ),
