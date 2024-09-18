@@ -352,7 +352,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 9),
                     child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                       const Text("Version", style: TextStyle(fontSize: 18)),
-                      Text("1.0.1",
+                      Text("0.0.0 (Build 10)",
                           style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.onSurfaceVariant))
                     ]),
                   ),
