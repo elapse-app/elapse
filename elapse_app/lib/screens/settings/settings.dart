@@ -81,15 +81,37 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     const SizedBox(height: 18),
                                     GestureDetector(
                                         onTap: () {
-                                          FirebaseAuth.instance.signOut();
-                                          prefs.remove("currentUser");
-                                          prefs.remove("savedTeam");
-                                          Navigator.pushAndRemoveUntil(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) => const SignUpPage(onboarding: false)),
-                                            ModalRoute.withName("/"),
-                                          );
+                                          showDialog(
+                                              context: context,
+                                              builder: (context) {
+                                                return AlertDialog(
+                                                  title: const Text("Sign out"),
+                                                  content: const Text("Are you sure you want to sign out?"),
+                                                  actions: [
+                                                    ElevatedButton(
+                                                      child: Text("Cancel", style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                                                      onPressed: () => Navigator.pop(context),
+                                                    ),
+                                                    ElevatedButton(
+                                                        child: const Text("Sign out", style: TextStyle(color: Colors.redAccent)),
+                                                        onPressed: () {
+                                                          FirebaseAuth.instance.signOut();
+                                                          prefs.remove("currentUser");
+                                                          prefs.remove("savedTeam");
+                                                          Navigator.pushAndRemoveUntil(
+                                                            context,
+                                                            MaterialPageRoute(
+                                                                builder: (context) =>
+                                                                    const SignUpPage(onboarding: false)),
+                                                            ModalRoute.withName("/"),
+                                                          );
+                                                        })
+                                                  ],
+                                                  shape: RoundedRectangleBorder(
+                                                      side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                                                      borderRadius: BorderRadius.circular(18)),
+                                                );
+                                              });
                                         },
                                         child: Container(
                                           width: double.infinity,
