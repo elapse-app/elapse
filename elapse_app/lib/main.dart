@@ -14,6 +14,7 @@ import 'package:elapse_app/screens/tournament_mode/tournament.dart';
 import 'package:elapse_app/setup/welcome/first_page.dart';
 import 'package:elapse_app/setup/deprecated/setup.dart';
 import 'package:flutter/material.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
@@ -24,6 +25,7 @@ import 'firebase_options.dart';
 
 final GlobalKey<MyAppState> myAppKey = GlobalKey<MyAppState>();
 late SharedPreferences prefs;
+late PackageInfo appInfo;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
@@ -72,8 +74,10 @@ class MyAppState extends State<MyApp> {
   late int teamID;
   late String teamNumber;
 
+  @override
   void initState() {
     super.initState();
+    _initPackageInfo();
     if (widget.prefs.getBool("isSetUp") ?? false) {
       teamID = jsonDecode(widget.prefs.getString("savedTeam"))["teamID"];
       teamNumber =
@@ -101,6 +105,11 @@ class MyAppState extends State<MyApp> {
     setState(() {
       initializeTournamentMode();
     });
+  }
+
+  void _initPackageInfo() async {
+    final info = await PackageInfo.fromPlatform();
+    appInfo = info;
   }
 
   @override

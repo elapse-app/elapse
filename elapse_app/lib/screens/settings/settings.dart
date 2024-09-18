@@ -10,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../../classes/Team/teamPreview.dart';
 import '../../main.dart';
@@ -352,7 +353,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     padding: const EdgeInsets.symmetric(vertical: 9),
                     child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                       const Text("Version", style: TextStyle(fontSize: 18)),
-                      Text("0.0.0 (Build 10)",
+                      Text("${appInfo.version} (Build ${appInfo.buildNumber})",
                           style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.onSurfaceVariant))
                     ]),
                   ),
