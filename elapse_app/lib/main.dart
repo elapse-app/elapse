@@ -78,10 +78,9 @@ class MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _initPackageInfo();
-    if (widget.prefs.getBool("isSetUp") ?? false) {
+    if (widget.prefs.getBool("isSetUp") == true) {
       teamID = jsonDecode(widget.prefs.getString("savedTeam"))["teamID"];
-      teamNumber =
-          jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"];
+      teamNumber = jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"];
       initializeTournamentMode();
     }
   }
@@ -90,8 +89,7 @@ class MyAppState extends State<MyApp> {
     if (widget.prefs.getBool("isTournamentMode") ?? false) {
       int? tournamentID = widget.prefs.getInt("tournamentID");
       teamID = jsonDecode(widget.prefs.getString("savedTeam"))["teamID"];
-      teamNumber =
-          jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"];
+      teamNumber = jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"];
       if (tournamentID != null) {
         isTournamentMode = true;
       }
@@ -114,22 +112,19 @@ class MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    if (prefs.getString("currentUser") == null) {
+    if (widget.prefs.getBool("isSetUp") != true) {
       return Consumer<ColorProvider>(
         builder: (context, value, child) {
           bool systemDefined = false;
           ColorScheme systemTheme =
-              MediaQuery.of(context).platformBrightness == Brightness.dark
-                  ? darkScheme
-                  : lightScheme;
+              MediaQuery.of(context).platformBrightness == Brightness.dark ? darkScheme : lightScheme;
 
           if (widget.prefs.getString("theme") == "system") {
             systemDefined = true;
             print("is system defined");
           }
 
-          ColorScheme chosenTheme =
-              systemDefined ? systemTheme : value.colorScheme;
+          ColorScheme chosenTheme = systemDefined ? systemTheme : value.colorScheme;
 
           return MaterialApp(
             home: const FirstSetupPage(),
@@ -144,8 +139,7 @@ class MyAppState extends State<MyApp> {
       );
     }
     TeamPreview savedTeam = TeamPreview(
-        teamNumber:
-            jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"],
+        teamNumber: jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"],
         teamID: jsonDecode(widget.prefs.getString("savedTeam"))["teamID"]);
     List<Widget> screens;
 
@@ -183,38 +177,31 @@ class MyAppState extends State<MyApp> {
       builder: (context, colorProvider, tournamentModeProvider, child) {
         bool systemDefined = false;
         ColorScheme systemTheme =
-            MediaQuery.of(context).platformBrightness == Brightness.dark
-                ? darkScheme
-                : lightScheme;
+            MediaQuery.of(context).platformBrightness == Brightness.dark ? darkScheme : lightScheme;
 
         if (widget.prefs.getString("theme") == "system") {
           systemDefined = true;
         }
 
-        ColorScheme chosenTheme =
-            systemDefined ? systemTheme : colorProvider.colorScheme;
+        ColorScheme chosenTheme = systemDefined ? systemTheme : colorProvider.colorScheme;
 
         // Build the list of destinations dynamically
         List<NavigationDestination> destinations = [
           NavigationDestination(
-              selectedIcon:
-                  Icon(Icons.home_rounded, color: chosenTheme.secondary),
+              selectedIcon: Icon(Icons.home_rounded, color: chosenTheme.secondary),
               icon: const Icon(Icons.home_outlined),
               label: "Home"),
           NavigationDestination(
-              selectedIcon:
-                  Icon(Icons.bubble_chart, color: chosenTheme.secondary),
+              selectedIcon: Icon(Icons.bubble_chart, color: chosenTheme.secondary),
               icon: const Icon(Icons.bubble_chart_outlined),
               label: "Scout"),
           NavigationDestination(
-            selectedIcon:
-                Icon(Icons.people_alt_rounded, color: chosenTheme.secondary),
+            selectedIcon: Icon(Icons.people_alt_rounded, color: chosenTheme.secondary),
             icon: const Icon(Icons.people_alt_outlined),
             label: "My Team",
           ),
           NavigationDestination(
-            selectedIcon:
-                Icon(Icons.explore_rounded, color: chosenTheme.secondary),
+            selectedIcon: Icon(Icons.explore_rounded, color: chosenTheme.secondary),
             icon: const Icon(Icons.explore_outlined),
             label: "Explore",
           ),
@@ -227,8 +214,7 @@ class MyAppState extends State<MyApp> {
           destinations.insert(
             1, // Add it to the second position
             NavigationDestination(
-              selectedIcon: Icon(Icons.emoji_events_rounded,
-                  color: chosenTheme.secondary),
+              selectedIcon: Icon(Icons.emoji_events_rounded, color: chosenTheme.secondary),
               icon: const Icon(Icons.emoji_events_outlined),
               label: "Tournament",
             ),
@@ -252,10 +238,8 @@ class MyAppState extends State<MyApp> {
               selectedIndex: selectedIndex,
               indicatorColor: chosenTheme.primary,
               animationDuration: const Duration(milliseconds: 500),
-              labelBehavior:
-                  NavigationDestinationLabelBehavior.onlyShowSelected,
-              onDestinationSelected: (value) =>
-                  setState(() => selectedIndex = value),
+              labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+              onDestinationSelected: (value) => setState(() => selectedIndex = value),
               destinations: destinations,
             ),
           ),
