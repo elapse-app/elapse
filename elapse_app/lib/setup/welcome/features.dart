@@ -238,7 +238,7 @@ class _FeaturesState extends State<Features> {
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
-                                      const SignUpPage(onboarding: true),
+                                      const SignUpPage(),
                                 ),
                               );
                             } else {
