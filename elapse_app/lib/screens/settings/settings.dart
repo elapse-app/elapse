@@ -129,22 +129,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                                 color: Colors
                                                                     .redAccent)),
                                                         onPressed: () {
-                                                          FirebaseAuth.instance
-                                                              .signOut();
-                                                          prefs.remove(
-                                                              "currentUser");
-                                                          prefs.remove(
-                                                              "savedTeam");
-                                                          Navigator
-                                                              .pushAndRemoveUntil(
+                                                          Navigator.pushAndRemoveUntil(
                                                             context,
                                                             MaterialPageRoute(
-                                                                builder:
-                                                                    (context) =>
-                                                                        const FirstSetupPage()),
-                                                            ModalRoute.withName(
-                                                                "/"),
+                                                                builder: (context) =>
+                                                                const FirstSetupPage()),
+                                                            ((_) => false),
                                                           );
+                                                          FirebaseAuth.instance.signOut();
+                                                          prefs.remove("currentUser");
+                                                          prefs.remove("savedTeam");
                                                         })
                                                   ],
                                                   actionsPadding:
