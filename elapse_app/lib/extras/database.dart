@@ -18,7 +18,7 @@ class Database {
   Future<String> createUser(ElapseUser? newUser, TeamPreview savedTeam) async {
     String returnVal = 'monke';
     try {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
+      // SharedPreferences prefs = await SharedPreferences.getInstance(); // Might be useful at some point
       await _firestore.collection("users").doc(newUser?.uid).set({
         'email': newUser?.email,
         'firstName': newUser?.fname, // Changed to first name field later
@@ -79,8 +79,7 @@ class Database {
         mustHaveAtLeastOneOfEach: true,
       );
 
-      String joinCode =
-          '${alphanumericGenerator.generate()}-${alphanumericGenerator.generate()}';
+      String joinCode = '${alphanumericGenerator.generate()}-${alphanumericGenerator.generate()}';
       Map<String, String> members = {adminID: "$fname $lname"};
       var group = await _firestore.collection('teamGroups').add({
         'adminId': adminID,
@@ -157,8 +156,7 @@ class Database {
     return returnVal;
   }
 
-  Future<String> promoteNewAdmin(
-      String groupID, String uid, String memberID) async {
+  Future<String> promoteNewAdmin(String groupID, String uid, String memberID) async {
     String returnVal = 'hello';
     try {
       await _firestore.collection('teamGroups').doc(groupID).update({
@@ -172,8 +170,7 @@ class Database {
 
   Future<Map<String, dynamic>?> getGroupInfo(String groupid) async {
     try {
-      var collection =
-          await _firestore.collection('teamGroups').doc(groupid).get();
+      var collection = await _firestore.collection('teamGroups').doc(groupid).get();
       return collection.data();
     } catch (e) {
       print(e);
@@ -215,16 +212,20 @@ class Database {
             "intakeType": "",
             "otherNotes": ""
           },
-          "photos": []
         },
+        // Picklist
+        // 'picklist': {
+        //   'teams': [],
+        //   'tournamentId': "",
+        // },
         // Notes about the team & match
         'teamNotes': "",
         'gameNotes': "",
         // List of the URLs for any pictures
         'photos': [],
-        // Bool for Currently Editing and Ablility to Join
+        // Bool for Currently Editing and Ablility to Join?
         'isEditing': false,
-        'allowJoin': false,
+        'allowJoin': false, // Not sure why this is here anymore tbh
       }).then((onValue) {
         returnVal = onValue.id;
       });
@@ -276,8 +277,7 @@ class Database {
     return returnVal;
   }
 
-  Future<List?>? getAllTeamScoutSheets(
-      String teamGroupId, String teamID, String tournamentID) async {
+  Future<List?>? getAllTeamScoutSheets(String teamGroupId) async {
     try {
       var collection = await _firestore
           .collection('teamGroups')
@@ -291,8 +291,22 @@ class Database {
     return null;
   }
 
-  Future<DocumentSnapshot?> getTeamScoutSheetInfo(
-      String teamGroupId, String teamID, String tournamentID) async {
+  Future<List?>? getTeamScoutSheetPerCompetition(String teamGroupId, String tournamentID) async {
+    try {
+      var collection = await _firestore
+          .collection('teamGroups')
+          .doc(teamGroupId)
+          .collection('scoutsheets')
+          .where('tournamentID', isEqualTo: tournamentID)
+          .get();
+      return collection.docs.toList(); // Unchecked
+    } catch (e) {
+      print(e);
+    }
+    return null;
+  }
+
+  Future<DocumentSnapshot?> getTeamScoutSheetInfo(String teamGroupId, String teamID, String tournamentID) async {
     try {
       var collection = await _firestore
           .collection('teamGroups')
@@ -309,9 +323,7 @@ class Database {
     return null;
   }
 
-  Future<Map<String, dynamic>?> updateProperty(String teamGroupId,
-      String teamID, String tournamentID, String property, dynamic val) async {
-    // Will probably need to be changed
+  Future<Map<String, dynamic>?> updateProperty(String teamGroupId, String teamID, String tournamentID, String property, dynamic val) async { // Will probably need to be changed
     try {
       var scoutSheetCollection = await _firestore
           .collection('teamGroups')
@@ -331,9 +343,7 @@ class Database {
     return null;
   }
 
-  Future<Map<String, dynamic>?> updateTeamNotes(String teamGroupId,
-      String teamID, String tournamentID, String notes) async {
-    // Will probably need to be changed
+  Future<Map<String, dynamic>?> updateTeamNotes(String teamGroupId, String teamID, String tournamentID, String notes) async { // Will probably need to be changed
     try {
       var scoutSheetCollection = await _firestore
           .collection('teamGroups')
@@ -353,9 +363,7 @@ class Database {
     return null;
   }
 
-  Future<Map<String, dynamic>?> addPhoto(String teamGroupId, String teamID,
-      String tournamentID, String URL) async {
-    // Will probably need to be changed
+  Future<Map<String, dynamic>?> addPhoto(String teamGroupId, String teamID,String tournamentID, String url) async { // Will probably need to be changed
     try {
       var scoutSheetCollection = await _firestore
           .collection('teamGroups')
@@ -367,7 +375,7 @@ class Database {
           .get();
       DocumentSnapshot? collection = scoutSheetCollection.docs.first;
       collection.reference.update({
-        'properties.Specs.photos': FieldValue.arrayUnion([URL]),
+        'properties.Specs.photos': FieldValue.arrayUnion([url]),
       });
     } catch (e) {
       print(e);
@@ -398,8 +406,7 @@ class Database {
   }
 
   Future<String?> uploadPhoto(File image) async {
-    final imagesRef = storage.ref().child(
-        "elapse-images/${DateTime.now().millisecondsSinceEpoch}.jpg"); // add a unique name for each file
+    final imagesRef = storage.ref().child("elapse-images/${DateTime.now().millisecondsSinceEpoch}.jpg"); // add a unique name for each file
     try {
       final uploadTask = await imagesRef.putFile(image);
       final downloadUrl = await uploadTask.ref.getDownloadURL();
@@ -408,6 +415,7 @@ class Database {
     } catch (e) {
       print('Upload error: $e');
     }
+    return "";
   }
 
 /* ------------------------------ */
@@ -436,6 +444,11 @@ class Database {
         'latestUpdate': DateTime,
         // List of the properties of the scouted robot
         'properties': {},
+        // Picklist
+        // 'picklist': {
+        //   'teams': [],
+        //   'tournamentId': "",
+        // },
         // Notes about the team & match
         'teamNotes': "",
         'gameNotes': {},
@@ -467,4 +480,44 @@ class Database {
     }
     return null;
   }
+
+
+/* ------------------------------ */
+/*          Team Picklist         */
+/* ------------------------------ */
+
+// Make a copy constructor to make teams/users easily able to share via QR CODE
+// Add Realtime Listener
+
+Future<String> createTeamPicklist(String teamGroupID, String teamid, String tournamentID) async {
+    String returnVal = '';
+    try {
+      await _firestore
+          .collection('teamGroups')
+          .doc(teamGroupID)
+          .collection('picklist')
+          .add({
+        /* Made with creation */
+        // List of potential teams
+        'teams': [],
+        // Tourny ID
+        'tournamentID': tournamentID,
+
+        // Timestamp Stuff
+        'createTime': DateTime.now(),
+
+        /* Updated with Editing */
+        'latestUpdate': null,
+      
+        // Bool for Currently Editing
+        'isEditing': false,
+      }).then((onValue) {
+        returnVal = onValue.id;
+      });
+    } catch (e) {
+      print(e);
+    }
+    return returnVal;
+  }
+
 }
