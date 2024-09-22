@@ -38,7 +38,12 @@ void adjustMatchTiming(List<Game> games) {
 
   for (int i = lastPlayed; i >= 0 && n < 5; i--) {
     if (i > 0) {
-      int timeSinceLastMatch = games[i].startedTime!.difference(games[i - 1].startedTime!).inMinutes;
+      int timeSinceLastMatch;
+      if (games[i].startedTime != null && games[i - 1].startedTime != null) {
+        timeSinceLastMatch = games[i].startedTime!.difference(games[i - 1].startedTime!).inMinutes;
+      } else {
+        timeSinceLastMatch = 0;
+      }
       if (timeSinceLastMatch > 30) break;
     }
 
@@ -47,10 +52,11 @@ void adjustMatchTiming(List<Game> games) {
     n++;
   }
 
-  delay *= n == 0 ? 0 : 1/n;
+  delay *= n == 0 ? 0 : 1 / n;
 
   for (int i = lastPlayed + 1; i < games.length; i++) {
     if (i > 0) {
+      if (games[i].scheduledTime == null) break;
       int timeSinceLastMatch = games[i].scheduledTime!.difference(games[i - 1].scheduledTime!).inMinutes;
       if (timeSinceLastMatch > 30) break;
     }

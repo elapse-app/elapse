@@ -62,8 +62,42 @@ class NextGame extends StatelessWidget {
       }
     }
 
-    Game currGame = games.lastWhere((e) => e.startedTime != null);
-    int gamesLeft = game.gameNum - currGame.gameNum;
+    Game currGame = games.lastWhere((e) => (e.redScore != 0 && e.blueScore != 0) || e.startedTime != null);
+    int gamesLeft = games.indexOf(game) - games.indexOf(currGame);
+    // int gamesLeft = game.gameNum - currGame.gameNum;
+
+    Widget gameText;
+    if (game.gameName.substring(0, 1) == "R") {
+      gameText = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        Text("R",
+            style: TextStyle(
+              fontSize: 64,
+              height: 1,
+              fontWeight: FontWeight.w400,
+            )),
+        Text("16",
+            style: TextStyle(
+              fontSize: 40,
+              height: 1.15,
+              letterSpacing: -1,
+              fontWeight: FontWeight.w400,
+            )),
+        Text(game.gameName.substring(3, 4),
+            style: TextStyle(
+              fontSize: 64,
+              height: 1,
+              fontWeight: FontWeight.w400,
+            ))
+      ]);
+    } else {
+      gameText = Text(game.gameName,
+          style: TextStyle(
+            letterSpacing: -1.75,
+            fontSize: 64,
+            height: 1,
+            fontWeight: FontWeight.w400,
+          ));
+    }
 
     return GestureDetector(
       onTap: () {
@@ -84,13 +118,7 @@ class NextGame extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      game.gameName,
-                      style: TextStyle(
-                        fontSize: 64,
-                        height: 1,
-                      ),
-                    ),
+                    gameText,
                     const Text(
                       "Next Game",
                       style: TextStyle(
@@ -175,7 +203,7 @@ class NextGame extends StatelessWidget {
                 ),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(
-                    game.fieldName!,
+                    game.fieldName ?? "N/A",
                     style: TextStyle(fontSize: 24),
                   ),
                   Text(
