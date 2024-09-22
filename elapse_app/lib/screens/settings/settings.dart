@@ -111,6 +111,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                           FirebaseAuth.instance.signOut();
                                                           prefs.remove("currentUser");
                                                           prefs.remove("savedTeam");
+                                                          prefs.remove("savedTeams");
+                                                          prefs.remove("isTournamentMode");
 
                                                           prefs.setBool("isSetUp", false);
                                                         })
@@ -421,12 +423,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
 List<TeamPreview> getSavedTeams() {
   final String savedTeam = prefs.getString("savedTeam") ?? "";
-  final parsed = jsonDecode(savedTeam);
-  List<TeamPreview> savedTeamsList = [TeamPreview(teamID: parsed["teamID"], teamNumber: parsed["teamNumber"])];
+  List<TeamPreview> savedTeamsList = [];
 
   final List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
   savedTeamsList.addAll(
       savedTeams.map((e) => TeamPreview(teamID: jsonDecode(e)["teamID"], teamNumber: jsonDecode(e)["teamNumber"])));
+  savedTeamsList.insert(0, loadTeamPreview(savedTeam));
+
+  print(savedTeamsList[0].teamID);
 
   return savedTeamsList;
 }
