@@ -7,10 +7,7 @@ import '../../screens/widgets/app_bar.dart';
 class LoginPage extends StatefulWidget {
   const LoginPage({
     super.key,
-    this.onboarding = false,
   });
-
-  final bool onboarding;
 
   @override
   State<LoginPage> createState() => _LoginPageState();
@@ -198,11 +195,10 @@ class _LoginPageState extends State<LoginPage> {
                         onPressed: () async {
                           await signIN(_emailController.text, _passwordController.text).then((a) {
                             Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const CompleteSetupPage(),
-                              ),
-                            );
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const CompleteSetupPage(),
+                                ));
                           }).catchError((onError) {
                             showDialog(
                                 barrierDismissible: false,

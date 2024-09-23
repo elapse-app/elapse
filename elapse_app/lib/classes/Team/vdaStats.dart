@@ -80,15 +80,13 @@ class VDAStats {
       losses: json["total_losses"]?.truncate(),
       ties: json["total_ties"]?.truncate(),
       matches: json["total_matches"]?.truncate(),
-      winPercent: json["total_winning_percent"],
+      winPercent: double.tryParse(json["total_winning_percent"]?.toStringAsFixed(2) ?? ""),
       trueSkill: json["trueskill"],
       trueSkillGlobalRank: json["ts_ranking"],
       trueSkillRegionRank: json["ts_ranking_region"],
       regionalQual: json["qualified_for_regionals"],
       worldsQual: json["qualified_for_worlds"],
-      eventRegion: json["event_region"] == "British Columbia"
-          ? "British Columbia (BC)"
-          : json["event_region"],
+      eventRegion: json["event_region"] == "British Columbia" ? "British Columbia (BC)" : json["event_region"],
       location: Location(
         region: json["loc_region"],
         country: json["loc_country"],
@@ -113,8 +111,22 @@ class VDAStats {
       wins: (json["total_wins"] + json["elimination_wins"])?.truncate(),
       losses: (json["total_losses"] + json["elimination_losses"])?.truncate(),
       ties: (json["total_ties"] + json["elimination_losses"])?.truncate(),
-      matches: (((json["total_wins"] + json["elimination_wins"]) ?? 0) + ((json["total_losses"] + json["elimination_losses"]) ?? 0) + ((json["total_ties"] + json["elimination_losses"]) ?? 0))?.truncate() ?? 0,
-      winPercent: ((json["total_wins"] + json["elimination_wins"]) ?? 0) / ((((json["total_wins"] + json["elimination_wins"]) ?? 0) + ((json["total_losses"] + json["elimination_losses"]) ?? 0) + ((json["total_ties"] + json["elimination_losses"]) ?? 0)) == 0 ? 1 : (((json["total_wins"] + json["elimination_wins"]) ?? 0) + ((json["total_losses"] + json["elimination_losses"]) ?? 0) + ((json["total_ties"] + json["elimination_losses"]) ?? 0))) * 100,
+      matches: (((json["total_wins"] + json["elimination_wins"]) ?? 0) +
+                  ((json["total_losses"] + json["elimination_losses"]) ?? 0) +
+                  ((json["total_ties"] + json["elimination_losses"]) ?? 0))
+              ?.truncate() ??
+          0,
+      winPercent: double.parse((((json["total_wins"] + json["elimination_wins"]) ?? 0) /
+              ((((json["total_wins"] + json["elimination_wins"]) ?? 0) +
+                          ((json["total_losses"] + json["elimination_losses"]) ?? 0) +
+                          ((json["total_ties"] + json["elimination_losses"]) ?? 0)) ==
+                      0
+                  ? 1
+                  : (((json["total_wins"] + json["elimination_wins"]) ?? 0) +
+                      ((json["total_losses"] + json["elimination_losses"]) ?? 0) +
+                      ((json["total_ties"] + json["elimination_losses"]) ?? 0))) *
+              100)
+          .toStringAsFixed(2)),
       trueSkill: json["trueskill"],
       trueSkillGlobalRank: json["ts_ranking"]?.truncate(),
       trueSkillRegionRank: 0,
@@ -130,7 +142,8 @@ Future<List<VDAStats>> getTrueSkillData(int seasonId) async {
 
   List<dynamic> parsed = [];
 
-  if (seasonId < 154) { // TiP season ID (earliest season that had VDA stats)
+  if (seasonId < 154) {
+    // TiP season ID (earliest season that had VDA stats)
     return List<VDAStats>.empty();
   }
 
@@ -144,19 +157,17 @@ Future<List<VDAStats>> getTrueSkillData(int seasonId) async {
     return vdaStats;
   } else if (!hasCachedTrueSkillData()) {
     final response = await http.get(
-        Uri.parse("https://vrc-data-analysis.com/v1/allteams"),
-      );
+      Uri.parse("https://vrc-data-analysis.com/v1/allteams"),
+    );
 
     parsed = jsonDecode(response.body) as List;
     prefs.setString("vdaData", response.body);
-    prefs.setString(
-        "vdaExpiry", DateTime.now().add(const Duration(hours: 2)).toString());
+    prefs.setString("vdaExpiry", DateTime.now().add(const Duration(hours: 2)).toString());
   } else {
     parsed = jsonDecode(vdaData!) as List;
   }
 
-  List<VDAStats> vdaStats =
-      parsed.map<VDAStats>((json) => VDAStats.fromJson(json)).toList();
+  List<VDAStats> vdaStats = parsed.map<VDAStats>((json) => VDAStats.fromJson(json)).toList();
   return vdaStats;
 }
 
@@ -170,7 +181,5 @@ bool hasCachedTrueSkillData() {
   final String? vdaData = prefs.getString("vdaData");
   final String? expiryDate = prefs.getString("vdaExpiry");
 
-  return vdaData != null &&
-      expiryDate != null &&
-      DateTime.parse(expiryDate).isAfter(DateTime.now());
+  return vdaData != null && expiryDate != null && DateTime.parse(expiryDate).isAfter(DateTime.now());
 }
