@@ -210,330 +210,345 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: CustomScrollView(
-        controller: _scrollController,
-        slivers: [
-          ElapseAppBar(
-            title: Row(
-              children: [
-                Text(
-                  titles[selectedIndex],
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
-                ),
-                Spacer(),
-                GestureDetector(
-                  child: const Icon(
-                    Icons.search,
+      body: RefreshIndicator(
+        onRefresh: () async {
+          Tournament tournament = await getTournamentDetails(widget.tournament.id);
+          setState(() {
+            rankingsTeams = tournament.teams;
+            inSearch = false;
+            searchQuery = "";
+            savedQuery = "";
+
+            worldSkillsStats = getWorldSkillsRankings(tournament.seasonID,
+                getGradeLevel(prefs.getString("defaultGrade")));
+            vdaStats = getTrueSkillData(tournament.seasonID);
+          });
+        },
+        child: CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            ElapseAppBar(
+              title: Row(
+                children: [
+                  Text(
+                    titles[selectedIndex],
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                   ),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      PageRouteBuilder(
-                        transitionDuration: Duration(milliseconds: 300),
-                        reverseTransitionDuration: Duration(milliseconds: 300),
-                        pageBuilder: (context, animation, secondaryAnimation) =>
-                            SearchScreen(
-                          tournament: widget.tournament,
-                          division: division,
+                  Spacer(),
+                  GestureDetector(
+                    child: const Icon(
+                      Icons.search,
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          transitionDuration: Duration(milliseconds: 300),
+                          reverseTransitionDuration: Duration(milliseconds: 300),
+                          pageBuilder: (context, animation, secondaryAnimation) =>
+                              SearchScreen(
+                                tournament: widget.tournament,
+                                division: division,
+                              ),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            // Create a Tween that transitions the new screen from fully transparent to fully opaque
+                            return FadeTransition(
+                              opacity: animation,
+                              child: child,
+                            );
+                          },
                         ),
-                        transitionsBuilder:
-                            (context, animation, secondaryAnimation, child) {
-                          // Create a Tween that transitions the new screen from fully transparent to fully opaque
-                          return FadeTransition(
-                            opacity: animation,
-                            child: child,
-                          );
-                        },
-                      ),
-                    );
-                  },
-                ),
-                SizedBox(width: 18),
-              ],
-            ),
-            backNavigation: widget.isPreview,
-            background: SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.only(
-                    left: 23, right: 12, bottom: 20, top: 10),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    widget.isPreview
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              GestureDetector(
-                                onTap: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Icon(Icons.arrow_back,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurface),
-                              ),
-                              Spacer(),
-                              DropdownButton<Division>(
-                                value: division,
-                                borderRadius: BorderRadius.circular(20),
-                                items: widget.tournament.divisions
-                                    .map<DropdownMenuItem<Division>>(
-                                        (division) {
-                                  return DropdownMenuItem(
-                                      value: division,
-                                      child: Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.groups_3_outlined,
-                                            size: 30,
-                                          ),
-                                          SizedBox(width: 10),
-                                          Text(division.name),
-                                        ],
-                                      ));
-                                }).toList(),
-                                onChanged: (Division? value) => {
-                                  setState(() {
-                                    division = value!;
-                                    selectedIndex = selectedIndex;
-                                  })
-                                },
-                              ),
-                            ],
-                          )
-                        : Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              DropdownButton<Division>(
-                                value: division,
-                                borderRadius: BorderRadius.circular(20),
-                                items: widget.tournament.divisions
-                                    .map<DropdownMenuItem<Division>>(
-                                        (division) {
-                                  return DropdownMenuItem(
-                                      value: division,
-                                      child: Row(
-                                        children: [
-                                          const Icon(
-                                            Icons.groups_3_outlined,
-                                            size: 30,
-                                          ),
-                                          SizedBox(width: 10),
-                                          Text(division.name),
-                                        ],
-                                      ));
-                                }).toList(),
-                                onChanged: (Division? value) => {
-                                  setState(() {
-                                    division = value!;
-                                    selectedIndex = selectedIndex;
-                                  })
-                                },
-                              ),
-                              Spacer(),
-                              SettingsButton()
-                            ],
+                      );
+                    },
+                  ),
+                  SizedBox(width: 18),
+                ],
+              ),
+              backNavigation: widget.isPreview,
+              background: SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.only(
+                      left: 23, right: 12, bottom: 20, top: 10),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      widget.isPreview
+                          ? Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pop(context);
+                            },
+                            child: Icon(Icons.arrow_back,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface),
                           ),
+                          Spacer(),
+                          widget.tournament.divisions.isNotEmpty
+                          ? DropdownButton<Division>(
+                            value: division,
+                            borderRadius: BorderRadius.circular(20),
+                            items: widget.tournament.divisions
+                                .map<DropdownMenuItem<Division>>(
+                                    (division) {
+                                  return DropdownMenuItem(
+                                      value: division,
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.groups_3_outlined,
+                                            size: 30,
+                                          ),
+                                          SizedBox(width: 10),
+                                          Text(division.name),
+                                        ],
+                                      ));
+                                }).toList(),
+                            onChanged: (Division? value) => {
+                              setState(() {
+                                division = value!;
+                                selectedIndex = selectedIndex;
+                              })
+                            },
+                          ) : const SizedBox.shrink(),
+                        ],
+                      )
+                          : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          DropdownButton<Division>(
+                            value: division,
+                            borderRadius: BorderRadius.circular(20),
+                            items: widget.tournament.divisions
+                                .map<DropdownMenuItem<Division>>(
+                                    (division) {
+                                  return DropdownMenuItem(
+                                      value: division,
+                                      child: Row(
+                                        children: [
+                                          const Icon(
+                                            Icons.groups_3_outlined,
+                                            size: 30,
+                                          ),
+                                          SizedBox(width: 10),
+                                          Text(division.name),
+                                        ],
+                                      ));
+                                }).toList(),
+                            onChanged: (Division? value) => {
+                              setState(() {
+                                division = value!;
+                                selectedIndex = selectedIndex;
+                              })
+                            },
+                          ),
+                          Spacer(),
+                          SettingsButton()
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // SliverAppBar.large(
+            //   automaticallyImplyLeading: false,
+            //   expandedHeight: 125,
+            //   centerTitle: false,
+            //   flexibleSpace: FlexibleSpaceBar(
+            //     expandedTitleScale: 1,
+            //     collapseMode: CollapseMode.parallax,
+            //     title: Padding(
+            //       padding: const EdgeInsets.only(left: 20.0, right: 12.0),
+            //       child: Row(
+            //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //         crossAxisAlignment: CrossAxisAlignment.end,
+            //         children: [
+            //           widget.isPreview
+            //               ? IconButton(
+            //                   padding: const EdgeInsets.only(top: 10),
+            //                   constraints: BoxConstraints(),
+            //                   icon: const Icon(Icons.arrow_back),
+            //                   onPressed: () {
+            //                     Navigator.pop(context);
+            //                   },
+            //                 )
+            //               : Container(),
+            //           Text(
+            //             titles[selectedIndex],
+            //             style: const TextStyle(
+            //                 fontSize: 30, fontWeight: FontWeight.w600),
+            //           ),
+            //           Spacer(),
+            //           IconButton(
+            //             icon: const Icon(
+            //               Icons.search,
+            //               size: 30,
+            //             ),
+            //             onPressed: () {
+            //               Navigator.push(
+            //                 context,
+            //                 PageRouteBuilder(
+            //                   transitionDuration: Duration(milliseconds: 300),
+            //                   reverseTransitionDuration:
+            //                       Duration(milliseconds: 300),
+            //                   pageBuilder:
+            //                       (context, animation, secondaryAnimation) =>
+            //                           SearchScreen(
+            //                     tournament: widget.tournament,
+            //                     division: division,
+            //                   ),
+            //                   transitionsBuilder: (context, animation,
+            //                       secondaryAnimation, child) {
+            //                     // Create a Tween that transitions the new screen from fully transparent to fully opaque
+            //                     return FadeTransition(
+            //                       opacity: animation,
+            //                       child: child,
+            //                     );
+            //                   },
+            //                 ),
+            //               );
+            //             },
+            //           ),
+            //         ],
+            //       ),
+            //     ),
+            //     centerTitle: false,
+            //     background: SafeArea(
+            //       child: Padding(
+            //         padding:
+            //             const EdgeInsets.only(left: 20, right: 12, bottom: 20),
+            //         child: Column(
+            //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //           crossAxisAlignment: CrossAxisAlignment.start,
+            //           children: [
+            //             Row(
+            //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //               children: [
+            //                 DropdownButton<Division>(
+            //                   value: division,
+            //                   borderRadius: BorderRadius.circular(20),
+            //                   items: widget.tournament.divisions
+            //                       .map<DropdownMenuItem<Division>>((division) {
+            //                     return DropdownMenuItem(
+            //                         value: division,
+            //                         child: Row(
+            //                           children: [
+            //                             const Icon(
+            //                               Icons.groups_3_outlined,
+            //                               size: 30,
+            //                             ),
+            //                             SizedBox(width: 10),
+            //                             Text(division.name),
+            //                           ],
+            //                         ));
+            //                   }).toList(),
+            //                   onChanged: (Division? value) => {
+            //                     setState(() {
+            //                       division = value!;
+            //                       selectedIndex = selectedIndex;
+            //                     })
+            //                   },
+            //                 ),
+            //                 const Spacer(),
+            //               ],
+            //             ),
+            //           ],
+            //         ),
+            //       ),
+            //     ),
+            //   ),
+            //   backgroundColor: Theme.of(context).colorScheme.primary,
+            // ),
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: SliverHeaderDelegate(
+                minHeight: 70.0,
+                maxHeight: 70.0,
+                child: Stack(
+                  children: [
+                    Container(
+                        height: 300,
+                        color: Theme.of(context).colorScheme.primary),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).colorScheme.surface,
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(25),
+                          topRight: Radius.circular(25),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 25, vertical: 13),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            _buildIconButton(context, Icons.schedule, 0),
+                            _buildIconButton(
+                                context, Icons.format_list_numbered_outlined, 1),
+                            _buildIconButton(
+                                context, Icons.sports_esports_outlined, 2),
+                            _buildIconButton(context, Icons.info_outlined, 3),
+                          ],
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
             ),
-          ),
-          // SliverAppBar.large(
-          //   automaticallyImplyLeading: false,
-          //   expandedHeight: 125,
-          //   centerTitle: false,
-          //   flexibleSpace: FlexibleSpaceBar(
-          //     expandedTitleScale: 1,
-          //     collapseMode: CollapseMode.parallax,
-          //     title: Padding(
-          //       padding: const EdgeInsets.only(left: 20.0, right: 12.0),
-          //       child: Row(
-          //         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //         crossAxisAlignment: CrossAxisAlignment.end,
-          //         children: [
-          //           widget.isPreview
-          //               ? IconButton(
-          //                   padding: const EdgeInsets.only(top: 10),
-          //                   constraints: BoxConstraints(),
-          //                   icon: const Icon(Icons.arrow_back),
-          //                   onPressed: () {
-          //                     Navigator.pop(context);
-          //                   },
-          //                 )
-          //               : Container(),
-          //           Text(
-          //             titles[selectedIndex],
-          //             style: const TextStyle(
-          //                 fontSize: 30, fontWeight: FontWeight.w600),
-          //           ),
-          //           Spacer(),
-          //           IconButton(
-          //             icon: const Icon(
-          //               Icons.search,
-          //               size: 30,
-          //             ),
-          //             onPressed: () {
-          //               Navigator.push(
-          //                 context,
-          //                 PageRouteBuilder(
-          //                   transitionDuration: Duration(milliseconds: 300),
-          //                   reverseTransitionDuration:
-          //                       Duration(milliseconds: 300),
-          //                   pageBuilder:
-          //                       (context, animation, secondaryAnimation) =>
-          //                           SearchScreen(
-          //                     tournament: widget.tournament,
-          //                     division: division,
-          //                   ),
-          //                   transitionsBuilder: (context, animation,
-          //                       secondaryAnimation, child) {
-          //                     // Create a Tween that transitions the new screen from fully transparent to fully opaque
-          //                     return FadeTransition(
-          //                       opacity: animation,
-          //                       child: child,
-          //                     );
-          //                   },
-          //                 ),
-          //               );
-          //             },
-          //           ),
-          //         ],
-          //       ),
-          //     ),
-          //     centerTitle: false,
-          //     background: SafeArea(
-          //       child: Padding(
-          //         padding:
-          //             const EdgeInsets.only(left: 20, right: 12, bottom: 20),
-          //         child: Column(
-          //           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //           crossAxisAlignment: CrossAxisAlignment.start,
-          //           children: [
-          //             Row(
-          //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //               children: [
-          //                 DropdownButton<Division>(
-          //                   value: division,
-          //                   borderRadius: BorderRadius.circular(20),
-          //                   items: widget.tournament.divisions
-          //                       .map<DropdownMenuItem<Division>>((division) {
-          //                     return DropdownMenuItem(
-          //                         value: division,
-          //                         child: Row(
-          //                           children: [
-          //                             const Icon(
-          //                               Icons.groups_3_outlined,
-          //                               size: 30,
-          //                             ),
-          //                             SizedBox(width: 10),
-          //                             Text(division.name),
-          //                           ],
-          //                         ));
-          //                   }).toList(),
-          //                   onChanged: (Division? value) => {
-          //                     setState(() {
-          //                       division = value!;
-          //                       selectedIndex = selectedIndex;
-          //                     })
-          //                   },
-          //                 ),
-          //                 const Spacer(),
-          //               ],
-          //             ),
-          //           ],
-          //         ),
-          //       ),
-          //     ),
-          //   ),
-          //   backgroundColor: Theme.of(context).colorScheme.primary,
-          // ),
-          SliverPersistentHeader(
-            pinned: true,
-            delegate: SliverHeaderDelegate(
-              minHeight: 70.0,
-              maxHeight: 70.0,
-              child: Stack(
-                children: [
-                  Container(
-                      height: 300,
-                      color: Theme.of(context).colorScheme.primary),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(25),
-                        topRight: Radius.circular(25),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 25, vertical: 13),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            // selectedIndex == 0 && division.teamStats?.isNotEmpty == true
+            //     ? SliverPersistentHeader(
+            //         pinned: true,
+            //         delegate: SliverHeaderDelegate(
+            //           maxHeight: 40,
+            //           minHeight: 40,
+            //           child: Container(
+            //             alignment: Alignment.topCenter,
+            //             padding: EdgeInsets.only(
+            //                 left: 23, right: 23, bottom: 10, top: 5),
+            //             color: Theme.of(context).colorScheme.surface,
+            //             child: Row(
+            //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //               children: [
+            //                 Text(
+            //                   "Enable Live Timing",
+            //                   style: TextStyle(fontSize: 16),
+            //                 ),
+            //                 Switch(
+            //                   value: useLiveTiming,
+            //                   onChanged: (bool value) {
+            //                     setState(() {
+            //                       useLiveTiming = value;
+            //                     });
+            //                   },
+            //                 )
+            //               ],
+            //             ),
+            //           ),
+            //         ),
+            //       )
+            //     : SliverToBoxAdapter(),
+            selectedIndex == 1 && division.teamStats?.isNotEmpty == true
+                ? SliverToBoxAdapter(
+              child: Container(
+                padding: const EdgeInsets.only(left: 23),
+                height: 50,
+                child: Flex(
+                  direction: Axis.horizontal,
+                  children: [
+                    Flexible(
+                      flex: 6,
+                      child: Stack(
                         children: [
-                          _buildIconButton(context, Icons.schedule, 0),
-                          _buildIconButton(
-                              context, Icons.format_list_numbered_outlined, 1),
-                          _buildIconButton(
-                              context, Icons.sports_esports_outlined, 2),
-                          _buildIconButton(context, Icons.info_outlined, 3),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          // selectedIndex == 0 && division.teamStats?.isNotEmpty == true
-          //     ? SliverPersistentHeader(
-          //         pinned: true,
-          //         delegate: SliverHeaderDelegate(
-          //           maxHeight: 40,
-          //           minHeight: 40,
-          //           child: Container(
-          //             alignment: Alignment.topCenter,
-          //             padding: EdgeInsets.only(
-          //                 left: 23, right: 23, bottom: 10, top: 5),
-          //             color: Theme.of(context).colorScheme.surface,
-          //             child: Row(
-          //               mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //               children: [
-          //                 Text(
-          //                   "Enable Live Timing",
-          //                   style: TextStyle(fontSize: 16),
-          //                 ),
-          //                 Switch(
-          //                   value: useLiveTiming,
-          //                   onChanged: (bool value) {
-          //                     setState(() {
-          //                       useLiveTiming = value;
-          //                     });
-          //                   },
-          //                 )
-          //               ],
-          //             ),
-          //           ),
-          //         ),
-          //       )
-          //     : SliverToBoxAdapter(),
-          selectedIndex == 1 && division.teamStats?.isNotEmpty == true
-              ? SliverToBoxAdapter(
-                  child: Container(
-                    padding: const EdgeInsets.only(left: 23),
-                    height: 50,
-                    child: Flex(
-                      direction: Axis.horizontal,
-                      children: [
-                        Flexible(
-                          flex: 6,
-                          child: Stack(
-                            children: [
-                              ListView(
-                                scrollDirection: Axis.horizontal,
-                                children: List<Widget>.generate(sorts.length,
+                          ListView(
+                            scrollDirection: Axis.horizontal,
+                            children: List<Widget>.generate(sorts.length,
                                     (int index) {
                                   return Container(
                                     padding: const EdgeInsets.only(right: 5),
@@ -554,9 +569,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
                                                   .primary,
                                               width: 1.5),
                                           borderRadius:
-                                              BorderRadius.circular(10)),
+                                          BorderRadius.circular(10)),
                                       selectedColor:
-                                          Theme.of(context).colorScheme.primary,
+                                      Theme.of(context).colorScheme.primary,
                                       chipAnimationStyle: ChipAnimationStyle(
                                           enableAnimation: AnimationStyle(
                                               duration: Duration.zero),
@@ -570,194 +585,195 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
                                     ),
                                   );
                                 }).toList(),
-                              ),
-                              IgnorePointer(
-                                ignoring: true,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Theme.of(context)
-                                            .colorScheme
-                                            .surface
-                                            .withOpacity(0),
-                                        Theme.of(context).colorScheme.surface,
-                                      ],
-                                      stops: const [0.9, 1.0],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
                           ),
-                        ),
-                        Flexible(
-                            flex: 1,
-                            child: IconButton(
-                                icon: const Icon(
-                                  Icons.filter_list,
-                                  size: 30,
+                          IgnorePointer(
+                            ignoring: true,
+                            child: Container(
+                              decoration: BoxDecoration(
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Theme.of(context)
+                                        .colorScheme
+                                        .surface
+                                        .withOpacity(0),
+                                    Theme.of(context).colorScheme.surface,
+                                  ],
+                                  stops: const [0.9, 1.0],
                                 ),
-                                onPressed: () async {
-                                  TournamentRankingsFilter updatedFilter =
-                                      await worldRankingsFilter(
-                                    context,
-                                    filter,
-                                    prefs.getBool("isTournamentMode") ?? false,
-                                  );
-                                  setState(() {
-                                    filter = updatedFilter;
-                                  });
-                                })),
-                      ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                )
-              : const SliverToBoxAdapter(),
-          // selectedIndex == 0 &&
-          //         division.games != null &&
-          //         division.games!.isNotEmpty &&
-          //         division.games!.any(
-          //           (element) {
-          //             return element.roundNum == 1;
-          //           },
-          //         )
-          //     ? SliverPersistentHeader(
-          //         pinned: true,
-          //         delegate: SliverHeaderDelegate(
-          //           child: Container(
-          //             color: Theme.of(context).colorScheme.surface,
-          //             padding:
-          //                 EdgeInsets.symmetric(horizontal: 23, vertical: 5),
-          //             child: Row(
-          //               crossAxisAlignment: CrossAxisAlignment.center,
-          //               children: [
-          //                 Text(
-          //                   "Practice",
-          //                   style: TextStyle(fontSize: 24),
-          //                 ),
-          //                 IconButton(
-          //                   focusColor: Colors.transparent,
-          //                   splashColor: Colors.transparent,
-          //                   highlightColor: Colors.transparent,
-          //                   onPressed: () {
-          //                     setState(() {
-          //                       showPractice = !showPractice;
-          //                     });
-          //                   },
-          //                   icon: Icon(showPractice
-          //                       ? Icons.keyboard_arrow_down
-          //                       : Icons.keyboard_arrow_right),
-          //                 ),
-          //               ],
-          //             ),
-          //           ),
-          //           maxHeight: 40,
-          //           minHeight: 40,
-          //         ),
-          //       )
-          //     : SliverToBoxAdapter(),
-          // selectedIndex == 0 &&
-          //         division.games != null &&
-          //         division.games!.isNotEmpty
-          //     ? SliverPersistentHeader(
-          //         pinned: true,
-          //         delegate: SliverHeaderDelegate(
-          //           child: Container(
-          //             color: Theme.of(context).colorScheme.surface,
-          //             padding:
-          //                 EdgeInsets.symmetric(horizontal: 23, vertical: 5),
-          //             child: Row(
-          //               crossAxisAlignment: CrossAxisAlignment.center,
-          //               children: [
-          //                 Text(
-          //                   "Qualification",
-          //                   style: TextStyle(fontSize: 24),
-          //                 ),
-          //                 IconButton(
-          //                   focusColor: Colors.transparent,
-          //                   splashColor: Colors.transparent,
-          //                   highlightColor: Colors.transparent,
-          //                   onPressed: () {
-          //                     setState(() {
-          //                       showQualification = !showQualification;
-          //                     });
-          //                   },
-          //                   icon: Icon(showQualification
-          //                       ? Icons.keyboard_arrow_down
-          //                       : Icons.keyboard_arrow_right),
-          //                 ),
-          //               ],
-          //             ),
-          //           ),
-          //           maxHeight: 40,
-          //           minHeight: 40,
-          //         ),
-          //       )
-          //     : SliverToBoxAdapter(),
+                    Flexible(
+                        flex: 1,
+                        child: IconButton(
+                            icon: const Icon(
+                              Icons.filter_list,
+                              size: 30,
+                            ),
+                            onPressed: () async {
+                              TournamentRankingsFilter updatedFilter =
+                              await worldRankingsFilter(
+                                context,
+                                filter,
+                                prefs.getBool("isTournamentMode") ?? false,
+                              );
+                              setState(() {
+                                filter = updatedFilter;
+                              });
+                            })),
+                  ],
+                ),
+              ),
+            )
+                : const SliverToBoxAdapter(),
+            // selectedIndex == 0 &&
+            //         division.games != null &&
+            //         division.games!.isNotEmpty &&
+            //         division.games!.any(
+            //           (element) {
+            //             return element.roundNum == 1;
+            //           },
+            //         )
+            //     ? SliverPersistentHeader(
+            //         pinned: true,
+            //         delegate: SliverHeaderDelegate(
+            //           child: Container(
+            //             color: Theme.of(context).colorScheme.surface,
+            //             padding:
+            //                 EdgeInsets.symmetric(horizontal: 23, vertical: 5),
+            //             child: Row(
+            //               crossAxisAlignment: CrossAxisAlignment.center,
+            //               children: [
+            //                 Text(
+            //                   "Practice",
+            //                   style: TextStyle(fontSize: 24),
+            //                 ),
+            //                 IconButton(
+            //                   focusColor: Colors.transparent,
+            //                   splashColor: Colors.transparent,
+            //                   highlightColor: Colors.transparent,
+            //                   onPressed: () {
+            //                     setState(() {
+            //                       showPractice = !showPractice;
+            //                     });
+            //                   },
+            //                   icon: Icon(showPractice
+            //                       ? Icons.keyboard_arrow_down
+            //                       : Icons.keyboard_arrow_right),
+            //                 ),
+            //               ],
+            //             ),
+            //           ),
+            //           maxHeight: 40,
+            //           minHeight: 40,
+            //         ),
+            //       )
+            //     : SliverToBoxAdapter(),
+            // selectedIndex == 0 &&
+            //         division.games != null &&
+            //         division.games!.isNotEmpty
+            //     ? SliverPersistentHeader(
+            //         pinned: true,
+            //         delegate: SliverHeaderDelegate(
+            //           child: Container(
+            //             color: Theme.of(context).colorScheme.surface,
+            //             padding:
+            //                 EdgeInsets.symmetric(horizontal: 23, vertical: 5),
+            //             child: Row(
+            //               crossAxisAlignment: CrossAxisAlignment.center,
+            //               children: [
+            //                 Text(
+            //                   "Qualification",
+            //                   style: TextStyle(fontSize: 24),
+            //                 ),
+            //                 IconButton(
+            //                   focusColor: Colors.transparent,
+            //                   splashColor: Colors.transparent,
+            //                   highlightColor: Colors.transparent,
+            //                   onPressed: () {
+            //                     setState(() {
+            //                       showQualification = !showQualification;
+            //                     });
+            //                   },
+            //                   icon: Icon(showQualification
+            //                       ? Icons.keyboard_arrow_down
+            //                       : Icons.keyboard_arrow_right),
+            //                 ),
+            //               ],
+            //             ),
+            //           ),
+            //           maxHeight: 40,
+            //           minHeight: 40,
+            //         ),
+            //       )
+            //     : SliverToBoxAdapter(),
 
-          // showQualification ? pages[selectedIndex] : SliverToBoxAdapter(),
-          selectedIndex == 0 && practice.isNotEmpty
-              ? SliverStickyHeader(
-                  header: ScheduleTab(
-                      Theme.of(context).colorScheme.surface, "Practice", () {
-                    setState(() {
-                      showPractice = !showPractice;
-                    });
-                  }, showPractice),
-                  sliver: showPractice
-                      ? MatchesView(games: practice)
-                      : SliverToBoxAdapter(),
-                )
-              : SliverToBoxAdapter(),
+            // showQualification ? pages[selectedIndex] : SliverToBoxAdapter(),
+            selectedIndex == 0 && practice.isNotEmpty
+                ? SliverStickyHeader(
+              header: ScheduleTab(
+                  Theme.of(context).colorScheme.surface, "Practice", () {
+                setState(() {
+                  showPractice = !showPractice;
+                });
+              }, showPractice),
+              sliver: showPractice
+                  ? MatchesView(games: practice)
+                  : SliverToBoxAdapter(),
+            )
+                : SliverToBoxAdapter(),
 
-          selectedIndex == 0 && qualifications.isNotEmpty
-              ? SliverStickyHeader(
-                  header: ScheduleTab(
-                      Theme.of(context).colorScheme.surface, "Qualifications",
+            selectedIndex == 0 && qualifications.isNotEmpty
+                ? SliverStickyHeader(
+              header: ScheduleTab(
+                  Theme.of(context).colorScheme.surface, "Qualifications",
                       () {
                     setState(() {
                       showQualification = !showQualification;
                     });
                   }, showQualification),
-                  sliver: showQualification
-                      ? MatchesView(games: qualifications)
-                      : SliverToBoxAdapter(),
-                )
-              : SliverToBoxAdapter(),
+              sliver: showQualification
+                  ? MatchesView(games: qualifications)
+                  : SliverToBoxAdapter(),
+            )
+                : SliverToBoxAdapter(),
 
-          selectedIndex == 0 && eliminations.isNotEmpty
-              ? SliverStickyHeader(
-                  header: ScheduleTab(
-                      Theme.of(context).colorScheme.surface, "Eliminations",
+            selectedIndex == 0 && eliminations.isNotEmpty
+                ? SliverStickyHeader(
+              header: ScheduleTab(
+                  Theme.of(context).colorScheme.surface, "Eliminations",
                       () {
                     setState(() {
                       showElimination = !showElimination;
                     });
                   }, showElimination),
-                  sliver: showElimination
-                      ? MatchesView(games: eliminations)
-                      : SliverToBoxAdapter(),
-                )
-              : SliverToBoxAdapter(),
+              sliver: showElimination
+                  ? MatchesView(games: eliminations)
+                  : SliverToBoxAdapter(),
+            )
+                : SliverToBoxAdapter(),
 
-          selectedIndex == 0 &&
-                  (division.games == null || division.games!.isEmpty)
-              ? SliverToBoxAdapter(
-                  child: BigErrorMessage(
-                      icon: Icons.schedule, message: "Schedule Not Available"),
-                )
-              : SliverToBoxAdapter(),
+            selectedIndex == 0 &&
+                (division.games == null || division.games!.isEmpty)
+                ? SliverToBoxAdapter(
+              child: BigErrorMessage(
+                  icon: Icons.schedule, message: "Schedule Not Available"),
+            )
+                : SliverToBoxAdapter(),
 
-          pages[selectedIndex],
-          const SliverToBoxAdapter(
-            child: SizedBox(
-              height: 50,
-            ),
-          )
-        ],
-      ),
-    );
+            pages[selectedIndex],
+            const SliverToBoxAdapter(
+              child: SizedBox(
+                height: 50,
+              ),
+            )
+          ],
+        ),
+      )
+      );
   }
 
   Widget ScheduleTab(Color backgroundColor, String title, void Function() onTap,
