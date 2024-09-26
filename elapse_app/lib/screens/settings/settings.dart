@@ -89,20 +89,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                             Text('${currentUser.fname!} ${currentUser.lname!}',
                                                 style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
                                             GestureDetector(
-                                              child: Text(currentUser.email!,
-                                                  style: TextStyle(
-                                                    fontSize: 16,
-                                                    foreground: showEmail ? null : (Paint()
-                                                      ..style = PaintingStyle.fill
-                                                      ..color = Colors.grey
-                                                      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3)),
-                                                  )),
-                                              onTap: () {
-                                                setState(() {
-                                                  showEmail = !showEmail;
-                                                });
-                                              }
-                                            )
+                                                child: Column(
+                                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(currentUser.email!,
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      foreground: showEmail
+                                                          ? null
+                                                          : (Paint()
+                                                            ..style = PaintingStyle.fill
+                                                            ..color = Colors.grey
+                                                            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3)),
+                                                    )),
+                                                    Text(showEmail ? "Tap to hide email" : "Tap to show email",
+                                                        style: const TextStyle(fontSize: 12)),
+                                                  ]
+                                                ),
+                                                onTap: () {
+                                                  setState(() {
+                                                    showEmail = !showEmail;
+                                                  });
+                                                }),
                                           ]),
                                       CircleAvatar(
                                         radius: 32,
@@ -511,8 +519,6 @@ List<TeamPreview> getSavedTeams() {
   savedTeamsList.addAll(
       savedTeams.map((e) => TeamPreview(teamID: jsonDecode(e)["teamID"], teamNumber: jsonDecode(e)["teamNumber"])));
   savedTeamsList.insert(0, loadTeamPreview(savedTeam));
-
-  print(savedTeamsList[0].teamID);
 
   return savedTeamsList;
 }
