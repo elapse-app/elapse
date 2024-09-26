@@ -37,6 +37,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String defaultGrade = prefs.getString("defaultGrade") ?? "Main Team";
 
   ElapseUser currentUser = elapseUserDecode(prefs.getString("currentUser")!);
+  bool showEmail = false;
 
   @override
   Widget build(BuildContext context) {
@@ -87,7 +88,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           children: [
                                             Text('${currentUser.fname!} ${currentUser.lname!}',
                                                 style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
-                                            Text(currentUser.email!, style: const TextStyle(fontSize: 16)),
+                                            GestureDetector(
+                                              child: Text(currentUser.email!,
+                                                  style: TextStyle(
+                                                    fontSize: 16,
+                                                    foreground: showEmail ? null : (Paint()
+                                                      ..style = PaintingStyle.fill
+                                                      ..color = Colors.grey
+                                                      ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3)),
+                                                  )),
+                                              onTap: () {
+                                                setState(() {
+                                                  showEmail = !showEmail;
+                                                });
+                                              }
+                                            )
                                           ]),
                                       CircleAvatar(
                                         radius: 32,
