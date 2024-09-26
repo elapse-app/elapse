@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:elapse_app/classes/Users/user.dart';
+import 'package:elapse_app/screens/home/home.dart';
 import 'package:elapse_app/screens/settings/add_teams.dart';
 import 'package:elapse_app/screens/settings/edit_account.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
@@ -15,6 +16,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:collection/collection.dart';
 
 import '../../classes/Team/teamPreview.dart';
+import '../../classes/Tournament/tournament.dart';
+import '../../classes/Tournament/tournament_preview.dart';
 import '../../main.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -41,12 +44,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
-          const ElapseAppBar(
-            title: Text(
+          ElapseAppBar(
+            title: const Text(
               "Settings",
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
             backNavigation: true,
+            background: Padding(
+                padding: const EdgeInsets.only(left: 23, top: 10),
+                child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
+                    ))),
           ),
           const RoundedTop(),
           SliverPadding(
@@ -160,14 +173,68 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                               String? selected =
                                                   savedTeams.firstWhereOrNull((e) => jsonDecode(e)["teamID"] == value);
                                               if (selected == null) return;
-                                              savedTeams.removeWhere((e) => jsonDecode(e)["teamID"] == value);
-                                              savedTeams.add(savedTeam);
-                                              prefs.setStringList("savedTeams", savedTeams);
-                                              prefs.setString("savedTeam", selected);
 
-                                              setState(() {
-                                                mainTeamId = value!;
-                                              });
+                                              Tournament? tournament;
+                                              if (prefs.getBool("isTournamentMode") ?? false) {
+                                                tournament = loadTournament(prefs.getString("TMSavedTournament"));
+                                              }
+
+                                              if (tournament != null &&
+                                                  !tournament.teams.contains(loadTeamPreview(selected))) {
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return AlertDialog(
+                                                        title: const Text("Switch main team"),
+                                                        content: const Text("You will be exiting Tournament Mode."),
+                                                        contentPadding:
+                                                            const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                                                        actions: [
+                                                          ElevatedButton(
+                                                            child: Text("Cancel",
+                                                                style: TextStyle(
+                                                                    color: Theme.of(context).colorScheme.secondary)),
+                                                            onPressed: () => Navigator.pop(context),
+                                                          ),
+                                                          ElevatedButton(
+                                                              child: Text("Switch",
+                                                                  style: TextStyle(
+                                                                      color: Theme.of(context).colorScheme.secondary)),
+                                                              onPressed: () {
+                                                                savedTeams.removeWhere(
+                                                                    (e) => jsonDecode(e)["teamID"] == value);
+                                                                savedTeams.add(savedTeam);
+                                                                prefs.setStringList("savedTeams", savedTeams);
+                                                                prefs.setString("savedTeam", selected);
+
+                                                                setState(() {
+                                                                  mainTeamId = value!;
+                                                                });
+
+                                                                prefs.setBool("isTournamentMode", false);
+                                                                prefs.remove("tournament-${tournament!.id}");
+                                                                prefs.remove("TMSavedTournament");
+                                                                myAppKey.currentState!.reloadApp();
+                                                                Navigator.pop(context);
+                                                              })
+                                                        ],
+                                                        actionsPadding: const EdgeInsets.only(bottom: 8),
+                                                        shape: RoundedRectangleBorder(
+                                                            side: BorderSide(
+                                                                color: Theme.of(context).colorScheme.primary),
+                                                            borderRadius: BorderRadius.circular(18)),
+                                                      );
+                                                    });
+                                              } else {
+                                                savedTeams.removeWhere((e) => jsonDecode(e)["teamID"] == value);
+                                                savedTeams.add(savedTeam);
+                                                prefs.setStringList("savedTeams", savedTeams);
+                                                prefs.setString("savedTeam", selected);
+
+                                                setState(() {
+                                                  mainTeamId = value!;
+                                                });
+                                              }
                                             },
                                             style: TextStyle(
                                                 fontSize: 18,
