@@ -29,7 +29,9 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
           ElapseAppBar(
               title: Text("CloudScout",
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
-              includeSettings: true),
+              includeSettings: true,
+            settingsCallback: () => setState(() {}),
+          ),
           RoundedTop(),
           !teamSync
               ? SliverToBoxAdapter(

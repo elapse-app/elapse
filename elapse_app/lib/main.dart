@@ -162,7 +162,6 @@ class MyAppState extends State<MyApp> {
           ]
         : screens = [
             HomeScreen(
-              teamID: savedTeam.teamID,
               key: PageStorageKey<String>("home"),
             ),
             CloudScoutScreen(),

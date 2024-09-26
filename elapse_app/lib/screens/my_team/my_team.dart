@@ -38,6 +38,11 @@ class _MyTeamsState extends State<MyTeams> {
 
   @override
   void initState() {
+    super.initState();
+    reload();
+  }
+
+  void reload() {
     final String savedTeam = prefs.getString("savedTeam") ?? "";
     final parsed = jsonDecode(savedTeam);
     savedTeamPreview =
@@ -47,14 +52,13 @@ class _MyTeamsState extends State<MyTeams> {
     savedTeamPreviews.add(savedTeamPreview);
     savedTeamPreviews.addAll(savedTeamStrings
         .map((e) => TeamPreview(
-            teamID: jsonDecode(e)["teamID"],
-            teamNumber: jsonDecode(e)["teamNumber"]))
+        teamID: jsonDecode(e)["teamID"],
+        teamNumber: jsonDecode(e)["teamNumber"]))
         .toList());
 
     selectedTeamPreview = savedTeamPreview;
 
     savedTeamPreviews = savedTeamPreviews.toSet().toList();
-    super.initState();
     season = seasons[0];
     team = fetchTeam(savedTeamPreview.teamID);
     teamStats =
@@ -126,7 +130,11 @@ class _MyTeamsState extends State<MyTeams> {
                         const Icon(Icons.arrow_right)
                       ])),
                   const Spacer(),
-                  const SettingsButton(),
+                  SettingsButton(callback: () {
+                    setState(() {
+                      reload();
+                    });
+                  }),
                 ],
               ),
             ),
