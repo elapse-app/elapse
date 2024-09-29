@@ -12,7 +12,8 @@ import 'dart:convert';
 
 class Database {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final storage = FirebaseStorage.instance;
+  final FirebaseStorage storage = FirebaseStorage.instance;
+  final FirebaseAuth auth = FirebaseAuth.instance;
 
 /* Users */
   Future<String> createUser(ElapseUser? newUser, TeamPreview savedTeam) async {
@@ -42,26 +43,37 @@ class Database {
     return null;
   }
 
-  Future<String?> deleteUser(String uid) async {
+  Future<String?> deleteUser() async {
     try {
+      String? uid = auth.currentUser?.uid;
+      // Remove from all team groups
+      var snapshot = await _firestore.collection('Users').doc(uid).get();
+
+      List<dynamic> groups = snapshot.get('groupID');
+
+      for (int x = 0; x < groups.length; x++) {
+        leaveTeamGroup(groups[x], uid!);
+      }
+
+      // Delete UID from Users doc
       await _firestore.collection('users').doc(uid).delete();
+
+      // Delete User Account
+      await auth.currentUser?.delete();
     } catch (e) {
       print(e);
     }
     return null;
   }
 
-  Future<String?> deleteCurrentUser() async {
-    try {
-      await _firestore
-          .collection('users')
-          .doc(FirebaseAuth.instance.currentUser?.uid)
-          .delete();
-    } catch (e) {
-      print(e);
-    }
-    return "";
-  }
+  // Future<String?> deleteCurrentUser() async {
+  //   try {
+  //     await _firestore.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).delete();
+  //   } catch (e) {
+  //     print(e);
+  //   }
+  //   return "";
+  // }
 
 /* Team Groups */
 
@@ -141,7 +153,7 @@ class Database {
     return returnVal;
   }
 
-  Future<String> removeMember(String groupid, String memberID) async {
+  Future<String> removeMember(String groupid, String memberID) async { // Make admin only
     String returnVal = 'hello';
     try {
       await _firestore.collection('teamGroups').doc(groupid).update({
