@@ -240,52 +240,55 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ])),
                   const SizedBox(height: 23),
                   Container(
-                      height: 230,
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      padding: const EdgeInsets.all(18),
-                      child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text("${teamGroup.groupName}",
-                                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
-                                      const SizedBox(height: 18),
-                                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                        const Text("Team", style: TextStyle(fontSize: 18)),
-                                        Text("${teamGroup.teamNumber}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                                      ]),
-                                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                        const Text("Admin", style: TextStyle(fontSize: 18)),
-                                        Text.rich(
-                                            TextSpan(
-                                                text: teamGroup.adminId == currentUser.uid ? "(You) " : "",
-                                                style: const TextStyle(fontSize: 18),
-                                                children: [
-                                                  TextSpan(text: teamGroup.members[teamGroup.adminId], style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                                            ]),
-                                        )
-                                      ]),
-                                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                        const Text("Members", style: TextStyle(fontSize: 18)),
-                                        Text("${teamGroup.members.length}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                                      ]),
-                                      Padding(
-                                          padding: const EdgeInsets.symmetric(vertical: 5),
-                                          child: Divider(
-                                            color: Theme.of(context).colorScheme.surfaceDim,
-                                          )),
-                                      GestureDetector(
-                                        onTap: () {},
-                                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                          const Text("Group Settings", style: TextStyle(fontSize: 20)),
-                                          Icon(Icons.arrow_forward_outlined,
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant),
-                                        ]),
-                                      ),
-                                    ]),
+                    height: 230,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    padding: const EdgeInsets.all(18),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("${teamGroup.groupName}",
+                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 18),
+                          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                            const Text("Team", style: TextStyle(fontSize: 18)),
+                            Text("${teamGroup.teamNumber}",
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                          ]),
+                          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                            const Text("Admin", style: TextStyle(fontSize: 18)),
+                            Text.rich(
+                              TextSpan(
+                                  text: teamGroup.adminId == currentUser.uid ? "(You) " : "",
+                                  style: const TextStyle(fontSize: 18),
+                                  children: [
+                                    TextSpan(
+                                        text: teamGroup.members[teamGroup.adminId],
+                                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                                  ]),
+                            )
+                          ]),
+                          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                            const Text("Members", style: TextStyle(fontSize: 18)),
+                            Text("${teamGroup.members.length}",
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                          ]),
+                          Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 5),
+                              child: Divider(
+                                color: Theme.of(context).colorScheme.surfaceDim,
+                              )),
+                          GestureDetector(
+                            onTap: () {},
+                            child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                              const Text("Group Settings", style: TextStyle(fontSize: 20)),
+                              Icon(Icons.arrow_forward_outlined, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                            ]),
+                          ),
+                        ]),
                   ),
                   const SizedBox(height: 32),
                   const SizedBox(
