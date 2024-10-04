@@ -15,10 +15,14 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:collection/collection.dart';
 
+import '../../classes/Groups/teamGroup.dart';
+import '../../classes/Team/team.dart';
 import '../../classes/Team/teamPreview.dart';
 import '../../classes/Tournament/tournament.dart';
 import '../../classes/Tournament/tournament_preview.dart';
+import '../../extras/database.dart';
 import '../../main.dart';
+import '../widgets/big_error_message.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -34,9 +38,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   int mainTeamId = jsonDecode(prefs.getString("savedTeam") ?? "")["teamID"];
   bool useLiveTiming = prefs.getBool("useLiveTiming") ?? true;
+  bool autoRefresh = prefs.getBool("autoRefresh") ?? true;
   String defaultGrade = prefs.getString("defaultGrade") ?? "Main Team";
+  bool sendLTTelemetry = prefs.getBool("sendLTTelemetry") ?? false;
 
   ElapseUser currentUser = elapseUserDecode(prefs.getString("currentUser")!);
+  TeamGroup teamGroup = TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup") ?? ""));
   bool showEmail = false;
 
   @override
@@ -69,7 +76,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Column(
                 children: [
                   Container(
-                      height: FirebaseAuth.instance.currentUser != null ? 320 : 200,
+                      height: 320,
                       decoration: BoxDecoration(
                         border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
                         borderRadius: BorderRadius.circular(18),
@@ -79,106 +86,45 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            FirebaseAuth.instance.currentUser != null
-                                ? Column(children: [
-                                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                      Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Text('${currentUser.fname!} ${currentUser.lname!}',
-                                                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
-                                            GestureDetector(
-                                                child: Column(
-                                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(currentUser.email!,
-                                                    style: TextStyle(
-                                                      fontSize: 16,
-                                                      foreground: showEmail
-                                                          ? null
-                                                          : (Paint()
-                                                            ..style = PaintingStyle.fill
-                                                            ..color = Colors.grey
-                                                            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3)),
-                                                    )),
-                                                    Text(showEmail ? "Tap to hide email" : "Tap to show email",
-                                                        style: const TextStyle(fontSize: 12)),
-                                                  ]
-                                                ),
-                                                onTap: () {
-                                                  setState(() {
-                                                    showEmail = !showEmail;
-                                                  });
-                                                }),
-                                          ]),
-                                      CircleAvatar(
-                                        radius: 32,
-                                      )
-                                    ]),
-                                    const SizedBox(height: 18),
-                                    GestureDetector(
-                                        onTap: () {
-                                          showDialog(
-                                              context: context,
-                                              builder: (context) {
-                                                return AlertDialog(
-                                                  title: const Text("Sign out"),
-                                                  content: const Text("Are you sure you want to sign out?"),
-                                                  contentPadding:
-                                                      const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                                                  actions: [
-                                                    ElevatedButton(
-                                                      child: Text("Cancel",
-                                                          style: TextStyle(
-                                                              color: Theme.of(context).colorScheme.secondary)),
-                                                      onPressed: () => Navigator.pop(context),
-                                                    ),
-                                                    ElevatedButton(
-                                                        child: const Text("Sign out",
-                                                            style: TextStyle(color: Colors.redAccent)),
-                                                        onPressed: () {
-                                                          Navigator.pushAndRemoveUntil(
-                                                            context,
-                                                            MaterialPageRoute(
-                                                                builder: (context) => const FirstSetupPage()),
-                                                            ((_) => false),
-                                                          );
-                                                          FirebaseAuth.instance.signOut();
-                                                          prefs.remove("currentUser");
-                                                          prefs.remove("savedTeam");
-                                                          prefs.remove("savedTeams");
-                                                          prefs.remove("isTournamentMode");
-
-                                                          prefs.setBool("isSetUp", false);
-                                                        })
-                                                  ],
-                                                  actionsPadding: const EdgeInsets.only(bottom: 8),
-                                                  shape: RoundedRectangleBorder(
-                                                      side: BorderSide(color: Theme.of(context).colorScheme.primary),
-                                                      borderRadius: BorderRadius.circular(18)),
-                                                );
-                                              });
-                                        },
-                                        child: Container(
-                                          width: double.infinity,
-                                          decoration: BoxDecoration(
-                                            border: Border.all(color: Colors.redAccent),
-                                            borderRadius: BorderRadius.circular(100),
-                                          ),
-                                          padding: const EdgeInsets.all(8),
-                                          child: const Center(child: Text("Sign out", style: TextStyle(fontSize: 18))),
-                                        )),
-                                  ])
-                                : const SizedBox.shrink(),
+                            Column(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  CircleAvatar(
+                                    radius: 33,
+                                  ),
+                                  Text('${currentUser.fname!} ${currentUser.lname!}',
+                                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                                  GestureDetector(
+                                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                        Text(currentUser.email!,
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              foreground: showEmail
+                                                  ? (Paint()..color = Theme.of(context).colorScheme.secondary)
+                                                  : (Paint()
+                                                    ..style = PaintingStyle.fill
+                                                    ..color = Colors.grey
+                                                    ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3)),
+                                            )),
+                                        Text(showEmail ? "Tap to hide email" : "Tap to show email",
+                                            style: const TextStyle(fontSize: 12)),
+                                      ]),
+                                      onTap: () {
+                                        setState(() {
+                                          showEmail = !showEmail;
+                                        });
+                                      }),
+                                ]),
+                            const SizedBox(height: 18),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
                               decoration: BoxDecoration(
-                                border: Border.all(color: Theme.of(context).colorScheme.secondary),
-                                borderRadius: BorderRadius.circular(100),
+                                border: Border.all(color: Theme.of(context).colorScheme.primary),
+                                borderRadius: BorderRadius.circular(10),
                               ),
                               child: Row(children: [
-                                Icon(Icons.group, color: Theme.of(context).colorScheme.secondary),
+                                Icon(Icons.group_outlined, color: Theme.of(context).colorScheme.secondary),
                                 const SizedBox(width: 15),
                                 Expanded(
                                   child: getSavedTeams().length > 1
@@ -264,6 +210,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                 fontWeight: FontWeight.w400,
                                                 color: Theme.of(context).colorScheme.secondary),
                                             borderRadius: BorderRadius.circular(10),
+                                            icon: Icon(Icons.arrow_drop_down,
+                                                color: Theme.of(context).colorScheme.secondary),
                                           ),
                                         )
                                       : Padding(
@@ -276,84 +224,73 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 )
                               ]),
                             ),
-                            Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(18),
-                                  color: Theme.of(context).colorScheme.tertiary,
-                                ),
-                                padding: const EdgeInsets.all(10),
-                                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                  Flexible(
-                                    fit: FlexFit.tight,
-                                    flex: 10,
-                                    child: GestureDetector(
-                                      child: const Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                                        Icon(Icons.add),
-                                        Text("Add Teams", textAlign: TextAlign.center, style: TextStyle(fontSize: 16))
-                                      ]),
-                                      behavior: HitTestBehavior.opaque,
-                                      onTap: () async {
-                                        await Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) => const AddTeamPage(),
-                                            ));
-                                        setState(() {});
-                                      },
-                                    ),
-                                  ),
-                                  const Flexible(
-                                    fit: FlexFit.tight,
-                                    flex: 1,
-                                    child: SizedBox(
-                                      height: 50,
-                                      child: VerticalDivider(width: 3, thickness: 0.5),
-                                    ),
-                                  ),
-                                  Flexible(
-                                    fit: FlexFit.tight,
-                                    flex: 10,
-                                    child: FirebaseAuth.instance.currentUser != null
-                                        ? GestureDetector(
-                                            child: const Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                children: [
-                                                  Icon(Icons.edit),
-                                                  Text("Edit Account",
-                                                      textAlign: TextAlign.center, style: TextStyle(fontSize: 16))
-                                                ]),
-                                            behavior: HitTestBehavior.opaque,
-                                            onTap: () async {
-                                              await Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) => const EditAccountPage(),
-                                                  ));
-                                              setState(() {});
-                                            },
-                                          )
-                                        : GestureDetector(
-                                            child:
-                                                const Row(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: [
-                                              Icon(Icons.login),
-                                              Text("Login", textAlign: TextAlign.center, style: TextStyle(fontSize: 16))
-                                            ]),
-                                            onTap: () async {
-                                              await Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) => const SignUpPage(),
-                                                  ));
-                                              setState(() {});
-                                            },
-                                          ),
-                                  ),
-                                ])),
+                            Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 5),
+                                child: Divider(
+                                  color: Theme.of(context).colorScheme.surfaceDim,
+                                )),
+                            GestureDetector(
+                              onTap: () {},
+                              child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                                const Text("Account Settings", style: TextStyle(fontSize: 20)),
+                                Icon(Icons.arrow_forward_outlined,
+                                    color: Theme.of(context).colorScheme.onSurfaceVariant),
+                              ]),
+                            ),
                           ])),
+                  const SizedBox(height: 23),
+                  Container(
+                      height: 230,
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                      padding: const EdgeInsets.all(18),
+                      child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text("${teamGroup.groupName}",
+                                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                                      const SizedBox(height: 18),
+                                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                                        const Text("Team", style: TextStyle(fontSize: 18)),
+                                        Text("${teamGroup.teamNumber}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                                      ]),
+                                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                                        const Text("Admin", style: TextStyle(fontSize: 18)),
+                                        Text.rich(
+                                            TextSpan(
+                                                text: teamGroup.adminId == currentUser.uid ? "(You) " : "",
+                                                style: const TextStyle(fontSize: 18),
+                                                children: [
+                                                  TextSpan(text: teamGroup.members[teamGroup.adminId], style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                                            ]),
+                                        )
+                                      ]),
+                                      Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                                        const Text("Members", style: TextStyle(fontSize: 18)),
+                                        Text("${teamGroup.members.length}", style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                                      ]),
+                                      Padding(
+                                          padding: const EdgeInsets.symmetric(vertical: 5),
+                                          child: Divider(
+                                            color: Theme.of(context).colorScheme.surfaceDim,
+                                          )),
+                                      GestureDetector(
+                                        onTap: () {},
+                                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                                          const Text("Group Settings", style: TextStyle(fontSize: 20)),
+                                          Icon(Icons.arrow_forward_outlined,
+                                              color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                        ]),
+                                      ),
+                                    ]),
+                  ),
                   const SizedBox(height: 32),
                   const SizedBox(
                     width: double.infinity,
-                    child: Text("Tournament", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                    child: Text("Tournament Settings", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
                   ),
                   const SizedBox(height: 25),
                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
@@ -371,12 +308,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   Divider(
                     color: Theme.of(context).colorScheme.surfaceDim,
                   ),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                    const Text("Send Live Timing Telemetry", style: TextStyle(fontSize: 18)),
+                    Switch(
+                      value: sendLTTelemetry,
+                      onChanged: (bool? value) {
+                        prefs.setBool("sendLTTelemetry", value!);
+                        setState(() {
+                          sendLTTelemetry = value;
+                        });
+                      },
+                    )
+                  ]),
+                  Divider(
+                    color: Theme.of(context).colorScheme.surfaceDim,
+                  ),
                   const SizedBox(height: 32),
                   const SizedBox(
                     width: double.infinity,
-                    child: Text("General", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                    child: Text("General Settings", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
                   ),
                   const SizedBox(height: 25),
+                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                    const Text("Auto Refresh", style: TextStyle(fontSize: 18)),
+                    Switch(
+                      value: autoRefresh,
+                      onChanged: (bool? value) {
+                        prefs.setBool("autoRefresh", value!);
+                        setState(() {
+                          autoRefresh = value;
+                        });
+                      },
+                    )
+                  ]),
+                  Divider(
+                    color: Theme.of(context).colorScheme.surfaceDim,
+                  ),
                   Consumer<ColorProvider>(builder: (context, colorProvider, snapshot) {
                     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                       const Text("Theme", style: TextStyle(fontSize: 18)),

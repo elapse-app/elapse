@@ -10,13 +10,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'dart:convert';
 
+import '../classes/Groups/teamGroup.dart';
+
 class Database {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final storage = FirebaseStorage.instance;
 
 /* Users */
-  Future<String> createUser(ElapseUser? newUser, TeamPreview savedTeam) async {
-    String returnVal = 'monke';
+  Future<String?> createUser(ElapseUser? newUser, TeamPreview savedTeam) async {
     try {
       // SharedPreferences prefs = await SharedPreferences.getInstance(); // Might be useful at some point
       await _firestore.collection("users").doc(newUser?.uid).set({
@@ -26,10 +27,11 @@ class Database {
         'team': savedTeam.toJson(),
         'groupId': []
       });
+      return newUser?.uid;
     } catch (e) {
       print(e);
     }
-    return returnVal;
+    return null;
   }
 
   Future<Map<String, dynamic>?> getUserInfo(String uid) async {
@@ -42,16 +44,15 @@ class Database {
     return null;
   }
 
-  Future<String?> deleteUser(String uid) async {
+  Future<void> deleteUser(String uid) async {
     try {
       await _firestore.collection('users').doc(uid).delete();
     } catch (e) {
       print(e);
     }
-    return null;
   }
 
-  Future<String?> deleteCurrentUser() async {
+  Future<void> deleteCurrentUser() async {
     try {
       await _firestore
           .collection('users')
@@ -60,15 +61,13 @@ class Database {
     } catch (e) {
       print(e);
     }
-    return "";
   }
 
 /* Team Groups */
 
   // String AdminID, String groupName
-  Future<String> createTeamGroup(String adminID, String gname, String teamid,
+  Future<TeamGroup?> createTeamGroup(String adminID, String gname, String teamNumber,
       String fname, String lname) async {
-    String returnVal = 'hello';
     try {
       var alphanumericGenerator = RandomStringGenerator(
         fixedLength: 4,
@@ -84,7 +83,7 @@ class Database {
       var group = await _firestore.collection('teamGroups').add({
         'adminId': adminID,
         'joinCode': joinCode,
-        'team': teamid, // needs to be updated
+        'teamNumber': teamNumber,
         'members': members,
         'groupName': gname,
       });
@@ -92,14 +91,21 @@ class Database {
       await _firestore.collection('users').doc(adminID).update({
         'groupId': FieldValue.arrayUnion([group.id]),
       });
+
+      return TeamGroup(
+        groupId: group.id,
+        groupName: gname,
+        adminId: adminID,
+        members: members,
+        teamNumber: teamNumber
+      );
     } catch (e) {
       print(e);
     }
-    return returnVal;
+    return null;
   }
 
-  Future<String> joinTeamGroup(String joinCode, String uid) async {
-    String returnVal = 'hello';
+  Future<TeamGroup?> joinTeamGroup(String joinCode, String uid) async {
     var Data = await getUserInfo(uid);
     try {
       // Get the Users Name
@@ -120,14 +126,21 @@ class Database {
       await _firestore.collection('users').doc(uid).update({
         'groupId': FieldValue.arrayUnion([userDoc.reference.id]),
       });
+
+      return TeamGroup(
+        groupId: userDoc.id,
+        groupName: userDoc.get("groupName"),
+        adminId: userDoc.get("adminId"),
+        teamNumber: userDoc.get("teamNumber"),
+        members: userDoc.get("members")
+      );
     } catch (e) {
       print(e);
     }
-    return returnVal;
+    return null;
   }
 
-  Future<String> leaveTeamGroup(String groupid, String memberid) async {
-    String returnVal = 'hello';
+  Future<void> leaveTeamGroup(String groupid, String memberid) async {
     try {
       await _firestore.collection('teamGroups').doc(groupid).update({
         'members.$memberid': FieldValue.delete(),
@@ -138,11 +151,9 @@ class Database {
     } catch (e) {
       print(e);
     }
-    return returnVal;
   }
 
-  Future<String> removeMember(String groupid, String memberID) async {
-    String returnVal = 'hello';
+  Future<void> removeMember(String groupid, String memberID) async {
     try {
       await _firestore.collection('teamGroups').doc(groupid).update({
         'members.$memberID': FieldValue.delete(),
@@ -153,11 +164,9 @@ class Database {
     } catch (e) {
       print(e);
     }
-    return returnVal;
   }
 
-  Future<String> promoteNewAdmin(String groupID, String uid, String memberID) async {
-    String returnVal = 'hello';
+  Future<void> promoteNewAdmin(String groupID, String uid, String memberID) async {
     try {
       await _firestore.collection('teamGroups').doc(groupID).update({
         'adminId': memberID,
@@ -165,7 +174,6 @@ class Database {
     } catch (e) {
       print(e);
     }
-    return returnVal;
   }
 
   Future<Map<String, dynamic>?> getGroupInfo(String groupid) async {
@@ -235,9 +243,8 @@ class Database {
     return returnVal;
   }
 
-  Future<String> removeTeamScoutSheet(
+  Future<void> removeTeamScoutSheet(
       String teamid, String teamGroupID, String tournamentID) async {
-    String returnVal = 'hello';
     try {
       var scoutSheetCollection = await _firestore
           .collection('teamGroups')
@@ -252,12 +259,10 @@ class Database {
     } catch (e) {
       print(e);
     }
-    return returnVal;
   }
 
-  Future<String> updateMemberEditing(
+  Future<void> updateMemberEditing(
       String teamGroupId, String teamID, String tournamentID, bool Val) async {
-    String returnVal = "";
     try {
       var scoutSheetCollection = await _firestore
           .collection('teamGroups')
@@ -274,7 +279,6 @@ class Database {
     } catch (e) {
       print(e);
     }
-    return returnVal;
   }
 
   Future<List?>? getAllTeamScoutSheets(String teamGroupId) async {
@@ -422,9 +426,8 @@ class Database {
 /*         User ScoutSheet        */
 /* ------------------------------ */
 
-  Future<String> createUserScoutSheet(
+  Future<void> createUserScoutSheet(
       String uid, String teamid, String tournamentID) async {
-    String returnVal = 'hello';
     try {
       await _firestore
           .collection('Users')
@@ -460,7 +463,6 @@ class Database {
     } catch (e) {
       print(e);
     }
-    return returnVal;
   }
 
   Future<Map<String, dynamic>?> getUserScoutSheetInfo(

@@ -15,22 +15,38 @@ class TeamGroup {
   String? adminId;
 
   // Team of the Team Group
-  Team? team;
+  String teamNumber;
 
   // Members of the Team Group
-  List<String> members = [];
+  Map<String, String> members;
 
   TeamGroup({
     required this.groupId,
     required this.adminId,
-    required this.team,
+    required this.teamNumber,
+    required this.members,
     this.groupName,
   });
 
+  factory TeamGroup.fromJson(Map<String, dynamic> json) {
+    return TeamGroup(
+      groupName: json["groupName"],
+      groupId: json["groupId"],
+      adminId: json["adminId"],
+      teamNumber: json["teamNumber"],
+      members: json["members"].map<String, String>((key, val) => MapEntry(key.toString(), val.toString())),
+    );
+  }
 
-  // factory TeamGroup() {
-
-  // }
+  Map<String, dynamic> toJson() {
+    return {
+      "groupName": groupName,
+      "groupId": groupId,
+      "adminId": adminId,
+      "teamNumber": teamNumber,
+      "members": members,
+    };
+  }
 
 
   void addMember() {
@@ -48,13 +64,4 @@ class TeamGroup {
   void joinTeamGroup() {
 
   }
-
-
-
-
-
-
-
-
-
 }
