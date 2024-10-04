@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:elapse_app/classes/Users/user.dart';
 import 'package:elapse_app/extras/database.dart';
 import 'package:elapse_app/main.dart';
@@ -198,7 +200,7 @@ class _CreateTeamGroupState extends State<CreateTeamGroup> {
                                       currentElapseUser.fname ?? "",
                                       currentElapseUser.lname ?? "")
                                   .then((value) {
-                                prefs.setString("teamGroup", value);
+                                prefs.setString("teamGroup", jsonEncode(value?.toJson()));
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
