@@ -3,6 +3,7 @@ import 'package:elapse_app/classes/Filters/levelClass.dart';
 import '../../classes/Filters/gradeLevel.dart';
 import 'package:flutter/material.dart';
 
+import '../../classes/Miscellaneous/location.dart';
 import '../../main.dart';
 
 class ExploreSearchFilter {
@@ -11,6 +12,7 @@ class ExploreSearchFilter {
   GradeLevel gradeLevel;
   DateTime startDate;
   DateTime endDate;
+  Location? location;
 
   ExploreSearchFilter({
     Season? season,
@@ -18,6 +20,7 @@ class ExploreSearchFilter {
     GradeLevel? gradeLevel,
     DateTime? startDate,
     DateTime? endDate,
+    this.location,
   })  : this.season = season ?? seasons[0],
         this.levelClass = levelClass ?? levelClasses[0],
         this.gradeLevel = gradeLevel ?? getGradeLevel(prefs.getString("defaultGrade")),

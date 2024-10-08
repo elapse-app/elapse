@@ -25,7 +25,7 @@ class _UpcomingTournamentsState extends State<UpcomingTournaments> {
   @override
   void initState() {
     super.initState();
-    upcomingTournaments = getTournaments("", widget.filter);
+    upcomingTournaments = getTournaments("", widget.filter, getAllPages: true);
   }
 
   @override
@@ -42,10 +42,11 @@ class _UpcomingTournamentsState extends State<UpcomingTournaments> {
             return _LoadedUpcomingTournaments(
                 tournaments: (snapshot.data as TournamentList).tournaments);
           } else {
+            print(snapshot.error);
             return const Center(
               child: BigErrorMessage(
-                icon: Icons.emoji_events,
-                message: "Unable to load upcoming tournaments",
+                icon: Icons.emoji_events_outlined,
+                message: "Unable to load upcoming events",
                 topPadding: 15,
                 textPadding: 10,
               ),
@@ -66,7 +67,7 @@ class _LoadedUpcomingTournaments extends StatelessWidget {
       return const Center(
         child: BigErrorMessage(
           icon: Icons.emoji_events_outlined,
-          message: "No upcoming signature events",
+          message: "No upcoming events",
           topPadding: 15,
           textPadding: 10,
         ),
