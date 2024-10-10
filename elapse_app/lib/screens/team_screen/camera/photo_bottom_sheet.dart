@@ -1,11 +1,11 @@
 import 'dart:io';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
-import 'package:elapse_app/extras/database.dart';
 import 'package:elapse_app/screens/widgets/long_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:path/path.dart' as p;
 
 const int maxFileSize = 5 * 1024 * 1024; // 5 MB
 
@@ -203,7 +203,7 @@ Future<String?> uploadFile(XFile? pic) async {
   final file = File(pic.path);
 
   final ref = FirebaseStorage.instance.ref().child(path);
-  final snapshot = await ref.putData(file.readAsBytesSync());
+  final snapshot = await ref.putData(file.readAsBytesSync(), SettableMetadata(contentType: 'image/${p.extension(path).substring(1)}'));
 
   return await snapshot.ref.getDownloadURL();
 
