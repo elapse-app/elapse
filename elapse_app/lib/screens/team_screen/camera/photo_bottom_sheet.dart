@@ -199,19 +199,13 @@ void _showSizeError(BuildContext context) {
 }
 
 Future<String?> uploadFile(XFile? pic) async {
-  final path =
-      'images/${FirebaseAuth.instance.currentUser?.uid}/scoutsheet/images/${pic!.name}';
+  final path = 'images/${FirebaseAuth.instance.currentUser?.uid}/scoutsheet/images/${pic!.name}';
   final file = File(pic.path);
 
   final ref = FirebaseStorage.instance.ref().child(path);
+  final snapshot = await ref.putData(file.readAsBytesSync());
 
-  var uploadTask = ref.putFile(file);
-
-  final snapshot = await uploadTask.whenComplete(() {});
-
-  final URL = await snapshot.ref.getDownloadURL();
-
-  return URL;
+  return await snapshot.ref.getDownloadURL();
 
   // Database().addPhoto("", "", "", URL);
 }

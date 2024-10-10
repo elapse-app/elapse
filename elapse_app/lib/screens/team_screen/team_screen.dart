@@ -112,7 +112,7 @@ class _TeamScreenState extends State<TeamScreen> {
                       numMotors: specs["numMotors"] ?? "",
                       RPM: specs["RPM"] ?? "",
                       otherNotes: specs["otherNotes"] ?? "",
-                      photos: specs["photos"],
+                      photos: specs["photos"] ?? [],
                       autonNotes: specs["numMotors"] ?? "");
                 });
                 return value;
