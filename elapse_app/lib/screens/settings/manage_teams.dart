@@ -35,7 +35,7 @@ class _ManageTeamPageState extends State<ManageTeamPage> {
         const ElapseAppBar(
           title: Text(
             "Manage teams",
-            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
           ),
           backNavigation: true,
         ),
@@ -231,6 +231,7 @@ class _ManageTeamPageState extends State<ManageTeamPage> {
                                 "savedTeams", savedTeams.sublist(1).map((e) => jsonEncode(e.toJson())).toList());
                             setState(() {});
                           },
+                          behavior: HitTestBehavior.translucent,
                           child: Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10),
                             child: Flex(direction: Axis.horizontal, children: [

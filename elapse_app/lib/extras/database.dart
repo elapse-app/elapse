@@ -74,7 +74,7 @@ class Database {
 
   // String AdminID, String groupName
   Future<TeamGroup?> createTeamGroup(
-      String adminID, String gname, String teamNumber, String fname, String lname) async {
+      String adminID, String gname, String fname, String lname) async {
     try {
       var alphanumericGenerator = RandomStringGenerator(
         fixedLength: 4,
@@ -91,7 +91,6 @@ class Database {
         'adminId': adminID,
         'joinCode': joinCode,
         'allowJoin': true,
-        'teamNumber': teamNumber,
         'members': members,
         'groupName': gname,
       });
@@ -106,8 +105,7 @@ class Database {
           adminId: adminID,
           joinCode: joinCode,
           allowJoin: true,
-          members: members,
-          teamNumber: teamNumber);
+          members: members);
     } catch (e) {
       print(e);
     }
@@ -141,7 +139,6 @@ class Database {
         adminId: userDoc.get("adminId"),
         joinCode: joinCode,
         allowJoin: userDoc.get("allowJoin"),
-        teamNumber: userDoc.get("teamNumber"),
         members: members,
       );
     } catch (e) {
