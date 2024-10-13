@@ -14,7 +14,7 @@ import '../../setup/welcome/first_page.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/long_button.dart';
 import '../widgets/rounded_top.dart';
-import 'add_teams.dart';
+import 'manage_teams.dart';
 
 class AccountSettings extends StatefulWidget {
   AccountSettings({
@@ -30,7 +30,6 @@ class AccountSettings extends StatefulWidget {
 
 class _AccountSettingsState extends State<AccountSettings> {
   int mainTeamId = jsonDecode(prefs.getString("savedTeam") ?? "")["teamID"];
-  bool showEmail = false;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +42,16 @@ class _AccountSettingsState extends State<AccountSettings> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
             backNavigation: true,
-
+            background: Padding(
+                padding: const EdgeInsets.only(left: 23, top: 10),
+                child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pop(context);
+                      },
+                      child: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
+                    ))),
           ),
           const RoundedTop(),
           SliverPadding(
@@ -249,11 +257,11 @@ class _AccountSettingsState extends State<AccountSettings> {
                       );
                       setState(() {});
                     },
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text("Manage Teams", style: TextStyle(fontSize: 20)),
-                        Icon(Icons.arrow_forward),
+                        const Text("Manage Teams", style: TextStyle(fontSize: 20)),
+                        Icon(Icons.arrow_forward, color: Theme.of(context).colorScheme.onSurfaceVariant),
                       ]
                     )
                   ),
@@ -273,11 +281,11 @@ class _AccountSettingsState extends State<AccountSettings> {
                         );
                         setState(() {});
                       },
-                      child: const Row(
+                      child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("Change Password", style: TextStyle(fontSize: 20)),
-                            Icon(Icons.arrow_forward),
+                            const Text("Change Password", style: TextStyle(fontSize: 20)),
+                            Icon(Icons.arrow_forward, color: Theme.of(context).colorScheme.onSurfaceVariant),
                           ]
                       )
                   ),
@@ -314,25 +322,26 @@ class _AccountSettingsState extends State<AccountSettings> {
                                         prefs.remove("savedTeam");
                                         prefs.remove("savedTeams");
                                         prefs.remove("isTournamentMode");
+                                        prefs.remove("teamGroup");
 
                                         prefs.setBool("isSetUp", false);
                                       })
                                 ],
-                                actionsPadding: const EdgeInsets.only(bottom: 8),
+                                actionsPadding: const EdgeInsets.only(bottom: 8, right: 16),
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(color: Theme.of(context).colorScheme.primary),
                                     borderRadius: BorderRadius.circular(18)),
                               );
                             });
                       },
-                      child: const Row(
+                    behavior: HitTestBehavior.translucent,
+                      child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Text("Sign Out", style: TextStyle(fontSize: 20)),
-                            Icon(Icons.logout_outlined),
+                            const Text("Sign Out", style: TextStyle(fontSize: 20)),
+                            Icon(Icons.logout_outlined, color: Theme.of(context).colorScheme.onSurfaceVariant),
                           ]
                       ),
-                    behavior: HitTestBehavior.translucent,
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 18),
@@ -372,11 +381,12 @@ class _AccountSettingsState extends State<AccountSettings> {
                                         prefs.remove("savedTeam");
                                         prefs.remove("savedTeams");
                                         prefs.remove("isTournamentMode");
+                                        prefs.remove("teamGroup");
 
                                         prefs.setBool("isSetUp", false);
                                       })
                                 ],
-                                actionsPadding: const EdgeInsets.only(bottom: 8, left: 8),
+                                actionsPadding: const EdgeInsets.only(bottom: 8, right: 16),
                                 shape: RoundedRectangleBorder(
                                     side: BorderSide(color: Theme.of(context).colorScheme.primary),
                                     borderRadius: BorderRadius.circular(18)),

@@ -101,9 +101,13 @@ Future<void> signIN(String email, String password) async {
       teamNumber: userInfo["team"]["teamNumber"],
       verified: userInfo["verified"],
   );
-  final group = await database.getGroupInfo(userInfo["groupId"][0]);
+  if (userInfo["groupId"].isNotEmpty) {
+    Map<String, dynamic>? group = await database.getGroupInfo(userInfo["groupId"][0]);
+    final teamGroup = TeamGroup.fromJson(group!);
+    teamGroup.groupId = userInfo["groupId"][0];
+    prefs.setString("teamGroup", jsonEncode(teamGroup.toJson()));
+  }
 
   prefs.setString("currentUser", jsonEncode(currentUser.toJson()));
-  prefs.setString("teamGroup", jsonEncode(group));
   prefs.setString("savedTeam", jsonEncode(userInfo["team"]));
 }

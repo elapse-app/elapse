@@ -1,8 +1,10 @@
 import 'dart:convert';
 
 import 'package:elapse_app/classes/Users/user.dart';
+import 'package:elapse_app/screens/settings/setup_group.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:provider/provider.dart';
@@ -15,6 +17,7 @@ import '../../classes/Tournament/tournament.dart';
 import '../../main.dart';
 import '../widgets/long_button.dart';
 import 'account_settings.dart';
+import 'group_settings.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -35,11 +38,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool sendLTTelemetry = prefs.getBool("sendLTTelemetry") ?? false;
 
   ElapseUser currentUser = elapseUserDecode(prefs.getString("currentUser")!);
-  TeamGroup? teamGroup = prefs.getString("teamGroup") != null ? TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup")!)) : null;
+  TeamGroup? teamGroup =
+      prefs.getString("teamGroup") != null ? TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup")!)) : null;
   bool showEmail = false;
 
   @override
   Widget build(BuildContext context) {
+    print(prefs.getString("teamGroup"));
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
@@ -141,7 +146,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                               }
 
                                               if (tournament != null &&
-                                                  !tournament.teams.contains(loadTeamPreview(selected))) {
+                                                  tournament.teams.singleWhereOrNull((e) => e.id == loadTeamPreview(selected).teamID) != null) {
                                                 showDialog(
                                                     context: context,
                                                     builder: (context) {
@@ -222,12 +227,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   color: Theme.of(context).colorScheme.surfaceDim,
                                 )),
                             GestureDetector(
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => AccountSettings(user: currentUser),
-                                )
-                              ),
+                              onTap: () async {
+                                await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => AccountSettings(user: currentUser),
+                                    ));
+                                setState(() {
+                                  currentUser = elapseUserDecode(prefs.getString("currentUser")!);
+                                });
+                              },
+                              behavior: HitTestBehavior.translucent,
                               child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                                 const Text("Account Settings", style: TextStyle(fontSize: 20)),
                                 Icon(Icons.arrow_forward_outlined,
@@ -245,101 +255,119 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     padding: const EdgeInsets.all(18),
                     child: teamGroup != null
                         ? Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("${teamGroup!.groupName}",
-                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
-                          const SizedBox(height: 18),
-                          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                            const Text("Team", style: TextStyle(fontSize: 18)),
-                            Text("${teamGroup!.teamNumber}",
-                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                          ]),
-                          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                            const Text("Admin", style: TextStyle(fontSize: 18)),
-                            Text.rich(
-                              TextSpan(
-                                  text: teamGroup!.adminId == currentUser.uid ? "(You) " : "",
-                                  style: const TextStyle(fontSize: 18),
-                                  children: [
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                                Text("${teamGroup!.groupName}",
+                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                                const SizedBox(height: 18),
+                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                                  const Text("Team", style: TextStyle(fontSize: 18)),
+                                  Text("${teamGroup!.teamNumber}",
+                                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                                ]),
+                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                                  const Text("Admin", style: TextStyle(fontSize: 18)),
+                                  Text.rich(
                                     TextSpan(
-                                        text: teamGroup!.members[teamGroup!.adminId],
-                                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                                  ]),
-                            )
-                          ]),
-                          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                            const Text("Members", style: TextStyle(fontSize: 18)),
-                            Text("${teamGroup!.members.length}",
-                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                          ]),
-                          Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 5),
-                              child: Divider(
-                                color: Theme.of(context).colorScheme.surfaceDim,
-                              )),
-                          GestureDetector(
-                            onTap: () {},
-                            child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                              const Text("Group Settings", style: TextStyle(fontSize: 20)),
-                              Icon(Icons.arrow_forward_outlined, color: Theme.of(context).colorScheme.onSurfaceVariant),
-                            ]),
-                          ),
-                        ])
-                    : Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Set Up a Group",
-                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
-                          const SizedBox(height: 18),
-                          Text("Currently you are not part of a group. To get access to ScoutSheets and MatchNotes, create a new group or join an existing one.", softWrap: true),
-                          const SizedBox(height: 18),
-                          LongButton(
-                            onPressed: () {
-                              if (true) {
-                                showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: const Text("Not Verified"),
-                                      content: const Text("Go to verify your account?"),
-                                      contentPadding:
-                                      const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                                      actions: [
-                                        TextButton(
-                                          child: Text("Cancel",
-                                              style: TextStyle(
-                                                  color: Theme.of(context).colorScheme.secondary)),
-                                          onPressed: () => Navigator.pop(context),
-                                        ),
-                                        TextButton(
-                                            child: Text("Verify",
-                                                style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
-                                            onPressed: () => Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => AccountSettings(user: currentUser),
-                                              )
-                                            )
-                                        )
-                                      ],
-                                      actionsPadding: const EdgeInsets.only(bottom: 8),
-                                      shape: RoundedRectangleBorder(
-                                          side: BorderSide(color: Theme.of(context).colorScheme.primary),
-                                          borderRadius: BorderRadius.circular(18)),
+                                        text: teamGroup!.adminId == currentUser.uid ? "(You) " : "",
+                                        style: const TextStyle(fontSize: 18),
+                                        children: [
+                                          TextSpan(
+                                              text: teamGroup!.members[teamGroup!.adminId],
+                                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                                        ]),
+                                  )
+                                ]),
+                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                                  const Text("Members", style: TextStyle(fontSize: 18)),
+                                  Text("${teamGroup!.members.length}",
+                                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                                ]),
+                                Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 5),
+                                    child: Divider(
+                                      color: Theme.of(context).colorScheme.surfaceDim,
+                                    )),
+                                GestureDetector(
+                                  onTap: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => GroupSettings(group: teamGroup!),
+                                      ),
                                     );
-                                  }
-                                );
-                                return;
-                              }
-                            },
-                            gradient: true,
-                            text: "Get Started",
-                          )
-                        ]
-                    ),
+                                    setState(() {
+                                      teamGroup = prefs.getString("teamGroup") != null ? TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup")!)) : null;
+                                    });
+                                  },
+                                  behavior: HitTestBehavior.translucent,
+                                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                                    const Text("Group Settings", style: TextStyle(fontSize: 20)),
+                                    Icon(Icons.arrow_forward_outlined,
+                                        color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                  ]),
+                                ),
+                              ])
+                        : Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                                Text("Set Up a Group",
+                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                                const SizedBox(height: 18),
+                                Text(
+                                    "Currently you are not part of a group. To get access to ScoutSheets and MatchNotes, create a new group or join an existing one.",
+                                    softWrap: true),
+                                const SizedBox(height: 18),
+                                LongButton(
+                                  onPressed: () async {
+                                    if (!FirebaseAuth.instance.currentUser!.emailVerified) {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              title: const Text("Not Verified"),
+                                              content: const Text("Go to verify your account?"),
+                                              contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                                              actions: [
+                                                TextButton(
+                                                  child: Text("Cancel",
+                                                      style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                                                  onPressed: () => Navigator.pop(context),
+                                                ),
+                                                TextButton(
+                                                    child: Text("Verify",
+                                                        style:
+                                                            TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                                                    onPressed: () => Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) => AccountSettings(user: currentUser),
+                                                        )))
+                                              ],
+                                              actionsPadding: const EdgeInsets.only(bottom: 8, right: 16),
+                                              shape: RoundedRectangleBorder(
+                                                  side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                                                  borderRadius: BorderRadius.circular(18)),
+                                            );
+                                          });
+                                      return;
+                                    }
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => GroupSetupPage(),
+                                      )
+                                    );
+                                    setState(() {
+                                      teamGroup = prefs.getString("teamGroup") != null ? TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup")!)) : null;
+                                    });
+                                  },
+                                  gradient: true,
+                                  text: "Get Started",
+                                )
+                              ]),
                   ),
                   const SizedBox(height: 32),
                   const SizedBox(
