@@ -36,7 +36,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                   const SizedBox(width: 12),
                   Text('Create',
                       style: TextStyle(
-                        fontSize: 32,
+                        fontSize: 24,
                         fontFamily: 'Manrope',
                         fontWeight: FontWeight.w500,
                         color: Theme.of(context).colorScheme.onSurface,

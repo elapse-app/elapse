@@ -45,7 +45,7 @@ class _GroupSettingsState extends State<GroupSettings> {
       ElapseAppBar(
         title: const Text(
           "Group",
-          style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
         ),
         backNavigation: true,
         background: Padding(
@@ -65,24 +65,24 @@ class _GroupSettingsState extends State<GroupSettings> {
         sliver: SliverToBoxAdapter(
             child: Column(children: [
           Container(
-              height: 140,
+              height: 175,
               decoration: BoxDecoration(
                 border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
                 borderRadius: BorderRadius.circular(18),
               ),
               padding: const EdgeInsets.all(18),
               child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                      SizedBox(
-                        height: 45,
-                        width: 250,
+                      IntrinsicWidth(
+                          child: SizedBox(
+                        height: 40,
                         child: editing
                             ? TextFormField(
                                 controller: nameEditController,
-                                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
+                                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                                 textAlignVertical: TextAlignVertical.center,
                                 decoration: InputDecoration(
                                   enabledBorder: OutlineInputBorder(
@@ -99,7 +99,7 @@ class _GroupSettingsState extends State<GroupSettings> {
                                       width: 2.0,
                                     ),
                                   ),
-                                  contentPadding: const EdgeInsets.only(left: 8),
+                                  contentPadding: const EdgeInsets.symmetric(horizontal: 8),
                                 ),
                                 onFieldSubmitted: (val) {
                                   if (val.isEmpty) {
@@ -108,8 +108,8 @@ class _GroupSettingsState extends State<GroupSettings> {
                                 },
                               )
                             : Text("${widget.group.groupName}",
-                                style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w500)),
-                      ),
+                                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                      )),
                       isAdmin
                           ? GestureDetector(
                               onTap: () {
@@ -127,14 +127,15 @@ class _GroupSettingsState extends State<GroupSettings> {
                                 });
                               },
                               child: Icon(editing ? Icons.done : Icons.edit_outlined,
-                                  color: Theme.of(context).colorScheme.secondary, size: 35),
+                                  color: Theme.of(context).colorScheme.secondary, size: 24),
                             )
                           : const SizedBox.shrink(),
                     ]),
+                    const SizedBox(height: 23),
                     SizedBox(
                       height: 25,
                       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        const Text("Allow Join", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
+                        const Text("Allow Join", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300)),
                         editing
                             ? Switch(
                                 value: widget.group.allowJoin,
@@ -147,13 +148,14 @@ class _GroupSettingsState extends State<GroupSettings> {
                                 },
                               )
                             : Text(widget.group.allowJoin ? "Yes" : "No",
-                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500))
+                                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500))
                       ]),
                     ),
+                    const SizedBox(height: 18),
                     SizedBox(
                       height: 25,
                       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        const Text("Join Code", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
+                        const Text("Join Code", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300)),
                         const Spacer(),
                         editing
                             ? GestureDetector(
@@ -178,7 +180,7 @@ class _GroupSettingsState extends State<GroupSettings> {
                               )
                             : const SizedBox.shrink(),
                         const SizedBox(width: 5),
-                        Text(widget.group.joinCode, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
+                        Text(widget.group.joinCode, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
                       ]),
                     ),
                   ])),
@@ -235,22 +237,19 @@ class _GroupSettingsState extends State<GroupSettings> {
                                     builder: (context) {
                                       return AlertDialog(
                                         title: const Text("Transfer Admin"),
-                                        content: Text.rich(
-                                            TextSpan(
-                                              text: "Are you sure you want to transfer admin to ",
-                                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
-                                              children: [
-                                                TextSpan(
-                                                  text: widget.group.members.values.toList()[selectedMemberIndex],
-                                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                                                ),
-                                                TextSpan(
-                                                  text: "?",
-                                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
-                                                )
-                                              ]
-                                          )
-                                        ),
+                                        content: Text.rich(TextSpan(
+                                            text: "Are you sure you want to transfer admin to ",
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                            children: [
+                                              TextSpan(
+                                                text: widget.group.members.values.toList()[selectedMemberIndex],
+                                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                              ),
+                                              TextSpan(
+                                                text: "?",
+                                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                              )
+                                            ])),
                                         contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                                         actions: [
                                           TextButton(
@@ -259,7 +258,8 @@ class _GroupSettingsState extends State<GroupSettings> {
                                             onPressed: () => Navigator.pop(context),
                                           ),
                                           TextButton(
-                                              child: Text("Transfer", style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                                              child: Text("Transfer",
+                                                  style: TextStyle(color: Theme.of(context).colorScheme.error)),
                                               onPressed: () async {
                                                 String id = widget.group.members.keys.toList()[selectedMemberIndex];
                                                 await database.promoteNewAdmin(
@@ -284,7 +284,10 @@ class _GroupSettingsState extends State<GroupSettings> {
                                 Icon(Icons.swap_horiz, color: Theme.of(context).colorScheme.secondary),
                                 const SizedBox(width: 8),
                                 Text("Transfer Admin",
-                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.secondary)),
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Theme.of(context).colorScheme.secondary)),
                               ])),
                           GestureDetector(
                               onTap: () async {
@@ -293,22 +296,19 @@ class _GroupSettingsState extends State<GroupSettings> {
                                     builder: (context) {
                                       return AlertDialog(
                                         title: const Text("Remove Member"),
-                                        content: Text.rich(
-                                            TextSpan(
-                                                text: "Are you sure you want to remove ",
+                                        content: Text.rich(TextSpan(
+                                            text: "Are you sure you want to remove ",
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                            children: [
+                                              TextSpan(
+                                                text: widget.group.members.values.toList()[selectedMemberIndex],
+                                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                              ),
+                                              TextSpan(
+                                                text: " from this group?",
                                                 style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
-                                                children: [
-                                                  TextSpan(
-                                                    text: widget.group.members.values.toList()[selectedMemberIndex],
-                                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                                                  ),
-                                                  TextSpan(
-                                                    text: " from this group?",
-                                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
-                                                  )
-                                                ]
-                                            )
-                                        ),
+                                              )
+                                            ])),
                                         contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                                         actions: [
                                           TextButton(
@@ -317,7 +317,8 @@ class _GroupSettingsState extends State<GroupSettings> {
                                             onPressed: () => Navigator.pop(context),
                                           ),
                                           TextButton(
-                                              child: Text("Remove", style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                                              child: Text("Remove",
+                                                  style: TextStyle(color: Theme.of(context).colorScheme.error)),
                                               onPressed: () async {
                                                 String id = widget.group.members.keys.toList()[selectedMemberIndex];
                                                 await database.removeMember(widget.group.groupId!, id);
@@ -339,7 +340,11 @@ class _GroupSettingsState extends State<GroupSettings> {
                               child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                                 Icon(Icons.person_remove_outlined, color: Theme.of(context).colorScheme.error),
                                 const SizedBox(width: 8),
-                                Text("Remove Member", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.error)),
+                                Text("Remove Member",
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                        color: Theme.of(context).colorScheme.error)),
                               ])),
                         ])
                       : const SizedBox.shrink())
@@ -359,22 +364,19 @@ class _GroupSettingsState extends State<GroupSettings> {
                             builder: (context) {
                               return AlertDialog(
                                 title: const Text("Clear Scoutsheets"),
-                                content: const Text.rich(
-                                    TextSpan(
-                                        text: "Are you sure you want to ",
+                                content: const Text.rich(TextSpan(
+                                    text: "Are you sure you want to ",
+                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                    children: [
+                                      TextSpan(
+                                        text: "permanently clear",
+                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                      ),
+                                      TextSpan(
+                                        text: " all Scoutsheets?",
                                         style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
-                                        children: [
-                                          TextSpan(
-                                            text: "permanently clear",
-                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                                          ),
-                                          TextSpan(
-                                            text: " all Scoutsheets?",
-                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
-                                          ),
-                                        ]
-                                    )
-                                ),
+                                      ),
+                                    ])),
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                                 actions: [
                                   TextButton(
@@ -383,7 +385,8 @@ class _GroupSettingsState extends State<GroupSettings> {
                                     onPressed: () => Navigator.pop(context),
                                   ),
                                   TextButton(
-                                      child: Text("Clear", style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                                      child:
+                                          Text("Clear", style: TextStyle(color: Theme.of(context).colorScheme.error)),
                                       onPressed: () {
                                         database.clearScoutsheets(widget.group.groupId!);
                                         Navigator.pop(context);
@@ -398,7 +401,9 @@ class _GroupSettingsState extends State<GroupSettings> {
                       },
                       behavior: HitTestBehavior.translucent,
                       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        Text("Clear Scoutsheets", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300, color: Theme.of(context).colorScheme.error)),
+                        Text("Clear Scoutsheets",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w300, color: Theme.of(context).colorScheme.error)),
                         Icon(Icons.contact_page_outlined, color: Theme.of(context).colorScheme.error),
                       ])),
                   const SizedBox(height: 18),
@@ -409,22 +414,19 @@ class _GroupSettingsState extends State<GroupSettings> {
                             builder: (context) {
                               return AlertDialog(
                                 title: const Text("Clear Match Notes"),
-                                content: const Text.rich(
-                                    TextSpan(
-                                        text: "Are you sure you want to ",
+                                content: const Text.rich(TextSpan(
+                                    text: "Are you sure you want to ",
+                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                    children: [
+                                      TextSpan(
+                                        text: "permanently clear",
+                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                      ),
+                                      TextSpan(
+                                        text: " all Match Notes?",
                                         style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
-                                        children: [
-                                          TextSpan(
-                                            text: "permanently clear",
-                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                                          ),
-                                          TextSpan(
-                                            text: " all Match Notes?",
-                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
-                                          ),
-                                        ]
-                                    )
-                                ),
+                                      ),
+                                    ])),
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                                 actions: [
                                   TextButton(
@@ -433,7 +435,8 @@ class _GroupSettingsState extends State<GroupSettings> {
                                     onPressed: () => Navigator.pop(context),
                                   ),
                                   TextButton(
-                                      child: Text("Clear", style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                                      child:
+                                          Text("Clear", style: TextStyle(color: Theme.of(context).colorScheme.error)),
                                       onPressed: () {
                                         database.clearMatchNotes(widget.group.groupId!);
                                         Navigator.pop(context);
@@ -448,7 +451,9 @@ class _GroupSettingsState extends State<GroupSettings> {
                       },
                       behavior: HitTestBehavior.translucent,
                       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        Text("Clear Match Notes", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300, color: Theme.of(context).colorScheme.error)),
+                        Text("Clear Match Notes",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w300, color: Theme.of(context).colorScheme.error)),
                         Icon(Icons.gamepad_outlined, color: Theme.of(context).colorScheme.error),
                       ])),
                   const SizedBox(height: 18),
@@ -459,34 +464,31 @@ class _GroupSettingsState extends State<GroupSettings> {
                             builder: (context) {
                               return AlertDialog(
                                 title: const Text("Delete Team Group"),
-                                content: const Text.rich(
-                                    TextSpan(
-                                        text: "Are you sure you want to ",
+                                content: const Text.rich(TextSpan(
+                                    text: "Are you sure you want to ",
+                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                    children: [
+                                      TextSpan(
+                                        text: "delete",
+                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                      ),
+                                      TextSpan(
+                                        text: " this group? This action ",
                                         style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
-                                        children: [
-                                          TextSpan(
-                                            text: "delete",
-                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                                          ),
-                                          TextSpan(
-                                            text: " this group? This action ",
-                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
-                                          ),
-                                          TextSpan(
-                                            text: "cannot",
-                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                                          ),
-                                          TextSpan(
-                                            text: " be undone.\n\n",
-                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
-                                          ),
-                                          TextSpan(
-                                            text: "All Scoutsheets and Match Notes will be deleted as well.",
-                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                                          ),
-                                        ]
-                                    )
-                                ),
+                                      ),
+                                      TextSpan(
+                                        text: "cannot",
+                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                      ),
+                                      TextSpan(
+                                        text: " be undone.\n\n",
+                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                      ),
+                                      TextSpan(
+                                        text: "All Scoutsheets and Match Notes will be deleted as well.",
+                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                      ),
+                                    ])),
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                                 actions: [
                                   TextButton(
@@ -495,9 +497,12 @@ class _GroupSettingsState extends State<GroupSettings> {
                                     onPressed: () => Navigator.pop(context),
                                   ),
                                   TextButton(
-                                      child: Text("Delete", style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                                      child:
+                                          Text("Delete", style: TextStyle(color: Theme.of(context).colorScheme.error)),
                                       onPressed: () {
-                                        Navigator.of(context)..pop()..pop();
+                                        Navigator.of(context)
+                                          ..pop()
+                                          ..pop();
                                         database.deleteTeamGroup(widget.group.groupId!);
                                         prefs.remove("teamGroup");
                                       })
@@ -511,7 +516,9 @@ class _GroupSettingsState extends State<GroupSettings> {
                       },
                       behavior: HitTestBehavior.translucent,
                       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        Text("Delete Group", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300, color: Theme.of(context).colorScheme.error)),
+                        Text("Delete Group",
+                            style: TextStyle(
+                                fontSize: 20, fontWeight: FontWeight.w300, color: Theme.of(context).colorScheme.error)),
                         Icon(Icons.delete_forever_outlined, color: Theme.of(context).colorScheme.error),
                       ])),
                 ])
@@ -532,7 +539,9 @@ class _GroupSettingsState extends State<GroupSettings> {
                               TextButton(
                                   child: Text("Leave", style: TextStyle(color: Theme.of(context).colorScheme.error)),
                                   onPressed: () {
-                                    Navigator.of(context)..pop()..pop();
+                                    Navigator.of(context)
+                                      ..pop()
+                                      ..pop();
                                     Database database = Database();
                                     database.leaveTeamGroup(
                                         widget.group.groupId!, FirebaseAuth.instance.currentUser!.uid);
@@ -548,7 +557,9 @@ class _GroupSettingsState extends State<GroupSettings> {
                   },
                   behavior: HitTestBehavior.translucent,
                   child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    Text("Leave Group", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300, color: Theme.of(context).colorScheme.error)),
+                    Text("Leave Group",
+                        style: TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.w300, color: Theme.of(context).colorScheme.error)),
                     Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
                   ])),
         ])),

@@ -38,7 +38,7 @@ class _AccountSettingsState extends State<AccountSettings> {
       ElapseAppBar(
         title: const Text(
           "Account",
-          style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
         ),
         backNavigation: true,
         background: Padding(
