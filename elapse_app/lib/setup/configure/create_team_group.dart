@@ -200,6 +200,7 @@ class _CreateTeamGroupState extends State<CreateTeamGroup> {
                                       currentElapseUser.fname ?? "",
                                       currentElapseUser.lname ?? "")
                                   .then((value) {
+                                    print(value?.toJson());
                                 prefs.setString("teamGroup", jsonEncode(value?.toJson()));
                                 Navigator.push(
                                   context,

@@ -69,7 +69,7 @@ class VDAStats {
 
   factory VDAStats.fromJson(Map<String, dynamic> json) {
     return VDAStats(
-      id: json["id"],
+      id: json["id"].truncate(),
       teamNum: json["team_number"],
       teamName: json["team_name"],
       gradeLevel: gradeLevels[json["grade"]],
