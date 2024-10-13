@@ -37,7 +37,7 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
           const SizedBox(width: 12),
           Text('Setup',
               style: TextStyle(
-                fontSize: 32,
+                fontSize: 24,
                 fontFamily: 'Manrope',
                 fontWeight: FontWeight.w500,
                 color: Theme.of(context).colorScheme.onSurface,
