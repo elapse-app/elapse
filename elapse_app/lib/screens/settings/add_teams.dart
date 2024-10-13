@@ -9,16 +9,23 @@ import '../../main.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/custom_tab_bar.dart';
 
-class AddTeamPage extends StatefulWidget {
-  const AddTeamPage({super.key});
+class ManageTeamPage extends StatefulWidget {
+  const ManageTeamPage({super.key});
 
   @override
-  State<AddTeamPage> createState() => _AddTeamPageState();
+  State<ManageTeamPage> createState() => _ManageTeamPageState();
 }
 
-class _AddTeamPageState extends State<AddTeamPage> {
+class _ManageTeamPageState extends State<ManageTeamPage> {
   String searchQuery = "";
   Future<List<TeamPreview>>? searchResults;
+  List<TeamPreview> savedTeams = [];
+
+  @override
+  void initState() {
+    super.initState();
+    savedTeams = getSavedTeams();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +34,7 @@ class _AddTeamPageState extends State<AddTeamPage> {
       body: CustomScrollView(slivers: [
         const ElapseAppBar(
           title: Text(
-            "Add teams",
+            "Manage teams",
             style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
           ),
           backNavigation: true,
@@ -62,13 +69,15 @@ class _AddTeamPageState extends State<AddTeamPage> {
                         onSubmitted: (query) {
                           setState(() {
                             searchQuery = query;
-                            searchResults = fetchTeamPreview(query);
+                            if (query.isNotEmpty) {
+                              searchResults = fetchTeamPreview(query);
+                            }
                           });
                         },
                         cursorColor: Theme.of(context).colorScheme.secondary,
                         decoration: const InputDecoration(
                           icon: Icon(Icons.search),
-                          hintText: "Search teams",
+                          hintText: "Search all teams",
                           border: InputBorder.none,
                         ),
                       ))
@@ -78,114 +87,211 @@ class _AddTeamPageState extends State<AddTeamPage> {
           ),
         ),
         SliverPadding(
-            padding: const EdgeInsets.symmetric(horizontal: 23),
-            sliver: FutureBuilder(
-                future: searchResults,
-                builder: (context, snapshot) {
-                  switch (snapshot.connectionState) {
-                    case ConnectionState.none:
-                      return const SliverToBoxAdapter(
-                          child: BigErrorMessage(icon: Icons.search, message: "Search for teams to add"));
-                    case ConnectionState.waiting:
-                    case ConnectionState.active:
-                      return const SliverToBoxAdapter(
-                          child: Center(
-                              child: Padding(padding: EdgeInsets.only(top: 50), child: CircularProgressIndicator())));
-                    case ConnectionState.done:
-                      if (snapshot.hasError) {
-                        print(snapshot.error);
+          padding: const EdgeInsets.symmetric(horizontal: 23),
+          sliver: searchQuery.isNotEmpty
+              ? FutureBuilder(
+                  future: searchResults,
+                  builder: (context, snapshot) {
+                    switch (snapshot.connectionState) {
+                      case ConnectionState.none:
+                      case ConnectionState.waiting:
+                      case ConnectionState.active:
                         return const SliverToBoxAdapter(
-                            child: BigErrorMessage(icon: Icons.search_off, message: "Unable to fetch teams"));
-                      }
+                            child: Center(
+                                child: Padding(padding: EdgeInsets.only(top: 50), child: CircularProgressIndicator())));
+                      case ConnectionState.done:
+                        if (snapshot.hasError) {
+                          print(snapshot.error);
+                          return const SliverToBoxAdapter(
+                              child: BigErrorMessage(icon: Icons.search_off, message: "Unable to fetch teams"));
+                        }
 
-                      List<TeamPreview> teams = (snapshot.data as List<TeamPreview>).toSet().toList();
-                      if (teams.isEmpty) {
-                        return const SliverToBoxAdapter(
-                            child: BigErrorMessage(icon: Icons.search_off, message: "No teams found"));
-                      }
+                        List<TeamPreview> teams = (snapshot.data as List<TeamPreview>).toSet().toList();
+                        if (teams.isEmpty) {
+                          return const SliverToBoxAdapter(
+                              child: BigErrorMessage(icon: Icons.search_off, message: "No teams found"));
+                        }
 
-                      return SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final team = teams[index];
-                            return Column(children: [
-                              GestureDetector(
-                                onTap: () {
-                                  List<TeamPreview> savedTeams = getSavedTeams();
+                        return SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final team = teams[index];
+                              return Column(children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    List<TeamPreview> savedTeams = getSavedTeams();
 
-                                  if (savedTeams.contains(team)) {
-                                    savedTeams.remove(team);
-                                  } else {
-                                    savedTeams.add(team);
-                                  }
+                                    if (savedTeams.contains(team)) {
+                                      savedTeams.remove(team);
+                                    } else {
+                                      savedTeams.add(team);
+                                    }
 
-                                  prefs.setString("savedTeam", jsonEncode(savedTeams[0].toJson()));
-                                  prefs.setStringList(
-                                      "savedTeams", savedTeams.sublist(1).map((e) => jsonEncode(e.toJson())).toList());
-                                  setState(() {});
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 10),
-                                  child: Flex(direction: Axis.horizontal, children: [
-                                    Flexible(
-                                      flex: 6,
-                                      fit: FlexFit.tight,
-                                      child: Text(team.teamNumber,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                              fontSize: 40,
-                                              height: 1,
-                                              letterSpacing: -1.5,
-                                              fontWeight: FontWeight.w400,
-                                              color: Theme.of(context).colorScheme.onSurface)),
-                                    ),
-                                    Flexible(
-                                      flex: 7,
-                                      fit: FlexFit.tight,
-                                      child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                        crossAxisAlignment: CrossAxisAlignment.end,
-                                        children: [
-                                          Text(team.teamName ?? "",
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                              )),
-                                          Text(
-                                              '${team.location?.city ?? ""}${team.location?.city != null ? "," : ""} ${team.location?.region ?? ""}',
-                                              textAlign: TextAlign.end,
-                                              style: TextStyle(
-                                                fontSize: 16,
-                                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.65),
-                                              ))
-                                        ],
+                                    if (savedTeams.isEmpty) {
+                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                        content: Text("Must have at least one saved team"),
+                                        duration: Duration(seconds: 1),
+                                      ));
+                                      return;
+                                    }
+
+                                    prefs.setString("savedTeam", jsonEncode(savedTeams[0].toJson()));
+                                    prefs.setStringList("savedTeams",
+                                        savedTeams.sublist(1).map((e) => jsonEncode(e.toJson())).toList());
+                                    setState(() {
+                                      savedTeams = getSavedTeams();
+                                    });
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 10),
+                                    child: Flex(direction: Axis.horizontal, children: [
+                                      Flexible(
+                                        flex: 6,
+                                        fit: FlexFit.tight,
+                                        child: Text(team.teamNumber,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                fontSize: 40,
+                                                height: 1,
+                                                letterSpacing: -1.5,
+                                                fontWeight: FontWeight.w400,
+                                                color: Theme.of(context).colorScheme.onSurface)),
                                       ),
-                                    ),
-                                    Flexible(
-                                      flex: 2,
-                                      fit: FlexFit.tight,
-                                      child: Icon(
-                                        getSavedTeams().contains(team) ? Icons.check : Icons.add,
+                                      Flexible(
+                                        flex: 7,
+                                        fit: FlexFit.tight,
+                                        child: Column(
+                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                          crossAxisAlignment: CrossAxisAlignment.end,
+                                          children: [
+                                            Text(team.teamName ?? "",
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                )),
+                                            Text(
+                                                '${team.location?.city ?? ""}${team.location?.city != null ? "," : ""} ${team.location?.region ?? ""}',
+                                                textAlign: TextAlign.end,
+                                                style: TextStyle(
+                                                  fontSize: 16,
+                                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.65),
+                                                ))
+                                          ],
+                                        ),
                                       ),
-                                    )
-                                  ]),
+                                      Flexible(
+                                        flex: 2,
+                                        fit: FlexFit.tight,
+                                        child: Icon(
+                                          getSavedTeams().contains(team) ? Icons.check : Icons.add,
+                                        ),
+                                      )
+                                    ]),
+                                  ),
+                                ),
+                                index != teams.length - 1
+                                    ? Divider(
+                                        height: 3,
+                                        color: Theme.of(context).colorScheme.surfaceDim,
+                                      )
+                                    : const SizedBox.shrink(),
+                              ]);
+                            },
+                            childCount: teams.length,
+                          ),
+                        );
+                    }
+                  })
+              : SliverList(
+                  delegate: SliverChildBuilderDelegate(
+                    (context, index) {
+                      final team = savedTeams[index];
+                      return Column(children: [
+                        GestureDetector(
+                          onTap: () {
+                            List<TeamPreview> savedTeams = getSavedTeams();
+
+                            if (savedTeams.contains(team)) {
+                              savedTeams.remove(team);
+                            } else {
+                              savedTeams.add(team);
+                            }
+                            if (savedTeams.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                content: Text("Must have at least one saved team"),
+                                duration: Duration(seconds: 1),
+                              ));
+                              return;
+                            }
+
+                            prefs.setString("savedTeam", jsonEncode(savedTeams[0].toJson()));
+                            prefs.setStringList(
+                                "savedTeams", savedTeams.sublist(1).map((e) => jsonEncode(e.toJson())).toList());
+                            setState(() {});
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            child: Flex(direction: Axis.horizontal, children: [
+                              Flexible(
+                                flex: 6,
+                                fit: FlexFit.tight,
+                                child: Text(team.teamNumber,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        fontSize: 40,
+                                        height: 1,
+                                        letterSpacing: -1.5,
+                                        fontWeight: FontWeight.w400,
+                                        color: Theme.of(context).colorScheme.onSurface)),
+                              ),
+                              Flexible(
+                                flex: 7,
+                                fit: FlexFit.tight,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Text(team.teamName ?? "",
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: const TextStyle(
+                                          fontSize: 16,
+                                        )),
+                                    Text(
+                                        '${team.location?.city ?? ""}${team.location?.city != null ? "," : ""} ${team.location?.region ?? ""}',
+                                        textAlign: TextAlign.end,
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.65),
+                                        ))
+                                  ],
                                 ),
                               ),
-                              index != teams.length - 1
-                                  ? Divider(
-                                      height: 3,
-                                      color: Theme.of(context).colorScheme.surfaceDim,
-                                    )
-                                  : const SizedBox.shrink(),
-                            ]);
-                          },
-                          childCount: teams.length,
+                              Flexible(
+                                flex: 2,
+                                fit: FlexFit.tight,
+                                child: Icon(
+                                  getSavedTeams().contains(team) ? Icons.check : Icons.add,
+                                ),
+                              )
+                            ]),
+                          ),
                         ),
-                      );
-                  }
-                }))
+                        index != savedTeams.length - 1
+                            ? Divider(
+                                height: 3,
+                                color: Theme.of(context).colorScheme.surfaceDim,
+                              )
+                            : const SizedBox.shrink(),
+                      ]);
+                    },
+                    childCount: savedTeams.length,
+                  ),
+                ),
+        ),
       ]),
     );
   }

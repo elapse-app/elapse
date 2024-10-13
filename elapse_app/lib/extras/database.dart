@@ -25,7 +25,8 @@ class Database {
         'firstName': newUser?.fname, // Changed to first name field later
         'lastName': newUser?.lname, // Changed to last name field later
         'team': savedTeam.toJson(),
-        'groupId': []
+        'groupId': [],
+        'verified': false
       });
       return newUser?.uid;
     } catch (e) {
@@ -55,6 +56,15 @@ class Database {
   Future<void> deleteCurrentUser() async {
     try {
       await _firestore.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).delete();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> verifyUser(String uid) async {
+    try {
+      var user = await _firestore.collection('users').doc(uid).get();
+      user.reference.update({'verified': true});
     } catch (e) {
       print(e);
     }

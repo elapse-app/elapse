@@ -1,14 +1,8 @@
 import 'dart:convert';
 
 import 'package:elapse_app/classes/Users/user.dart';
-import 'package:elapse_app/screens/home/home.dart';
-import 'package:elapse_app/screens/settings/add_teams.dart';
-import 'package:elapse_app/screens/settings/edit_account.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
-import 'package:elapse_app/setup/signup/login_or_signup.dart';
-import 'package:elapse_app/setup/welcome/first_page.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:provider/provider.dart';
@@ -16,13 +10,11 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:collection/collection.dart';
 
 import '../../classes/Groups/teamGroup.dart';
-import '../../classes/Team/team.dart';
 import '../../classes/Team/teamPreview.dart';
 import '../../classes/Tournament/tournament.dart';
-import '../../classes/Tournament/tournament_preview.dart';
-import '../../extras/database.dart';
 import '../../main.dart';
-import '../widgets/big_error_message.dart';
+import '../widgets/long_button.dart';
+import 'account_settings.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -43,7 +35,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool sendLTTelemetry = prefs.getBool("sendLTTelemetry") ?? false;
 
   ElapseUser currentUser = elapseUserDecode(prefs.getString("currentUser")!);
-  TeamGroup teamGroup = TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup") ?? ""));
+  TeamGroup? teamGroup = prefs.getString("teamGroup") != null ? TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup")!)) : null;
   bool showEmail = false;
 
   @override
@@ -159,13 +151,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                         contentPadding:
                                                             const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                                                         actions: [
-                                                          ElevatedButton(
+                                                          TextButton(
                                                             child: Text("Cancel",
                                                                 style: TextStyle(
                                                                     color: Theme.of(context).colorScheme.secondary)),
                                                             onPressed: () => Navigator.pop(context),
                                                           ),
-                                                          ElevatedButton(
+                                                          TextButton(
                                                               child: Text("Switch",
                                                                   style: TextStyle(
                                                                       color: Theme.of(context).colorScheme.secondary)),
@@ -230,7 +222,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   color: Theme.of(context).colorScheme.surfaceDim,
                                 )),
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AccountSettings(user: currentUser),
+                                )
+                              ),
                               child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                                 const Text("Account Settings", style: TextStyle(fontSize: 20)),
                                 Icon(Icons.arrow_forward_outlined,
@@ -246,34 +243,35 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       borderRadius: BorderRadius.circular(18),
                     ),
                     padding: const EdgeInsets.all(18),
-                    child: Column(
+                    child: teamGroup != null
+                        ? Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("${teamGroup.groupName}",
+                          Text("${teamGroup!.groupName}",
                               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
                           const SizedBox(height: 18),
                           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                             const Text("Team", style: TextStyle(fontSize: 18)),
-                            Text("${teamGroup.teamNumber}",
+                            Text("${teamGroup!.teamNumber}",
                                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                           ]),
                           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                             const Text("Admin", style: TextStyle(fontSize: 18)),
                             Text.rich(
                               TextSpan(
-                                  text: teamGroup.adminId == currentUser.uid ? "(You) " : "",
+                                  text: teamGroup!.adminId == currentUser.uid ? "(You) " : "",
                                   style: const TextStyle(fontSize: 18),
                                   children: [
                                     TextSpan(
-                                        text: teamGroup.members[teamGroup.adminId],
+                                        text: teamGroup!.members[teamGroup!.adminId],
                                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                                   ]),
                             )
                           ]),
                           Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                             const Text("Members", style: TextStyle(fontSize: 18)),
-                            Text("${teamGroup.members.length}",
+                            Text("${teamGroup!.members.length}",
                                 style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
                           ]),
                           Padding(
@@ -288,7 +286,60 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               Icon(Icons.arrow_forward_outlined, color: Theme.of(context).colorScheme.onSurfaceVariant),
                             ]),
                           ),
-                        ]),
+                        ])
+                    : Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Set Up a Group",
+                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                          const SizedBox(height: 18),
+                          Text("Currently you are not part of a group. To get access to ScoutSheets and MatchNotes, create a new group or join an existing one.", softWrap: true),
+                          const SizedBox(height: 18),
+                          LongButton(
+                            onPressed: () {
+                              if (true) {
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: const Text("Not Verified"),
+                                      content: const Text("Go to verify your account?"),
+                                      contentPadding:
+                                      const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                                      actions: [
+                                        TextButton(
+                                          child: Text("Cancel",
+                                              style: TextStyle(
+                                                  color: Theme.of(context).colorScheme.secondary)),
+                                          onPressed: () => Navigator.pop(context),
+                                        ),
+                                        TextButton(
+                                            child: Text("Verify",
+                                                style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                                            onPressed: () => Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => AccountSettings(user: currentUser),
+                                              )
+                                            )
+                                        )
+                                      ],
+                                      actionsPadding: const EdgeInsets.only(bottom: 8),
+                                      shape: RoundedRectangleBorder(
+                                          side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                                          borderRadius: BorderRadius.circular(18)),
+                                    );
+                                  }
+                                );
+                                return;
+                              }
+                            },
+                            gradient: true,
+                            text: "Get Started",
+                          )
+                        ]
+                    ),
                   ),
                   const SizedBox(height: 32),
                   const SizedBox(

@@ -12,7 +12,6 @@ import 'package:elapse_app/screens/tournament_mode/home.dart';
 import 'package:elapse_app/screens/tournament_mode/my_teams.dart';
 import 'package:elapse_app/screens/tournament_mode/tournament.dart';
 import 'package:elapse_app/setup/welcome/first_page.dart';
-import 'package:elapse_app/setup/deprecated/setup.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,7 +19,6 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
 
 final GlobalKey<MyAppState> myAppKey = GlobalKey<MyAppState>();
