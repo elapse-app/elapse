@@ -18,6 +18,7 @@ class ElapseUser {
   // Team of the Team Group
   String? teamNumber;
   String? age;
+  bool? verified;
 
   // Members of the Team Group
   List<String> groupID = [];
@@ -30,7 +31,9 @@ class ElapseUser {
       this.fname,
       this.lname,
       this.teamNumber,
-      this.age});
+      this.age,
+        this.verified,
+      });
 
   Map<String, dynamic> toJson() {
     return {
@@ -39,7 +42,8 @@ class ElapseUser {
       "first-name": this.fname,
       "last-name": this.lname,
       "team-number": this.teamNumber,
-      "age": this.age
+      "age": this.age,
+      "verified": this.verified,
     };
   }
 }
@@ -52,5 +56,7 @@ ElapseUser elapseUserDecode(String json) {
       fname: map["first-name"],
       lname: map["last-name"],
       teamNumber: map["team-number"],
-      age: map["age"]);
+      age: map["age"],
+      verified: map["verified"],
+  );
 }

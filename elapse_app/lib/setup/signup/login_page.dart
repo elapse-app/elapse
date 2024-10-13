@@ -200,6 +200,7 @@ class _LoginPageState extends State<LoginPage> {
                                   builder: (context) => const CompleteSetupPage(),
                                 ));
                           }).catchError((onError) {
+                            print(onError);
                             showDialog(
                                 barrierDismissible: false,
                                 context: context,

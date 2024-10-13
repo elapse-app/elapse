@@ -9,6 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../classes/Groups/teamGroup.dart';
+
 Future<String?> signUp(String email, String password, bool cancel) async {
   try {
     // Create user with email and password
@@ -96,9 +98,16 @@ Future<void> signIN(String email, String password) async {
       email: userInfo["email"],
       fname: userInfo["firstName"],
       lname: userInfo["lastName"],
-      teamNumber: userInfo["team"]["teamNumber"]);
+      teamNumber: userInfo["team"]["teamNumber"],
+      verified: userInfo["verified"],
+  );
+  if (userInfo["groupId"].isNotEmpty) {
+    Map<String, dynamic>? group = await database.getGroupInfo(userInfo["groupId"][0]);
+    final teamGroup = TeamGroup.fromJson(group!);
+    teamGroup.groupId = userInfo["groupId"][0];
+    prefs.setString("teamGroup", jsonEncode(teamGroup.toJson()));
+  }
 
   prefs.setString("currentUser", jsonEncode(currentUser.toJson()));
-  prefs.setString("teamGroup", userInfo["groupId"][0]);
   prefs.setString("savedTeam", jsonEncode(userInfo["team"]));
 }

@@ -28,6 +28,7 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
     currentUser = ElapseUser(
       uid: firebaseUser!.uid,
       email: firebaseUser!.email,
+      verified: firebaseUser!.emailVerified,
     );
   }
 
