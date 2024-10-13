@@ -34,7 +34,7 @@ class PicklistWidget extends StatelessWidget {
           Positioned.fill(
               child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 1),
-            child: Container(color: Colors.redAccent),
+            child: Container(color: Theme.of(context).colorScheme.error),
           )),
           Dismissible(
             key: Key("$index"),
@@ -49,7 +49,7 @@ class PicklistWidget extends StatelessWidget {
             background: Container(
               padding: const EdgeInsets.only(right: 20),
               alignment: Alignment.centerRight,
-              color: Colors.redAccent,
+              color: Theme.of(context).colorScheme.error,
               child: Icon(Icons.delete, color: Theme.of(context).colorScheme.surface),
             ),
             child: Container(

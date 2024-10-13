@@ -18,7 +18,7 @@ class GroupCreatePage extends StatefulWidget {
 }
 
 class _GroupCreatePageState extends State<GroupCreatePage> {
-  TextEditingController groupNameController = TextEditingController(), teamNumberController = TextEditingController();
+  TextEditingController groupNameController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -36,9 +36,9 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                   const SizedBox(width: 12),
                   Text('Create',
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 32,
                         fontFamily: 'Manrope',
-                        fontWeight: FontWeight.w600,
+                        fontWeight: FontWeight.w500,
                         color: Theme.of(context).colorScheme.onSurface,
                       )),
                 ]),
@@ -52,12 +52,12 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                           children: [
                             const SizedBox(
                               width: double.infinity,
-                              child: Text("Enter Details", style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600)),
+                              child: Text("Enter Details", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                             ),
                             const SizedBox(height: 18),
                             Align(
                               alignment: Alignment.centerLeft,
-                              child: Text("Enter your group name and your team number."),
+                              child: Text("Enter your group name and your team number.", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300)),
                             ),
                             const SizedBox(height: 23),
                             SizedBox(
@@ -101,49 +101,6 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 18),
-                            SizedBox(
-                              width: double.infinity,
-                              child: TextFormField(
-                                controller: teamNumberController,
-                                obscureText: true,
-                                decoration: InputDecoration(
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(9),
-                                    borderSide: BorderSide(
-                                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
-                                      width: 2.0,
-                                    ),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(9),
-                                    borderSide: BorderSide(
-                                      color: Theme.of(context).colorScheme.primary,
-                                      width: 2.0,
-                                    ),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Theme.of(context).colorScheme.error,
-                                      width: 1.0,
-                                    ),
-                                  ),
-                                  focusedErrorBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Theme.of(context).colorScheme.error,
-                                      width: 2.0,
-                                    ),
-                                  ),
-                                  labelText: 'Team Number',
-                                  labelStyle: TextStyle(
-                                    color: Theme.of(context).colorScheme.onSurface,
-                                    fontWeight: FontWeight.w400,
-                                    fontFamily: "Manrope",
-                                    fontSize: 16,
-                                  ),
-                                ),
-                              ),
-                            ),
                             const SizedBox(height: 23),
                             LongButton(
                               onPressed: () async {
@@ -156,7 +113,6 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                                     .createTeamGroup(
                                     currentUser!.uid,
                                     groupNameController.text,
-                                    teamNumberController.text,
                                     currentElapseUser.fname ?? "",
                                     currentElapseUser.lname ?? "")
                                     .then((value) {

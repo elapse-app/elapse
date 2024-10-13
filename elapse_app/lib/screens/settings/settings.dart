@@ -44,7 +44,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print(prefs.getString("teamGroup"));
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
@@ -52,7 +51,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ElapseAppBar(
             title: const Text(
               "Settings",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+              style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500),
             ),
             backNavigation: true,
             background: Padding(
@@ -91,7 +90,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     radius: 33,
                                   ),
                                   Text('${currentUser.fname!} ${currentUser.lname!}',
-                                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                                   GestureDetector(
                                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                         Text(currentUser.email!,
@@ -146,7 +145,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                               }
 
                                               if (tournament != null &&
-                                                  tournament.teams.singleWhereOrNull((e) => e.id == loadTeamPreview(selected).teamID) != null) {
+                                                  tournament.teams.singleWhereOrNull(
+                                                          (e) => e.id == loadTeamPreview(selected).teamID) !=
+                                                      null) {
                                                 showDialog(
                                                     context: context,
                                                     builder: (context) {
@@ -235,11 +236,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ));
                                 setState(() {
                                   currentUser = elapseUserDecode(prefs.getString("currentUser")!);
+                                  mainTeamId = jsonDecode(prefs.getString("savedTeam") ?? "")["teamID"];
                                 });
                               },
                               behavior: HitTestBehavior.translucent,
                               child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                const Text("Account Settings", style: TextStyle(fontSize: 20)),
+                                const Text("Account Settings",
+                                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
                                 Icon(Icons.arrow_forward_outlined,
                                     color: Theme.of(context).colorScheme.onSurfaceVariant),
                               ]),
@@ -247,7 +250,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ])),
                   const SizedBox(height: 23),
                   Container(
-                    height: 230,
+                    height: teamGroup != null ? 200 : 230,
                     decoration: BoxDecoration(
                       border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
                       borderRadius: BorderRadius.circular(18),
@@ -259,30 +262,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                                 Text("${teamGroup!.groupName}",
-                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                                 const SizedBox(height: 18),
                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                  const Text("Team", style: TextStyle(fontSize: 18)),
-                                  Text("${teamGroup!.teamNumber}",
-                                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                                  const Text("Admin", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300)),
+                                  Text(teamGroup!.members[teamGroup!.adminId]!, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
                                 ]),
                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                  const Text("Admin", style: TextStyle(fontSize: 18)),
-                                  Text.rich(
-                                    TextSpan(
-                                        text: teamGroup!.adminId == currentUser.uid ? "(You) " : "",
-                                        style: const TextStyle(fontSize: 18),
-                                        children: [
-                                          TextSpan(
-                                              text: teamGroup!.members[teamGroup!.adminId],
-                                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                                        ]),
-                                  )
-                                ]),
-                                Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                  const Text("Members", style: TextStyle(fontSize: 18)),
+                                  const Text("Members", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300)),
                                   Text("${teamGroup!.members.length}",
-                                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+                                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
                                 ]),
                                 Padding(
                                     padding: const EdgeInsets.symmetric(vertical: 5),
@@ -298,12 +287,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       ),
                                     );
                                     setState(() {
-                                      teamGroup = prefs.getString("teamGroup") != null ? TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup")!)) : null;
+                                      teamGroup = prefs.getString("teamGroup") != null
+                                          ? TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup")!))
+                                          : null;
                                     });
                                   },
                                   behavior: HitTestBehavior.translucent,
                                   child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                    const Text("Group Settings", style: TextStyle(fontSize: 20)),
+                                    const Text("Group Settings",
+                                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
                                     Icon(Icons.arrow_forward_outlined,
                                         color: Theme.of(context).colorScheme.onSurfaceVariant),
                                   ]),
@@ -314,10 +306,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                                 Text("Set Up a Group",
-                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                                 const SizedBox(height: 18),
                                 Text(
                                     "Currently you are not part of a group. To get access to ScoutSheets and MatchNotes, create a new group or join an existing one.",
+                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
                                     softWrap: true),
                                 const SizedBox(height: 18),
                                 LongButton(
@@ -328,7 +321,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           builder: (context) {
                                             return AlertDialog(
                                               title: const Text("Not Verified"),
-                                              content: const Text("Go to verify your account?"),
+                                              content: const Text("Go to account settings?"),
                                               contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                                               actions: [
                                                 TextButton(
@@ -337,7 +330,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                   onPressed: () => Navigator.pop(context),
                                                 ),
                                                 TextButton(
-                                                    child: Text("Verify",
+                                                    child: Text("Yes",
                                                         style:
                                                             TextStyle(color: Theme.of(context).colorScheme.secondary)),
                                                     onPressed: () => Navigator.push(
@@ -355,13 +348,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       return;
                                     }
                                     await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => GroupSetupPage(),
-                                      )
-                                    );
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => GroupSetupPage(),
+                                        ));
                                     setState(() {
-                                      teamGroup = prefs.getString("teamGroup") != null ? TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup")!)) : null;
+                                      teamGroup = prefs.getString("teamGroup") != null
+                                          ? TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup")!))
+                                          : null;
                                     });
                                   },
                                   gradient: true,
@@ -372,11 +366,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 32),
                   const SizedBox(
                     width: double.infinity,
-                    child: Text("Tournament Settings", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                    child: Text("Tournament", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                   ),
                   const SizedBox(height: 25),
                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    const Text("Use Live Timing", style: TextStyle(fontSize: 18)),
+                    const Text("Use Live Timing", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
                     Switch(
                       value: useLiveTiming,
                       onChanged: (bool? value) {
@@ -391,7 +385,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     color: Theme.of(context).colorScheme.surfaceDim,
                   ),
                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    const Text("Send Live Timing Telemetry", style: TextStyle(fontSize: 18)),
+                    const Text("Send Live Timing Telemetry",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
                     Switch(
                       value: sendLTTelemetry,
                       onChanged: (bool? value) {
@@ -408,27 +403,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 32),
                   const SizedBox(
                     width: double.infinity,
-                    child: Text("General Settings", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                    child: Text("General", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                   ),
                   const SizedBox(height: 25),
-                  Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    const Text("Auto Refresh", style: TextStyle(fontSize: 18)),
-                    Switch(
-                      value: autoRefresh,
-                      onChanged: (bool? value) {
-                        prefs.setBool("autoRefresh", value!);
-                        setState(() {
-                          autoRefresh = value;
-                        });
-                      },
-                    )
-                  ]),
-                  Divider(
-                    color: Theme.of(context).colorScheme.surfaceDim,
-                  ),
                   Consumer<ColorProvider>(builder: (context, colorProvider, snapshot) {
                     return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                      const Text("Theme", style: TextStyle(fontSize: 18)),
+                      const Text("Theme", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
                       DropdownButtonHideUnderline(
                         child: DropdownButton(
                           elevation: 2,
@@ -477,9 +457,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             });
                           },
                           style: TextStyle(
-                            color: Theme.of(context).colorScheme.secondary,
-                            fontSize: 18,
-                          ),
+                              color: Theme.of(context).colorScheme.secondary,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w400),
                           icon: const SizedBox.shrink(),
                           borderRadius: BorderRadius.circular(23),
 
@@ -492,7 +472,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     color: Theme.of(context).colorScheme.surfaceDim,
                   ),
                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    const Text("Default grade", style: TextStyle(fontSize: 18)),
+                    const Text("Default grade", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
                     DropdownButtonHideUnderline(
                         child: DropdownButton(
                       value: defaultGrade,
@@ -509,7 +489,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           defaultGrade = value;
                         });
                       },
-                      style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 18),
+                      style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 18, fontWeight: FontWeight.w400),
                       icon: const SizedBox.shrink(),
                       borderRadius: BorderRadius.circular(10),
                       alignment: Alignment.centerRight,
@@ -521,15 +501,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 32),
                   const SizedBox(
                     width: double.infinity,
-                    child: Text("Other", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                    child: Text("Other", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                   ),
                   const SizedBox(height: 25),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 9),
                     child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                      const Text("Version", style: TextStyle(fontSize: 18)),
+                      const Text("Version", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
                       Text("${appInfo.version} (Build ${appInfo.buildNumber})",
-                          style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.onSurfaceVariant))
+                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, color: Theme.of(context).colorScheme.onSurfaceVariant))
                     ]),
                   ),
                   Divider(
@@ -543,7 +523,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       },
                       child: const SizedBox(
                         width: double.infinity,
-                        child: Text("Send Feedback", style: TextStyle(fontSize: 18)),
+                        child: Text("Send Feedback", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
                       ),
                     ),
                   ),

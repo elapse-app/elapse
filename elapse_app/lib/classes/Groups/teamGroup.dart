@@ -14,9 +14,6 @@ class TeamGroup {
   String? groupId;
   String? adminId;
 
-  // Team of the Team Group
-  String teamNumber;
-
   // Members of the Team Group
   Map<String, String> members;
 
@@ -26,7 +23,6 @@ class TeamGroup {
   TeamGroup({
     required this.groupId,
     required this.adminId,
-    required this.teamNumber,
     required this.members,
     required this.joinCode,
     this.groupName,
@@ -40,7 +36,6 @@ class TeamGroup {
       adminId: json["adminId"],
       joinCode: json["joinCode"],
       allowJoin: json["allowJoin"],
-      teamNumber: json["teamNumber"],
       members: json["members"].map<String, String>((key, val) => MapEntry(key.toString(), val.toString())),
     );
   }
@@ -52,7 +47,6 @@ class TeamGroup {
       "adminId": adminId,
       "joinCode": joinCode,
       "allowJoin": allowJoin,
-      "teamNumber": teamNumber,
       "members": members,
     };
   }

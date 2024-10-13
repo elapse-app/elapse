@@ -45,7 +45,7 @@ class _GroupSettingsState extends State<GroupSettings> {
       ElapseAppBar(
         title: const Text(
           "Group",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+          style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500),
         ),
         backNavigation: true,
         background: Padding(
@@ -65,7 +65,7 @@ class _GroupSettingsState extends State<GroupSettings> {
         sliver: SliverToBoxAdapter(
             child: Column(children: [
           Container(
-              height: 200,
+              height: 140,
               decoration: BoxDecoration(
                 border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
                 borderRadius: BorderRadius.circular(18),
@@ -82,7 +82,7 @@ class _GroupSettingsState extends State<GroupSettings> {
                         child: editing
                             ? TextFormField(
                                 controller: nameEditController,
-                                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
+                                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
                                 textAlignVertical: TextAlignVertical.center,
                                 decoration: InputDecoration(
                                   enabledBorder: OutlineInputBorder(
@@ -108,7 +108,7 @@ class _GroupSettingsState extends State<GroupSettings> {
                                 },
                               )
                             : Text("${widget.group.groupName}",
-                                style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w600)),
+                                style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w500)),
                       ),
                       isAdmin
                           ? GestureDetector(
@@ -131,19 +131,10 @@ class _GroupSettingsState extends State<GroupSettings> {
                             )
                           : const SizedBox.shrink(),
                     ]),
-                    // const SizedBox(height: 18),
                     SizedBox(
                       height: 25,
                       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        const Text("Team", style: TextStyle(fontSize: 20)),
-                        Text(widget.group.teamNumber,
-                            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
-                      ]),
-                    ),
-                    SizedBox(
-                      height: 25,
-                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        const Text("Allow Join", style: TextStyle(fontSize: 20)),
+                        const Text("Allow Join", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
                         editing
                             ? Switch(
                                 value: widget.group.allowJoin,
@@ -156,13 +147,13 @@ class _GroupSettingsState extends State<GroupSettings> {
                                 },
                               )
                             : Text(widget.group.allowJoin ? "Yes" : "No",
-                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600))
+                                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500))
                       ]),
                     ),
                     SizedBox(
                       height: 25,
                       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        const Text("Join Code", style: TextStyle(fontSize: 20)),
+                        const Text("Join Code", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
                         const Spacer(),
                         editing
                             ? GestureDetector(
@@ -187,41 +178,38 @@ class _GroupSettingsState extends State<GroupSettings> {
                               )
                             : const SizedBox.shrink(),
                         const SizedBox(width: 5),
-                        Text(widget.group.joinCode, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+                        Text(widget.group.joinCode, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
                       ]),
                     ),
                   ])),
           const SizedBox(height: 23),
           const SizedBox(
             width: double.infinity,
-            child: Text("Members", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+            child: Text("Members", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
           ),
           const SizedBox(height: 10),
           ListView.builder(
             itemBuilder: (context, index) {
-              return GestureDetector(
+              return InkWell(
                   onTap: () {
                     setState(() {
                       if (!isAdmin) return;
                       selectedMemberIndex = selectedMemberIndex == index ? -1 : index;
                     });
                   },
+                  splashColor: Theme.of(context).colorScheme.tertiary,
+                  borderRadius: BorderRadius.circular(9),
                   child: Container(
                       height: 60,
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 8),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        color:
-                            selectedMemberIndex == index ? Theme.of(context).colorScheme.tertiary : Colors.transparent,
-                      ),
                       child: Row(children: [
                         CircleAvatar(
                           radius: 30,
                         ),
                         const SizedBox(width: 5),
                         Text(widget.group.members.values.toList()[index],
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500)),
                         const Spacer(),
                         widget.group.members.keys.toList()[index] == widget.group.adminId
                             ? Icon(Icons.manage_accounts_outlined, color: Theme.of(context).colorScheme.secondary)
@@ -247,8 +235,22 @@ class _GroupSettingsState extends State<GroupSettings> {
                                     builder: (context) {
                                       return AlertDialog(
                                         title: const Text("Transfer Admin"),
-                                        content: Text(
-                                            "Are you sure you want to transfer admin to ${widget.group.members.values.toList()[selectedMemberIndex]}?"),
+                                        content: Text.rich(
+                                            TextSpan(
+                                              text: "Are you sure you want to transfer admin to ",
+                                              style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                              children: [
+                                                TextSpan(
+                                                  text: widget.group.members.values.toList()[selectedMemberIndex],
+                                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                                ),
+                                                TextSpan(
+                                                  text: "?",
+                                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                                )
+                                              ]
+                                          )
+                                        ),
                                         contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                                         actions: [
                                           TextButton(
@@ -257,7 +259,7 @@ class _GroupSettingsState extends State<GroupSettings> {
                                             onPressed: () => Navigator.pop(context),
                                           ),
                                           TextButton(
-                                              child: const Text("Transfer", style: TextStyle(color: Colors.redAccent)),
+                                              child: Text("Transfer", style: TextStyle(color: Theme.of(context).colorScheme.error)),
                                               onPressed: () async {
                                                 String id = widget.group.members.keys.toList()[selectedMemberIndex];
                                                 await database.promoteNewAdmin(
@@ -282,7 +284,7 @@ class _GroupSettingsState extends State<GroupSettings> {
                                 Icon(Icons.swap_horiz, color: Theme.of(context).colorScheme.secondary),
                                 const SizedBox(width: 8),
                                 Text("Transfer Admin",
-                                    style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.secondary)),
+                                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.secondary)),
                               ])),
                           GestureDetector(
                               onTap: () async {
@@ -291,8 +293,22 @@ class _GroupSettingsState extends State<GroupSettings> {
                                     builder: (context) {
                                       return AlertDialog(
                                         title: const Text("Remove Member"),
-                                        content: Text(
-                                            "Are you sure you want to remove ${widget.group.members.values.toList()[selectedMemberIndex]} from the group?"),
+                                        content: Text.rich(
+                                            TextSpan(
+                                                text: "Are you sure you want to remove ",
+                                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                                children: [
+                                                  TextSpan(
+                                                    text: widget.group.members.values.toList()[selectedMemberIndex],
+                                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                                  ),
+                                                  TextSpan(
+                                                    text: " from this group?",
+                                                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                                  )
+                                                ]
+                                            )
+                                        ),
                                         contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                                         actions: [
                                           TextButton(
@@ -301,7 +317,7 @@ class _GroupSettingsState extends State<GroupSettings> {
                                             onPressed: () => Navigator.pop(context),
                                           ),
                                           TextButton(
-                                              child: const Text("Remove", style: TextStyle(color: Colors.redAccent)),
+                                              child: Text("Remove", style: TextStyle(color: Theme.of(context).colorScheme.error)),
                                               onPressed: () async {
                                                 String id = widget.group.members.keys.toList()[selectedMemberIndex];
                                                 await database.removeMember(widget.group.groupId!, id);
@@ -320,10 +336,10 @@ class _GroupSettingsState extends State<GroupSettings> {
                                       );
                                     });
                               },
-                              child: const Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                                Icon(Icons.person_remove_outlined, color: Colors.redAccent),
-                                SizedBox(width: 8),
-                                Text("Remove Member", style: TextStyle(fontSize: 16, color: Colors.redAccent)),
+                              child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                                Icon(Icons.person_remove_outlined, color: Theme.of(context).colorScheme.error),
+                                const SizedBox(width: 8),
+                                Text("Remove Member", style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Theme.of(context).colorScheme.error)),
                               ])),
                         ])
                       : const SizedBox.shrink())
@@ -333,7 +349,7 @@ class _GroupSettingsState extends State<GroupSettings> {
               ? Column(children: [
                   const SizedBox(
                     width: double.infinity,
-                    child: Text("Manage", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                    child: Text("Manage", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                   ),
                   const SizedBox(height: 23),
                   GestureDetector(
@@ -343,8 +359,22 @@ class _GroupSettingsState extends State<GroupSettings> {
                             builder: (context) {
                               return AlertDialog(
                                 title: const Text("Clear Scoutsheets"),
-                                content: const Text(
-                                    "Are you sure you want to CLEAR Scoutsheets? This action CANNOT be undone."),
+                                content: const Text.rich(
+                                    TextSpan(
+                                        text: "Are you sure you want to ",
+                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                        children: [
+                                          TextSpan(
+                                            text: "permanently clear",
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                          ),
+                                          TextSpan(
+                                            text: " all Scoutsheets?",
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                          ),
+                                        ]
+                                    )
+                                ),
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                                 actions: [
                                   TextButton(
@@ -353,7 +383,7 @@ class _GroupSettingsState extends State<GroupSettings> {
                                     onPressed: () => Navigator.pop(context),
                                   ),
                                   TextButton(
-                                      child: const Text("Clear", style: TextStyle(color: Colors.redAccent)),
+                                      child: Text("Clear", style: TextStyle(color: Theme.of(context).colorScheme.error)),
                                       onPressed: () {
                                         database.clearScoutsheets(widget.group.groupId!);
                                         Navigator.pop(context);
@@ -368,8 +398,8 @@ class _GroupSettingsState extends State<GroupSettings> {
                       },
                       behavior: HitTestBehavior.translucent,
                       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        const Text("Clear Scoutsheets", style: TextStyle(fontSize: 20, color: Colors.redAccent)),
-                        Icon(Icons.contact_page_outlined, color: Colors.redAccent),
+                        Text("Clear Scoutsheets", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300, color: Theme.of(context).colorScheme.error)),
+                        Icon(Icons.contact_page_outlined, color: Theme.of(context).colorScheme.error),
                       ])),
                   const SizedBox(height: 18),
                   GestureDetector(
@@ -379,8 +409,22 @@ class _GroupSettingsState extends State<GroupSettings> {
                             builder: (context) {
                               return AlertDialog(
                                 title: const Text("Clear Match Notes"),
-                                content: const Text(
-                                    "Are you sure you want to CLEAR Match Notes? This action CANNOT be undone."),
+                                content: const Text.rich(
+                                    TextSpan(
+                                        text: "Are you sure you want to ",
+                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                        children: [
+                                          TextSpan(
+                                            text: "permanently clear",
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                          ),
+                                          TextSpan(
+                                            text: " all Match Notes?",
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                          ),
+                                        ]
+                                    )
+                                ),
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                                 actions: [
                                   TextButton(
@@ -389,7 +433,7 @@ class _GroupSettingsState extends State<GroupSettings> {
                                     onPressed: () => Navigator.pop(context),
                                   ),
                                   TextButton(
-                                      child: const Text("Clear", style: TextStyle(color: Colors.redAccent)),
+                                      child: Text("Clear", style: TextStyle(color: Theme.of(context).colorScheme.error)),
                                       onPressed: () {
                                         database.clearMatchNotes(widget.group.groupId!);
                                         Navigator.pop(context);
@@ -404,8 +448,8 @@ class _GroupSettingsState extends State<GroupSettings> {
                       },
                       behavior: HitTestBehavior.translucent,
                       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        const Text("Clear Match Notes", style: TextStyle(fontSize: 20, color: Colors.redAccent)),
-                        Icon(Icons.gamepad_outlined, color: Colors.redAccent),
+                        Text("Clear Match Notes", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300, color: Theme.of(context).colorScheme.error)),
+                        Icon(Icons.gamepad_outlined, color: Theme.of(context).colorScheme.error),
                       ])),
                   const SizedBox(height: 18),
                   GestureDetector(
@@ -415,8 +459,34 @@ class _GroupSettingsState extends State<GroupSettings> {
                             builder: (context) {
                               return AlertDialog(
                                 title: const Text("Delete Team Group"),
-                                content: const Text(
-                                    "Are you sure you want to DELETE this group? This action CANNOT be undone.\n\nALL SCOUTSHEETS AND MATCH NOTES WILL BE DELETED AS WELL!"),
+                                content: const Text.rich(
+                                    TextSpan(
+                                        text: "Are you sure you want to ",
+                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                        children: [
+                                          TextSpan(
+                                            text: "delete",
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                          ),
+                                          TextSpan(
+                                            text: " this group? This action ",
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                          ),
+                                          TextSpan(
+                                            text: "cannot",
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                          ),
+                                          TextSpan(
+                                            text: " be undone.\n\n",
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                          ),
+                                          TextSpan(
+                                            text: "All Scoutsheets and Match Notes will be deleted as well.",
+                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                          ),
+                                        ]
+                                    )
+                                ),
                                 contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
                                 actions: [
                                   TextButton(
@@ -425,15 +495,9 @@ class _GroupSettingsState extends State<GroupSettings> {
                                     onPressed: () => Navigator.pop(context),
                                   ),
                                   TextButton(
-                                      child: const Text("Delete", style: TextStyle(color: Colors.redAccent)),
+                                      child: Text("Delete", style: TextStyle(color: Theme.of(context).colorScheme.error)),
                                       onPressed: () {
-                                        Navigator.pushAndRemoveUntil(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => SettingsScreen(),
-                                          ),
-                                          (_) => false,
-                                        );
+                                        Navigator.of(context)..pop()..pop();
                                         database.deleteTeamGroup(widget.group.groupId!);
                                         prefs.remove("teamGroup");
                                       })
@@ -447,8 +511,8 @@ class _GroupSettingsState extends State<GroupSettings> {
                       },
                       behavior: HitTestBehavior.translucent,
                       child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        const Text("Delete Group", style: TextStyle(fontSize: 20, color: Colors.redAccent)),
-                        Icon(Icons.delete_forever_outlined, color: Colors.redAccent),
+                        Text("Delete Group", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300, color: Theme.of(context).colorScheme.error)),
+                        Icon(Icons.delete_forever_outlined, color: Theme.of(context).colorScheme.error),
                       ])),
                 ])
               : GestureDetector(
@@ -466,15 +530,9 @@ class _GroupSettingsState extends State<GroupSettings> {
                                 onPressed: () => Navigator.pop(context),
                               ),
                               TextButton(
-                                  child: const Text("Leave", style: TextStyle(color: Colors.redAccent)),
+                                  child: Text("Leave", style: TextStyle(color: Theme.of(context).colorScheme.error)),
                                   onPressed: () {
-                                    Navigator.pushAndRemoveUntil(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => SettingsScreen(),
-                                      ),
-                                      (_) => false,
-                                    );
+                                    Navigator.of(context)..pop()..pop();
                                     Database database = Database();
                                     database.leaveTeamGroup(
                                         widget.group.groupId!, FirebaseAuth.instance.currentUser!.uid);
@@ -490,8 +548,8 @@ class _GroupSettingsState extends State<GroupSettings> {
                   },
                   behavior: HitTestBehavior.translucent,
                   child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                    const Text("Leave Group", style: TextStyle(fontSize: 20, color: Colors.redAccent)),
-                    Icon(Icons.logout, color: Colors.redAccent),
+                    Text("Leave Group", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300, color: Theme.of(context).colorScheme.error)),
+                    Icon(Icons.logout, color: Theme.of(context).colorScheme.error),
                   ])),
         ])),
       )

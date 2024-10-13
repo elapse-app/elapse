@@ -196,7 +196,6 @@ class _CreateTeamGroupState extends State<CreateTeamGroup> {
                                   .createTeamGroup(
                                       currentUser!.uid,
                                       groupName,
-                                      currentElapseUser.teamNumber ?? "",
                                       currentElapseUser.fname ?? "",
                                       currentElapseUser.lname ?? "")
                                   .then((value) {
