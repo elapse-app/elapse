@@ -80,7 +80,7 @@ class VDAStats {
       losses: json["total_losses"]?.truncate(),
       ties: json["total_ties"]?.truncate(),
       matches: json["total_matches"]?.truncate(),
-      winPercent: double.tryParse(json["total_winning_percent"]?.toStringAsFixed(2) ?? ""),
+      winPercent: double.tryParse(json["total_winning_percent"]?.toStringAsFixed(1) ?? ""),
       trueSkill: json["trueskill"],
       trueSkillGlobalRank: json["ts_ranking"],
       trueSkillRegionRank: json["ts_ranking_region"],
@@ -126,7 +126,7 @@ class VDAStats {
                       ((json["total_losses"] + json["elimination_losses"]) ?? 0) +
                       ((json["total_ties"] + json["elimination_losses"]) ?? 0))) *
               100)
-          .toStringAsFixed(2)),
+          .toStringAsFixed(1)),
       trueSkill: json["trueskill"],
       trueSkillGlobalRank: json["ts_ranking"]?.truncate(),
       trueSkillRegionRank: 0,

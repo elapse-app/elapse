@@ -129,7 +129,7 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
     while (stat.awp > stat.totalMatches) {
       stat.awp -= 2;
     }
-    stat.awpRate = double.parse((stat.awp / (stat.totalMatches == 0 ? 1 : stat.totalMatches)).toStringAsFixed(2));
+    stat.awpRate = double.parse((stat.awp / (stat.totalMatches == 0 ? 1 : stat.totalMatches)).toStringAsFixed(1));
 
     stat.highScore = t["high_score"] ?? 0;
     stat.avgScore = (t["average_points"] ?? 0).toDouble();
@@ -238,9 +238,9 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
 
   int i = 0;
   for (var stat in stats.values) {
-    stat.opr = double.parse(opr[i].toStringAsFixed(2));
-    stat.dpr = double.parse(dpr[i].toStringAsFixed(2));
-    stat.ccwm = double.parse((stat.opr - stat.dpr).toStringAsFixed(2));
+    stat.opr = double.parse(opr[i].toStringAsFixed(1));
+    stat.dpr = double.parse(dpr[i].toStringAsFixed(1));
+    stat.ccwm = double.parse((stat.opr - stat.dpr).toStringAsFixed(1));
     i++;
   }
 
