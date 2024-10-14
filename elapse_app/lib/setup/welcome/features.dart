@@ -204,7 +204,7 @@ class _FeaturesState extends State<Features> {
                           items: featurePages,
                           carouselController: carouselController,
                           options: CarouselOptions(
-                              height: 560,
+                              height: MediaQuery.of(context).size.height * 0.7,
                               enableInfiniteScroll: false,
                               autoPlay: false,
                               viewportFraction: 1,
@@ -265,7 +265,7 @@ class PhotoPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.50,
+      height: MediaQuery.of(context).size.height * 0.57,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
