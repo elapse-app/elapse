@@ -371,21 +371,130 @@ class _AccountSettingsState extends State<AccountSettings> {
                           TextButton(
                               child: Text("Delete", style: TextStyle(color: Theme.of(context).colorScheme.error)),
                               onPressed: () {
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const FirstSetupPage()),
-                                  ((_) => false),
-                                );
-                                Database database = Database();
-                                database.deleteCurrentUser();
-                                FirebaseAuth.instance.currentUser!.delete();
-                                prefs.remove("currentUser");
-                                prefs.remove("savedTeam");
-                                prefs.remove("savedTeams");
-                                prefs.remove("isTournamentMode");
-                                prefs.remove("teamGroup");
+                                Navigator.pop(context);
+                                TextEditingController passwordController = TextEditingController();
+                                String? error;
+                                final passKey = GlobalKey<FormState>();
+                                showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return StatefulBuilder(
+                                      builder: (context, setState) {
+                                        return AlertDialog(
+                                          title: const Text("Confirm Delete"),
+                                          content: Column(
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text("Enter your password to complete the deletion process."),
+                                                const SizedBox(height: 12),
+                                                TextFormField(
+                                                  key: passKey,
+                                                  controller: passwordController,
+                                                  decoration: InputDecoration(
+                                                    enabledBorder: OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(9),
+                                                      borderSide: BorderSide(
+                                                        color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                                                        width: 2.0,
+                                                      ),
+                                                    ),
+                                                    focusedBorder: OutlineInputBorder(
+                                                      borderRadius: BorderRadius.circular(9),
+                                                      borderSide: BorderSide(
+                                                        color: Theme.of(context).colorScheme.primary,
+                                                        width: 2.0,
+                                                      ),
+                                                    ),
+                                                    errorBorder: OutlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                        color: Theme.of(context).colorScheme.error,
+                                                        width: 1.0,
+                                                      ),
+                                                    ),
+                                                    focusedErrorBorder: OutlineInputBorder(
+                                                      borderSide: BorderSide(
+                                                        color: Theme.of(context).colorScheme.error,
+                                                        width: 2.0,
+                                                      ),
+                                                    ),
+                                                    labelText: 'Password',
+                                                    labelStyle: TextStyle(
+                                                      color: Theme.of(context).colorScheme.onSurface,
+                                                      fontWeight: FontWeight.w400,
+                                                      fontFamily: "Manrope",
+                                                      fontSize: 16,
+                                                    ),
+                                                  ),
+                                                  onChanged: (val) {
+                                                    setState(() {
+                                                      error = "";
+                                                    });
+                                                  },
+                                                  obscureText: true,
+                                                  autovalidateMode: error == null ? AutovalidateMode.onUserInteraction : AutovalidateMode.always,
+                                                  validator: (value) {
+                                                    if (value == null || value.isEmpty) {
+                                                      return 'Please enter your password';
+                                                    }
+                                                    if (error == "invalid-credential") {
+                                                      return "Incorrect Password";
+                                                    }
+                                                    if (error == "too-many-requests") {
+                                                      return "Too many attempts. Try again later.";
+                                                    }
+                                                    return null;
+                                                  },
+                                                ),
+                                              ]
+                                          ),
+                                          contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                                          actions: [
+                                            TextButton(
+                                              child: Text("Cancel", style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                                              onPressed: () => Navigator.pop(context),
+                                            ),
+                                            TextButton(
+                                              child: Text("Delete", style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                                              onPressed: () async {
+                                                try {
+                                                  await FirebaseAuth.instance.currentUser!.reauthenticateWithCredential(
+                                                      EmailAuthProvider.credential(
+                                                          email: FirebaseAuth.instance.currentUser!.email!,
+                                                          password: passwordController.text)
+                                                  );
+                                                } on FirebaseAuthException catch(e) {
+                                                  setState(() {
+                                                    error = e.code;
+                                                  });
+                                                  return;
+                                                }
+                                                Navigator.pushAndRemoveUntil(
+                                                  context,
+                                                  MaterialPageRoute(builder: (context) => const FirstSetupPage()),
+                                                  ((_) => false),
+                                                );
+                                                Database database = Database();
+                                                database.deleteCurrentUser();
+                                                FirebaseAuth.instance.currentUser!.delete();
+                                                prefs.remove("currentUser");
+                                                prefs.remove("savedTeam");
+                                                prefs.remove("savedTeams");
+                                                prefs.remove("isTournamentMode");
+                                                prefs.remove("teamGroup");
 
-                                prefs.setBool("isSetUp", false);
+                                                prefs.setBool("isSetUp", false);
+                                              },
+                                            ),
+                                          ],
+                                          actionsPadding: const EdgeInsets.only(bottom: 8, right: 16),
+                                          shape: RoundedRectangleBorder(
+                                              side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                                              borderRadius: BorderRadius.circular(18)),
+                                        );
+                                      }
+                                    );
+                                  },
+                                );
                               })
                         ],
                         actionsPadding: const EdgeInsets.only(bottom: 8, right: 16),
