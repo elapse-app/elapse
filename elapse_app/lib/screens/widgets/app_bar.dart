@@ -9,7 +9,6 @@ class ElapseAppBar extends StatelessWidget {
       this.includeSettings = false,
       this.backNavigation = false,
       this.returnData,
-      this.prefs,
       this.background,
       this.maxHeight = 125,
       this.backBehavior,
@@ -20,7 +19,6 @@ class ElapseAppBar extends StatelessWidget {
   final bool includeSettings;
   final bool backNavigation;
   final Object? returnData;
-  final SharedPreferences? prefs;
   final double maxHeight;
   final void Function()? backBehavior;
   final void Function()? settingsCallback;

@@ -3,6 +3,8 @@ import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/team_widget.dart';
 import 'package:flutter/material.dart';
 
+import '../../../widgets/app_bar.dart';
+
 class AllTeams extends StatelessWidget {
   const AllTeams({super.key, required this.teams});
   final List<Team> teams;
@@ -13,34 +15,14 @@ class AllTeams extends StatelessWidget {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
-          SliverAppBar.large(
-            automaticallyImplyLeading: false,
-            expandedHeight: 125,
-            centerTitle: false,
-            flexibleSpace: FlexibleSpaceBar(
-              expandedTitleScale: 1,
-              collapseMode: CollapseMode.parallax,
-              title: Padding(
-                padding: EdgeInsets.only(left: 20, right: 12),
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                      icon: Icon(Icons.arrow_back),
-                    ),
-                    const Text(
-                      "All teams",
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
-                    ),
-                  ],
-                ),
-              ),
-              centerTitle: false,
-            ),
-            backgroundColor: Theme.of(context).colorScheme.primary,
+          ElapseAppBar(
+            title: Row(children: [
+              const Text("All Teams", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+              const Spacer(),
+              Text("${teams.length}", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w400)),
+              const SizedBox(width: 23),
+            ]),
+            backNavigation: true,
           ),
           RoundedTop(),
           SliverPadding(
