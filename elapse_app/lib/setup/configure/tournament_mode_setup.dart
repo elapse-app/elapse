@@ -1,7 +1,11 @@
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/long_button.dart';
 import 'package:elapse_app/setup/configure/cloudscout_setup.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+
+import '../../main.dart';
+import 'complete_setup.dart';
 
 class TournamentModeSetupPage extends StatefulWidget {
   const TournamentModeSetupPage({
@@ -14,9 +18,15 @@ class TournamentModeSetupPage extends StatefulWidget {
 }
 
 class _TournamentModeSetupPageState extends State<TournamentModeSetupPage> {
-  @override
   bool useLiveTiming = false;
 
+  @override
+  void initState() {
+    super.initState();
+    prefs.setBool("useLiveTiming", useLiveTiming);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -196,6 +206,7 @@ class _TournamentModeSetupPageState extends State<TournamentModeSetupPage> {
                               Switch(
                                 value: useLiveTiming,
                                 onChanged: (value) {
+                                  prefs.setBool("useLiveTiming", value);
                                   setState(() {
                                     useLiveTiming = value;
                                   });
@@ -214,7 +225,7 @@ class _TournamentModeSetupPageState extends State<TournamentModeSetupPage> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => CloudScoutSetupPage(),
+                                    builder: (context) => FirebaseAuth.instance.currentUser!.emailVerified ? CloudScoutSetupPage() : CompleteSetupPage(),
                                   ),
                                 );
                               },
