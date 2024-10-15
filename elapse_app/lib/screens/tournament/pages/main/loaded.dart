@@ -778,27 +778,24 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen>
 
   Widget ScheduleTab(Color backgroundColor, String title, void Function() onTap,
       bool variable) {
-    return Container(
-      color: backgroundColor,
-      padding: EdgeInsets.symmetric(horizontal: 23, vertical: 5),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Text(
-            title,
-            style: TextStyle(fontSize: 24),
-          ),
-          IconButton(
-            focusColor: Colors.transparent,
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            onPressed: onTap,
-            icon: Icon(variable
-                ? Icons.keyboard_arrow_down
-                : Icons.keyboard_arrow_right),
-          ),
-        ],
-      ),
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.translucent,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 23, vertical: 5),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Text(
+              title,
+              style: TextStyle(fontSize: 24),
+            ),
+            Icon(variable
+                  ? Icons.keyboard_arrow_down
+                  : Icons.keyboard_arrow_right),
+          ],
+        )
+      )
     );
   }
 
