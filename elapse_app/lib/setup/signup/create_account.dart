@@ -19,7 +19,16 @@ class CreateAccount extends StatefulWidget {
 class _CreateAccountState extends State<CreateAccount> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _verifyPassController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    _verifyPassController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -51,332 +60,439 @@ class _CreateAccountState extends State<CreateAccount> {
         //     ),
         //   ),
         // ),
-        body: CustomScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            slivers: [
-              ElapseAppBar(
-                title: Row(children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Icon(Icons.arrow_back),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Sign up',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontFamily: 'Manrope',
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                ]),
-                maxHeight: 60,
+        body: CustomScrollView(physics: const NeverScrollableScrollPhysics(), slivers: [
+          ElapseAppBar(
+            title: Row(children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: const Icon(Icons.arrow_back),
               ),
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Container(
-                  height: double.infinity,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
+              const SizedBox(width: 12),
+              Text(
+                'Sign up',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontFamily: 'Manrope',
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ]),
+            maxHeight: 60,
+          ),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Container(
+              height: double.infinity,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 46),
+                    Center(
+                      child: Text(
+                        'Create an account',
+                        style: TextStyle(
+                          fontFamily: "Manrope",
+                          fontSize: 32,
+                          fontWeight: FontWeight.w300,
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                      ),
                     ),
-                  ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(height: 46),
-                        Center(
-                          child: Text(
-                            'Create an account',
-                            style: TextStyle(
-                              fontFamily: "Manrope",
-                              fontSize: 32,
-                              fontWeight: FontWeight.w300,
-                              color: Theme.of(context).colorScheme.secondary,
-                            ),
+                    SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
+                      child: Center(
+                        child: Text(
+                          'You will receive an email to verify your account',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontWeight: FontWeight.w400,
+                            fontFamily: "Manrope",
+                            fontSize: 16,
+                            color: Theme.of(context).colorScheme.onSurfaceVariant,
                           ),
                         ),
-                        SizedBox(height: 8),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
-                          child: Center(
-                            child: Text(
-                              'You will receive an email to verify your account',
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontFamily: "Manrope",
-                                fontSize: 16,
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurfaceVariant,
-                              ),
+                      ),
+                    ),
+                    SizedBox(height: 32),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
+                      child: TextFormField(
+                        controller: _emailController,
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(9),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                              width: 2.0,
                             ),
                           ),
-                        ),
-                        SizedBox(height: 32),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
-                          child: TextFormField(
-                            controller: _emailController,
-                            decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(9),
-                                borderSide: BorderSide(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withOpacity(0.25),
-                                  width: 2.0,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(9),
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 2.0,
-                                ),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.error,
-                                  width: 1.0,
-                                ),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.error,
-                                  width: 2.0,
-                                ),
-                              ),
-                              labelText: 'Email',
-                              labelStyle: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: "Manrope",
-                                fontSize: 16,
-                              ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(9),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 2.0,
                             ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your email';
-                              }
-                              return null;
-                            },
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.error,
+                              width: 1.0,
+                            ),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.error,
+                              width: 2.0,
+                            ),
+                          ),
+                          labelText: 'Email',
+                          labelStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: "Manrope",
+                            fontSize: 16,
                           ),
                         ),
-                        SizedBox(height: 12),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
-                          child: TextFormField(
-                            controller: _passwordController,
-                            obscureText: true,
-                            decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(9),
-                                borderSide: BorderSide(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withOpacity(0.25),
-                                  width: 2.0,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(9),
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 2.0,
-                                ),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.error,
-                                  width: 1.0,
-                                ),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.error,
-                                  width: 2.0,
-                                ),
-                              ),
-                              labelText: 'Password',
-                              helperText: "8-12 Characters",
-                              labelStyle: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: "Manrope",
-                                fontSize: 16,
-                              ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your email';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
+                      child: TextFormField(
+                        controller: _passwordController,
+                        obscureText: true,
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(9),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                              width: 2.0,
                             ),
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your password';
-                              }
-                              if (value.length < 6 || value.length > 12) {
-                                return 'Password must be 6-12 characters';
-                              }
-                              return null;
-                            },
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(9),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 2.0,
+                            ),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.error,
+                              width: 1.0,
+                            ),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.error,
+                              width: 2.0,
+                            ),
+                          ),
+                          labelText: 'Password',
+                          helperText: "8+ Characters",
+                          labelStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: "Manrope",
+                            fontSize: 16,
                           ),
                         ),
-                        SizedBox(height: 38),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 23.0),
-                          child: LongButton(
-                            text: "Send Verification Email",
-                            icon: Icons.mail_outline,
-                            onPressed: () async {
-                              if (_formKey.currentState!.validate()) {
-                                bool cancel = false;
-                                Future<String?> signUpFuture = signUp(
-                                    _emailController.text,
-                                    _passwordController.text,
-                                    cancel);
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your password';
+                          }
+                          if (value.length < 8) {
+                            return 'Password must be at least 8 characters';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
+                      child: TextFormField(
+                        controller: _verifyPassController,
+                        obscureText: true,
+                        autofocus: false,
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(9),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                              width: 2.0,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(9),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 2.0,
+                            ),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.error,
+                              width: 1.0,
+                            ),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.error,
+                              width: 2.0,
+                            ),
+                          ),
+                          labelText: 'Confirm Password',
+                          helperText: "Please re-enter your password",
+                          labelStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: "Manrope",
+                            fontSize: 16,
+                          ),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please re-enter your password';
+                          }
+                          if (value != _passwordController.text) {
+                            return 'Please make sure your passwords match';
+                          }
+                          return null;
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 38),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 23.0),
+                      child: LongButton(
+                        text: "Create Account",
+                        icon: Icons.person_add_alt,
+                        onPressed: () async {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          if (_formKey.currentState!.validate()) {
+                            String? signUpState = await signUp(_emailController.text, _passwordController.text);
 
-                                showDialog(
-                                    barrierDismissible: false,
-                                    context: context,
-                                    builder: (context) {
-                                      return AlertDialog(
+                            if (signUpState == "email-already-in-use") {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text("Email already in use"),
+                                      content: Text("Login with this email, or create a new account"),
+                                      actions: [
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text(
+                                              "Close",
+                                              style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                            ))
+                                      ],
+                                    );
+                                  });
+                              return;
+                            } else if (signUpState != "success") {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text("Error Occurred"),
+                                      content: Text("An unexpected error occurred."),
+                                      actions: [
+                                        TextButton(
+                                            onPressed: () async {
+                                              final updatedUser = FirebaseAuth.instance.currentUser;
+                                              if (updatedUser != null) {
+                                                await updatedUser.reload(); // Ensure the user object is updated
+                                                await updatedUser.delete(); // Delete the user if verification fails
+                                              }
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text(
+                                              "Close",
+                                              style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                            ))
+                                      ],
+                                    );
+                                  });
+                              return;
+                            }
+
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  bool verified = false;
+                                  return AlertDialog(
                                         title: Text("Verify Email"),
-                                        content: Text(
-                                            "Check your email for a verification link. You have 3 minutes to verify"),
+                                        content: Text("Would you like to verify your account now?"),
                                         actions: [
                                           TextButton(
-                                              onPressed: () async {
-                                                final updatedUser = FirebaseAuth
-                                                    .instance.currentUser;
-                                                if (updatedUser != null) {
-                                                  await updatedUser
-                                                      .reload(); // Ensure the user object is updated
-                                                  await updatedUser
-                                                      .delete(); // Delete the user if verification fails
-                                                }
-                                                Navigator.pop(context);
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) => const EnterDetailsPage(),
+                                                  ),
+                                                );
                                               },
                                               child: Text(
-                                                "Cancel",
-                                                style: TextStyle(
-                                                    color: Theme.of(context)
-                                                        .colorScheme
-                                                        .secondary),
+                                                "Later",
+                                                style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                              )),
+                                          TextButton(
+                                              onPressed: () async {
+                                                Navigator.pop(context);
+
+                                                bool initBuild = false;
+                                                FirebaseAuth.instance.currentUser!.sendEmailVerification();
+                                                showDialog(
+                                                    context: context,
+                                                    builder: (context) {
+                                                      return StatefulBuilder(
+                                                        builder: (context, setState) {
+                                                          if (!initBuild) {
+                                                            initBuild = true;
+                                                            verify() async {
+                                                              DateTime timeout = DateTime.now().add(Duration(minutes: 3));
+                                                              while (!FirebaseAuth.instance.currentUser!.emailVerified &&
+                                                                  DateTime.now().isBefore(timeout)) {
+                                                                await Future.delayed(Duration(seconds: 5));
+                                                                await FirebaseAuth.instance.currentUser!.reload();
+                                                              }
+
+                                                              if (FirebaseAuth.instance.currentUser!.emailVerified) {
+                                                                setState(() {
+                                                                  verified = true;
+                                                                });
+                                                              } else {
+                                                                Navigator.pop(context);
+                                                                final updatedUser = FirebaseAuth.instance.currentUser;
+                                                                if (updatedUser != null) {
+                                                                  await updatedUser
+                                                                      .reload(); // Ensure the user object is updated
+                                                                  await updatedUser
+                                                                      .delete(); // Delete the user if verification fails
+                                                                }
+
+                                                                showDialog(
+                                                                    context: context,
+                                                                    builder: (context) {
+                                                                      return AlertDialog(
+                                                                        title: Text("Verification Timed Out"),
+                                                                        content: Text("Elapse was unable to verify your email in time."),
+                                                                        actions: [
+                                                                          TextButton(
+                                                                              onPressed: () {
+                                                                                Navigator.pop(context);
+                                                                              },
+                                                                              child: Text(
+                                                                                "Close",
+                                                                                style: TextStyle(
+                                                                                    color: Theme.of(context).colorScheme.secondary),
+                                                                              )),
+                                                                        ],
+                                                                      );
+                                                                    });
+                                                              }
+                                                            }
+                                                            verify();
+                                                          }
+
+                                                          return AlertDialog(
+                                                            title: Text("Verify Email"),
+                                                            content: Text.rich(
+                                                              TextSpan(
+                                                                  text:
+                                                                  "Check your email for a verification link. You have 3 minutes to verify. Afterwards, click the ",
+                                                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                                                  children: [
+                                                                    TextSpan(
+                                                                      text: "continue",
+                                                                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
+                                                                    ),
+                                                                    TextSpan(
+                                                                      text: " button below.",
+                                                                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                                                    )
+                                                                  ]),
+                                                            ),
+                                                            actions: [
+                                                              TextButton(
+                                                                  onPressed: () async {
+                                                                    await FirebaseAuth.instance.currentUser!.reload();
+                                                                    await FirebaseAuth.instance.currentUser!.delete();
+                                                                    Navigator.pop(context);
+                                                                  },
+                                                                  child: Text(
+                                                                    "Cancel",
+                                                                    style: TextStyle(
+                                                                        color: Theme.of(context).colorScheme.secondary),
+                                                                  )),
+                                                              TextButton(
+                                                                  onPressed: verified
+                                                                      ? () {
+                                                                    Navigator.push(
+                                                                      context,
+                                                                      MaterialPageRoute(
+                                                                        builder: (context) => const EnterDetailsPage(),
+                                                                      ),
+                                                                    );
+                                                                  }
+                                                                      : null,
+                                                                  child: Text(
+                                                                    "Continue",
+                                                                    style: TextStyle(
+                                                                        color: verified
+                                                                            ? Theme.of(context).colorScheme.secondary
+                                                                            : Theme.of(context).colorScheme.onSurfaceVariant),
+                                                                  )),
+                                                            ],
+                                                          );
+                                                        }
+                                                      );
+                                                    });
+                                              },
+                                              child: Text(
+                                                "Now",
+                                                style: TextStyle(color: Theme.of(context).colorScheme.secondary),
                                               ))
                                         ],
                                       );
-                                    });
-
-                                final uid = await signUpFuture;
-                                Navigator.pop(context);
-                                if (uid == "email-already-in-use") {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                          title: Text("Email already in use"),
-                                          content: Text(
-                                              "Login with this email, or create a new account"),
-                                          actions: [
-                                            TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text(
-                                                  "Close",
-                                                  style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .secondary),
-                                                ))
-                                          ],
-                                        );
-                                      });
-                                }
-
-                                if (uid == "email-not-verified-deleted" ||
-                                    uid == null) {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                          title: Text("Verication Failed"),
-                                          content: Text(
-                                              "Elapse could not verify your email so your account was not created"),
-                                          actions: [
-                                            TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text(
-                                                  "Close",
-                                                  style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .secondary),
-                                                ))
-                                          ],
-                                        );
-                                      });
-                                }
-                                print(uid);
-                                final updatedUser =
-                                    FirebaseAuth.instance.currentUser;
-
-                                if (uid != "email-not-verified-deleted" &&
-                                    uid != null &&
-                                    uid != "email-already-in-use" &&
-                                    updatedUser != null) {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const EnterDetailsPage(),
-                                    ),
-                                  );
-                                } else {
-                                  showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                          title: Text("An Error Occured"),
-                                          content: Text(
-                                              "Your account could not be created at this time, please try again later"),
-                                          actions: [
-                                            TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text(
-                                                  "Close",
-                                                  style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .secondary),
-                                                ))
-                                          ],
-                                        );
-                                      });
-                                }
-                              }
-                            },
-                          ),
-                        ),
-                        SizedBox(height: 12),
-                      ],
+                                });
+                          }
+                        },
+                      ),
                     ),
-                  ),
+                    SizedBox(height: 12),
+                  ],
                 ),
               ),
-            ]));
+            ),
+          ),
+        ]));
   }
 }

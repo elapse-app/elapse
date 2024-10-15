@@ -42,18 +42,18 @@ dependencies:
   ml_linalg: ^13.12.6
   side_sheet: ^1.0.4
   maps_launcher: ^2.2.1
-  firebase_auth: ^4.16.0
-  cloud_firestore: ^4.14.0
-  firebase_core: ^2.24.2
+  firebase_auth: ^5.3.1
+  cloud_firestore: ^5.4.4
+  firebase_core: ^3.6.0
   random_string_generator: ^2.0.0
-  flutter_sticky_header: ^0.6.5
+  flutter_sticky_header: ^0.7.0
   dots_indicator: ^3.0.0
   gradient_borders: ^1.0.1
   camera: ^0.11.0+2
   path_provider: ^2.1.4
   path: ^1.9.0
   image_picker: ^1.1.2
-  firebase_storage: ^11.6.5
+  firebase_storage: ^12.3.3
   carousel_slider: ^5.0.0
   package_info_plus: ^8.0.2
   pinput: ^5.0.0

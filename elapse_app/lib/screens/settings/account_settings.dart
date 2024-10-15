@@ -108,12 +108,15 @@ class _AccountSettingsState extends State<AccountSettings> {
                         const SizedBox(width: 18),
                         Expanded(
                           child: LongButton(
-                            onPressed: () {
+                            onPressed: () async {
+                              await FirebaseAuth.instance.currentUser!.reload();
                               if (FirebaseAuth.instance.currentUser!.emailVerified) {
                                 Database database = Database();
                                 database.verifyUser(widget.user.uid!);
-                                widget.user.verified = true;
-                                prefs.setString("currentUser", jsonEncode(widget.user.toJson()));
+                                setState(() {
+                                  widget.user.verified = true;
+                                  prefs.setString("currentUser", jsonEncode(widget.user.toJson()));
+                                });
                               }
                             },
                             gradient: true,

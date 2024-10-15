@@ -50,12 +50,13 @@ class Database {
     try {
       String? uid = auth.currentUser?.uid;
       // Remove from all team groups
-      var snapshot = await _firestore.collection('Users').doc(uid).get();
+      var snapshot = await _firestore.collection('users').doc(uid).get();
 
-      List<dynamic> groups = snapshot.get('groupID');
+      List<dynamic> groups = snapshot.get('groupId');
 
       for (int x = 0; x < groups.length; x++) {
-        leaveTeamGroup(groups[x], uid!);
+        print(groups[x]);
+        await leaveTeamGroup(groups[x], uid!);
       }
 
       // Delete UID from Users doc
@@ -69,11 +70,7 @@ class Database {
   }
 
   Future<void> deleteCurrentUser() async {
-    try {
-      await _firestore.collection('users').doc(FirebaseAuth.instance.currentUser?.uid).delete();
-    } catch (e) {
-      print(e);
-    }
+    deleteUser(FirebaseAuth.instance.currentUser!.uid);
   }
 
   Future<void> verifyUser(String uid) async {
@@ -182,6 +179,15 @@ class Database {
       await _firestore.collection('teamGroups').doc(groupid).update({
         'members.$memberid': FieldValue.delete(),
       });
+      var info = await _firestore.collection('teamGroups').doc(groupid).get();
+      if (info.get("members").isEmpty) {
+        await deleteTeamGroup(groupid);
+      } else if (info.get("adminId") == memberid) {
+        await _firestore.collection('teamGroups').doc(groupid).update({
+          'adminId': info.get("members").keys.toList()[0],
+        });
+      }
+
       await _firestore.collection('users').doc(memberid).update({
         'groupId': FieldValue.arrayRemove([groupid]),
       });
