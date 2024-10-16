@@ -63,252 +63,191 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
         // ),
 
         backgroundColor: Theme.of(context).colorScheme.primary,
-        body: CustomScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            slivers: [
-              ElapseAppBar(
-                title: Row(children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Icon(Icons.arrow_back),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Sign up',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontFamily: 'Manrope',
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                ]),
-                maxHeight: 60,
+        body: CustomScrollView(physics: const NeverScrollableScrollPhysics(), slivers: [
+          ElapseAppBar(
+            title: Row(children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: const Icon(Icons.arrow_back),
               ),
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Container(
-                  height: double.infinity,
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.surface,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(30),
-                      topRight: Radius.circular(30),
-                    ),
-                  ),
-                  child: Form(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(height: 46),
-                        Center(
-                          child: Text(
-                            'Enter your details',
-                            style: TextStyle(
-                              fontFamily: "Manrope",
-                              fontSize: 32,
-                              fontWeight: FontWeight.w300,
-                              color: Theme.of(context).colorScheme.secondary,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 8),
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
-                          child: Center(
-                            child: RichText(
-                              text: TextSpan(
-                                text: 'Please fill in the fields below',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontFamily: "Manrope",
-                                  fontSize: 16,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurfaceVariant,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 32),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
-                          child: TextFormField(
-                            controller: _firstNameController,
-                            onChanged: (value) {
-                              setState(() {
-                                currentUser.fname = value;
-                              });
-                            },
-                            decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(9),
-                                borderSide: BorderSide(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withOpacity(0.25),
-                                  width: 2.0,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(9),
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 2.0,
-                                ),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.error,
-                                  width: 1.0,
-                                ),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.error,
-                                  width: 2.0,
-                                ),
-                              ),
-                              labelText: 'First Name',
-                              labelStyle: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: "Manrope",
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 12),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
-                          child: TextFormField(
-                            controller: _lastNameController,
-                            onChanged: (value) {
-                              setState(() {
-                                currentUser.lname = value;
-                              });
-                            },
-                            decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(9),
-                                borderSide: BorderSide(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withOpacity(0.25),
-                                  width: 2.0,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(9),
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 2.0,
-                                ),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.error,
-                                  width: 1.0,
-                                ),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.error,
-                                  width: 2.0,
-                                ),
-                              ),
-                              labelText: 'Last Name',
-                              labelStyle: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: "Manrope",
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 12),
-                        Padding(
-                          padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
-                          child: TextFormField(
-                            controller: _ageController,
-                            onChanged: (value) {
-                              setState(() {
-                                currentUser.age = value;
-                              });
-                            },
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(9),
-                                borderSide: BorderSide(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withOpacity(0.25),
-                                  width: 2.0,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(9),
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  width: 2.0,
-                                ),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.error,
-                                  width: 1.0,
-                                ),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                  color: Theme.of(context).colorScheme.error,
-                                  width: 2.0,
-                                ),
-                              ),
-                              labelText: 'Age',
-                              labelStyle: TextStyle(
-                                color: Theme.of(context).colorScheme.onSurface,
-                                fontWeight: FontWeight.w400,
-                                fontFamily: "Manrope",
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 38),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 23.0),
-                          child: LongButton(
-                            text: "Continue",
-                            onPressed: () {
-                              prefs.setString("currentUser",
-                                  jsonEncode(currentUser.toJson()));
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const JoinTeamPage(),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        SizedBox(height: 12),
-                      ],
-                    ),
-                  ),
+              const SizedBox(width: 12),
+              Text(
+                'Sign up',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontFamily: 'Manrope',
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
                 ),
               ),
-            ]));
+            ]),
+            maxHeight: 60,
+          ),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Container(
+              height: double.infinity,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: Form(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 46),
+                    Center(
+                      child: Text(
+                        'Enter your details',
+                        style: TextStyle(
+                          fontFamily: "Manrope",
+                          fontSize: 32,
+                          fontWeight: FontWeight.w300,
+                          color: Theme.of(context).colorScheme.secondary,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
+                      child: Center(
+                        child: RichText(
+                          text: TextSpan(
+                            text: 'Please fill in the fields below',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w400,
+                              fontFamily: "Manrope",
+                              fontSize: 16,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 32),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
+                      child: TextFormField(
+                        controller: _firstNameController,
+                        onChanged: (value) {
+                          setState(() {
+                            currentUser.fname = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(9),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                              width: 2.0,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(9),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 2.0,
+                            ),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.error,
+                              width: 1.0,
+                            ),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.error,
+                              width: 2.0,
+                            ),
+                          ),
+                          labelText: 'First Name',
+                          labelStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: "Manrope",
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    Padding(
+                      padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
+                      child: TextFormField(
+                        controller: _lastNameController,
+                        onChanged: (value) {
+                          setState(() {
+                            currentUser.lname = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(9),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                              width: 2.0,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(9),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 2.0,
+                            ),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.error,
+                              width: 1.0,
+                            ),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.error,
+                              width: 2.0,
+                            ),
+                          ),
+                          labelText: 'Last Name',
+                          labelStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: "Manrope",
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                    SizedBox(height: 38),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 23.0),
+                      child: LongButton(
+                        text: "Continue",
+                        onPressed: () {
+                          prefs.setString("currentUser", jsonEncode(currentUser.toJson()));
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const JoinTeamPage(),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                    SizedBox(height: 12),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ]));
   }
 }

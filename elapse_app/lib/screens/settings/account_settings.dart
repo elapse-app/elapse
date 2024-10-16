@@ -76,9 +76,8 @@ class _AccountSettingsState extends State<AccountSettings> {
                   Text(widget.user.email!, style: const TextStyle(fontSize: 18)),
                 ])),
             const SizedBox(height: 23),
-            !widget.user.verified!
+            widget.user.verified == false
                 ? SizedBox(
-                    height: 400,
                     width: double.infinity,
                     child: Column(children: [
                       const SizedBox(
@@ -92,14 +91,51 @@ class _AccountSettingsState extends State<AccountSettings> {
                             style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, wordSpacing: -0.5)),
                         TextSpan(
                             text:
-                                " You need to verify to get access to group features such as ScoutSheets and MatchNotes.\n\nTo verify your account, click send email and check your inbox for an email asking to verify your Elapse account. Click the link to verify. Once the link has been clicked, click the Verify Account button, and your account will be verified.",
+                                " You need to verify to get access to CloudScout.\n\nTo verify your account, click send email. Check your inbox for a verification email. Click the link in the email to verify your account.",
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300, wordSpacing: -0.5))
                       ])),
                       const SizedBox(height: 18),
                       Row(children: [
                         Expanded(
                           child: LongButton(
-                            onPressed: () => FirebaseAuth.instance.currentUser?.sendEmailVerification(),
+                            onPressed: () {
+                              FirebaseAuth.instance.currentUser?.sendEmailVerification().then((e) {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: const Text("Email Sent"),
+                                        content: const Text("Check your inbox for a verification email."),
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                                        actions: [
+                                          TextButton(
+                                            child: Text("Close",
+                                                style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                                            onPressed: () => Navigator.pop(context),
+                                          ),
+                                        ],
+                                      );
+                                    });
+                              }).catchError((e) {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: const Text("Error Occurred"),
+                                        content: const Text(
+                                            "An error occured while trying to verify your email. Try again later."),
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                                        actions: [
+                                          TextButton(
+                                            child: Text("Close",
+                                                style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                                            onPressed: () => Navigator.pop(context),
+                                          ),
+                                        ],
+                                      );
+                                    });
+                              });
+                            },
                             text: "Send Email",
                             useForwardArrow: false,
                             centerAlign: true,
@@ -113,10 +149,43 @@ class _AccountSettingsState extends State<AccountSettings> {
                               if (FirebaseAuth.instance.currentUser!.emailVerified) {
                                 Database database = Database();
                                 database.verifyUser(widget.user.uid!);
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: const Text("Verification Complete"),
+                                        content: const Text("You now have access to CloudScout."),
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                                        actions: [
+                                          TextButton(
+                                            child: Text("Finish",
+                                                style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                                            onPressed: () => Navigator.pop(context),
+                                          ),
+                                        ],
+                                      );
+                                    });
                                 setState(() {
                                   widget.user.verified = true;
                                   prefs.setString("currentUser", jsonEncode(widget.user.toJson()));
                                 });
+                              } else {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: const Text("Not Verified"),
+                                        content: const Text("Please click the link in your email to verify."),
+                                        contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                                        actions: [
+                                          TextButton(
+                                            child: Text("Close",
+                                                style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                                            onPressed: () => Navigator.pop(context),
+                                          ),
+                                        ],
+                                      );
+                                    });
                               }
                             },
                             gradient: true,
