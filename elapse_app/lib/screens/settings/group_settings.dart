@@ -45,7 +45,7 @@ class _GroupSettingsState extends State<GroupSettings> {
       ElapseAppBar(
         title: const Text(
           "Group",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
         ),
         backNavigation: true,
         background: Padding(
