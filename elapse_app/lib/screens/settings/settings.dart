@@ -38,12 +38,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool sendLTTelemetry = prefs.getBool("sendLTTelemetry") ?? false;
 
   ElapseUser currentUser = elapseUserDecode(prefs.getString("currentUser")!);
-  TeamGroup? teamGroup =
-      prefs.getString("teamGroup") != null ? TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup")!)) : null;
   bool showEmail = false;
 
   @override
   Widget build(BuildContext context) {
+    TeamGroup? teamGroup;
+    try {
+      teamGroup =
+          prefs.getString("teamGroup") != null ? TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup")!)) : null;
+    } catch (e) {
+      teamGroup = null;
+    }
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
@@ -266,7 +271,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 const SizedBox(height: 18),
                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                                   const Text("Admin", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300)),
-                                  Text(teamGroup!.members[teamGroup!.adminId]!, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                                  Text(teamGroup!.members[teamGroup!.adminId]!,
+                                      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
                                 ]),
                                 Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                                   const Text("Members", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300)),
@@ -489,7 +495,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           defaultGrade = value;
                         });
                       },
-                      style: TextStyle(color: Theme.of(context).colorScheme.secondary, fontSize: 18, fontWeight: FontWeight.w400),
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.secondary, fontSize: 18, fontWeight: FontWeight.w400),
                       icon: const SizedBox.shrink(),
                       borderRadius: BorderRadius.circular(10),
                       alignment: Alignment.centerRight,
@@ -509,7 +516,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                       const Text("Version", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
                       Text("${appInfo.version} (Build ${appInfo.buildNumber})",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400, color: Theme.of(context).colorScheme.onSurfaceVariant))
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w400,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant))
                     ]),
                   ),
                   Divider(
