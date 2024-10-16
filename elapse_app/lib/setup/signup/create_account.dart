@@ -347,114 +347,120 @@ class _CreateAccountState extends State<CreateAccount> {
                                 builder: (context) {
                                   bool verified = false;
                                   return AlertDialog(
-                                        title: Text("Verify Email"),
-                                        content: Text("Would you like to verify your account now?"),
-                                        actions: [
-                                          TextButton(
-                                              onPressed: () {
-                                                Navigator.push(
-                                                  context,
-                                                  MaterialPageRoute(
-                                                    builder: (context) => const EnterDetailsPage(),
-                                                  ),
-                                                );
-                                              },
-                                              child: Text(
-                                                "Later",
-                                                style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-                                              )),
-                                          TextButton(
-                                              onPressed: () async {
-                                                Navigator.pop(context);
+                                    title: Text("Verify Email"),
+                                    content: Text(
+                                        "Would you like to verify your account now? You will need to verify for CloudScout"),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => const EnterDetailsPage(),
+                                              ),
+                                            );
+                                          },
+                                          child: Text(
+                                            "Later",
+                                            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                          )),
+                                      TextButton(
+                                          onPressed: () async {
+                                            Navigator.pop(context);
 
-                                                bool initBuild = false;
-                                                FirebaseAuth.instance.currentUser!.sendEmailVerification();
-                                                showDialog(
-                                                    context: context,
-                                                    builder: (context) {
-                                                      return StatefulBuilder(
-                                                        builder: (context, setState) {
-                                                          if (!initBuild) {
-                                                            initBuild = true;
-                                                            verify() async {
-                                                              DateTime timeout = DateTime.now().add(Duration(minutes: 3));
-                                                              while (!FirebaseAuth.instance.currentUser!.emailVerified &&
-                                                                  DateTime.now().isBefore(timeout)) {
-                                                                await Future.delayed(Duration(seconds: 5));
-                                                                await FirebaseAuth.instance.currentUser!.reload();
-                                                              }
+                                            bool initBuild = false;
+                                            FirebaseAuth.instance.currentUser!.sendEmailVerification();
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return StatefulBuilder(builder: (context, setState) {
+                                                    if (!initBuild) {
+                                                      initBuild = true;
+                                                      verify() async {
+                                                        DateTime timeout = DateTime.now().add(Duration(minutes: 3));
+                                                        while (!FirebaseAuth.instance.currentUser!.emailVerified &&
+                                                            DateTime.now().isBefore(timeout)) {
+                                                          await Future.delayed(Duration(seconds: 5));
+                                                          await FirebaseAuth.instance.currentUser!.reload();
+                                                        }
 
-                                                              if (FirebaseAuth.instance.currentUser!.emailVerified) {
-                                                                setState(() {
-                                                                  verified = true;
-                                                                });
-                                                              } else {
-                                                                Navigator.pop(context);
-                                                                final updatedUser = FirebaseAuth.instance.currentUser;
-                                                                if (updatedUser != null) {
-                                                                  await updatedUser
-                                                                      .reload(); // Ensure the user object is updated
-                                                                  await updatedUser
-                                                                      .delete(); // Delete the user if verification fails
-                                                                }
-
-                                                                showDialog(
-                                                                    context: context,
-                                                                    builder: (context) {
-                                                                      return AlertDialog(
-                                                                        title: Text("Verification Timed Out"),
-                                                                        content: Text("Elapse was unable to verify your email in time."),
-                                                                        actions: [
-                                                                          TextButton(
-                                                                              onPressed: () {
-                                                                                Navigator.pop(context);
-                                                                              },
-                                                                              child: Text(
-                                                                                "Close",
-                                                                                style: TextStyle(
-                                                                                    color: Theme.of(context).colorScheme.secondary),
-                                                                              )),
-                                                                        ],
-                                                                      );
-                                                                    });
-                                                              }
-                                                            }
-                                                            verify();
+                                                        if (FirebaseAuth.instance.currentUser!.emailVerified) {
+                                                          setState(() {
+                                                            verified = true;
+                                                          });
+                                                        } else {
+                                                          Navigator.pop(context);
+                                                          final updatedUser = FirebaseAuth.instance.currentUser;
+                                                          if (updatedUser != null) {
+                                                            await updatedUser
+                                                                .reload(); // Ensure the user object is updated
+                                                            await updatedUser
+                                                                .delete(); // Delete the user if verification fails
                                                           }
 
-                                                          return AlertDialog(
-                                                            title: Text("Verify Email"),
-                                                            content: Text.rich(
+                                                          showDialog(
+                                                              context: context,
+                                                              builder: (context) {
+                                                                return AlertDialog(
+                                                                  title: Text("Verification Timed Out"),
+                                                                  content: Text(
+                                                                      "Elapse was unable to verify your email in time."),
+                                                                  actions: [
+                                                                    TextButton(
+                                                                        onPressed: () {
+                                                                          Navigator.pop(context);
+                                                                        },
+                                                                        child: Text(
+                                                                          "Close",
+                                                                          style: TextStyle(
+                                                                              color: Theme.of(context)
+                                                                                  .colorScheme
+                                                                                  .secondary),
+                                                                        )),
+                                                                  ],
+                                                                );
+                                                              });
+                                                        }
+                                                      }
+
+                                                      verify();
+                                                    }
+
+                                                    return AlertDialog(
+                                                      title: Text("Verify Email"),
+                                                      content: Text.rich(
+                                                        TextSpan(
+                                                            text:
+                                                                "Check your email for a verification link. You have 3 minutes to verify. Afterwards, click the ",
+                                                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                                            children: [
                                                               TextSpan(
-                                                                  text:
-                                                                  "Check your email for a verification link. You have 3 minutes to verify. Afterwards, click the ",
-                                                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
-                                                                  children: [
-                                                                    TextSpan(
-                                                                      text: "continue",
-                                                                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500),
-                                                                    ),
-                                                                    TextSpan(
-                                                                      text: " button below.",
-                                                                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
-                                                                    )
-                                                                  ]),
-                                                            ),
-                                                            actions: [
-                                                              TextButton(
-                                                                  onPressed: () async {
-                                                                    await FirebaseAuth.instance.currentUser!.reload();
-                                                                    await FirebaseAuth.instance.currentUser!.delete();
-                                                                    Navigator.pop(context);
-                                                                  },
-                                                                  child: Text(
-                                                                    "Cancel",
-                                                                    style: TextStyle(
-                                                                        color: Theme.of(context).colorScheme.secondary),
-                                                                  )),
-                                                              TextButton(
-                                                                  onPressed: verified
-                                                                      ? () {
+                                                                text: "continue",
+                                                                style: TextStyle(
+                                                                    fontSize: 14, fontWeight: FontWeight.w500),
+                                                              ),
+                                                              TextSpan(
+                                                                text: " button below.",
+                                                                style: TextStyle(
+                                                                    fontSize: 14, fontWeight: FontWeight.w300),
+                                                              )
+                                                            ]),
+                                                      ),
+                                                      actions: [
+                                                        TextButton(
+                                                            onPressed: () async {
+                                                              await FirebaseAuth.instance.currentUser!.reload();
+                                                              await FirebaseAuth.instance.currentUser!.delete();
+                                                              Navigator.pop(context);
+                                                            },
+                                                            child: Text(
+                                                              "Cancel",
+                                                              style: TextStyle(
+                                                                  color: Theme.of(context).colorScheme.secondary),
+                                                            )),
+                                                        TextButton(
+                                                            onPressed: verified
+                                                                ? () {
                                                                     Navigator.push(
                                                                       context,
                                                                       MaterialPageRoute(
@@ -462,26 +468,25 @@ class _CreateAccountState extends State<CreateAccount> {
                                                                       ),
                                                                     );
                                                                   }
-                                                                      : null,
-                                                                  child: Text(
-                                                                    "Continue",
-                                                                    style: TextStyle(
-                                                                        color: verified
-                                                                            ? Theme.of(context).colorScheme.secondary
-                                                                            : Theme.of(context).colorScheme.onSurfaceVariant),
-                                                                  )),
-                                                            ],
-                                                          );
-                                                        }
-                                                      );
-                                                    });
-                                              },
-                                              child: Text(
-                                                "Now",
-                                                style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-                                              ))
-                                        ],
-                                      );
+                                                                : null,
+                                                            child: Text(
+                                                              "Continue",
+                                                              style: TextStyle(
+                                                                  color: verified
+                                                                      ? Theme.of(context).colorScheme.secondary
+                                                                      : Theme.of(context).colorScheme.onSurfaceVariant),
+                                                            )),
+                                                      ],
+                                                    );
+                                                  });
+                                                });
+                                          },
+                                          child: Text(
+                                            "Now",
+                                            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                          ))
+                                    ],
+                                  );
                                 });
                           }
                         },
