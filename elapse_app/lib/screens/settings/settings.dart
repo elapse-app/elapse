@@ -151,7 +151,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                                               if (tournament != null &&
                                                   tournament.teams.singleWhereOrNull(
-                                                          (e) => e.id == loadTeamPreview(selected).teamID) !=
+                                                          (e) => e.id == loadTeamPreview(selected).teamID) ==
                                                       null) {
                                                 showDialog(
                                                     context: context,
