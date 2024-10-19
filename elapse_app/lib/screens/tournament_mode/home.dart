@@ -46,7 +46,7 @@ class _TMHomePageState extends State<TMHomePage> {
         body: RefreshIndicator(
       onRefresh: () async {
         setState(() {
-          tournament = TMTournamentDetails(widget.tournamentID);
+          tournament = TMTournamentDetails(widget.tournamentID, forceRefresh: true);
         });
       },
       child: CustomScrollView(
@@ -101,13 +101,7 @@ class _TMHomePageState extends State<TMHomePage> {
                               ),
                               Image(image: AssetImage(imageString), height: 25),
                               const Spacer(),
-                              SettingsButton(callback: () {
-                                if (context.mounted) {
-                                  setState(() {
-                                    tournament = TMTournamentDetails(widget.tournamentID);
-                                  });
-                                }
-                              }),
+                              SettingsButton(callback: () {}),
                             ],
                           ),
                           Padding(
@@ -399,7 +393,7 @@ class _TMHomePageState extends State<TMHomePage> {
                   ),
                   onPressed: () {
                     prefs.setBool("isTournamentMode", false);
-                    prefs.remove("TMSavedTournament");
+                    prefs.remove("tournament-${widget.tournamentID}");
                     myAppKey.currentState!.reloadApp();
                   }),
               Spacer(),
