@@ -46,7 +46,7 @@ class _TMHomePageState extends State<TMHomePage> {
       body: RefreshIndicator(
         onRefresh: () async {
           setState(() {
-            tournament = TMTournamentDetails(widget.tournamentID);
+            tournament = TMTournamentDetails(widget.tournamentID, forceRefresh: true);
           });
         },
         child: CustomScrollView(

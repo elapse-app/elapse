@@ -28,7 +28,7 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
   @override
   void initState() {
     super.initState();
-    tournament = TMTournamentDetails(widget.tournamentID);
+    tournament = TMTournamentDetails(widget.tournamentID, forceRefresh: true);
   }
 
   @override

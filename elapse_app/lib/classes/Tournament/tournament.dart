@@ -190,7 +190,7 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
   }
 }
 
-Future<Tournament> TMTournamentDetails(int tournamentID) async {
+Future<Tournament> TMTournamentDetails(int tournamentID, {bool forceRefresh = false}) async {
   Tournament tournament;
   if (prefs.getString("TMSavedTournament") == null) {
     tournament = await getTournamentDetails(tournamentID);
@@ -202,7 +202,7 @@ Future<Tournament> TMTournamentDetails(int tournamentID) async {
     DateTime? updateTime =
         DateTime.tryParse(prefs.getString("updateTime") ?? "");
 
-    if (updateTime == null || DateTime.now().isAfter(updateTime)) {
+    if (updateTime == null || DateTime.now().isAfter(updateTime) || forceRefresh) {
       await updateTournament(tournament);
       prefs.setString("updateTime",
           DateTime.now().add(const Duration(minutes: 1)).toIso8601String());
