@@ -233,7 +233,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                               }
 
                               if (tournament != null &&
-                                  tournament.teams.singleWhereOrNull((e) => e.id == loadTeamPreview(selected).teamID) !=
+                                  tournament.teams.singleWhereOrNull((e) => e.id == loadTeamPreview(selected).teamID) ==
                                       null) {
                                 showDialog(
                                     context: context,

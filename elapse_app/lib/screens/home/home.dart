@@ -3,6 +3,7 @@ import 'package:elapse_app/main.dart';
 import 'package:elapse_app/providers/tournament_mode_provider.dart';
 import 'package:elapse_app/screens/tournament/tournament.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
+import 'package:elapse_app/screens/widgets/long_button.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
@@ -40,9 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
       welcomeMessage = "Good Evening";
     }
     String imageString =
-        Theme.of(context).colorScheme.brightness == Brightness.dark
-            ? "assets/dg4x.png"
-            : "assets/lg4x.png";
+        Theme.of(context).colorScheme.brightness == Brightness.dark ? "assets/dg4x.png" : "assets/lg4x.png";
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: RefreshIndicator(
@@ -60,8 +59,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
               background: SafeArea(
                 child: Padding(
-                  padding:
-                  EdgeInsets.only(left: 20, right: 12, bottom: 20, top: 10),
+                  padding: EdgeInsets.only(left: 20, right: 12, bottom: 20, top: 10),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,7 +74,8 @@ class _HomeScreenState extends State<HomeScreen> {
                           Spacer(),
                           SettingsButton(callback: () {
                             setState(() {
-                              tournaments = fetchTeamTournaments(loadTeamPreview(prefs.getString("savedTeam")).teamID, seasons[0].vrcId);
+                              tournaments = fetchTeamTournaments(
+                                  loadTeamPreview(prefs.getString("savedTeam")).teamID, seasons[0].vrcId);
                             });
                           }),
                         ],
@@ -93,7 +92,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                   padding: EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.tertiary,
+                      border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
                       borderRadius: BorderRadius.all(Radius.circular(18))),
                   child: FutureBuilder(
                     future: tournaments,
@@ -117,12 +116,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             return Column();
                           }
 
-                          List<TournamentPreview> teamTournaments =
-                          snapshot.data as List<TournamentPreview>;
+                          List<TournamentPreview> teamTournaments = snapshot.data as List<TournamentPreview>;
                           teamTournaments.removeWhere((item) {
-                            return item.startDate == null ||
-                                item.startDate!.difference(DateTime.now()).inDays <
-                                    -2;
+                            return item.startDate == null || item.startDate!.difference(DateTime.now()).inDays < -2;
                           });
                           if (teamTournaments.isEmpty) {
                             return const Padding(
@@ -157,9 +153,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       child: Text(upcoming.name,
                                           maxLines: 2,
                                           overflow: TextOverflow.ellipsis,
-                                          style: TextStyle(
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.w500)),
+                                          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                                     ),
                                     Icon(Icons.arrow_forward)
                                   ],
@@ -178,109 +172,74 @@ class _HomeScreenState extends State<HomeScreen> {
                                   children: [
                                     upcoming.startDate != null
                                         ? Text(
-                                      "${DateFormat("EEE, MMM d, y").format(upcoming.startDate!)}",
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface
-                                              .withOpacity(0.7)),
-                                    )
+                                            "${DateFormat("EEE, MMM d, y").format(upcoming.startDate!)}",
+                                            style: TextStyle(
+                                                fontSize: 16,
+                                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+                                          )
                                         : Container(),
-                                    upcoming.endDate != null &&
-                                        upcoming.endDate != upcoming.startDate
-                                        ? Text(
-                                        " - ${DateFormat("EEE, MMM d, y").format(upcoming.endDate!)}",
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .onSurface
-                                              .withOpacity(0.7),
-                                        ))
+                                    upcoming.endDate != null && upcoming.endDate != upcoming.startDate
+                                        ? Text(" - ${DateFormat("EEE, MMM d, y").format(upcoming.endDate!)}",
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                            ))
                                         : Container()
                                   ],
                                 ),
-                                DateTime.now().compareTo(upcoming.endDate!
-                                    .add(const Duration(days: 1))) <=
-                                    0 &&
-                                    DateTime.now()
-                                        .difference(upcoming.startDate!)
-                                        .inDays >
-                                        -1
-                                    ? GestureDetector(
-                                  onTap: () {
-                                    showDialog(
-                                        context: context,
-                                        builder: (context) {
-                                          return AlertDialog(
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                BorderRadius.circular(
-                                                    18)),
-                                            title: Text(
-                                              "Are you sure you want to enter Tournament Mode?",
-                                              style: TextStyle(fontSize: 18),
-                                            ),
-                                            actions: [
-                                              TextButton(
-                                                onPressed: () {
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text(
-                                                  "Cancel",
-                                                  style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .secondary),
-                                                ),
-                                              ),
-                                              TextButton(
-                                                onPressed: () {
-                                                  prefs.setBool(
-                                                      "isTournamentMode",
-                                                      true);
-                                                  prefs.setInt("tournamentID",
-                                                      upcoming.id);
-                                                  myAppKey.currentState!
-                                                      .reloadApp();
+                                DateTime.now().compareTo(upcoming.endDate!.add(const Duration(days: 1))) <= 0 &&
+                                        DateTime.now().difference(upcoming.startDate!).inDays > -1
+                                    ? Padding(
+                                        padding: const EdgeInsets.only(top: 18.0),
+                                        child: LongButton(
+                                          onPressed: () {
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    shape:
+                                                        RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                                                    title: Text(
+                                                      "Are you sure you want to enter Tournament Mode?",
+                                                      style: TextStyle(fontSize: 18),
+                                                    ),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(context);
+                                                        },
+                                                        child: Text(
+                                                          "Cancel",
+                                                          style:
+                                                              TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                                        ),
+                                                      ),
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          prefs.setBool("isTournamentMode", true);
+                                                          print(upcoming.id);
+                                                          prefs.setInt("tournamentID", upcoming.id);
+                                                          myAppKey.currentState!.reloadApp();
 
-                                                  Provider.of<TournamentModeProvider>(
-                                                      context,
-                                                      listen: false)
-                                                      .setTournamentMode(
-                                                      true);
-                                                  Navigator.pop(context);
-                                                },
-                                                child: Text(
-                                                  "Confirm",
-                                                  style: TextStyle(
-                                                      color: Theme.of(context)
-                                                          .colorScheme
-                                                          .secondary),
-                                                ),
-                                              ),
-                                            ],
-                                          );
-                                        });
-                                  },
-                                  child: Container(
-                                    height: 64,
-                                    margin: EdgeInsets.only(top: 25),
-                                    width: double.infinity,
-                                    alignment: Alignment.center,
-                                    decoration: BoxDecoration(
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .surface,
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(9))),
-                                    child: Text(
-                                      "Enter Tournament Mode",
-                                      style: TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                )
+                                                          Provider.of<TournamentModeProvider>(context, listen: false)
+                                                              .setTournamentMode(true);
+                                                          Navigator.pop(context);
+                                                        },
+                                                        child: Text(
+                                                          "Confirm",
+                                                          style:
+                                                              TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  );
+                                                });
+                                          },
+                                          text: "Tournament Mode",
+                                          icon: Icons.emoji_events,
+                                          gradient: true,
+                                        ),
+                                      )
                                     : Container(),
                               ],
                             ),
@@ -312,18 +271,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             return const SizedBox.shrink();
                           }
 
-                          List<TournamentPreview> teamTournaments =
-                          snapshot.data as List<TournamentPreview>;
+                          List<TournamentPreview> teamTournaments = snapshot.data as List<TournamentPreview>;
                           if (teamTournaments.length < 2) {
                             return Container();
                           }
                           teamTournaments.removeWhere((item) {
-                            return item.startDate == null ||
-                                item.startDate!.difference(DateTime.now()).inDays <
-                                    -2;
+                            return item.startDate == null || item.startDate!.difference(DateTime.now()).inDays < -2;
                           });
                           List<TournamentPreview> filteredTournaments =
-                          teamTournaments.length < 2 ? [] : teamTournaments.sublist(1);
+                              teamTournaments.length < 2 ? [] : teamTournaments.sublist(1);
                           if (filteredTournaments.isEmpty) {
                             return const SizedBox.shrink();
                           }
@@ -332,17 +288,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             children: [
                               Text(
                                 "Upcoming",
-                                style: TextStyle(
-                                    fontSize: 24, fontWeight: FontWeight.w500),
+                                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                               ),
                               SizedBox(
                                 height: 10,
                               ),
                               Column(
                                 children: filteredTournaments.map(
-                                      (e) {
-                                    return TournamentPreviewWidget(
-                                        tournamentPreview: e);
+                                  (e) {
+                                    return TournamentPreviewWidget(tournamentPreview: e);
                                   },
                                 ).toList(),
                               )
