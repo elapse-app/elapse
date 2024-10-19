@@ -158,37 +158,14 @@ class TMMyTeamsState extends State<TMMyTeams> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    DropdownButton<TeamPreview>(
-                      itemHeight: 64,
-                      value: selectedTeamPreview,
-                      underline: Container(),
-                      borderRadius: BorderRadius.circular(18),
-                      elevation: 5,
-                      items: savedTeamPreviews
-                          .map(
-                            (TeamPreview teamPreview) => DropdownMenuItem(
-                              value: teamPreview,
-                              child: Text(
-                                teamPreview.teamNumber,
-                                style: const TextStyle(fontSize: 24, height: 1, letterSpacing: -2),
-                              ),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: teamChange,
-                      selectedItemBuilder: (BuildContext context) {
-                        return savedTeamPreviews
-                            .map((TeamPreview teamPreview) => Text(
-                                  teamPreview.teamNumber,
-                                  style: TextStyle(
-                                    fontSize: 64, // Larger size for the selected item
-                                    height: 1.0,
-                                    letterSpacing: -2,
-                                    fontWeight: FontWeight.w400,
-                                  ),
-                                ))
-                            .toList();
-                      },
+                    Text(
+                      savedTeamPreview.teamNumber,
+                      style: const TextStyle(
+                        fontSize: 64,
+                        height: 1.0,
+                        letterSpacing: -2,
+                        fontWeight: FontWeight.w400,
+                      ),
                     ),
                     const SizedBox(
                       height: 5,
@@ -203,88 +180,93 @@ class TMMyTeamsState extends State<TMMyTeams> {
                     FutureBuilder(
                       future: teamStats,
                       builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          VDAStats stats = snapshot.data as VDAStats;
-                          List<String> qualifications = [];
-                          String qualificationString = "";
-                          if (stats.regionalQual == 1) {
-                            qualifications.add("RC");
-                          }
-                          if (stats.worldsQual == 1) {
-                            qualifications.add("WC");
-                          }
-                          for (int i = 0; i < qualifications.length; i++) {
-                            qualificationString += qualifications[i];
-                            if (i != qualifications.length - 1) {
-                              qualificationString += ", ";
+                        switch (snapshot.connectionState) {
+                          case ConnectionState.none:
+                          case ConnectionState.waiting:
+                          case ConnectionState.active:
+                            return Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    const Text(
+                                      "Qualifications",
+                                      style: TextStyle(fontSize: 24),
+                                    ),
+                                    const Spacer(),
+                                    Container(width: 75, child: const LinearProgressIndicator()),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      "Win Rate",
+                                      style: TextStyle(fontSize: 24),
+                                    ),
+                                    const Spacer(),
+                                    Container(width: 75, child: const LinearProgressIndicator()),
+                                  ],
+                                ),
+                              ],
+                            );
+                          case ConnectionState.done:
+                            if (snapshot.hasError || snapshot.data == null) {
+                              return const Text("No Data Available");
                             }
-                          }
-                          if (qualificationString == "") {
-                            qualificationString = "NQ";
-                          }
-                          return Column(
-                            children: [
-                              Row(
-                                children: [
-                                  const Text(
-                                    "Qualifications",
-                                    style: TextStyle(fontSize: 24),
-                                  ),
-                                  const Spacer(),
-                                  Text(
-                                    qualificationString,
-                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 8,
-                              ),
-                              Row(
-                                children: [
-                                  const Text(
-                                    "Win Rate",
-                                    style: TextStyle(fontSize: 24),
-                                  ),
-                                  const Spacer(),
-                                  Text(
-                                    "${stats.winPercent == null ? "" : stats.winPercent}%",
-                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          );
-                        } else if (snapshot.hasError) {
-                          return Container();
-                        } else {
-                          return Column(
-                            children: [
-                              Row(
-                                children: [
-                                  const Text(
-                                    "Qualifications",
-                                    style: TextStyle(fontSize: 24),
-                                  ),
-                                  const Spacer(),
-                                  Container(width: 75, child: const LinearProgressIndicator()),
-                                ],
-                              ),
-                              const SizedBox(
-                                height: 8,
-                              ),
-                              Row(
-                                children: [
-                                  const Text(
-                                    "Win Rate",
-                                    style: TextStyle(fontSize: 24),
-                                  ),
-                                  const Spacer(),
-                                  Container(width: 75, child: const LinearProgressIndicator()),
-                                ],
-                              ),
-                            ],
-                          );
+
+                            VDAStats stats = snapshot.data as VDAStats;
+                            List<String> qualifications = [];
+                            String qualificationString = "";
+                            if (stats.regionalQual == 1) {
+                              qualifications.add("RC");
+                            }
+                            if (stats.worldsQual == 1) {
+                              qualifications.add("WC");
+                            }
+                            for (int i = 0; i < qualifications.length; i++) {
+                              qualificationString += qualifications[i];
+                              if (i != qualifications.length - 1) {
+                                qualificationString += ", ";
+                              }
+                            }
+                            if (qualificationString == "") {
+                              qualificationString = "NQ";
+                            }
+                            return Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    const Text(
+                                      "Qualifications",
+                                      style: TextStyle(fontSize: 24),
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      qualificationString,
+                                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 8,
+                                ),
+                                Row(
+                                  children: [
+                                    const Text(
+                                      "Win Rate",
+                                      style: TextStyle(fontSize: 24),
+                                    ),
+                                    const Spacer(),
+                                    Text(
+                                      "${stats.winPercent == null ? "" : stats.winPercent!.toStringAsFixed(1)}%",
+                                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            );
                         }
                       },
                     ),

@@ -199,7 +199,7 @@ Future<Tournament> TMTournamentDetails(int tournamentID, {bool forceRefresh = fa
 
     if (updateTime == null || DateTime.now().isAfter(updateTime) || forceRefresh) {
       await updateTournament(tournament);
-      prefs.setString("updateTime", DateTime.now().add(const Duration(minutes: 1)).toIso8601String());
+      prefs.setString("updateTime", DateTime.now().add(const Duration(seconds: 30)).toIso8601String());
       // Update every minute
     }
 
