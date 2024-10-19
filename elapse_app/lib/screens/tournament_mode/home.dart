@@ -101,7 +101,11 @@ class _TMHomePageState extends State<TMHomePage> {
                               ),
                               Image(image: AssetImage(imageString), height: 25),
                               const Spacer(),
-                              SettingsButton(callback: () {}),
+                              SettingsButton(callback: () {
+                                setState(() {
+                                  tournament = TMTournamentDetails(widget.tournamentID, forceRefresh: true);
+                                });
+                              }),
                             ],
                           ),
                           Padding(
