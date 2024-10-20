@@ -12,6 +12,7 @@ import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
 import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
+import 'package:elapse_app/screens/my_team/my_team.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:elapse_app/screens/tournament_mode/widgets/ranking_overview_widget.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
@@ -724,77 +725,85 @@ class TMMyTeamsState extends State<TMMyTeams> {
               child: FutureBuilder(
                 future: teamAwards,
                 builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    List<Award> awards = snapshot.data as List<Award>;
-                    return Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(18),
-                        border: Border.all(
-                          color: Theme.of(context).colorScheme.primary,
-                          width: 2,
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.none:
+                    case ConnectionState.waiting:
+                    case ConnectionState.active:
+                      return const Center(
+                        child: SizedBox(
+                          width: 50,
+                          height: 50,
+                          child: CircularProgressIndicator(),
                         ),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      );
+                    case ConnectionState.done:
+                      if (snapshot.hasError) {
+                        return const Text("Awards Unavailable");
+                      }
+
+                      List<Award> awards = snapshot.data as List<Award>;
+                      if (awards.isNotEmpty)
+                        return Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 2,
+                            ),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text("Awards", style: TextStyle(fontSize: 24)),
-                              Text(awards.length.toString(),
-                                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500))
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text("Awards", style: TextStyle(fontSize: 24)),
+                                  Text(awards.length.toString(),
+                                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500))
+                                ],
+                              ),
+                              const SizedBox(height: 18),
+                              Column(
+                                children: awards.map((e) {
+                                  return Column(
+                                    children: [
+                                      Container(
+                                        alignment: Alignment.centerLeft,
+                                        height: 60,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              e.name,
+                                              overflow: TextOverflow.ellipsis,
+                                              textAlign: TextAlign.start,
+                                              maxLines: 1,
+                                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                            ),
+                                            Text(
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              textAlign: TextAlign.start,
+                                              e.tournamentName ?? "",
+                                              style: const TextStyle(fontSize: 16),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      Divider(
+                                        color: Theme.of(context).colorScheme.surfaceDim,
+                                      )
+                                    ],
+                                  );
+                                }).toList(),
+                              ),
                             ],
                           ),
-                          const SizedBox(height: 18),
-                          Column(
-                            children: awards.map((e) {
-                              return Column(
-                                children: [
-                                  Container(
-                                    alignment: Alignment.centerLeft,
-                                    height: 60,
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      mainAxisAlignment: MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                          e.name,
-                                          overflow: TextOverflow.ellipsis,
-                                          textAlign: TextAlign.start,
-                                          maxLines: 1,
-                                          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                                        ),
-                                        Text(
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                          textAlign: TextAlign.start,
-                                          e.tournamentName ?? "",
-                                          style: const TextStyle(fontSize: 16),
-                                        )
-                                      ],
-                                    ),
-                                  ),
-                                  Divider(
-                                    color: Theme.of(context).colorScheme.surfaceDim,
-                                  )
-                                ],
-                              );
-                            }).toList(),
-                          ),
-                        ],
-                      ),
-                    );
-                  } else if (snapshot.hasError) {
-                    return Container();
-                  } else {
-                    return const Center(
-                      child: SizedBox(
-                        width: 50,
-                        height: 50,
-                        child: CircularProgressIndicator(),
-                      ),
-                    );
+                        );
+                      else
+                        return Container();
                   }
                 },
               ),
@@ -871,123 +880,5 @@ class TMMyTeamsState extends State<TMMyTeams> {
         ],
       ),
     );
-  }
-}
-
-class TeamBio extends StatelessWidget {
-  const TeamBio({
-    super.key,
-    required this.grade,
-    required this.location,
-    required this.teamName,
-    required this.organization,
-  });
-
-  final String grade;
-  final Location location;
-  final String teamName;
-  final String organization;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Flex(
-          direction: Axis.horizontal,
-          children: [
-            Flexible(
-              flex: 2,
-              fit: FlexFit.tight,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    getGrade(grade),
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                  const Text(
-                    "Grade",
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 18),
-            Flexible(
-              flex: 10,
-              fit: FlexFit.tight,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    getLocation(location),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                  const Text(
-                    "Location",
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(
-          height: 25,
-        ),
-        Flex(
-          direction: Axis.horizontal,
-          children: [
-            Flexible(
-              flex: 12,
-              fit: FlexFit.tight,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    teamName,
-                    maxLines: 1,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                  const Text(
-                    "Team Name",
-                    style: const TextStyle(
-                      fontSize: 16,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-}
-
-String getGrade(String? grade) {
-  if (grade == "High School") {
-    return "HS";
-  } else if (grade == "Middle School") {
-    return "MS";
-  } else if (grade == "College") {
-    return "CG";
-  } else {
-    return "NG";
-  }
-}
-
-String getLocation(Location? location) {
-  if (location?.city != null) {
-    return "${location!.city}, ${location.region}";
-  } else {
-    return "No Location";
   }
 }
