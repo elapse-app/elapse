@@ -84,9 +84,11 @@ Future<void> checkAccountDeleted() async {
     if (idToken == null || idToken.token == null) {
       print("User was deleted");
       clearPrefs();
+      FirebaseAuth.instance.signOut();
     }
   } catch(e) {
     print("User was deleted");
     clearPrefs();
+    FirebaseAuth.instance.signOut();
   }
 }
