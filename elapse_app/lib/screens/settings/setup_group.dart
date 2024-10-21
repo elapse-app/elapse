@@ -137,7 +137,7 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => GroupSettings(group: value),
+                        builder: (context) => GroupSettings(uid: currentUser.uid),
                       ));
                 }).catchError((onError) {
                   showDialog(

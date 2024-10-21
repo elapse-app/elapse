@@ -107,8 +107,8 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                                 Database database = Database();
                                 final currentUser =
                                     FirebaseAuth.instance.currentUser;
-                                ElapseUser currentElapseUser = elapseUserDecode(
-                                    prefs.getString("currentUser")!);
+                                ElapseUser currentElapseUser = ElapseUser.fromJson(jsonDecode(
+                                    prefs.getString("currentUser")!));
                                 await database
                                     .createTeamGroup(
                                     currentUser!.uid,
@@ -121,7 +121,7 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                                   Navigator.pushReplacement(
                                     context,
                                     MaterialPageRoute(
-                                      builder: (context) => GroupSettings(group: value!),
+                                      builder: (context) => GroupSettings(uid: currentUser.uid),
                                     ),
                                   );
                                 }).catchError((onError) {
