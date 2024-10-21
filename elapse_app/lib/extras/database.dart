@@ -39,7 +39,7 @@ class Database {
   Future<Map<String, dynamic>?> getUserInfo(String uid) async {
     try {
       var collection = await _firestore.collection('users').doc(uid).get();
-      return collection.data();
+      return collection.data()?..addAll({"uid": uid});
     } catch (e) {
       print(e);
     }

@@ -210,8 +210,8 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                                     selectedTeam != null) {
                                   prefs.setString("savedTeam",
                                       jsonEncode(selectedTeam!.toJson()));
-                                  ElapseUser currentUser = elapseUserDecode(
-                                      prefs.getString("currentUser")!);
+                                  ElapseUser currentUser = ElapseUser.fromJson(
+                                      jsonDecode(prefs.getString("currentUser")!));
                                   currentUser.teamNumber =
                                       selectedTeam!.teamNumber;
                                   prefs.setString("currentUser",

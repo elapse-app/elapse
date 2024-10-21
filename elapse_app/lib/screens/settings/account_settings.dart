@@ -8,6 +8,7 @@ import 'package:collection/collection.dart';
 import '../../classes/Team/teamPreview.dart';
 import '../../classes/Tournament/tournament.dart';
 import '../../classes/Users/user.dart';
+import '../../extras/auth.dart';
 import '../../extras/database.dart';
 import '../../main.dart';
 import '../../setup/welcome/first_page.dart';
@@ -377,13 +378,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                                   ((_) => false),
                                 );
                                 FirebaseAuth.instance.signOut();
-                                prefs.remove("currentUser");
-                                prefs.remove("savedTeam");
-                                prefs.remove("savedTeams");
-                                prefs.remove("isTournamentMode");
-                                prefs.remove("teamGroup");
-
-                                prefs.setBool("isSetUp", false);
+                                clearPrefs();
                               })
                         ],
                         actionsPadding: const EdgeInsets.only(bottom: 8, right: 16),
@@ -544,13 +539,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                                               Database database = Database();
                                               database.deleteCurrentUser();
                                               FirebaseAuth.instance.currentUser!.delete();
-                                              prefs.remove("currentUser");
-                                              prefs.remove("savedTeam");
-                                              prefs.remove("savedTeams");
-                                              prefs.remove("isTournamentMode");
-                                              prefs.remove("teamGroup");
-
-                                              prefs.setBool("isSetUp", false);
+                                              clearPrefs();
                                             },
                                           ),
                                         ],

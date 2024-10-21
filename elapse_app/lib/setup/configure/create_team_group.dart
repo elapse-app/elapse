@@ -190,8 +190,8 @@ class _CreateTeamGroupState extends State<CreateTeamGroup> {
                               Database database = Database();
                               final currentUser =
                                   FirebaseAuth.instance.currentUser;
-                              ElapseUser currentElapseUser = elapseUserDecode(
-                                  prefs.getString("currentUser")!);
+                              ElapseUser currentElapseUser = ElapseUser.fromJson(
+                                  jsonDecode(prefs.getString("currentUser")!));
                               await database
                                   .createTeamGroup(
                                       currentUser!.uid,
