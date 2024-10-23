@@ -3,6 +3,7 @@ import 'package:elapse_app/setup/signup/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/setup/signup/create_account.dart';
 import '../../screens/widgets/app_bar.dart';
+import '../configure/join_team.dart';
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({
@@ -179,12 +180,32 @@ class SignUpPage extends StatelessWidget {
                                 text: "Existing User? Sign in Here",
                                 useForwardArrow: false,
                                 centerAlign: true,
-                                isGray: true,
+                                isGray: false,
                                 onPressed: () {
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                       builder: (context) => const LoginPage(),
+                                    ),
+                                  );
+                                },
+                              )),
+                          const SizedBox(height: 12),
+                          Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 23.0,
+                                vertical: 6.0,
+                              ),
+                              child: LongButton(
+                                text: "Use Elapse without an account",
+                                useForwardArrow: false,
+                                centerAlign: true,
+                                isGray: true,
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const JoinTeamPage(),
                                     ),
                                   );
                                 },
