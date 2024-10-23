@@ -273,7 +273,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text("No Account",
+                              Text("Sign Up",
                                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                               const SizedBox(height: 18),
                               Text(

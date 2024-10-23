@@ -173,7 +173,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                       ),
                       SizedBox(height: 16.0),
                       SizedBox(
-                        height: 20,
+                        height: 30,
                         child: FutureBuilder<List<TeamPreview>>(
                           future: teamSearch,
                           builder: (context, snapshot) {
@@ -182,7 +182,10 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                                 return SizedBox.shrink();
                               case ConnectionState.waiting:
                               case ConnectionState.active:
-                                return CircularProgressIndicator();
+                                return SizedBox(
+                                  width: 30,
+                                  child: CircularProgressIndicator(),
+                                );
                               case ConnectionState.done:
                                 return Text("Press confirm to continue");
                             }
