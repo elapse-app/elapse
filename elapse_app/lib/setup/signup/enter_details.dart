@@ -8,6 +8,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
 
+import '../configure/theme_setup.dart';
+
 class EnterDetailsPage extends StatefulWidget {
   const EnterDetailsPage({
     super.key,
@@ -21,7 +23,6 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
   @override
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
   final firebaseUser = FirebaseAuth.instance.currentUser;
   ElapseUser currentUser = ElapseUser(uid: "", email: "");
   void initState() {
