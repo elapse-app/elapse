@@ -277,7 +277,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                               const SizedBox(height: 18),
                               Text(
-                                  "Currently you are using Elapse without an account. To utilise Elapse fully and gain access to ScoutSheets and Match Notes, create an account or login to an existing one.",
+                                  "Currently you are using Elapse without an account. To fully utilise Elapse and gain access to ScoutSheets and Match Notes, create an account or login to an existing one.",
                                   style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
                                   softWrap: true),
                               const SizedBox(height: 18),
