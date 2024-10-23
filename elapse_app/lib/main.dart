@@ -13,6 +13,7 @@ import 'package:elapse_app/screens/tournament_mode/home.dart';
 import 'package:elapse_app/screens/tournament_mode/my_teams.dart';
 import 'package:elapse_app/screens/tournament_mode/tournament.dart';
 import 'package:elapse_app/setup/welcome/first_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,7 +45,9 @@ void main() async {
 
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-  await checkAccountDeleted();
+  if ((prefs.getBool("isSetUp") ?? false) && FirebaseAuth.instance.currentUser != null) {
+    await checkAccountDeleted();
+  }
 
   runApp(
     MultiProvider(
@@ -79,7 +82,7 @@ class MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _initPackageInfo();
-    if (widget.prefs.getBool("isSetUp") == true) {
+    if (widget.prefs.getBool("isSetUp")) {
       teamID = jsonDecode(widget.prefs.getString("savedTeam"))["teamID"];
       teamNumber = jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"];
       initializeTournamentMode();
@@ -113,7 +116,7 @@ class MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.prefs.getBool("isSetUp") != true) {
+    if (!widget.prefs.getBool("isSetUp")) {
       return Consumer<ColorProvider>(
         builder: (context, value, child) {
           bool systemDefined = false;
