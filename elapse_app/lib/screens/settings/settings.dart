@@ -15,10 +15,13 @@ import '../../classes/Groups/teamGroup.dart';
 import '../../classes/Team/teamPreview.dart';
 import '../../classes/Tournament/tournament.dart';
 import '../../main.dart';
+import '../../setup/signup/create_account.dart';
+import '../../setup/signup/login_page.dart';
 import '../widgets/big_error_message.dart';
 import '../widgets/long_button.dart';
 import 'account_settings.dart';
 import 'group_settings.dart';
+import 'manage_teams.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -38,7 +41,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String defaultGrade = prefs.getString("defaultGrade") ?? "Main Team";
   bool sendLTTelemetry = prefs.getBool("sendLTTelemetry") ?? false;
 
-  ElapseUser currentUser = ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
+  ElapseUser? currentUser;
   bool showEmail = false;
 
   late Future<TeamGroup?> teamGroupFuture;
@@ -46,7 +49,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    teamGroupFuture = getUserTeamGroup(currentUser.uid!);
+    if (prefs.getString("currentUser") != null) {
+      currentUser = ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
+      teamGroupFuture = getUserTeamGroup(currentUser!.uid!);
+    }
   }
 
   @override
@@ -56,7 +62,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       body: RefreshIndicator(
         onRefresh: () async {
           setState(() {
-            teamGroupFuture = getUserTeamGroup(currentUser.uid!);
+            if (currentUser != null) {
+              teamGroupFuture = getUserTeamGroup(currentUser!.uid!);
+            }
           });
         },
         child: CustomScrollView(
@@ -85,13 +93,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Column(
                   children: [
                     Container(
-                        height: 320,
+                        height: currentUser != null ? 320 : 400,
                         decoration: BoxDecoration(
                           border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
                           borderRadius: BorderRadius.circular(18),
                         ),
                         padding: const EdgeInsets.all(18),
-                        child: Column(
+                        child: currentUser != null ? Column(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -102,11 +110,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     CircleAvatar(
                                       radius: 33,
                                     ),
-                                    Text('${currentUser.fname!} ${currentUser.lname!}',
+                                    Text('${currentUser!.fname!} ${currentUser!.lname!}',
                                         style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                                     GestureDetector(
                                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                          Text(currentUser.email!,
+                                          Text(currentUser!.email!,
                                               style: TextStyle(
                                                 fontSize: 16,
                                                 foreground: showEmail
@@ -245,7 +253,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   await Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => AccountSettings(user: currentUser),
+                                        builder: (context) => AccountSettings(user: currentUser!),
                                       ));
                                   setState(() {
                                     currentUser = ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
@@ -260,10 +268,201 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       color: Theme.of(context).colorScheme.onSurfaceVariant),
                                 ]),
                               ),
-                            ])),
+                            ])
+                            : Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("No Account",
+                                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                              const SizedBox(height: 18),
+                              Text(
+                                  "Currently you are using Elapse without an account. To utilise Elapse fully and gain access to ScoutSheets and Match Notes, create an account or login to an existing one.",
+                                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                  softWrap: true),
+                              const SizedBox(height: 18),
+                              Row(children: [
+                                Expanded(
+                                  child: LongButton(
+                                    onPressed: () async {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const CreateAccount(),
+                                        )
+                                      );
+                                      setState(() {
+                                        if (prefs.getString("currentUser") != null) {
+                                          currentUser = ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
+                                          teamGroupFuture = getUserTeamGroup(currentUser!.uid!);
+                                        }
+                                      });
+                                    },
+                                    text: "Sign Up",
+                                    useForwardArrow: false,
+                                    centerAlign: true,
+                                  ),
+                                ),
+                                const SizedBox(width: 18),
+                                Expanded(
+                                  child: LongButton(
+                                    onPressed: () async {
+                                      await Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => const LoginPage(),
+                                        )
+                                      );
+                                      setState(() {
+                                        if (prefs.getString("currentUser") != null) {
+                                          currentUser = ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
+                                          teamGroupFuture = getUserTeamGroup(currentUser!.uid!);
+                                        }
+                                      });
+                                    },
+                                    gradient: false,
+                                    text: "Log In",
+                                    useForwardArrow: false,
+                                    centerAlign: true,
+                                  ),
+                                )
+                              ]),
+                              const SizedBox(height: 13),
+                              Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 5),
+                                  child: Divider(
+                                    color: Theme.of(context).colorScheme.surfaceDim,
+                                  )),
+                              Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                                decoration: BoxDecoration(
+                                  border: Border.all(color: Theme.of(context).colorScheme.primary),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(children: [
+                                  Icon(Icons.group_outlined, color: Theme.of(context).colorScheme.secondary),
+                                  const SizedBox(width: 15),
+                                  Expanded(
+                                    child: getSavedTeams().length > 1
+                                        ? DropdownButtonHideUnderline(
+                                      child: DropdownButton(
+                                        isExpanded: true,
+                                        value: mainTeamId,
+                                        items: getSavedTeams()
+                                            .map((e) => DropdownMenuItem(
+                                            value: e.teamID, child: Text("Team ${e.teamNumber}")))
+                                            .toList(),
+                                        onChanged: (int? value) {
+                                          final String savedTeam = prefs.getString("savedTeam") ?? "";
+                                          final List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
+                                          String? selected =
+                                          savedTeams.firstWhereOrNull((e) => jsonDecode(e)["teamID"] == value);
+                                          if (selected == null) return;
+
+                                          Tournament? tournament;
+                                          if (prefs.getBool("isTournamentMode") ?? false) {
+                                            tournament = loadTournament(prefs.getString("TMSavedTournament"));
+                                          }
+
+                                          if (tournament != null &&
+                                              tournament.teams.singleWhereOrNull(
+                                                      (e) => e.id == loadTeamPreview(selected).teamID) ==
+                                                  null) {
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    title: const Text("Switch main team"),
+                                                    content: const Text("You will be exiting Tournament Mode."),
+                                                    contentPadding:
+                                                    const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                                                    actions: [
+                                                      TextButton(
+                                                        child: Text("Cancel",
+                                                            style: TextStyle(
+                                                                color: Theme.of(context).colorScheme.secondary)),
+                                                        onPressed: () => Navigator.pop(context),
+                                                      ),
+                                                      TextButton(
+                                                          child: Text("Switch",
+                                                              style: TextStyle(
+                                                                  color: Theme.of(context).colorScheme.secondary)),
+                                                          onPressed: () {
+                                                            savedTeams.removeWhere(
+                                                                    (e) => jsonDecode(e)["teamID"] == value);
+                                                            savedTeams.add(savedTeam);
+                                                            prefs.setStringList("savedTeams", savedTeams);
+                                                            prefs.setString("savedTeam", selected);
+
+                                                            setState(() {
+                                                              mainTeamId = value!;
+                                                            });
+
+                                                            prefs.setBool("isTournamentMode", false);
+                                                            prefs.remove("tournament-${tournament!.id}");
+                                                            prefs.remove("TMSavedTournament");
+                                                            myAppKey.currentState!.reloadApp();
+                                                            Navigator.pop(context);
+                                                          })
+                                                    ],
+                                                    actionsPadding: const EdgeInsets.only(bottom: 8),
+                                                    shape: RoundedRectangleBorder(
+                                                        side: BorderSide(
+                                                            color: Theme.of(context).colorScheme.primary),
+                                                        borderRadius: BorderRadius.circular(18)),
+                                                  );
+                                                });
+                                          } else {
+                                            savedTeams.removeWhere((e) => jsonDecode(e)["teamID"] == value);
+                                            savedTeams.add(savedTeam);
+                                            prefs.setStringList("savedTeams", savedTeams);
+                                            prefs.setString("savedTeam", selected);
+
+                                            setState(() {
+                                              mainTeamId = value!;
+                                            });
+                                          }
+                                        },
+                                        style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w400,
+                                            color: Theme.of(context).colorScheme.secondary),
+                                        borderRadius: BorderRadius.circular(10),
+                                        icon: Icon(Icons.arrow_drop_down,
+                                            color: Theme.of(context).colorScheme.secondary),
+                                      ),
+                                    )
+                                        : Padding(
+                                        padding: const EdgeInsets.all(10),
+                                        child: Text("Team ${getSavedTeams()[0].teamNumber}",
+                                            style: TextStyle(
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.w400,
+                                                color: Theme.of(context).colorScheme.secondary))),
+                                  )
+                                ]),
+                              ),
+                              const SizedBox(height: 18),
+                              GestureDetector(
+                                  onTap: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const ManageTeamPage(),
+                                      ),
+                                    );
+                                    setState(() {});
+                                  },
+                                  behavior: HitTestBehavior.translucent,
+                                  child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                                    const Text("Manage Teams", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
+                                    Icon(Icons.arrow_forward, color: Theme.of(context).colorScheme.onSurfaceVariant),
+                                  ])),
+                            ]
+                        )),
                     const SizedBox(height: 23),
-                    Container(
-                      height: currentUser.groupID.isNotEmpty ? 200 : 230,
+                    currentUser != null ? Container(
+                      height: currentUser!.groupID.isNotEmpty ? 200 : 230,
                       width: double.infinity,
                       decoration: BoxDecoration(
                         border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
@@ -325,7 +524,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                             await Navigator.push(
                                               context,
                                               MaterialPageRoute(
-                                                builder: (context) => GroupSettings(uid: currentUser.uid!),
+                                                builder: (context) => GroupSettings(uid: currentUser!.uid!),
                                               ),
                                             );
                                             setState(() {
@@ -380,7 +579,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                           onPressed: () => Navigator.push(
                                                               context,
                                                               MaterialPageRoute(
-                                                                builder: (context) => AccountSettings(user: currentUser),
+                                                                builder: (context) => AccountSettings(user: currentUser!),
                                                               )))
                                                     ],
                                                     actionsPadding: const EdgeInsets.only(bottom: 8, right: 16),
@@ -409,7 +608,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             }
                           }
                       ),
-                    ),
+                    ) : const SizedBox.shrink(),
                     const SizedBox(height: 32),
                     const SizedBox(
                       width: double.infinity,

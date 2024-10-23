@@ -208,6 +208,7 @@ class _FeaturesState extends State<Features> {
                                 });
                               })),
                     ),
+                    Spacer(),
                     DotsIndicator(
                       dotsCount: featurePages.length,
                       position: currIndex,
@@ -219,7 +220,6 @@ class _FeaturesState extends State<Features> {
                         activeColor: Theme.of(context).colorScheme.onSurface,
                       ),
                     ),
-                    Spacer(),
                     Container(
                       margin: EdgeInsets.fromLTRB(23, 15, 23, 50),
                       child: LongButton(
