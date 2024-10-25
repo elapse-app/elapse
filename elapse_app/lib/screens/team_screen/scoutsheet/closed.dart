@@ -7,7 +7,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
-List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI sheet, String teamID, String teamGroupID,
+List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI sheet, String teamID,
     String tournamentID, void Function() updateIndex) {
   Database database = Database();
 
