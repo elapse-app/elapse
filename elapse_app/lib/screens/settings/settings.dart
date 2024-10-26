@@ -137,122 +137,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                               }),
                                         ]),
                                     const SizedBox(height: 18),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Theme.of(context).colorScheme.primary),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Row(children: [
-                                        Icon(Icons.group_outlined, color: Theme.of(context).colorScheme.secondary),
-                                        const SizedBox(width: 15),
-                                        Expanded(
-                                          child: getSavedTeams().length > 1
-                                              ? DropdownButtonHideUnderline(
-                                                  child: DropdownButton(
-                                                    isExpanded: true,
-                                                    value: mainTeamId,
-                                                    items: getSavedTeams()
-                                                        .map((e) => DropdownMenuItem(
-                                                            value: e.teamID, child: Text("Team ${e.teamNumber}")))
-                                                        .toList(),
-                                                    onChanged: (int? value) {
-                                                      final String savedTeam = prefs.getString("savedTeam") ?? "";
-                                                      final List<String> savedTeams =
-                                                          prefs.getStringList("savedTeams") ?? [];
-                                                      String? selected = savedTeams
-                                                          .firstWhereOrNull((e) => jsonDecode(e)["teamID"] == value);
-                                                      if (selected == null) return;
-
-                                                      Tournament? tournament;
-                                                      if (prefs.getBool("isTournamentMode") ?? false) {
-                                                        tournament =
-                                                            loadTournament(prefs.getString("TMSavedTournament"));
-                                                      }
-
-                                                      if (tournament != null &&
-                                                          tournament.teams.singleWhereOrNull(
-                                                                  (e) => e.id == loadTeamPreview(selected).teamID) ==
-                                                              null) {
-                                                        showDialog(
-                                                            context: context,
-                                                            builder: (context) {
-                                                              return AlertDialog(
-                                                                title: const Text("Switch main team"),
-                                                                content:
-                                                                    const Text("You will be exiting Tournament Mode."),
-                                                                contentPadding: const EdgeInsets.symmetric(
-                                                                    horizontal: 24, vertical: 10),
-                                                                actions: [
-                                                                  TextButton(
-                                                                    child: Text("Cancel",
-                                                                        style: TextStyle(
-                                                                            color: Theme.of(context)
-                                                                                .colorScheme
-                                                                                .secondary)),
-                                                                    onPressed: () => Navigator.pop(context),
-                                                                  ),
-                                                                  TextButton(
-                                                                      child: Text("Switch",
-                                                                          style: TextStyle(
-                                                                              color: Theme.of(context)
-                                                                                  .colorScheme
-                                                                                  .secondary)),
-                                                                      onPressed: () {
-                                                                        savedTeams.removeWhere(
-                                                                            (e) => jsonDecode(e)["teamID"] == value);
-                                                                        savedTeams.add(savedTeam);
-                                                                        prefs.setStringList("savedTeams", savedTeams);
-                                                                        prefs.setString("savedTeam", selected);
-
-                                                                        setState(() {
-                                                                          mainTeamId = value!;
-                                                                        });
-
-                                                                        prefs.setBool("isTournamentMode", false);
-                                                                        prefs.remove("tournament-${tournament!.id}");
-                                                                        prefs.remove("TMSavedTournament");
-                                                                        myAppKey.currentState!.reloadApp();
-                                                                        Navigator.pop(context);
-                                                                      })
-                                                                ],
-                                                                actionsPadding: const EdgeInsets.only(bottom: 8, right: 16),
-                                                                shape: RoundedRectangleBorder(
-                                                                    side: BorderSide(
-                                                                        color: Theme.of(context).colorScheme.primary),
-                                                                    borderRadius: BorderRadius.circular(18)),
-                                                              );
-                                                            });
-                                                      } else {
-                                                        savedTeams.removeWhere((e) => jsonDecode(e)["teamID"] == value);
-                                                        savedTeams.add(savedTeam);
-                                                        prefs.setStringList("savedTeams", savedTeams);
-                                                        prefs.setString("savedTeam", selected);
-
-                                                        setState(() {
-                                                          mainTeamId = value!;
-                                                        });
-                                                      }
-                                                    },
-                                                    style: TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight: FontWeight.w400,
-                                                        color: Theme.of(context).colorScheme.secondary),
-                                                    borderRadius: BorderRadius.circular(10),
-                                                    icon: Icon(Icons.arrow_drop_down,
-                                                        color: Theme.of(context).colorScheme.secondary),
-                                                  ),
-                                                )
-                                              : Padding(
-                                                  padding: const EdgeInsets.all(10),
-                                                  child: Text("Team ${getSavedTeams()[0].teamNumber}",
-                                                      style: TextStyle(
-                                                          fontSize: 18,
-                                                          fontWeight: FontWeight.w400,
-                                                          color: Theme.of(context).colorScheme.secondary))),
-                                        )
-                                      ]),
-                                    ),
+                                    buildTeamDropdown(context, mainTeamId, setState),
                                     Padding(
                                         padding: const EdgeInsets.symmetric(vertical: 5),
                                         child: Divider(
@@ -345,122 +230,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         child: Divider(
                                           color: Theme.of(context).colorScheme.surfaceDim,
                                         )),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(color: Theme.of(context).colorScheme.primary),
-                                        borderRadius: BorderRadius.circular(10),
-                                      ),
-                                      child: Row(children: [
-                                        Icon(Icons.group_outlined, color: Theme.of(context).colorScheme.secondary),
-                                        const SizedBox(width: 15),
-                                        Expanded(
-                                          child: getSavedTeams().length > 1
-                                              ? DropdownButtonHideUnderline(
-                                                  child: DropdownButton(
-                                                    isExpanded: true,
-                                                    value: mainTeamId,
-                                                    items: getSavedTeams()
-                                                        .map((e) => DropdownMenuItem(
-                                                            value: e.teamID, child: Text("Team ${e.teamNumber}")))
-                                                        .toList(),
-                                                    onChanged: (int? value) {
-                                                      final String savedTeam = prefs.getString("savedTeam") ?? "";
-                                                      final List<String> savedTeams =
-                                                          prefs.getStringList("savedTeams") ?? [];
-                                                      String? selected = savedTeams
-                                                          .firstWhereOrNull((e) => jsonDecode(e)["teamID"] == value);
-                                                      if (selected == null) return;
-
-                                                      Tournament? tournament;
-                                                      if (prefs.getBool("isTournamentMode") ?? false) {
-                                                        tournament =
-                                                            loadTournament(prefs.getString("TMSavedTournament"));
-                                                      }
-
-                                                      if (tournament != null &&
-                                                          tournament.teams.singleWhereOrNull(
-                                                                  (e) => e.id == loadTeamPreview(selected).teamID) ==
-                                                              null) {
-                                                        showDialog(
-                                                            context: context,
-                                                            builder: (context) {
-                                                              return AlertDialog(
-                                                                title: const Text("Switch main team"),
-                                                                content:
-                                                                    const Text("You will be exiting Tournament Mode."),
-                                                                contentPadding: const EdgeInsets.symmetric(
-                                                                    horizontal: 24, vertical: 10),
-                                                                actions: [
-                                                                  TextButton(
-                                                                    child: Text("Cancel",
-                                                                        style: TextStyle(
-                                                                            color: Theme.of(context)
-                                                                                .colorScheme
-                                                                                .secondary)),
-                                                                    onPressed: () => Navigator.pop(context),
-                                                                  ),
-                                                                  TextButton(
-                                                                      child: Text("Switch",
-                                                                          style: TextStyle(
-                                                                              color: Theme.of(context)
-                                                                                  .colorScheme
-                                                                                  .secondary)),
-                                                                      onPressed: () {
-                                                                        savedTeams.removeWhere(
-                                                                            (e) => jsonDecode(e)["teamID"] == value);
-                                                                        savedTeams.add(savedTeam);
-                                                                        prefs.setStringList("savedTeams", savedTeams);
-                                                                        prefs.setString("savedTeam", selected);
-
-                                                                        setState(() {
-                                                                          mainTeamId = value!;
-                                                                        });
-
-                                                                        prefs.setBool("isTournamentMode", false);
-                                                                        prefs.remove("tournament-${tournament!.id}");
-                                                                        prefs.remove("TMSavedTournament");
-                                                                        myAppKey.currentState!.reloadApp();
-                                                                        Navigator.pop(context);
-                                                                      })
-                                                                ],
-                                                                actionsPadding: const EdgeInsets.only(bottom: 8, right: 16),
-                                                                shape: RoundedRectangleBorder(
-                                                                    side: BorderSide(
-                                                                        color: Theme.of(context).colorScheme.primary),
-                                                                    borderRadius: BorderRadius.circular(18)),
-                                                              );
-                                                            });
-                                                      } else {
-                                                        savedTeams.removeWhere((e) => jsonDecode(e)["teamID"] == value);
-                                                        savedTeams.add(savedTeam);
-                                                        prefs.setStringList("savedTeams", savedTeams);
-                                                        prefs.setString("savedTeam", selected);
-
-                                                        setState(() {
-                                                          mainTeamId = value!;
-                                                        });
-                                                      }
-                                                    },
-                                                    style: TextStyle(
-                                                        fontSize: 18,
-                                                        fontWeight: FontWeight.w400,
-                                                        color: Theme.of(context).colorScheme.secondary),
-                                                    borderRadius: BorderRadius.circular(10),
-                                                    icon: Icon(Icons.arrow_drop_down,
-                                                        color: Theme.of(context).colorScheme.secondary),
-                                                  ),
-                                                )
-                                              : Padding(
-                                                  padding: const EdgeInsets.all(10),
-                                                  child: Text("Team ${getSavedTeams()[0].teamNumber}",
-                                                      style: TextStyle(
-                                                          fontSize: 18,
-                                                          fontWeight: FontWeight.w400,
-                                                          color: Theme.of(context).colorScheme.secondary))),
-                                        )
-                                      ]),
-                                    ),
+                                    buildTeamDropdown(context, mainTeamId, setState),
                                     const SizedBox(height: 18),
                                     GestureDetector(
                                         onTap: () async {
@@ -825,4 +595,102 @@ List<TeamPreview> getSavedTeams() {
   savedTeamsList.insert(0, loadTeamPreview(savedTeam));
 
   return savedTeamsList;
+}
+
+Widget buildTeamDropdown(BuildContext context, int mainTeamId, void Function(void Function()) setState) {
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+    decoration: BoxDecoration(
+      border: Border.all(color: Theme.of(context).colorScheme.primary),
+      borderRadius: BorderRadius.circular(10),
+    ),
+    child: Row(children: [
+      Icon(Icons.group_outlined, color: Theme.of(context).colorScheme.secondary),
+      const SizedBox(width: 15),
+      Expanded(
+        child: getSavedTeams().length > 1
+            ? DropdownButtonHideUnderline(
+                child: DropdownButton(
+                  isExpanded: true,
+                  value: mainTeamId,
+                  items: getSavedTeams()
+                      .map((e) => DropdownMenuItem(value: e.teamID, child: Text("Team ${e.teamNumber}")))
+                      .toList(),
+                  onChanged: (int? value) {
+                    final String savedTeam = prefs.getString("savedTeam") ?? "";
+                    final List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
+                    String? selected = savedTeams.firstWhereOrNull((e) => jsonDecode(e)["teamID"] == value);
+                    if (selected == null) return;
+
+                    Tournament? tournament;
+                    if (prefs.getBool("isTournamentMode") ?? false) {
+                      tournament = loadTournament(prefs.getString("TMSavedTournament"));
+                    }
+
+                    if (tournament != null &&
+                        tournament.teams.singleWhereOrNull((e) => e.id == loadTeamPreview(selected).teamID) == null) {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text("Switch main team"),
+                              content: const Text("You will be exiting Tournament Mode."),
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                              actions: [
+                                TextButton(
+                                  child:
+                                      Text("Cancel", style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                                  onPressed: () => Navigator.pop(context),
+                                ),
+                                TextButton(
+                                    child: Text("Switch",
+                                        style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                                    onPressed: () {
+                                      savedTeams.removeWhere((e) => jsonDecode(e)["teamID"] == value);
+                                      savedTeams.add(savedTeam);
+                                      prefs.setStringList("savedTeams", savedTeams);
+                                      prefs.setString("savedTeam", selected);
+
+                                      setState(() {
+                                        mainTeamId = value!;
+                                      });
+
+                                      prefs.setBool("isTournamentMode", false);
+                                      prefs.remove("tournament-${tournament!.id}");
+                                      prefs.remove("TMSavedTournament");
+                                      myAppKey.currentState!.reloadApp();
+                                      Navigator.pop(context);
+                                    })
+                              ],
+                              actionsPadding: const EdgeInsets.only(bottom: 8, right: 16),
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                                  borderRadius: BorderRadius.circular(18)),
+                            );
+                          });
+                    } else {
+                      savedTeams.removeWhere((e) => jsonDecode(e)["teamID"] == value);
+                      savedTeams.add(savedTeam);
+                      prefs.setStringList("savedTeams", savedTeams);
+                      prefs.setString("savedTeam", selected);
+
+                      setState(() {
+                        mainTeamId = value!;
+                      });
+                    }
+                  },
+                  style: TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.w400, color: Theme.of(context).colorScheme.secondary),
+                  borderRadius: BorderRadius.circular(10),
+                  icon: Icon(Icons.arrow_drop_down, color: Theme.of(context).colorScheme.secondary),
+                ),
+              )
+            : Padding(
+                padding: const EdgeInsets.all(10),
+                child: Text("Team ${getSavedTeams()[0].teamNumber}",
+                    style: TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w400, color: Theme.of(context).colorScheme.secondary))),
+      )
+    ]),
+  );
 }
