@@ -8,6 +8,7 @@ import 'package:elapse_app/extras/twelve_hour.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:collection/collection.dart';
 
 class NextGame extends StatelessWidget {
   const NextGame(
@@ -62,8 +63,11 @@ class NextGame extends StatelessWidget {
       }
     }
 
-    Game currGame = games.lastWhere((e) => (e.redScore != 0 && e.blueScore != 0) || e.startedTime != null);
-    int gamesLeft = games.indexOf(game) - games.indexOf(currGame);
+    Game? currGame = games.lastWhereOrNull((e) => (e.redScore != 0 && e.blueScore != 0) || e.startedTime != null);
+    int gamesLeft = games.indexOf(game);
+    if (currGame != null) {
+      gamesLeft -= games.indexOf(currGame);
+    }
     // int gamesLeft = game.gameNum - currGame.gameNum;
 
     Widget gameText;
@@ -212,7 +216,7 @@ class NextGame extends StatelessWidget {
                   ),
                 ]),
               ],
-            )
+            ),
           ],
         ),
       ),
