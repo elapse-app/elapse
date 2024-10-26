@@ -26,25 +26,6 @@ class GameWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Tournament tournament = loadTournament(prefs.getString("recently-opened-tournament"));
-
-    int divisionIndex = 0;
-
-    if (game.blueAlliancePreview != null) {
-      divisionIndex = getTeamDivisionIndex(tournament.divisions, game.blueAlliancePreview![0].teamID);
-      if (divisionIndex == -1) {
-        divisionIndex = getTeamDivisionIndex(tournament.divisions, game.blueAlliancePreview![1].teamID);
-      }
-      if (divisionIndex == -1) {
-        divisionIndex = getTeamDivisionIndex(tournament.divisions, game.redAlliancePreview![0].teamID);
-      }
-      if (divisionIndex == -1) {
-        divisionIndex = getTeamDivisionIndex(tournament.divisions, game.redAlliancePreview![1].teamID);
-      }
-    }
-
-    List<Game> games = tournament.divisions[divisionIndex].games!;
-
     String time = "No Time";
     if (game.startedTime != null) {
       time = DateFormat.Hm().format(game.startedTime!.toLocal());
