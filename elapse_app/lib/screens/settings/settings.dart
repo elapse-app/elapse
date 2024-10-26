@@ -216,7 +216,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                                         Navigator.pop(context);
                                                                       })
                                                                 ],
-                                                                actionsPadding: const EdgeInsets.only(bottom: 8),
+                                                                actionsPadding: const EdgeInsets.only(bottom: 8, right: 16),
                                                                 shape: RoundedRectangleBorder(
                                                                     side: BorderSide(
                                                                         color: Theme.of(context).colorScheme.primary),
@@ -424,7 +424,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                                         Navigator.pop(context);
                                                                       })
                                                                 ],
-                                                                actionsPadding: const EdgeInsets.only(bottom: 8),
+                                                                actionsPadding: const EdgeInsets.only(bottom: 8, right: 16),
                                                                 shape: RoundedRectangleBorder(
                                                                     side: BorderSide(
                                                                         color: Theme.of(context).colorScheme.primary),
