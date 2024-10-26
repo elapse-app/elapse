@@ -205,7 +205,12 @@ class _AccountSettingsState extends State<AccountSettings> {
               child: Text("Teams", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
             ),
             const SizedBox(height: 18),
-            buildTeamDropdown(context, mainTeamId, setState),
+            buildTeamDropdown(
+                context,
+                mainTeamId,
+                (value) => setState(() {
+                      mainTeamId = value;
+                    })),
             const SizedBox(height: 18),
             GestureDetector(
                 onTap: () async {

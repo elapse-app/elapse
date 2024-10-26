@@ -137,7 +137,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                               }),
                                         ]),
                                     const SizedBox(height: 18),
-                                    buildTeamDropdown(context, mainTeamId, setState),
+                                    buildTeamDropdown(
+                                        context,
+                                        mainTeamId,
+                                        (value) => setState(() {
+                                              mainTeamId = value;
+                                            })),
                                     Padding(
                                         padding: const EdgeInsets.symmetric(vertical: 5),
                                         child: Divider(
@@ -230,7 +235,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                         child: Divider(
                                           color: Theme.of(context).colorScheme.surfaceDim,
                                         )),
-                                    buildTeamDropdown(context, mainTeamId, setState),
+                                    buildTeamDropdown(
+                                        context,
+                                        mainTeamId,
+                                        (value) => setState(() {
+                                              mainTeamId = value;
+                                            })),
                                     const SizedBox(height: 18),
                                     GestureDetector(
                                         onTap: () async {
@@ -597,7 +607,7 @@ List<TeamPreview> getSavedTeams() {
   return savedTeamsList;
 }
 
-Widget buildTeamDropdown(BuildContext context, int mainTeamId, void Function(void Function()) setState) {
+Widget buildTeamDropdown(BuildContext context, int mainTeamId, void Function(int) update) {
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
     decoration: BoxDecoration(
@@ -651,9 +661,7 @@ Widget buildTeamDropdown(BuildContext context, int mainTeamId, void Function(voi
                                       prefs.setStringList("savedTeams", savedTeams);
                                       prefs.setString("savedTeam", selected);
 
-                                      setState(() {
-                                        mainTeamId = value!;
-                                      });
+                                      update(value!);
 
                                       prefs.setBool("isTournamentMode", false);
                                       prefs.remove("tournament-${tournament!.id}");
@@ -674,9 +682,7 @@ Widget buildTeamDropdown(BuildContext context, int mainTeamId, void Function(voi
                       prefs.setStringList("savedTeams", savedTeams);
                       prefs.setString("savedTeam", selected);
 
-                      setState(() {
-                        mainTeamId = value!;
-                      });
+                      update(value!);
                     }
                   },
                   style: TextStyle(
