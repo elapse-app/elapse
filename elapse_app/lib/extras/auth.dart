@@ -15,11 +15,6 @@ Future<String?> signUp(String email, String password) async {
   try {
     // Create user with email and password
     // Check if email already exists before creating an account
-    final methods =
-        await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
-    if (methods.isNotEmpty) {
-      return "email-already-in-use";
-    }
     await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: email,
       password: password,
