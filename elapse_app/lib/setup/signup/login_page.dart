@@ -2,6 +2,7 @@ import 'package:elapse_app/extras/auth.dart';
 import 'package:elapse_app/screens/widgets/long_button.dart';
 import 'package:elapse_app/setup/configure/complete_setup.dart';
 import 'package:flutter/material.dart';
+import '../../main.dart';
 import '../../screens/widgets/app_bar.dart';
 
 class LoginPage extends StatefulWidget {
@@ -194,11 +195,15 @@ class _LoginPageState extends State<LoginPage> {
                         icon: Icons.mail_outline,
                         onPressed: () async {
                           await signIN(_emailController.text, _passwordController.text).then((a) {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const CompleteSetupPage(),
-                                ));
+                            if (prefs.getBool("isSetUp") ?? false) {
+                              Navigator.pop(context);
+                            } else {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const CompleteSetupPage(),
+                                  ));
+                            }
                           }).catchError((onError) {
                             print(onError);
                             showDialog(
