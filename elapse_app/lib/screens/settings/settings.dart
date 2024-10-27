@@ -326,9 +326,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                     ),
                                                   );
                                                   setState(() {
-                                                    teamGroup = prefs.getString("teamGroup") != null
-                                                        ? TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup")!))
-                                                        : null;
+                                                    currentUser =
+                                                        ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
+                                                    teamGroupFuture = getUserTeamGroup(currentUser!.uid!);
                                                   });
                                                 },
                                                 behavior: HitTestBehavior.translucent,
@@ -378,7 +378,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                                     style: TextStyle(
                                                                         color:
                                                                             Theme.of(context).colorScheme.secondary)),
-                                                                onPressed: () => Navigator.push(
+                                                                onPressed: () => Navigator.pushReplacement(
                                                                     context,
                                                                     MaterialPageRoute(
                                                                       builder: (context) =>
