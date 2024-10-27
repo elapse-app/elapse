@@ -276,7 +276,7 @@ class Database {
   Future<Map<String, dynamic>?> getGroupInfo(String groupid) async {
     try {
       var collection = await _firestore.collection('teamGroups').doc(groupid).get();
-      return collection.data();
+      return collection.data()?..addAll({'groupId': groupid});
     } catch (e) {
       print(e);
     }
@@ -325,7 +325,7 @@ class Database {
         returnVal = onValue.id;
       });
     } catch (e) {
-      print(e);
+      print("here $e");
     }
     return returnVal;
   }

@@ -5,8 +5,10 @@ import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../classes/Groups/teamGroup.dart';
+import '../../classes/Users/user.dart';
 import '../../extras/database.dart';
 import '../../main.dart';
 import '../widgets/app_bar.dart';
@@ -211,7 +213,24 @@ class _GroupSettingsState extends State<GroupSettings> {
                                                     : Icon(Icons.cached,
                                                         color: Theme.of(context).colorScheme.secondary),
                                               )
-                                            : const SizedBox.shrink(),
+                                            : GestureDetector(
+                                                onTap: () async {
+                                                  Clipboard.setData(ClipboardData(text: group.joinCode)).then((_) {
+                                                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                                                      content: Text("Join Code copied to clipboard",
+                                                          style: TextStyle(
+                                                              fontSize: 14,
+                                                              color: Theme.of(context).colorScheme.onSurface)),
+                                                      backgroundColor: Theme.of(context).colorScheme.surfaceDim,
+                                                      duration: Duration(seconds: 1),
+                                                      shape: RoundedRectangleBorder(
+                                                          borderRadius: BorderRadius.circular(18)),
+                                                    ));
+                                                  });
+                                                },
+                                                child: Icon(Icons.content_copy_outlined,
+                                                    color: Theme.of(context).colorScheme.secondary),
+                                              ),
                                         const SizedBox(width: 5),
                                         Text(group.joinCode,
                                             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
@@ -565,11 +584,14 @@ class _GroupSettingsState extends State<GroupSettings> {
                                                       child: Text("Delete",
                                                           style: TextStyle(color: Theme.of(context).colorScheme.error)),
                                                       onPressed: () {
+                                                        ElapseUser user = ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
+                                                        user.groupID.remove(group.groupId!);
+                                                        prefs.setString("currentUser", jsonEncode(user.toJson()));
+                                                        database.deleteTeamGroup(group.groupId!);
+                                                        prefs.remove("teamGroup");
                                                         Navigator.of(context)
                                                           ..pop()
                                                           ..pop();
-                                                        database.deleteTeamGroup(group.groupId!);
-                                                        prefs.remove("teamGroup");
                                                       })
                                                 ],
                                                 actionsPadding: const EdgeInsets.only(bottom: 8, right: 16),
