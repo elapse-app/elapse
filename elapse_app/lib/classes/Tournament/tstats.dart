@@ -107,6 +107,9 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
     parsedRankings = jsonDecode(rankingsResponse.body)["data"] as List;
   }));
   await Future.wait(requestFutures);
+  if (parsedRankings.isEmpty) {
+    return [allMatches];
+  }
 
   stats.addAll(Map<int, TeamStats>.fromEntries(parsedRankings.map((v) => MapEntry(v["team"]["id"], TeamStats()))));
   for (final t in parsedRankings) {
@@ -230,6 +233,10 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
   Matrix mOppScores = Matrix.column(blueScores + redScores);
   Matrix mMatches = Matrix.fromList(matchTeams);
   Matrix mMatchesT = mMatches.transpose();
+
+  if (mMatches.length != mScores.length) {
+    return [allMatches];
+  }
 
   Matrix mOPR = (mMatchesT * mMatches).solve(mMatchesT * mScores);
   Matrix mDPR = (mMatchesT * mMatches).solve(mMatchesT * mOppScores);
