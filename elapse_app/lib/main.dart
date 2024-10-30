@@ -57,14 +57,13 @@ void main() async {
         ),
         ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
       ],
-      child: MyApp(key: myAppKey, prefs: prefs),
+      child: MyApp(key: myAppKey),
     ),
   );
 }
 
 class MyApp extends StatefulWidget {
-  final prefs;
-  const MyApp({super.key, required this.prefs});
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => MyAppState();
@@ -82,18 +81,18 @@ class MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _initPackageInfo();
-    if (widget.prefs.getBool("isSetUp")) {
-      teamID = jsonDecode(widget.prefs.getString("savedTeam"))["teamID"];
-      teamNumber = jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"];
+    if (prefs.getBool("isSetUp") ?? false) {
+      teamID = jsonDecode(prefs.getString("savedTeam")!)["teamID"];
+      teamNumber = jsonDecode(prefs.getString("savedTeam")!)["teamNumber"];
       initializeTournamentMode();
     }
   }
 
   void initializeTournamentMode() {
-    if (widget.prefs.getBool("isTournamentMode") ?? false) {
-      int? tournamentID = widget.prefs.getInt("tournamentID");
-      teamID = jsonDecode(widget.prefs.getString("savedTeam"))["teamID"];
-      teamNumber = jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"];
+    if (prefs.getBool("isTournamentMode") ?? false) {
+      int? tournamentID = prefs.getInt("tournamentID");
+      teamID = jsonDecode(prefs.getString("savedTeam")!)["teamID"];
+      teamNumber = jsonDecode(prefs.getString("savedTeam")!)["teamNumber"];
       if (tournamentID != null) {
         isTournamentMode = true;
       }
@@ -116,14 +115,14 @@ class MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    if (!widget.prefs.getBool("isSetUp")) {
+    if (!(prefs.getBool("isSetUp") ?? false)) {
       return Consumer<ColorProvider>(
         builder: (context, value, child) {
           bool systemDefined = false;
           ColorScheme systemTheme =
               MediaQuery.of(context).platformBrightness == Brightness.dark ? darkScheme : lightScheme;
 
-          if (widget.prefs.getString("theme") == "system") {
+          if (prefs.getString("theme") == "system") {
             systemDefined = true;
             print("is system defined");
           }
@@ -143,24 +142,24 @@ class MyAppState extends State<MyApp> {
       );
     }
     TeamPreview savedTeam = TeamPreview(
-        teamNumber: jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"],
-        teamID: jsonDecode(widget.prefs.getString("savedTeam"))["teamID"]);
+        teamNumber: jsonDecode(prefs.getString("savedTeam")!)["teamNumber"],
+        teamID: jsonDecode(prefs.getString("savedTeam")!)["teamID"]);
     List<Widget> screens;
 
     isTournamentMode
         ? screens = [
             TMHomePage(
-              tournamentID: widget.prefs.getInt("tournamentID") ?? 0,
+              tournamentID: prefs.getInt("tournamentID") ?? 0,
               teamID: teamID,
               teamNumber: teamNumber,
             ),
             TMTournamentScreen(
-              tournamentID: widget.prefs.getInt("tournamentID") ?? 0,
+              tournamentID: prefs.getInt("tournamentID") ?? 0,
               isPreview: false,
             ),
             CloudScoutScreen(),
             TMMyTeams(
-              tournamentID: widget.prefs.getInt("tournamentID") ?? 0,
+              tournamentID: prefs.getInt("tournamentID") ?? 0,
             ),
             ExploreScreen()
           ]
@@ -182,7 +181,7 @@ class MyAppState extends State<MyApp> {
         ColorScheme systemTheme =
             MediaQuery.of(context).platformBrightness == Brightness.dark ? darkScheme : lightScheme;
 
-        if (widget.prefs.getString("theme") == "system") {
+        if (prefs.getString("theme") == "system") {
           systemDefined = true;
         }
 

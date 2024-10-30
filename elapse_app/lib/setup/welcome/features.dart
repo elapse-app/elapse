@@ -117,9 +117,7 @@ class _FeaturesState extends State<Features> {
           ),
         ),
         const SizedBox(height: 20),
-        Expanded(
-          child: PhotoPreview(imageLocation: 'assets/onboardingMyTeam$imageStringAddition.png')
-        )
+        Expanded(child: PhotoPreview(imageLocation: 'assets/onboardingMyTeam$imageStringAddition.png'))
       ]),
     ];
 
@@ -202,18 +200,18 @@ class _FeaturesState extends State<Features> {
                         height: double.infinity,
                         padding: const EdgeInsets.only(top: 18),
                         child: CarouselSlider(
-                              items: featurePages,
-                              carouselController: carouselController,
-                              options: CarouselOptions(
-                                  height: MediaQuery.of(context).size.height * 0.7,
-                                  enableInfiniteScroll: false,
-                                  autoPlay: false,
-                                  viewportFraction: 1,
-                                  onPageChanged: (index, reason) {
-                                    setState(() {
-                                      currIndex = index;
-                                    });
-                                  })),
+                            items: featurePages,
+                            carouselController: carouselController,
+                            options: CarouselOptions(
+                                height: MediaQuery.of(context).size.height * 0.7,
+                                enableInfiniteScroll: false,
+                                autoPlay: false,
+                                viewportFraction: 1,
+                                onPageChanged: (index, reason) {
+                                  setState(() {
+                                    currIndex = index;
+                                  });
+                                })),
                       ),
                     ),
                     Flexible(
@@ -234,23 +232,26 @@ class _FeaturesState extends State<Features> {
                     Flexible(
                       fit: FlexFit.tight,
                       flex: 10,
-                      child: LongButton(
-                          centerAlign: true,
-                          useForwardArrow: false,
-                          onPressed: () {
-                            if (currIndex == 3) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SignUpPage(),
-                                ),
-                              );
-                            } else {
-                              carouselController.nextPage(
-                                  duration: const Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
-                            }
-                          },
-                          text: "Next"),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 23.0),
+                        child: LongButton(
+                            centerAlign: true,
+                            useForwardArrow: false,
+                            onPressed: () {
+                              if (currIndex == 3) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const SignUpPage(),
+                                  ),
+                                );
+                              } else {
+                                carouselController.nextPage(
+                                    duration: const Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
+                              }
+                            },
+                            text: "Next"),
+                      ),
                     ),
                   ],
                 ),
@@ -268,10 +269,10 @@ class PhotoPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(width: 1, color: Theme.of(context).colorScheme.surface)),
-        child: ClipRRect(borderRadius: BorderRadius.circular(18), child: Image.asset(imageLocation, fit: BoxFit.fill)),
-      );
+      decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(width: 1, color: Theme.of(context).colorScheme.surface)),
+      child: ClipRRect(borderRadius: BorderRadius.circular(18), child: Image.asset(imageLocation, fit: BoxFit.fill)),
+    );
   }
 }
