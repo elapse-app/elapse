@@ -24,19 +24,14 @@ List<Widget> EditState(
     },
     child: Container(
       decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(9)),
-          color: Theme.of(context).colorScheme.tertiary),
+          borderRadius: const BorderRadius.all(Radius.circular(9)), color: Theme.of(context).colorScheme.tertiary),
       height: 175,
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.add_photo_alternate_outlined),
-              SizedBox(height: 5),
-              Text("Add Photo")
-            ],
+            children: [Icon(Icons.add_photo_alternate_outlined), SizedBox(height: 5), Text("Add Photo")],
           ),
         ],
       ),
@@ -78,25 +73,27 @@ List<Widget> EditState(
                       size: 30,
                     )),
               ]);
-            }).toList() + (sheet.photos.length < 6 ?
-            <Widget>[
-              GestureDetector(
-                onTap: () async {
-                  final result = await getPhoto(context);
-                  if (result != null) {
-                    addPhoto(result);
-                    print(photos.length);
-                  }
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                      borderRadius: const BorderRadius.all(Radius.circular(9)),
-                      color: Theme.of(context).colorScheme.tertiary),
-                  height: 175,
-                  child: const Icon(Icons.add_photo_alternate_outlined, size: 40),
-                ),
-              )
-            ] : []),
+            }).toList() +
+            (sheet.photos.length < 6
+                ? <Widget>[
+                    GestureDetector(
+                      onTap: () async {
+                        final result = await getPhoto(context);
+                        if (result != null) {
+                          addPhoto(result);
+                          print(photos.length);
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.all(Radius.circular(9)),
+                            color: Theme.of(context).colorScheme.tertiary),
+                        height: 175,
+                        child: const Icon(Icons.add_photo_alternate_outlined, size: 40),
+                      ),
+                    )
+                  ]
+                : []),
       ))
     ]);
   }
@@ -228,24 +225,6 @@ List<Widget> EditState(
               initialValue: sheet.autonNotes,
             ),
           ],
-        ),
-      ),
-    ),
-    SliverToBoxAdapter(
-      child: Container(
-        margin: EdgeInsets.only(top: 35, left: 23, right: 23),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [Text("Scouted Matches", style: TextStyle(fontSize: 24))],
-        ),
-      ),
-    ),
-    SliverToBoxAdapter(
-      child: Container(
-        margin: EdgeInsets.only(top: 15, left: 23, right: 23),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [Text("All Matches", style: TextStyle(fontSize: 24))],
         ),
       ),
     ),

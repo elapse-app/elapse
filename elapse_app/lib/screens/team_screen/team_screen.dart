@@ -47,7 +47,9 @@ class _TeamScreenState extends State<TeamScreen> {
   int scoutSheetStateIndex = 0;
   int selectedTournamentIndex = 0;
   String selectedTournamentName = "";
-  String teamGroupID = prefs.getString("teamGroup") != null ? TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup")!)).groupId! : "";
+  String teamGroupID = prefs.getString("teamGroup") != null
+      ? TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup")!)).groupId!
+      : "";
   TournamentPreview selectedTournament = TournamentPreview(id: 0, name: "");
   ScoutSheetUI activeScoutSheet = ScoutSheetUI(
     intakeType: "",
@@ -255,6 +257,7 @@ class _TeamScreenState extends State<TeamScreen> {
     List<Widget> ScoutSheetEmpty = selectedTournament.id != 0 && teamGroupID.isNotEmpty
         ? EmptyState(context, () async {
             showDialog(
+              barrierDismissible: false,
               context: context,
               builder: (context) {
                 return AlertDialog(
@@ -293,26 +296,20 @@ class _TeamScreenState extends State<TeamScreen> {
                 alignment: Alignment.center,
                 child: Column(children: [
                   BigErrorMessage(
-                      icon: Icons.people_alt_outlined,
-                      message: "Not in a team group",
+                    icon: Icons.people_alt_outlined,
+                    message: "Not in a team group",
                     topPadding: 0,
                     textPadding: 5,
                   ),
                   const SizedBox(height: 18),
                   LongButton(
-                    onPressed: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => GroupSetupPage()
-                        )
-                      );
-                      setState(() {
-                        teamGroupID = prefs.getString("teamGroup") ?? "";
-                      });
-                    },
-                    text: "Set Up a Team Group"
-                  )
+                      onPressed: () async {
+                        await Navigator.push(context, MaterialPageRoute(builder: (context) => GroupSetupPage()));
+                        setState(() {
+                          teamGroupID = prefs.getString("teamGroup") ?? "";
+                        });
+                      },
+                      text: "Set Up a Team Group")
                 ]),
               ),
             )
@@ -322,11 +319,7 @@ class _TeamScreenState extends State<TeamScreen> {
       SliverToBoxAdapter(child: Text("ScoutSheet is currently being edited from another member"))
     ];
 
-    List<List<Widget>> ScoutSheetScreens = [
-      ScoutSheetEmpty,
-      ScoutSheetClosedScreen,
-      ScoutsheetEditScreen
-    ];
+    List<List<Widget>> ScoutSheetScreens = [ScoutSheetEmpty, ScoutSheetClosedScreen, ScoutsheetEditScreen];
 
     Widget button;
 
@@ -436,61 +429,67 @@ class _TeamScreenState extends State<TeamScreen> {
                                     fontWeight: FontWeight.w500),
                               );
                             }
+                            tournaments.sort((a, b) => (a.startDate != null && b.startDate != null)
+                                ? ((a.startDate!.compareTo(DateTime.now()) < b.startDate!.compareTo(DateTime.now()))
+                                    ? 1
+                                    : -1)
+                                : -1);
                             return DropdownButtonHideUnderline(
-                                child: DropdownButton(
-                                  borderRadius: BorderRadius.circular(18),
-                                  isExpanded: true,
-                                  value: tournaments[selectedTournamentIndex].id,
-                                  menuMaxHeight: 250,
-                                  style: TextStyle(
-                                      overflow: TextOverflow.ellipsis,
-                                      fontFamily: "Manrope",
-                                      fontSize: 15.9,
-                                      letterSpacing: 0.25,
-                                      fontWeight: FontWeight.w500,
-                                      color: Theme.of(context).colorScheme.onSurface),
-                                  items: tournaments.map((tournament) {
-                                    return DropdownMenuItem(
-                                      value: tournament.id,
-                                      child: Text(
-                                        tournament.name,
-                                        style: TextStyle(
-                                            overflow: TextOverflow.ellipsis,
-                                            fontFamily: "Manrope",
-                                            fontSize: 15.9,
-                                            fontWeight: FontWeight.w500),
-                                      ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) => {
-                                    setState(
-                                          () {
-                                        selectedTournamentIndex = tournaments.indexWhere((element) => element.id == value);
-                                        selectedTournament = tournaments[selectedTournamentIndex];
-                                        if (teamGroupID.isNotEmpty) {
-                                          scoutSheet = database
-                                              .getTeamScoutSheetInfo(
-                                              teamGroupID, widget.teamID.toString(), selectedTournament.id.toString())
-                                              .then(
-                                                (value) {
-                                              if (value != null) {
-                                                setState(() {
-                                                  scoutsheetID = value.id;
-                                                  scoutSheetStateIndex = 1;
-                                                });
-                                              } else {
-                                                setState(() {
-                                                  scoutSheetStateIndex = 0;
-                                                });
-                                              }
-                                              return value;
-                                            },
-                                          );
-                                        }
-                                      },
+                              child: DropdownButton(
+                                borderRadius: BorderRadius.circular(18),
+                                isExpanded: true,
+                                value: tournaments[selectedTournamentIndex].id,
+                                menuMaxHeight: 250,
+                                style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    fontFamily: "Manrope",
+                                    fontSize: 15.9,
+                                    letterSpacing: 0.25,
+                                    fontWeight: FontWeight.w500,
+                                    color: Theme.of(context).colorScheme.onSurface),
+                                items: tournaments.map((tournament) {
+                                  return DropdownMenuItem(
+                                    value: tournament.id,
+                                    child: Text(
+                                      tournament.name,
+                                      style: TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          fontFamily: "Manrope",
+                                          fontSize: 15.9,
+                                          fontWeight: FontWeight.w500),
                                     ),
-                                  },
-                                ),
+                                  );
+                                }).toList(),
+                                onChanged: (value) => {
+                                  setState(
+                                    () {
+                                      selectedTournamentIndex =
+                                          tournaments.indexWhere((element) => element.id == value);
+                                      selectedTournament = tournaments[selectedTournamentIndex];
+                                      if (teamGroupID.isNotEmpty) {
+                                        scoutSheet = database
+                                            .getTeamScoutSheetInfo(
+                                                teamGroupID, widget.teamID.toString(), selectedTournament.id.toString())
+                                            .then(
+                                          (value) {
+                                            if (value != null) {
+                                              setState(() {
+                                                scoutsheetID = value.id;
+                                                scoutSheetStateIndex = 1;
+                                              });
+                                            } else {
+                                              setState(() {
+                                                scoutSheetStateIndex = 0;
+                                              });
+                                            }
+                                            return value;
+                                          },
+                                        );
+                                      }
+                                    },
+                                  ),
+                                },
+                              ),
                             );
                           })
                       : Text(

@@ -250,24 +250,6 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
     ),
     SliverToBoxAdapter(
       child: Container(
-        margin: EdgeInsets.only(top: 30, left: 23, right: 23),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [Text("Scouted Matches", style: TextStyle(fontSize: 24))],
-        ),
-      ),
-    ),
-    SliverToBoxAdapter(
-      child: Container(
-        margin: EdgeInsets.only(top: 15, left: 23, right: 23),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [Text("All Matches", style: TextStyle(fontSize: 24))],
-        ),
-      ),
-    ),
-    SliverToBoxAdapter(
-      child: Container(
         margin: EdgeInsets.only(top: 15, left: 23, right: 23),
         child: TextButton(
             child: Text(
