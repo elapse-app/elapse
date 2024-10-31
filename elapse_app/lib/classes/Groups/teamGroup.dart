@@ -76,31 +76,13 @@ class TeamGroup {
 }
 
 Future<TeamGroup?> getUserTeamGroup(String userId) async {
-  final String? teamGroupData = prefs.getString("teamGroup");
-
   if (!FirebaseAuth.instance.currentUser!.emailVerified) return null;
 
-  if (teamGroupData == null || !hasCachedTeamGroup(userId)) {
-    Database database = Database();
-    ElapseUser user = elapseUserDecode(jsonEncode(await database.getUserInfo(userId)));
-    if (user.groupID.isEmpty) return null;
+  Database database = Database();
+  ElapseUser user = elapseUserDecode(jsonEncode(await database.getUserInfo(userId)));
+  if (user.groupID.isEmpty) return null;
 
-    TeamGroup group = TeamGroup.fromJson((await database.getGroupInfo(user.groupID[0]))!);
-    prefs.setString("teamGroup", jsonEncode(group.toJson()));
-    prefs.setString("teamGroupExpiry", DateTime.now().add(const Duration(minutes: 3)).toString());
-    return group;
-  }
-
-  return TeamGroup.fromJson(jsonDecode(teamGroupData));
-}
-
-bool hasCachedTeamGroup(String userId) {
-  if (userId != ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!)).uid) return false;
-
-  final String? teamGroupData = prefs.getString("teamGroup");
-  final String? expiryDate = prefs.getString("teamGroupExpiry");
-
-  return teamGroupData != null &&
-      expiryDate != null &&
-      DateTime.parse(expiryDate).isAfter(DateTime.now());
+  TeamGroup group = TeamGroup.fromJson((await database.getGroupInfo(user.groupID[0]))!);
+  prefs.setString("teamGroup", jsonEncode(group.toJson()));
+  return group;
 }
