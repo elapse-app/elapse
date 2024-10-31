@@ -412,6 +412,9 @@ class _AccountSettingsState extends State<AccountSettings> {
                                               if (error == "too-many-requests") {
                                                 return "Too many attempts. Try again later.";
                                               }
+                                              if (error?.isNotEmpty ?? false) {
+                                                return "An unexpected error occurred";
+                                              }
                                               return null;
                                             },
                                           ),
