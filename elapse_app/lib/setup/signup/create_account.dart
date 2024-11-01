@@ -64,7 +64,11 @@ class _CreateAccountState extends State<CreateAccount> {
           ElapseAppBar(
             title: Row(children: [
               GestureDetector(
-                onTap: () {
+                onTap: () async {
+                  if (FirebaseAuth.instance.currentUser != null) {
+                    await FirebaseAuth.instance.currentUser!.reload();
+                    await FirebaseAuth.instance.currentUser!.delete();
+                  }
                   Navigator.pop(context);
                 },
                 child: const Icon(Icons.arrow_back),
@@ -353,7 +357,7 @@ class _CreateAccountState extends State<CreateAccount> {
                                     actions: [
                                       TextButton(
                                           onPressed: () {
-                                            Navigator.push(
+                                            Navigator.pushReplacement(
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) => const EnterDetailsPage(),
@@ -407,7 +411,9 @@ class _CreateAccountState extends State<CreateAccount> {
                                                                       "Elapse was unable to verify your email in time."),
                                                                   actions: [
                                                                     TextButton(
-                                                                        onPressed: () {
+                                                                        onPressed: () async {
+                                                                          await FirebaseAuth.instance.currentUser!.reload();
+                                                                          await FirebaseAuth.instance.currentUser!.delete();
                                                                           Navigator.pop(context);
                                                                         },
                                                                         child: Text(
@@ -461,7 +467,7 @@ class _CreateAccountState extends State<CreateAccount> {
                                                         TextButton(
                                                             onPressed: verified
                                                                 ? () {
-                                                                    Navigator.push(
+                                                                    Navigator.pushReplacement(
                                                                       context,
                                                                       MaterialPageRoute(
                                                                         builder: (context) => const EnterDetailsPage(),

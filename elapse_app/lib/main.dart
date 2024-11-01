@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
+import 'package:elapse_app/extras/auth.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/providers/tournament_mode_provider.dart';
 import 'package:elapse_app/screens/explore/explore.dart';
@@ -12,6 +13,7 @@ import 'package:elapse_app/screens/tournament_mode/home.dart';
 import 'package:elapse_app/screens/tournament_mode/my_teams.dart';
 import 'package:elapse_app/screens/tournament_mode/tournament.dart';
 import 'package:elapse_app/setup/welcome/first_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -43,6 +45,10 @@ void main() async {
 
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
+  if ((prefs.getBool("isSetUp") ?? false) && FirebaseAuth.instance.currentUser != null) {
+    await checkAccountDeleted();
+  }
+
   runApp(
     MultiProvider(
       providers: [
@@ -51,14 +57,13 @@ void main() async {
         ),
         ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
       ],
-      child: MyApp(key: myAppKey, prefs: prefs),
+      child: MyApp(key: myAppKey),
     ),
   );
 }
 
 class MyApp extends StatefulWidget {
-  final prefs;
-  const MyApp({super.key, required this.prefs});
+  const MyApp({super.key});
 
   @override
   State<MyApp> createState() => MyAppState();
@@ -76,18 +81,18 @@ class MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
     _initPackageInfo();
-    if (widget.prefs.getBool("isSetUp") == true) {
-      teamID = jsonDecode(widget.prefs.getString("savedTeam"))["teamID"];
-      teamNumber = jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"];
+    if (prefs.getBool("isSetUp") ?? false) {
+      teamID = jsonDecode(prefs.getString("savedTeam")!)["teamID"];
+      teamNumber = jsonDecode(prefs.getString("savedTeam")!)["teamNumber"];
       initializeTournamentMode();
     }
   }
 
   void initializeTournamentMode() {
-    if (widget.prefs.getBool("isTournamentMode") ?? false) {
-      int? tournamentID = widget.prefs.getInt("tournamentID");
-      teamID = jsonDecode(widget.prefs.getString("savedTeam"))["teamID"];
-      teamNumber = jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"];
+    if (prefs.getBool("isTournamentMode") ?? false) {
+      int? tournamentID = prefs.getInt("tournamentID");
+      teamID = jsonDecode(prefs.getString("savedTeam")!)["teamID"];
+      teamNumber = jsonDecode(prefs.getString("savedTeam")!)["teamNumber"];
       if (tournamentID != null) {
         isTournamentMode = true;
       }
@@ -110,14 +115,14 @@ class MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.prefs.getBool("isSetUp") != true) {
+    if (!(prefs.getBool("isSetUp") ?? false)) {
       return Consumer<ColorProvider>(
         builder: (context, value, child) {
           bool systemDefined = false;
           ColorScheme systemTheme =
               MediaQuery.of(context).platformBrightness == Brightness.dark ? darkScheme : lightScheme;
 
-          if (widget.prefs.getString("theme") == "system") {
+          if (prefs.getString("theme") == "system") {
             systemDefined = true;
             print("is system defined");
           }
@@ -137,24 +142,24 @@ class MyAppState extends State<MyApp> {
       );
     }
     TeamPreview savedTeam = TeamPreview(
-        teamNumber: jsonDecode(widget.prefs.getString("savedTeam"))["teamNumber"],
-        teamID: jsonDecode(widget.prefs.getString("savedTeam"))["teamID"]);
+        teamNumber: jsonDecode(prefs.getString("savedTeam")!)["teamNumber"],
+        teamID: jsonDecode(prefs.getString("savedTeam")!)["teamID"]);
     List<Widget> screens;
 
     isTournamentMode
         ? screens = [
             TMHomePage(
-              tournamentID: widget.prefs.getInt("tournamentID") ?? 0,
+              tournamentID: prefs.getInt("tournamentID") ?? 0,
               teamID: teamID,
               teamNumber: teamNumber,
             ),
             TMTournamentScreen(
-              tournamentID: widget.prefs.getInt("tournamentID") ?? 0,
+              tournamentID: prefs.getInt("tournamentID") ?? 0,
               isPreview: false,
             ),
             CloudScoutScreen(),
             TMMyTeams(
-              tournamentID: widget.prefs.getInt("tournamentID") ?? 0,
+              tournamentID: prefs.getInt("tournamentID") ?? 0,
             ),
             ExploreScreen()
           ]
@@ -176,7 +181,7 @@ class MyAppState extends State<MyApp> {
         ColorScheme systemTheme =
             MediaQuery.of(context).platformBrightness == Brightness.dark ? darkScheme : lightScheme;
 
-        if (widget.prefs.getString("theme") == "system") {
+        if (prefs.getString("theme") == "system") {
           systemDefined = true;
         }
 

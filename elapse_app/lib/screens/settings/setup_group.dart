@@ -91,6 +91,7 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
                 keyboardType: TextInputType.text,
                 textCapitalization: TextCapitalization.characters,
                 inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp("[0-9a-zA-Z]")),
                   TextInputFormatter.withFunction((oldVal, newVal) {
                     return TextEditingValue(
                       text: newVal.text.toUpperCase(),
@@ -137,7 +138,7 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => GroupSettings(group: value),
+                        builder: (context) => GroupSettings(uid: currentUser.uid),
                       ));
                 }).catchError((onError) {
                   showDialog(

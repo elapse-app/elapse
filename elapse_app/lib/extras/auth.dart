@@ -15,11 +15,6 @@ Future<String?> signUp(String email, String password) async {
   try {
     // Create user with email and password
     // Check if email already exists before creating an account
-    final methods =
-        await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
-    if (methods.isNotEmpty) {
-      return "email-already-in-use";
-    }
     await FirebaseAuth.instance.createUserWithEmailAndPassword(
       email: email,
       password: password,
@@ -58,10 +53,37 @@ Future<void> signIN(String email, String password) async {
   if (userInfo["groupId"].isNotEmpty) {
     Map<String, dynamic>? group = await database.getGroupInfo(userInfo["groupId"][0]);
     final teamGroup = TeamGroup.fromJson(group!);
+    currentUser.groupID.add(userInfo["groupId"][0]);
     teamGroup.groupId = userInfo["groupId"][0];
     prefs.setString("teamGroup", jsonEncode(teamGroup.toJson()));
   }
 
   prefs.setString("currentUser", jsonEncode(currentUser.toJson()));
   prefs.setString("savedTeam", jsonEncode(userInfo["team"]));
+}
+
+void clearPrefs() {
+  prefs.remove("currentUser");
+  prefs.remove("savedTeam");
+  prefs.remove("savedTeams");
+  prefs.remove("isTournamentMode");
+  prefs.remove("teamGroup");
+
+  prefs.setBool("isSetUp", false);
+}
+
+Future<void> checkAccountDeleted() async {
+  try {
+    IdTokenResult? idToken = await FirebaseAuth.instance.currentUser?.getIdTokenResult(true);
+
+    if (idToken == null || idToken.token == null) {
+      print("User was deleted");
+      clearPrefs();
+      FirebaseAuth.instance.signOut();
+    }
+  } catch(e) {
+    print("User was deleted");
+    clearPrefs();
+    FirebaseAuth.instance.signOut();
+  }
 }

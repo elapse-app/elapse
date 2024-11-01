@@ -14,6 +14,7 @@ import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
 import 'package:elapse_app/extras/database.dart';
+import 'package:elapse_app/screens/settings/setup_group.dart';
 import 'package:elapse_app/screens/team_screen/details/details.dart';
 import 'package:elapse_app/screens/team_screen/scoutsheet/closed.dart';
 import 'package:elapse_app/screens/team_screen/scoutsheet/edit.dart';
@@ -23,9 +24,12 @@ import 'package:elapse_app/screens/widgets/custom_tab_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
 
+import '../../classes/Groups/teamGroup.dart';
+import '../widgets/big_error_message.dart';
+import '../widgets/long_button.dart';
+
 class TeamScreen extends StatefulWidget {
-  const TeamScreen(
-      {super.key, required this.teamID, required this.teamNumber, this.team});
+  const TeamScreen({super.key, required this.teamID, required this.teamNumber, this.team});
   final int teamID;
   final String teamNumber;
   final Team? team;
@@ -43,7 +47,9 @@ class _TeamScreenState extends State<TeamScreen> {
   int scoutSheetStateIndex = 0;
   int selectedTournamentIndex = 0;
   String selectedTournamentName = "";
-  String teamGroupID = prefs.getString("teamGroup")!;
+  String teamGroupID = prefs.getString("teamGroup") != null
+      ? TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup")!)).groupId!
+      : "";
   TournamentPreview selectedTournament = TournamentPreview(id: 0, name: "");
   ScoutSheetUI activeScoutSheet = ScoutSheetUI(
     intakeType: "",
@@ -69,8 +75,7 @@ class _TeamScreenState extends State<TeamScreen> {
   @override
   void initState() {
     super.initState();
-    teamSave =
-        TeamPreview(teamID: widget.teamID, teamNumber: widget.teamNumber);
+    teamSave = TeamPreview(teamID: widget.teamID, teamNumber: widget.teamNumber);
     isSaved = false;
     displaySave = true;
     team = fetchTeam(widget.teamID).then(
@@ -90,19 +95,16 @@ class _TeamScreenState extends State<TeamScreen> {
 
     teamTournaments = fetchTeamTournaments(widget.teamID, season.vrcId).then(
       (value) {
-        if (value.isNotEmpty) {
+        if (value.isNotEmpty && teamGroupID.isNotEmpty) {
           setState(() {
             selectedTournament = value[0];
           });
-          scoutSheet = database
-              .getTeamScoutSheetInfo(
-                  teamGroupID, widget.teamID.toString(), value[0].id.toString())
-              .then(
+          scoutSheet =
+              database.getTeamScoutSheetInfo(teamGroupID, widget.teamID.toString(), value[0].id.toString()).then(
             (value) {
               if (value != null) {
                 print(value.data());
-                Map<String, dynamic> sheet =
-                    value.data() as Map<String, dynamic>;
+                Map<String, dynamic> sheet = value.data() as Map<String, dynamic>;
                 Map<String, dynamic> specs = sheet["properties"]["Specs"];
                 setState(() {
                   scoutsheetID = value.id;
@@ -146,8 +148,7 @@ class _TeamScreenState extends State<TeamScreen> {
   }
 
   bool isMainTeam() {
-    return jsonDecode(prefs.getString("savedTeam") ?? "")["teamID"] ==
-        widget.teamID.toString();
+    return jsonDecode(prefs.getString("savedTeam") ?? "")["teamID"] == widget.teamID.toString();
   }
 
   void toggleSaveTeam() {
@@ -173,14 +174,13 @@ class _TeamScreenState extends State<TeamScreen> {
   void addPhoto(String photo) {
     setState(() {
       activeScoutSheet.photos.add(photo);
-      database.addPhoto(teamGroupID, widget.teamID.toString(),
-          selectedTournament.id.toString(), photo);
+      database.addPhoto(teamGroupID, widget.teamID.toString(), selectedTournament.id.toString(), photo);
     });
   }
 
   void removePhoto(int index) async {
-    await database.deletePhoto(teamGroupID, widget.teamID.toString(),
-        selectedTournament.id.toString(), activeScoutSheet.photos[index]);
+    await database.deletePhoto(
+        teamGroupID, widget.teamID.toString(), selectedTournament.id.toString(), activeScoutSheet.photos[index]);
     setState(() {
       activeScoutSheet.photos.removeAt(index);
     });
@@ -193,55 +193,35 @@ class _TeamScreenState extends State<TeamScreen> {
           activeScoutSheet.intakeType = value;
         });
         await database.updateProperty(
-            teamGroupID,
-            widget.teamID.toString(),
-            selectedTournament.id.toString(),
-            "Specs",
-            activeScoutSheet.toMap());
+            teamGroupID, widget.teamID.toString(), selectedTournament.id.toString(), "Specs", activeScoutSheet.toMap());
         break;
       case "numMotors":
         setState(() {
           activeScoutSheet.numMotors = value;
         });
         await database.updateProperty(
-            teamGroupID,
-            widget.teamID.toString(),
-            selectedTournament.id.toString(),
-            "Specs",
-            activeScoutSheet.toMap());
+            teamGroupID, widget.teamID.toString(), selectedTournament.id.toString(), "Specs", activeScoutSheet.toMap());
         break;
       case "RPM":
         setState(() {
           activeScoutSheet.RPM = value;
         });
         await database.updateProperty(
-            teamGroupID,
-            widget.teamID.toString(),
-            selectedTournament.id.toString(),
-            "Specs",
-            activeScoutSheet.toMap());
+            teamGroupID, widget.teamID.toString(), selectedTournament.id.toString(), "Specs", activeScoutSheet.toMap());
         break;
       case "otherNotes":
         setState(() {
           activeScoutSheet.otherNotes = value;
         });
         await database.updateProperty(
-            teamGroupID,
-            widget.teamID.toString(),
-            selectedTournament.id.toString(),
-            "Specs",
-            activeScoutSheet.toMap());
+            teamGroupID, widget.teamID.toString(), selectedTournament.id.toString(), "Specs", activeScoutSheet.toMap());
         break;
       case "autonNotes":
         setState(() {
           activeScoutSheet.autonNotes = value;
         });
         await database.updateProperty(
-            teamGroupID,
-            widget.teamID.toString(),
-            selectedTournament.id.toString(),
-            "Specs",
-            activeScoutSheet.toMap());
+            teamGroupID, widget.teamID.toString(), selectedTournament.id.toString(), "Specs", activeScoutSheet.toMap());
         break;
     }
   }
@@ -250,21 +230,15 @@ class _TeamScreenState extends State<TeamScreen> {
   late bool displaySave;
   @override
   Widget build(BuildContext context) {
-    List<Widget> DetailsScreen = Details(context, widget.teamNumber, teamSave,
-        displaySave, isSaved, toggleSaveTeam, () {
+    List<Widget> DetailsScreen =
+        Details(context, widget.teamNumber, teamSave, displaySave, isSaved, toggleSaveTeam, () {
       setState(() {});
-    }, widget.team, team, teamStats, teamAwards, teamTournaments, tournament,
-        skillsStats);
+    }, widget.team, team, teamStats, teamAwards, teamTournaments, tournament, skillsStats);
 
     List<Widget> ScoutSheetClosedScreen = ClosedState(
-        context,
-        widget.teamNumber,
-        activeScoutSheet,
-        widget.teamID.toString(),
-        teamGroupID,
-        selectedTournament.id.toString(), () async {
-      await database.removeTeamScoutSheet(widget.teamID.toString(), teamGroupID,
-          selectedTournament.id.toString());
+        context, widget.teamNumber, activeScoutSheet, widget.teamID.toString(), selectedTournament.id.toString(),
+        () async {
+      await database.removeTeamScoutSheet(widget.teamID.toString(), teamGroupID, selectedTournament.id.toString());
       setState(() {
         scoutSheetStateIndex = 0;
         activeScoutSheet = ScoutSheetUI(
@@ -279,35 +253,25 @@ class _TeamScreenState extends State<TeamScreen> {
       Navigator.pop(context);
     });
     List<Widget> ScoutsheetEditScreen = EditState(
-        context,
-        widget.teamNumber,
-        addPhoto,
-        removePhoto,
-        activeScoutSheet.photos,
-        updateSheet,
-        activeScoutSheet);
-    List<Widget> ScoutSheetEmpty = selectedTournament.id != 0
+        context, widget.teamNumber, addPhoto, removePhoto, activeScoutSheet.photos, updateSheet, activeScoutSheet);
+    List<Widget> ScoutSheetEmpty = selectedTournament.id != 0 && teamGroupID.isNotEmpty
         ? EmptyState(context, () async {
             showDialog(
+              barrierDismissible: false,
               context: context,
               builder: (context) {
                 return AlertDialog(
                   title: Text("Creating Scoutsheet"),
-                  content: Text(
-                      "You will be able to edit once the scoutsheet is created"),
+                  content: Text("You will be able to edit once the scoutsheet is created"),
                 );
               },
             );
             await database
-                .createTeamScoutSheet(teamGroupID, widget.teamID.toString(),
-                    selectedTournament.id.toString())
+                .createTeamScoutSheet(teamGroupID, widget.teamID.toString(), selectedTournament.id.toString())
                 .then(
               (id) async {
                 await database.updateMemberEditing(
-                    teamGroupID,
-                    widget.teamID.toString(),
-                    selectedTournament.id.toString(),
-                    true);
+                    teamGroupID, widget.teamID.toString(), selectedTournament.id.toString(), true);
                 print(id);
                 Navigator.pop(context);
                 setState(() {
@@ -317,19 +281,45 @@ class _TeamScreenState extends State<TeamScreen> {
               },
             );
           })
-        : [];
+        : [
+            SliverToBoxAdapter(
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(
+                    color: Theme.of(context).colorScheme.primary,
+                    width: 2,
+                  ),
+                ),
+                margin: EdgeInsets.only(left: 23, right: 23, top: 8),
+                padding: EdgeInsets.all(18),
+                alignment: Alignment.center,
+                child: Column(children: [
+                  BigErrorMessage(
+                    icon: Icons.people_alt_outlined,
+                    message: "Not in a team group",
+                    topPadding: 0,
+                    textPadding: 5,
+                  ),
+                  const SizedBox(height: 18),
+                  LongButton(
+                      onPressed: () async {
+                        await Navigator.push(context, MaterialPageRoute(builder: (context) => GroupSetupPage()));
+                        setState(() {
+                          teamGroupID = prefs.getString("teamGroup") ?? "";
+                        });
+                      },
+                      text: "Set Up a Team Group")
+                ]),
+              ),
+            )
+          ];
 
     List<Widget> ScoutSheetCurrentlyEditing = [
-      SliverToBoxAdapter(
-          child:
-              Text("ScoutSheet is currently being edited from another member"))
+      SliverToBoxAdapter(child: Text("ScoutSheet is currently being edited from another member"))
     ];
 
-    List<List<Widget>> ScoutSheetScreens = [
-      ScoutSheetEmpty,
-      ScoutSheetClosedScreen,
-      ScoutsheetEditScreen
-    ];
+    List<List<Widget>> ScoutSheetScreens = [ScoutSheetEmpty, ScoutSheetClosedScreen, ScoutsheetEditScreen];
 
     Widget button;
 
@@ -353,10 +343,7 @@ class _TeamScreenState extends State<TeamScreen> {
         button = IconButton(
           onPressed: () async {
             await database.updateMemberEditing(
-                teamGroupID,
-                widget.teamID.toString(),
-                selectedTournament.id.toString(),
-                false);
+                teamGroupID, widget.teamID.toString(), selectedTournament.id.toString(), false);
             setState(() {
               scoutSheetStateIndex = 1;
             });
@@ -411,8 +398,7 @@ class _TeamScreenState extends State<TeamScreen> {
                       ? FutureBuilder<Object>(
                           future: teamTournaments,
                           builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
+                            if (snapshot.connectionState == ConnectionState.waiting) {
                               return Text(
                                 "Loading...",
                                 style: TextStyle(
@@ -432,8 +418,7 @@ class _TeamScreenState extends State<TeamScreen> {
                                     fontWeight: FontWeight.w500),
                               );
                             }
-                            List<TournamentPreview> tournaments =
-                                snapshot.data as List<TournamentPreview>;
+                            List<TournamentPreview> tournaments = snapshot.data as List<TournamentPreview>;
                             if (tournaments.isEmpty) {
                               return Text(
                                 "No Tournaments",
@@ -444,65 +429,67 @@ class _TeamScreenState extends State<TeamScreen> {
                                     fontWeight: FontWeight.w500),
                               );
                             }
-                            return DropdownButton(
-                              borderRadius: BorderRadius.circular(18),
-                              isExpanded: true,
-                              value: tournaments[selectedTournamentIndex].id,
-                              menuMaxHeight: 250,
-                              style: TextStyle(
-                                  overflow: TextOverflow.ellipsis,
-                                  fontFamily: "Manrope",
-                                  fontSize: 15.9,
-                                  letterSpacing: 0.25,
-                                  fontWeight: FontWeight.w500,
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface),
-                              items: tournaments.map((tournament) {
-                                return DropdownMenuItem(
-                                  child: Text(
-                                    tournament.name,
-                                    style: TextStyle(
-                                        overflow: TextOverflow.ellipsis,
-                                        fontFamily: "Manrope",
-                                        fontSize: 15.9,
-                                        fontWeight: FontWeight.w500),
+                            tournaments.sort((a, b) => (a.startDate != null && b.startDate != null)
+                                ? ((a.startDate!.compareTo(DateTime.now()) < b.startDate!.compareTo(DateTime.now()))
+                                    ? 1
+                                    : -1)
+                                : -1);
+                            return DropdownButtonHideUnderline(
+                              child: DropdownButton(
+                                borderRadius: BorderRadius.circular(18),
+                                isExpanded: true,
+                                value: tournaments[selectedTournamentIndex].id,
+                                menuMaxHeight: 250,
+                                style: TextStyle(
+                                    overflow: TextOverflow.ellipsis,
+                                    fontFamily: "Manrope",
+                                    fontSize: 15.9,
+                                    letterSpacing: 0.25,
+                                    fontWeight: FontWeight.w500,
+                                    color: Theme.of(context).colorScheme.onSurface),
+                                items: tournaments.map((tournament) {
+                                  return DropdownMenuItem(
+                                    value: tournament.id,
+                                    child: Text(
+                                      tournament.name,
+                                      style: TextStyle(
+                                          overflow: TextOverflow.ellipsis,
+                                          fontFamily: "Manrope",
+                                          fontSize: 15.9,
+                                          fontWeight: FontWeight.w500),
+                                    ),
+                                  );
+                                }).toList(),
+                                onChanged: (value) => {
+                                  setState(
+                                    () {
+                                      selectedTournamentIndex =
+                                          tournaments.indexWhere((element) => element.id == value);
+                                      selectedTournament = tournaments[selectedTournamentIndex];
+                                      if (teamGroupID.isNotEmpty) {
+                                        scoutSheet = database
+                                            .getTeamScoutSheetInfo(
+                                                teamGroupID, widget.teamID.toString(), selectedTournament.id.toString())
+                                            .then(
+                                          (value) {
+                                            if (value != null) {
+                                              setState(() {
+                                                scoutsheetID = value.id;
+                                                scoutSheetStateIndex = 1;
+                                              });
+                                            } else {
+                                              setState(() {
+                                                scoutSheetStateIndex = 0;
+                                              });
+                                            }
+                                            return value;
+                                          },
+                                        );
+                                      }
+                                    },
                                   ),
-                                  value: tournament.id,
-                                );
-                              }).toList(),
-                              onChanged: (value) => {
-                                setState(
-                                  () {
-                                    selectedTournamentIndex =
-                                        tournaments.indexWhere(
-                                            (element) => element.id == value);
-                                    selectedTournament =
-                                        tournaments[selectedTournamentIndex];
-                                    scoutSheet = database
-                                        .getTeamScoutSheetInfo(
-                                            teamGroupID,
-                                            widget.teamID.toString(),
-                                            selectedTournament.id.toString())
-                                        .then(
-                                      (value) {
-                                        if (value != null) {
-                                          print(value);
-                                          setState(() {
-                                            scoutsheetID = value.id;
-                                            scoutSheetStateIndex = 1;
-                                          });
-                                          return value;
-                                        } else {
-                                          setState(() {
-                                            scoutSheetStateIndex = 0;
-                                          });
-                                        }
-                                        return null;
-                                      },
-                                    );
-                                  },
-                                ),
-                              },
+                                },
+                              ),
                             );
                           })
                       : Text(
@@ -543,8 +530,7 @@ class _TeamScreenState extends State<TeamScreen> {
                 onTap: () {
                   Navigator.pop(context);
                 },
-                child: Icon(Icons.arrow_back,
-                    color: Theme.of(context).colorScheme.onSurface),
+                child: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
               ),
               const Spacer(),
               GestureDetector(
@@ -552,18 +538,14 @@ class _TeamScreenState extends State<TeamScreen> {
                     Season updated = await Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) =>
-                            SeasonFilterPage(selected: season),
+                        builder: (context) => SeasonFilterPage(selected: season),
                       ),
                     );
                     setState(() {
                       season = updated;
-                      skillsStats =
-                          getWorldSkillsForTeam(season.vrcId, widget.teamID);
-                      teamStats = getTrueSkillDataForTeam(
-                          season.vrcId, widget.teamNumber);
-                      teamTournaments =
-                          fetchTeamTournaments(widget.teamID, season.vrcId);
+                      skillsStats = getWorldSkillsForTeam(season.vrcId, widget.teamID);
+                      teamStats = getTrueSkillDataForTeam(season.vrcId, widget.teamNumber);
+                      teamTournaments = fetchTeamTournaments(widget.teamID, season.vrcId);
                       teamAwards = getAwards(widget.teamID, season.vrcId);
                     });
                   },
@@ -628,8 +610,7 @@ class TeamBio extends StatelessWidget {
                 children: [
                   Text(
                     getGrade(grade),
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w500),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                   const Text(
                     "Grade",
@@ -651,8 +632,7 @@ class TeamBio extends StatelessWidget {
                     getLocation(location),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w500),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                   const Text(
                     "Location",
@@ -680,8 +660,7 @@ class TeamBio extends StatelessWidget {
                   Text(
                     teamName,
                     maxLines: 1,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w500),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                   const Text(
                     "Team Name",

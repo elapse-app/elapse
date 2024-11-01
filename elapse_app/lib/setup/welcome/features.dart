@@ -54,7 +54,7 @@ class _FeaturesState extends State<Features> {
           ),
         ),
         const SizedBox(height: 20),
-        PhotoPreview(imageLocation: 'assets/onboardingHome$imageStringAddition.png')
+        Expanded(child: PhotoPreview(imageLocation: 'assets/onboardingHome$imageStringAddition.png'))
       ]),
       Column(children: [
         Text(
@@ -75,7 +75,7 @@ class _FeaturesState extends State<Features> {
           ),
         ),
         const SizedBox(height: 20),
-        PhotoPreview(imageLocation: "assets/onboardingSchedule$imageStringAddition.png")
+        Expanded(child: PhotoPreview(imageLocation: "assets/onboardingSchedule$imageStringAddition.png"))
       ]),
       Column(children: [
         Text(
@@ -96,7 +96,7 @@ class _FeaturesState extends State<Features> {
           ),
         ),
         const SizedBox(height: 20),
-        PhotoPreview(imageLocation: 'assets/onboardingRankings$imageStringAddition.png')
+        Expanded(child: PhotoPreview(imageLocation: 'assets/onboardingRankings$imageStringAddition.png'))
       ]),
       Column(children: [
         Text(
@@ -117,7 +117,7 @@ class _FeaturesState extends State<Features> {
           ),
         ),
         const SizedBox(height: 20),
-        PhotoPreview(imageLocation: 'assets/onboardingMyTeam$imageStringAddition.png')
+        Expanded(child: PhotoPreview(imageLocation: 'assets/onboardingMyTeam$imageStringAddition.png'))
       ]),
     ];
 
@@ -190,55 +190,68 @@ class _FeaturesState extends State<Features> {
                     topRight: Radius.circular(30),
                   ),
                 ),
-                child: Column(
+                child: Flex(
+                  direction: Axis.vertical,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 18),
-                      child: CarouselSlider(
-                          items: featurePages,
-                          carouselController: carouselController,
-                          options: CarouselOptions(
-                              height: MediaQuery.of(context).size.height * 0.625,
-                              enableInfiniteScroll: false,
-                              autoPlay: false,
-                              viewportFraction: 1,
-                              onPageChanged: (index, reason) {
-                                setState(() {
-                                  currIndex = index;
-                                });
-                              })),
-                    ),
-                    DotsIndicator(
-                      dotsCount: featurePages.length,
-                      position: currIndex,
-                      mainAxisSize: MainAxisSize.min,
-                      decorator: DotsDecorator(
-                        color: Theme.of(context).colorScheme.surfaceDim, // Inactive color
-                        size: const Size.fromRadius(3.0),
-                        activeSize: const Size.fromRadius(3.0),
-                        activeColor: Theme.of(context).colorScheme.onSurface,
+                    Flexible(
+                      fit: FlexFit.tight,
+                      flex: 70,
+                      child: Container(
+                        height: double.infinity,
+                        padding: const EdgeInsets.only(top: 18),
+                        child: CarouselSlider(
+                            items: featurePages,
+                            carouselController: carouselController,
+                            options: CarouselOptions(
+                                height: MediaQuery.of(context).size.height * 0.7,
+                                enableInfiniteScroll: false,
+                                autoPlay: false,
+                                viewportFraction: 1,
+                                onPageChanged: (index, reason) {
+                                  setState(() {
+                                    currIndex = index;
+                                  });
+                                })),
                       ),
                     ),
-                    Spacer(),
-                    Container(
-                      margin: EdgeInsets.fromLTRB(23, 15, 23, 50),
-                      child: LongButton(
-                          centerAlign: true,
-                          useForwardArrow: false,
-                          onPressed: () {
-                            if (currIndex == 3) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const SignUpPage(),
-                                ),
-                              );
-                            } else {
-                              carouselController.nextPage(
-                                  duration: const Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
-                            }
-                          },
-                          text: "Next"),
+                    Flexible(
+                      fit: FlexFit.tight,
+                      flex: 5,
+                      child: DotsIndicator(
+                        dotsCount: featurePages.length,
+                        position: currIndex,
+                        mainAxisSize: MainAxisSize.min,
+                        decorator: DotsDecorator(
+                          color: Theme.of(context).colorScheme.surfaceDim, // Inactive color
+                          size: const Size.fromRadius(3.0),
+                          activeSize: const Size.fromRadius(3.0),
+                          activeColor: Theme.of(context).colorScheme.onSurface,
+                        ),
+                      ),
+                    ),
+                    Flexible(
+                      fit: FlexFit.tight,
+                      flex: 10,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 23.0),
+                        child: LongButton(
+                            centerAlign: true,
+                            useForwardArrow: false,
+                            onPressed: () {
+                              if (currIndex == 3) {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const SignUpPage(),
+                                  ),
+                                );
+                              } else {
+                                carouselController.nextPage(
+                                    duration: const Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
+                              }
+                            },
+                            text: "Next"),
+                      ),
                     ),
                   ],
                 ),
@@ -256,11 +269,10 @@ class PhotoPreview extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.57,
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(width: 1, color: Theme.of(context).colorScheme.onSurface)),
-      child: ClipRRect(borderRadius: BorderRadius.circular(18), child: Image.asset(imageLocation)),
+          border: Border.all(width: 1, color: Theme.of(context).colorScheme.surface)),
+      child: ClipRRect(borderRadius: BorderRadius.circular(18), child: Image.asset(imageLocation, fit: BoxFit.fill)),
     );
   }
 }

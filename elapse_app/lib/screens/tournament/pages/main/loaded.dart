@@ -158,7 +158,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                     return const SliverToBoxAdapter(child: LinearProgressIndicator());
                   case ConnectionState.done:
                     if (snapshot.hasError) {
-                      return const BigErrorMessage(icon: Icons.list_outlined, message: "Unable to load rankings");
+                      return const SliverToBoxAdapter(
+                        child: BigErrorMessage(icon: Icons.list_outlined, message: "Unable to load rankings")
+                      );
                     }
 
                     return RankingsPage(
