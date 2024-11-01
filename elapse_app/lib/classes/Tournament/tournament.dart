@@ -145,6 +145,8 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
       divisionDetails.add(calcEventStats(tournamentID, division["id"]).then((teamStats) {
         if (teamStats.length > 1) {
           returnDivision.teamStats = teamStats[1];
+        } else {
+          returnDivision.teamStats = {};
         }
         returnDivision.games = teamStats[0];
       }));
