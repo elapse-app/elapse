@@ -8,6 +8,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
 
+import '../../classes/Team/teamPreview.dart';
+import '../../extras/database.dart';
+import '../configure/theme_setup.dart';
+
 class EnterDetailsPage extends StatefulWidget {
   const EnterDetailsPage({
     super.key,
@@ -21,7 +25,6 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
   @override
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
-  final TextEditingController _ageController = TextEditingController();
   final firebaseUser = FirebaseAuth.instance.currentUser;
   ElapseUser currentUser = ElapseUser(uid: "", email: "");
   void initState() {
@@ -30,6 +33,10 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
       email: firebaseUser!.email,
       verified: firebaseUser!.emailVerified,
     );
+    if (prefs.getString("savedTeam") != null) {
+      TeamPreview team = loadTeamPreview(prefs.getString("savedTeam"));
+      currentUser.teamNumber = team.teamNumber;
+    }
   }
 
   Widget build(BuildContext context) {
@@ -65,25 +72,17 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
         backgroundColor: Theme.of(context).colorScheme.primary,
         body: CustomScrollView(physics: const NeverScrollableScrollPhysics(), slivers: [
           ElapseAppBar(
-            title: Row(children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: const Icon(Icons.arrow_back),
+            title: Text(
+              'Sign up',
+              style: TextStyle(
+                fontSize: 24,
+                fontFamily: 'Manrope',
+                fontWeight: FontWeight.w600,
+                color: Theme.of(context).colorScheme.onSurface,
               ),
-              const SizedBox(width: 12),
-              Text(
-                'Sign up',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontFamily: 'Manrope',
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-            ]),
+            ),
             maxHeight: 60,
+            backNavigation: false,
           ),
           SliverFillRemaining(
             hasScrollBody: false,
@@ -231,14 +230,45 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 23.0),
                       child: LongButton(
                         text: "Continue",
-                        onPressed: () {
+                        onPressed: () async {
                           prefs.setString("currentUser", jsonEncode(currentUser.toJson()));
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const JoinTeamPage(),
-                            ),
-                          );
+
+                          if (prefs.getBool("isSetUp") ?? false) {
+                            Database database = Database();
+                            await database
+                                .createUser(currentUser, loadTeamPreview(prefs.getString("savedTeam")))
+                                .then((_) => Navigator.of(context)
+                                  ..pop()
+                                  ..pop())
+                                .catchError((onError) {
+                              showDialog(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  builder: (context) {
+                                    return AlertDialog(
+                                      title: Text("Error Occured"),
+                                      content: Text("An error occured when creating your account, please try again"),
+                                      actions: [
+                                        TextButton(
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            },
+                                            child: Text(
+                                              "Cancel",
+                                              style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                            ))
+                                      ],
+                                    );
+                                  });
+                            });
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const JoinTeamPage(),
+                              )
+                            );
+                          }
                         },
                       ),
                     ),

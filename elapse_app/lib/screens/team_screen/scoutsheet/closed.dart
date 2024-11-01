@@ -7,7 +7,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
-List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI sheet, String teamID, String teamGroupID,
+List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI sheet, String teamID,
     String tournamentID, void Function() updateIndex) {
   Database database = Database();
 
@@ -245,24 +245,6 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
             ),
             Text(sheet.autonNotes != "" ? sheet.autonNotes : "No notes provided", style: TextStyle(fontSize: 16)),
           ],
-        ),
-      ),
-    ),
-    SliverToBoxAdapter(
-      child: Container(
-        margin: EdgeInsets.only(top: 30, left: 23, right: 23),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [Text("Scouted Matches", style: TextStyle(fontSize: 24))],
-        ),
-      ),
-    ),
-    SliverToBoxAdapter(
-      child: Container(
-        margin: EdgeInsets.only(top: 15, left: 23, right: 23),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [Text("All Matches", style: TextStyle(fontSize: 24))],
         ),
       ),
     ),
