@@ -393,7 +393,7 @@ class _TMHomePageState extends State<TMHomePage> {
                   ),
                   onPressed: () {
                     prefs.setBool("isTournamentMode", false);
-                    prefs.remove("tournament-${widget.tournamentID}");
+                    prefs.remove("TMSavedTournament");
                     myAppKey.currentState!.reloadApp();
                   }),
               Spacer(),
