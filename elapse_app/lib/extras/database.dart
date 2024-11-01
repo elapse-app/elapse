@@ -325,7 +325,7 @@ class Database {
         returnVal = onValue.id;
       });
     } catch (e) {
-      print("here $e");
+      print(e);
     }
     return returnVal;
   }
