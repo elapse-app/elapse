@@ -104,11 +104,12 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
     if (rankingsResponse.statusCode != 200) {
       throw Exception("Failed to get rankings");
     }
+    print(rankingsResponse.body);
     parsedRankings = jsonDecode(rankingsResponse.body)["data"] as List;
   }));
   await Future.wait(requestFutures);
   if (parsedRankings.isEmpty) {
-    return [allMatches];
+    return [allMatches, null];
   }
 
   stats.addAll(Map<int, TeamStats>.fromEntries(parsedRankings.map((v) => MapEntry(v["team"]["id"], TeamStats()))));
