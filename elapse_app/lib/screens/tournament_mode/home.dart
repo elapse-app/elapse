@@ -360,14 +360,15 @@ class _TMHomePageState extends State<TMHomePage> {
                 return SliverPadding(
                   padding: EdgeInsets.symmetric(horizontal: 23),
                   sliver: SliverToBoxAdapter(
-                    child:
-                        snapshot.data!.divisions[0].teamStats!.isNotEmpty && snapshot.data!.tournamentSkills!.isNotEmpty
-                            ? RankingOverviewWidget(
-                                teamStats: snapshot.data!.divisions[0].teamStats![widget.teamID]!,
-                                skills: snapshot.data!.tournamentSkills!,
-                                teamID: widget.teamID,
-                              )
-                            : Container(),
+                    child: snapshot.data!.divisions[0].teamStats != null &&
+                            snapshot.data!.divisions[0].teamStats!.isNotEmpty &&
+                            snapshot.data!.tournamentSkills!.isNotEmpty
+                        ? RankingOverviewWidget(
+                            teamStats: snapshot.data!.divisions[0].teamStats![widget.teamID]!,
+                            skills: snapshot.data!.tournamentSkills!,
+                            teamID: widget.teamID,
+                          )
+                        : Container(),
                   ),
                 );
               } else {

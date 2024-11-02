@@ -14,7 +14,7 @@ List<Game> getTeamGames(List<Game> games, String teamNumber) {
 }
 
 double _getDelay(List<Game> games) {
-  int lastPlayed = games.lastIndexWhere((e) => e.startedTime != null);
+  int lastPlayed = games.lastIndexWhere((e) => e.startedTime != null || e.blueScore != 0 || e.redScore != 0);
   int n = 0;
 
   double total = 0;

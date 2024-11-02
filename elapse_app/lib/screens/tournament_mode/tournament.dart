@@ -106,6 +106,8 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
           );
         } else {
           print(snapshot.error.toString());
+          print(snapshot.error.toString());
+          debugPrintStack(stackTrace: snapshot.stackTrace);
           return const Center(
             child: Text("Failed to load tournament details"),
           );
