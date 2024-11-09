@@ -1175,7 +1175,7 @@ PODS:
   - firebase_core (3.6.0):
     - Firebase/CoreOnly (= 11.2.0)
     - Flutter
-  - firebase_storage (12.3.3):
+  - firebase_storage (12.3.4):
     - Firebase/Storage (= 11.2.0)
     - firebase_core
     - Flutter
@@ -1432,7 +1432,7 @@ SPEC CHECKSUMS:
   Firebase: 98e6bf5278170668a7983e12971a66b2cd57fc8c
   firebase_auth: 0c77e299a8f2d1c74d1b1f6b78b3d4d802c19f47
   firebase_core: 2bedc3136ec7c7b8561c6123ed0239387b53f2af
-  firebase_storage: 65d4aea1e6a42b153b738412f7ac8b1c9bfa6206
+  firebase_storage: cee0d3d2e947db11289bbb57ed73a447ea111ec1
   FirebaseAppCheckInterop: 7789a8adfb09e905ce02a76540b94b059029ea81
   FirebaseAuth: 2a198b8cdbbbd457f08d74df7040feb0a0e7777a
   FirebaseAuthInterop: c453b7ba7c49b88b2f519bb8d2e29edf7ada4a2a
@@ -1452,7 +1452,7 @@ SPEC CHECKSUMS:
   leveldb-library: e8eadf9008a61f9e1dde3978c086d2b6d9b9dc28
   maps_launcher: 2e5b6a2d664ec6c27f82ffa81b74228d770ab203
   nanopb: fad817b59e0457d11a5dfbde799381cd727c1275
-  package_info_plus: 58f0028419748fad15bf008b270aaa8e54380b1c
+  package_info_plus: c0502532a26c7662a62a356cebe2692ec5fe4ec4
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
   RecaptchaInterop: 7d1a4a01a6b2cb1610a47ef3f85f0c411434cb21
   shared_preferences_foundation: fcdcbc04712aee1108ac7fda236f363274528f78

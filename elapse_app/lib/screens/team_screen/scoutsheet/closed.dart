@@ -193,7 +193,7 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
                   )
                 : SizedBox(),
             sheet.otherNotes != "" ? SizedBox(height: 12) : SizedBox(),
-            sheet.otherNotes != "" ? Text("Nice", style: TextStyle(fontSize: 16)) : SizedBox(),
+            sheet.otherNotes != "" ? Text(sheet.otherNotes, style: TextStyle(fontSize: 16)) : SizedBox(),
           ],
         ),
       ),
