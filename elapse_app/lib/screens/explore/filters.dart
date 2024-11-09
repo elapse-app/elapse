@@ -24,14 +24,11 @@ class ExploreSearchFilter {
   })  : this.season = season ?? seasons[0],
         this.levelClass = levelClass ?? levelClasses[0],
         this.gradeLevel = gradeLevel ?? getGradeLevel(prefs.getString("defaultGrade")),
-        this.startDate =
-            startDate ?? DateTime((season ?? seasons[0]).startYear.year, 5, 1),
-        this.endDate =
-            endDate ?? DateTime((season ?? seasons[0]).endYear.year, 4, 30);
+        this.startDate = startDate ?? DateTime.now(),
+        this.endDate = endDate ?? DateTime((season ?? seasons[0]).endYear.year, 4, 30);
 }
 
-Future<ExploreSearchFilter> exploreFilter(
-    BuildContext context, ExploreSearchFilter filter) async {
+Future<ExploreSearchFilter> exploreFilter(BuildContext context, ExploreSearchFilter filter) async {
   final DraggableScrollableController dra = DraggableScrollableController();
 
   List<GradeLevel> gradeFilters = gradeLevels.values.toList();
@@ -51,11 +48,9 @@ Future<ExploreSearchFilter> exploreFilter(
                 shouldCloseOnMinExtent: true,
                 snapAnimationDuration: const Duration(milliseconds: 250),
                 controller: dra,
-                builder:
-                    (BuildContext context, ScrollController scrollController) {
+                builder: (BuildContext context, ScrollController scrollController) {
                   return Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 23, vertical: 24),
+                      padding: const EdgeInsets.symmetric(horizontal: 23, vertical: 24),
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.surface,
                         borderRadius: const BorderRadius.only(
@@ -78,20 +73,14 @@ Future<ExploreSearchFilter> exploreFilter(
                               ),
                               filter.season != seasons[0] ||
                                       filter.levelClass != levelClasses[0] ||
-                                      filter.startDate !=
-                                          DateTime(filter.season.startYear.year,
-                                              5, 1) ||
-                                      filter.endDate !=
-                                          DateTime(
-                                              filter.season.endYear.year, 4, 30)
+                                      filter.startDate != DateTime(filter.season.startYear.year, 5, 1) ||
+                                      filter.endDate != DateTime(filter.season.endYear.year, 4, 30)
                                   ? TextButton(
                                       child: Text("Reset",
                                           style: TextStyle(
                                             fontSize: 16,
                                             height: 1,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .secondary,
+                                            color: Theme.of(context).colorScheme.secondary,
                                             fontWeight: FontWeight.w400,
                                           )),
                                       onPressed: () {
@@ -113,22 +102,17 @@ Future<ExploreSearchFilter> exploreFilter(
                           padding: const EdgeInsets.only(left: 20, right: 20),
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
-                            border: Border.all(
-                                color: Theme.of(context).colorScheme.primary),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(100)),
+                            border: Border.all(color: Theme.of(context).colorScheme.primary),
+                            borderRadius: const BorderRadius.all(Radius.circular(100)),
                           ),
                           child: InkWell(
-                            child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  const Icon(Icons.event_note),
-                                  const SizedBox(width: 10),
-                                  Text(filter.season.name,
-                                      style: const TextStyle(fontSize: 16)),
-                                  const Spacer(),
-                                  const Icon(Icons.arrow_right),
-                                ]),
+                            child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                              const Icon(Icons.event_note),
+                              const SizedBox(width: 10),
+                              Text(filter.season.name, style: const TextStyle(fontSize: 16)),
+                              const Spacer(),
+                              const Icon(Icons.arrow_right),
+                            ]),
                             onTap: () async {
                               Season updated = await Navigator.push(
                                 context,
@@ -140,10 +124,8 @@ Future<ExploreSearchFilter> exploreFilter(
                               );
                               setModalState(() {
                                 filter.season = updated;
-                                filter.startDate = DateTime(
-                                    filter.season.startYear.year, 5, 1);
-                                filter.endDate =
-                                    DateTime(filter.season.endYear.year, 4, 30);
+                                filter.startDate = DateTime(filter.season.startYear.year, 5, 1);
+                                filter.endDate = DateTime(filter.season.endYear.year, 4, 30);
                               });
                             },
                           ),
@@ -156,22 +138,17 @@ Future<ExploreSearchFilter> exploreFilter(
                           padding: const EdgeInsets.only(left: 20, right: 20),
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
-                            border: Border.all(
-                                color: Theme.of(context).colorScheme.primary),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(100)),
+                            border: Border.all(color: Theme.of(context).colorScheme.primary),
+                            borderRadius: const BorderRadius.all(Radius.circular(100)),
                           ),
                           child: InkWell(
-                            child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  const Icon(Icons.language),
-                                  const SizedBox(width: 10),
-                                  Text(filter.levelClass.name,
-                                      style: const TextStyle(fontSize: 16)),
-                                  const Spacer(),
-                                  const Icon(Icons.arrow_right),
-                                ]),
+                            child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                              const Icon(Icons.language),
+                              const SizedBox(width: 10),
+                              Text(filter.levelClass.name, style: const TextStyle(fontSize: 16)),
+                              const Spacer(),
+                              const Icon(Icons.arrow_right),
+                            ]),
                             onTap: () async {
                               LevelClass updated = await Navigator.push(
                                 context,
@@ -193,10 +170,8 @@ Future<ExploreSearchFilter> exploreFilter(
                             padding: const EdgeInsets.only(left: 20, right: 20),
                             decoration: BoxDecoration(
                               color: Theme.of(context).colorScheme.surface,
-                              border: Border.all(
-                                  color: Theme.of(context).colorScheme.primary),
-                              borderRadius:
-                                  const BorderRadius.all(Radius.circular(100)),
+                              border: Border.all(color: Theme.of(context).colorScheme.primary),
+                              borderRadius: const BorderRadius.all(Radius.circular(100)),
                             ),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -209,8 +184,7 @@ Future<ExploreSearchFilter> exploreFilter(
                                     return DropdownMenuItem(
                                       value: grade,
                                       child: Text(grade.name,
-                                          overflow: TextOverflow.fade,
-                                          style: const TextStyle(fontSize: 16)),
+                                          overflow: TextOverflow.fade, style: const TextStyle(fontSize: 16)),
                                     );
                                   }).toList(),
                                   onChanged: (GradeLevel? value) => {
@@ -227,21 +201,17 @@ Future<ExploreSearchFilter> exploreFilter(
                           padding: const EdgeInsets.only(left: 20, right: 20),
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
-                            border: Border.all(
-                                color: Theme.of(context).colorScheme.primary),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(100)),
+                            border: Border.all(color: Theme.of(context).colorScheme.primary),
+                            borderRadius: const BorderRadius.all(Radius.circular(100)),
                           ),
                           child: InkWell(
-                            child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  const Icon(Icons.calendar_month),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                      "Start Date: ${filter.startDate.month}/${filter.startDate.day}/${filter.startDate.year}",
-                                      style: const TextStyle(fontSize: 16)),
-                                ]),
+                            child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                              const Icon(Icons.calendar_month),
+                              const SizedBox(width: 10),
+                              Text(
+                                  "Start Date: ${filter.startDate.month}/${filter.startDate.day}/${filter.startDate.year}",
+                                  style: const TextStyle(fontSize: 16)),
+                            ]),
                             onTap: () async {
                               final DateTime? date = await showDatePicker(
                                 context: context,
@@ -263,21 +233,16 @@ Future<ExploreSearchFilter> exploreFilter(
                           padding: const EdgeInsets.only(left: 20, right: 20),
                           decoration: BoxDecoration(
                             color: Theme.of(context).colorScheme.surface,
-                            border: Border.all(
-                                color: Theme.of(context).colorScheme.primary),
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(100)),
+                            border: Border.all(color: Theme.of(context).colorScheme.primary),
+                            borderRadius: const BorderRadius.all(Radius.circular(100)),
                           ),
                           child: InkWell(
-                            child: Row(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  const Icon(Icons.calendar_month),
-                                  const SizedBox(width: 10),
-                                  Text(
-                                      "End Date: ${filter.endDate.month}/${filter.endDate.day}/${filter.endDate.year}",
-                                      style: const TextStyle(fontSize: 16)),
-                                ]),
+                            child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                              const Icon(Icons.calendar_month),
+                              const SizedBox(width: 10),
+                              Text("End Date: ${filter.endDate.month}/${filter.endDate.day}/${filter.endDate.year}",
+                                  style: const TextStyle(fontSize: 16)),
+                            ]),
                             onTap: () async {
                               final DateTime? date = await showDatePicker(
                                 context: context,

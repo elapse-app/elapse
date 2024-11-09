@@ -42,6 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
     String imageString =
         Theme.of(context).colorScheme.brightness == Brightness.dark ? "assets/dg4x.png" : "assets/lg4x.png";
+
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: RefreshIndicator(

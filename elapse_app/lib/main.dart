@@ -5,6 +5,7 @@ import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/extras/auth.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/providers/tournament_mode_provider.dart';
+import 'package:elapse_app/screens/error/error_page.dart';
 import 'package:elapse_app/screens/explore/explore.dart';
 import 'package:elapse_app/screens/home/home.dart';
 import 'package:elapse_app/screens/my_team/my_team.dart';
@@ -48,6 +49,10 @@ void main() async {
   if ((prefs.getBool("isSetUp") ?? false) && FirebaseAuth.instance.currentUser != null) {
     await checkAccountDeleted();
   }
+
+  ErrorWidget.builder = (FlutterErrorDetails details) {
+    return ErrorPage();
+  };
 
   runApp(
     MultiProvider(
@@ -225,6 +230,7 @@ class MyAppState extends State<MyApp> {
 
         return MaterialApp(
           title: 'Flutter Demo',
+          debugShowCheckedModeBanner: false,
           theme: ThemeData(
             colorScheme: chosenTheme,
             splashColor: Colors.transparent,

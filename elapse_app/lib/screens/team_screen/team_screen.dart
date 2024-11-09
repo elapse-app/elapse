@@ -429,11 +429,7 @@ class _TeamScreenState extends State<TeamScreen> {
                                     fontWeight: FontWeight.w500),
                               );
                             }
-                            tournaments.sort((a, b) => (a.startDate != null && b.startDate != null)
-                                ? ((a.startDate!.compareTo(DateTime.now()) < b.startDate!.compareTo(DateTime.now()))
-                                    ? 1
-                                    : -1)
-                                : -1);
+
                             return DropdownButtonHideUnderline(
                               child: DropdownButton(
                                 borderRadius: BorderRadius.circular(18),
