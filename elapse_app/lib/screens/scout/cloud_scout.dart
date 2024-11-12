@@ -21,15 +21,15 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
   Widget build(BuildContext context) {
     bool teamSync = true;
     List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
-    List<TeamPreview> savedTeamPreview =
-        savedTeams.map((e) => loadTeamPreview(e)).toList();
+    List<TeamPreview> savedTeamPreview = savedTeams.map((e) => loadTeamPreview(e)).toList();
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           ElapseAppBar(
-              title: Text("CloudScout",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
-              includeSettings: true),
+            title: Text("CloudScout", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+            includeSettings: true,
+            settingsCallback: () => setState(() {}),
+          ),
           RoundedTop(),
           !teamSync
               ? SliverToBoxAdapter(
@@ -39,9 +39,7 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
                     padding: EdgeInsets.all(18),
                     margin: EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
-                        border: Border.all(
-                            width: 1,
-                            color: Theme.of(context).colorScheme.primary),
+                        border: Border.all(width: 1, color: Theme.of(context).colorScheme.primary),
                         borderRadius: BorderRadius.circular(18)),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,15 +51,10 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
                         SizedBox(height: 18),
                         Text(
                           "Sync your ScoutSheets with your teammates.",
-                          style: TextStyle(
-                              fontSize: 16, fontWeight: FontWeight.w300),
+                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w300),
                         ),
                         SizedBox(height: 24),
-                        LongButton(
-                            onPressed: () {},
-                            gradient: true,
-                            text: "Sync Team Data",
-                            icon: Icons.sync),
+                        LongButton(onPressed: () {}, gradient: true, text: "Sync Team Data", icon: Icons.sync),
                       ],
                     ),
                   ),
@@ -85,10 +78,7 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
                         ),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(18),
-                          splashColor: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withOpacity(0.05),
+                          splashColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
                           onTap: () {
                             Navigator.push(
                                 context,
@@ -104,8 +94,7 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
                                 children: [
                                   Icon(
                                     Icons.list_alt_outlined,
-                                    color:
-                                        Theme.of(context).colorScheme.secondary,
+                                    color: Theme.of(context).colorScheme.secondary,
                                   ),
                                   SizedBox(width: 12),
                                   Text("My Picklist")
@@ -134,8 +123,7 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
           savedTeams == null || savedTeams.isEmpty
               ? SliverToBoxAdapter(
                   child: BigErrorMessage(
-                      icon: Icons.bookmark_add_outlined,
-                      message: "Add some teams from the explore menu"),
+                      icon: Icons.bookmark_add_outlined, message: "Add some teams from the explore menu"),
                 )
               : SliverPadding(
                   padding: EdgeInsets.symmetric(horizontal: 23),
@@ -167,67 +155,67 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
               height: 18,
             ),
           ),
-          teamSync
-              ? SliverToBoxAdapter(
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 23),
-                    child: Container(
-                      padding: EdgeInsets.all(18),
-                      margin: EdgeInsets.only(bottom: 12),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                            width: 1,
-                            color: Theme.of(context).colorScheme.primary),
-                        borderRadius: BorderRadius.circular(18),
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "TeamSync Enabled",
-                                style: TextStyle(fontSize: 24),
-                              ),
-                              Icon(Icons.sync,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary)
-                            ],
-                          ),
-                          SizedBox(height: 18),
-                          const Row(
-                            children: [
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '00',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w500),
-                                  ),
-                                  Text("Teammates")
-                                ],
-                              ),
-                              SizedBox(width: 18),
-                              Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    '0 Mins ago',
-                                    style:
-                                        TextStyle(fontWeight: FontWeight.w500),
-                                  ),
-                                  Text("Last updated")
-                                ],
-                              ),
-                            ],
-                          )
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-              : SliverToBoxAdapter(),
+          // teamSync
+          //     ? SliverToBoxAdapter(
+          //         child: Padding(
+          //           padding: EdgeInsets.symmetric(horizontal: 23),
+          //           child: Container(
+          //             padding: EdgeInsets.all(18),
+          //             margin: EdgeInsets.only(bottom: 12),
+          //             decoration: BoxDecoration(
+          //               border: Border.all(
+          //                   width: 1,
+          //                   color: Theme.of(context).colorScheme.primary),
+          //               borderRadius: BorderRadius.circular(18),
+          //             ),
+          //             child: Column(
+          //               children: [
+          //                 Row(
+          //                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //                   children: [
+          //                     Text(
+          //                       "TeamSync Enabled",
+          //                       style: TextStyle(fontSize: 24),
+          //                     ),
+          //                     Icon(Icons.sync,
+          //                         color:
+          //                             Theme.of(context).colorScheme.secondary)
+          //                   ],
+          //                 ),
+          //                 SizedBox(height: 18),
+          //                 const Row(
+          //                   children: [
+          //                     Column(
+          //                       crossAxisAlignment: CrossAxisAlignment.start,
+          //                       children: [
+          //                         Text(
+          //                           '00',
+          //                           style:
+          //                               TextStyle(fontWeight: FontWeight.w500),
+          //                         ),
+          //                         Text("Teammates")
+          //                       ],
+          //                     ),
+          //                     SizedBox(width: 18),
+          //                     Column(
+          //                       crossAxisAlignment: CrossAxisAlignment.start,
+          //                       children: [
+          //                         Text(
+          //                           '0 Mins ago',
+          //                           style:
+          //                               TextStyle(fontWeight: FontWeight.w500),
+          //                         ),
+          //                         Text("Last updated")
+          //                       ],
+          //                     ),
+          //                   ],
+          //                 )
+          //               ],
+          //             ),
+          //           ),
+          //         ),
+          //       )
+          //     : SliverToBoxAdapter(),
         ],
       ),
     );

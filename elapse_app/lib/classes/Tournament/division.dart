@@ -25,6 +25,15 @@ class Division {
           ?.map((key, value) => MapEntry(key.toString(), value.toJson())),
     };
   }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Division && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
 Division loadDivision(division) {

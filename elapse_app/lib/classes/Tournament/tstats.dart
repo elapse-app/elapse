@@ -75,9 +75,7 @@ TeamStats loadTeamStats(stats) {
     ..highScore = stats["highScore"]
     ..avgScore = stats["avgScore"]
     ..totalScore = stats["totalScore"]
-    ..tournamentSkills = stats["tournamentSkills"] != null
-        ? loadSkills(stats["tournamentSkills"])
-        : null;
+    ..tournamentSkills = stats["tournamentSkills"] != null ? loadSkills(stats["tournamentSkills"]) : null;
 }
 
 Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
@@ -96,8 +94,7 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
     qualiMatches = m.where((e) => e.roundNum == 2).toList();
   }));
   requestFutures.add(http.get(
-    Uri.parse(
-        "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/rankings?per_page=250"),
+    Uri.parse("https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/rankings?per_page=250"),
     headers: {
       HttpHeaders.authorizationHeader: getToken(),
     },
@@ -107,12 +104,15 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
     if (rankingsResponse.statusCode != 200) {
       throw Exception("Failed to get rankings");
     }
+    print(rankingsResponse.body);
     parsedRankings = jsonDecode(rankingsResponse.body)["data"] as List;
   }));
   await Future.wait(requestFutures);
+  if (parsedRankings.isEmpty) {
+    return [allMatches, null];
+  }
 
-  stats.addAll(Map<int, TeamStats>.fromEntries(
-      parsedRankings.map((v) => MapEntry(v["team"]["id"], TeamStats()))));
+  stats.addAll(Map<int, TeamStats>.fromEntries(parsedRankings.map((v) => MapEntry(v["team"]["id"], TeamStats()))));
   for (final t in parsedRankings) {
     int teamId = t["team"]["id"];
     TeamStats? stat = stats[teamId];
@@ -133,7 +133,7 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
     while (stat.awp > stat.totalMatches) {
       stat.awp -= 2;
     }
-    stat.awpRate = stat.awp / (stat.totalMatches == 0 ? 1 : stat.totalMatches);
+    stat.awpRate = double.parse((stat.awp / (stat.totalMatches == 0 ? 1 : stat.totalMatches)).toStringAsFixed(1));
 
     stat.highScore = t["high_score"] ?? 0;
     stat.avgScore = (t["average_points"] ?? 0).toDouble();
@@ -146,8 +146,7 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
   int teamsLastPage = jsonDecode(rankings.body)["meta"]["last_page"];
   for (int pg = 2; pg <= teamsLastPage; pg++) {
     Future<void> pgResponse = http.get(
-        Uri.parse(
-            "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/rankings?page=$pg"),
+        Uri.parse("https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/rankings?page=$pg"),
         headers: {
           HttpHeaders.authorizationHeader: getToken(),
         }).then((pgResponse) {
@@ -156,8 +155,7 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
       }
       final parsedPg = jsonDecode(pgResponse.body)["data"] as List;
 
-      stats.addAll(Map<int, TeamStats>.fromEntries(
-          parsedPg.map((v) => MapEntry(v["team"]["id"], TeamStats()))));
+      stats.addAll(Map<int, TeamStats>.fromEntries(parsedPg.map((v) => MapEntry(v["team"]["id"], TeamStats()))));
       for (final t in parsedPg) {
         int teamId = t["team"]["id"];
 
@@ -188,12 +186,10 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
 
   int statsLength = stats.keys.length;
 
-  List<Map<int, double>> redMatchTeams =
-      List.generate(qualiMatches.length, (_) {
+  List<Map<int, double>> redMatchTeams = List.generate(qualiMatches.length, (_) {
     return Map.fromIterables(stats.keys, List<double>.filled(statsLength, 0));
   });
-  List<Map<int, double>> blueMatchTeams =
-      List.generate(qualiMatches.length, (_) {
+  List<Map<int, double>> blueMatchTeams = List.generate(qualiMatches.length, (_) {
     return Map.fromIterables(stats.keys, List<double>.filled(statsLength, 0));
   });
 
@@ -231,14 +227,17 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
   }
 
   // Combine red and blue match teams
-  List<List<double>> matchTeams =
-      redMatchTeams.map((map) => map.values.toList()).toList() +
-          blueMatchTeams.map((map) => map.values.toList()).toList();
+  List<List<double>> matchTeams = redMatchTeams.map((map) => map.values.toList()).toList() +
+      blueMatchTeams.map((map) => map.values.toList()).toList();
 
   Matrix mScores = Matrix.column(redScores + blueScores);
   Matrix mOppScores = Matrix.column(blueScores + redScores);
   Matrix mMatches = Matrix.fromList(matchTeams);
   Matrix mMatchesT = mMatches.transpose();
+
+  if (mMatches.length != mScores.length) {
+    return [allMatches];
+  }
 
   Matrix mOPR = (mMatchesT * mMatches).solve(mMatchesT * mScores);
   Matrix mDPR = (mMatchesT * mMatches).solve(mMatchesT * mOppScores);
@@ -247,9 +246,9 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
 
   int i = 0;
   for (var stat in stats.values) {
-    stat.opr = double.parse(opr[i].toStringAsFixed(2));
-    stat.dpr = double.parse(dpr[i].toStringAsFixed(2));
-    stat.ccwm = double.parse((stat.opr - stat.dpr).toStringAsFixed(2));
+    stat.opr = double.parse(opr[i].toStringAsFixed(1));
+    stat.dpr = double.parse(dpr[i].toStringAsFixed(1));
+    stat.ccwm = double.parse((stat.opr - stat.dpr).toStringAsFixed(1));
     i++;
   }
 

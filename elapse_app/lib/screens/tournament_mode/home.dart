@@ -12,11 +12,7 @@ import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
 
 class TMHomePage extends StatefulWidget {
-  const TMHomePage(
-      {super.key,
-      required this.tournamentID,
-      required this.teamID,
-      required this.teamNumber});
+  const TMHomePage({super.key, required this.tournamentID, required this.teamID, required this.teamNumber});
   final int tournamentID;
   final int teamID;
   final String teamNumber;
@@ -29,7 +25,7 @@ class _TMHomePageState extends State<TMHomePage> {
   @override
   void initState() {
     super.initState();
-    // tournament = TMTournamentDetails(widget.tournamentID, widget.prefs);
+    tournament = TMTournamentDetails(widget.tournamentID);
   }
 
   Future<Tournament>? tournament;
@@ -44,12 +40,16 @@ class _TMHomePageState extends State<TMHomePage> {
       welcomeMessage = "Good Evening";
     }
     String imageString =
-        Theme.of(context).colorScheme.brightness == Brightness.dark
-            ? "assets/dg4x.png"
-            : "assets/lg4x.png";
+        Theme.of(context).colorScheme.brightness == Brightness.dark ? "assets/dg4x.png" : "assets/lg4x.png";
 
     return Scaffold(
-      body: CustomScrollView(
+        body: RefreshIndicator(
+      onRefresh: () async {
+        setState(() {
+          tournament = TMTournamentDetails(widget.tournamentID, forceRefresh: true);
+        });
+      },
+      child: CustomScrollView(
         slivers: [
           SliverAppBar.large(
             automaticallyImplyLeading: false,
@@ -58,8 +58,7 @@ class _TMHomePageState extends State<TMHomePage> {
             flexibleSpace: LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
                 var top = constraints.biggest.height;
-                double sizedBoxHeight = (top - kToolbarHeight) * 0.58 -
-                    MediaQuery.of(context).viewPadding.top;
+                double sizedBoxHeight = (top - kToolbarHeight) * 0.58 - MediaQuery.of(context).viewPadding.top;
                 sizedBoxHeight = sizedBoxHeight < 0 ? 0 : sizedBoxHeight;
                 return FlexibleSpaceBar(
                   expandedTitleScale: 1.25,
@@ -75,8 +74,7 @@ class _TMHomePageState extends State<TMHomePage> {
                           children: [
                             Text(
                               welcomeMessage,
-                              style: TextStyle(
-                                  fontSize: 24, fontWeight: FontWeight.w600),
+                              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
                             ),
                             Spacer(),
                           ],
@@ -90,8 +88,7 @@ class _TMHomePageState extends State<TMHomePage> {
                   centerTitle: false,
                   background: SafeArea(
                     child: Padding(
-                      padding: EdgeInsets.only(
-                          left: 23, right: 12, bottom: 10, top: 10),
+                      padding: EdgeInsets.only(left: 23, right: 12, bottom: 10, top: 10),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -104,7 +101,7 @@ class _TMHomePageState extends State<TMHomePage> {
                               ),
                               Image(image: AssetImage(imageString), height: 25),
                               const Spacer(),
-                              SettingsButton()
+                              SettingsButton(),
                             ],
                           ),
                           Padding(
@@ -118,20 +115,11 @@ class _TMHomePageState extends State<TMHomePage> {
                                       Navigator.push(
                                         context,
                                         PageRouteBuilder(
-                                          transitionDuration:
-                                              const Duration(milliseconds: 300),
-                                          reverseTransitionDuration:
-                                              const Duration(milliseconds: 300),
-                                          pageBuilder: (context, animation,
-                                                  secondaryAnimation) =>
-                                              SearchScreen(
-                                                  tournament: snapshot.data!,
-                                                  division: snapshot
-                                                      .data!.divisions[0]),
-                                          transitionsBuilder: (context,
-                                              animation,
-                                              secondaryAnimation,
-                                              child) {
+                                          transitionDuration: const Duration(milliseconds: 300),
+                                          reverseTransitionDuration: const Duration(milliseconds: 300),
+                                          pageBuilder: (context, animation, secondaryAnimation) => SearchScreen(
+                                              tournament: snapshot.data!, division: snapshot.data!.divisions[0]),
+                                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                             // Create a Tween that transitions the new screen from fully transparent to fully opaque
                                             return FadeTransition(
                                               opacity: animation,
@@ -146,29 +134,41 @@ class _TMHomePageState extends State<TMHomePage> {
                                       width: double.infinity,
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(30),
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .surface,
+                                        color: Theme.of(context).colorScheme.surface,
                                       ),
                                       alignment: Alignment.centerLeft,
                                       child: Row(
                                         children: [
                                           Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 18.0),
-                                            child: Icon(Icons.search,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSecondary),
+                                            padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                                            child: Icon(Icons.search, color: Theme.of(context).colorScheme.onSecondary),
                                           ),
                                           Text("Search your tournament",
                                               style: TextStyle(
-                                                  fontSize: 16,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSecondary)),
+                                                  fontSize: 16, color: Theme.of(context).colorScheme.onSecondary)),
                                         ],
                                       ),
+                                    ),
+                                  );
+                                } else if (snapshot.hasError) {
+                                  return Container(
+                                    height: 60,
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(30),
+                                      color: Theme.of(context).colorScheme.surface,
+                                    ),
+                                    alignment: Alignment.centerLeft,
+                                    child: Row(
+                                      children: [
+                                        Padding(
+                                          padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                                          child: Icon(Icons.search, color: Theme.of(context).colorScheme.onSecondary),
+                                        ),
+                                        Text("Search your tournament",
+                                            style: TextStyle(
+                                                fontSize: 16, color: Theme.of(context).colorScheme.onSecondary)),
+                                      ],
                                     ),
                                   );
                                 } else {
@@ -177,26 +177,18 @@ class _TMHomePageState extends State<TMHomePage> {
                                     width: double.infinity,
                                     decoration: BoxDecoration(
                                       borderRadius: BorderRadius.circular(30),
-                                      color:
-                                          Theme.of(context).colorScheme.surface,
+                                      color: Theme.of(context).colorScheme.surface,
                                     ),
                                     alignment: Alignment.centerLeft,
                                     child: Row(
                                       children: [
                                         Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 18.0),
-                                          child: Icon(Icons.search,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSecondary),
+                                          padding: const EdgeInsets.symmetric(horizontal: 18.0),
+                                          child: Icon(Icons.search, color: Theme.of(context).colorScheme.onSecondary),
                                         ),
                                         Text("Search your tournament",
                                             style: TextStyle(
-                                                fontSize: 16,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSecondary)),
+                                                fontSize: 16, color: Theme.of(context).colorScheme.onSecondary)),
                                       ],
                                     ),
                                   );
@@ -225,8 +217,7 @@ class _TMHomePageState extends State<TMHomePage> {
                       child: Container(
                           padding: EdgeInsets.all(18),
                           decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.tertiary,
-                              borderRadius: BorderRadius.circular(18)),
+                              color: Theme.of(context).colorScheme.tertiary, borderRadius: BorderRadius.circular(18)),
                           child: Text(
                             "No games currently available",
                             style: TextStyle(fontSize: 16),
@@ -234,13 +225,9 @@ class _TMHomePageState extends State<TMHomePage> {
                     ),
                   );
                 }
-                List<Game> upcomingGames = getTeamGames(
-                        snapshot.data!.divisions[0].games!, widget.teamNumber)
-                    .where(
+                List<Game> upcomingGames = getTeamGames(snapshot.data!.divisions[0].games!, widget.teamNumber).where(
                   (element) {
-                    return element.startedTime == null &&
-                        element.redScore == 0 &&
-                        element.blueScore == 0;
+                    return element.startedTime == null && element.redScore == 0 && element.blueScore == 0;
                   },
                 ).toList();
                 if (upcomingGames.isEmpty) {
@@ -250,8 +237,7 @@ class _TMHomePageState extends State<TMHomePage> {
                       child: Container(
                           padding: EdgeInsets.all(18),
                           decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.tertiary,
-                              borderRadius: BorderRadius.circular(18)),
+                              color: Theme.of(context).colorScheme.tertiary, borderRadius: BorderRadius.circular(18)),
                           child: Text(
                             "No games currently available",
                             style: TextStyle(fontSize: 16),
@@ -270,9 +256,7 @@ class _TMHomePageState extends State<TMHomePage> {
                           games: snapshot.data!.divisions[0].games!,
                           rankings: snapshot.data!.divisions[0].teamStats!,
                           skills: snapshot.data!.tournamentSkills!,
-                          targetTeam: TeamPreview(
-                              teamNumber: widget.teamNumber,
-                              teamID: widget.teamID),
+                          targetTeam: TeamPreview(teamNumber: widget.teamNumber, teamID: widget.teamID),
                         ),
                         // SizedBox(height: 25),
                         // RankingOverviewWidget(
@@ -287,10 +271,7 @@ class _TMHomePageState extends State<TMHomePage> {
                 );
               } else {
                 return const SliverToBoxAdapter(
-                  child: SizedBox(
-                      height: 50,
-                      width: 50,
-                      child: Center(child: CircularProgressIndicator())),
+                  child: SizedBox(height: 50, width: 50, child: Center(child: CircularProgressIndicator())),
                 );
               }
             },
@@ -303,8 +284,7 @@ class _TMHomePageState extends State<TMHomePage> {
           const SliverPadding(
             padding: EdgeInsets.symmetric(horizontal: 23),
             sliver: SliverToBoxAdapter(
-              child: Text("Upcoming",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+              child: Text("Upcoming", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
             ),
           ),
           const SliverToBoxAdapter(
@@ -316,13 +296,9 @@ class _TMHomePageState extends State<TMHomePage> {
             future: tournament,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                List<Game> upcomingGames = getTeamGames(
-                        snapshot.data!.divisions[0].games!, widget.teamNumber)
-                    .where(
+                List<Game> upcomingGames = getTeamGames(snapshot.data!.divisions[0].games!, widget.teamNumber).where(
                   (element) {
-                    return element.startedTime == null &&
-                        element.redScore == 0 &&
-                        element.blueScore == 0;
+                    return element.startedTime == null && element.redScore == 0 && element.blueScore == 0;
                   },
                 ).toList();
                 if (upcomingGames.length < 2) {
@@ -332,8 +308,7 @@ class _TMHomePageState extends State<TMHomePage> {
                       child: Container(
                           padding: EdgeInsets.all(18),
                           decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.tertiary,
-                              borderRadius: BorderRadius.circular(18)),
+                              color: Theme.of(context).colorScheme.tertiary, borderRadius: BorderRadius.circular(18)),
                           child: Text(
                             "No upcoming Games",
                             style: TextStyle(fontSize: 16),
@@ -367,10 +342,7 @@ class _TMHomePageState extends State<TMHomePage> {
                 );
               } else {
                 return const SliverToBoxAdapter(
-                  child: SizedBox(
-                      height: 50,
-                      width: 50,
-                      child: Center(child: CircularProgressIndicator())),
+                  child: SizedBox(height: 50, width: 50, child: Center(child: CircularProgressIndicator())),
                 );
               }
             },
@@ -388,11 +360,11 @@ class _TMHomePageState extends State<TMHomePage> {
                 return SliverPadding(
                   padding: EdgeInsets.symmetric(horizontal: 23),
                   sliver: SliverToBoxAdapter(
-                    child: snapshot.data!.divisions[0].teamStats!.isNotEmpty &&
+                    child: snapshot.data!.divisions[0].teamStats != null &&
+                            snapshot.data!.divisions[0].teamStats!.isNotEmpty &&
                             snapshot.data!.tournamentSkills!.isNotEmpty
                         ? RankingOverviewWidget(
-                            teamStats: snapshot
-                                .data!.divisions[0].teamStats![widget.teamID]!,
+                            teamStats: snapshot.data!.divisions[0].teamStats![widget.teamID]!,
                             skills: snapshot.data!.tournamentSkills!,
                             teamID: widget.teamID,
                           )
@@ -401,10 +373,7 @@ class _TMHomePageState extends State<TMHomePage> {
                 );
               } else {
                 return const SliverToBoxAdapter(
-                  child: SizedBox(
-                      height: 50,
-                      width: 50,
-                      child: Center(child: CircularProgressIndicator())),
+                  child: SizedBox(height: 50, width: 50, child: Center(child: CircularProgressIndicator())),
                 );
               }
             },
@@ -418,18 +387,14 @@ class _TMHomePageState extends State<TMHomePage> {
               child: Row(
             children: [
               TextButton(
-                  style: ButtonStyle(
-                      padding: WidgetStateProperty.all(
-                          EdgeInsets.symmetric(horizontal: 23))),
+                  style: ButtonStyle(padding: WidgetStateProperty.all(EdgeInsets.symmetric(horizontal: 23))),
                   child: Text(
                     "Exit Tournament Mode",
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: Theme.of(context).colorScheme.secondary),
+                    style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.secondary),
                   ),
                   onPressed: () {
                     prefs.setBool("isTournamentMode", false);
-                    prefs.remove("tournament-${widget.tournamentID}");
+                    prefs.remove("TMSavedTournament");
                     myAppKey.currentState!.reloadApp();
                   }),
               Spacer(),
@@ -437,6 +402,6 @@ class _TMHomePageState extends State<TMHomePage> {
           )),
         ],
       ),
-    );
+    ));
   }
 }

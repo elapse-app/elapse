@@ -70,15 +70,12 @@ Future<void> updateTournament(Tournament tournament) async {
     tournament.awards = awards;
   }));
 
-  tournamentFutures.add(
-      getSkillsRankings(tournament.id, Future.value(tournament.teams))
-          .then((skills) {
+  tournamentFutures.add(getSkillsRankings(tournament.id, Future.value(tournament.teams)).then((skills) {
     tournament.tournamentSkills = skills;
   }));
 
   for (Division division in tournament.divisions) {
-    tournamentFutures
-        .add(calcEventStats(tournament.id, division.id).then((teamStats) {
+    tournamentFutures.add(calcEventStats(tournament.id, division.id).then((teamStats) {
       division.teamStats = teamStats[1];
       division.games = teamStats[0];
     }));
@@ -138,17 +135,19 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
   try {
     final parsed = jsonDecode(response.body);
 
-    List<Division> divisions = await Future.wait(
-        parsed["divisions"].map<Future<Division>>((division) async {
+    List<Division> divisions = await Future.wait(parsed["divisions"].map<Future<Division>>((division) async {
       Division returnDivision = Division(
         id: division["id"],
         name: division["name"],
         order: division["order"],
       );
       List<Future<void>> divisionDetails = [];
-      divisionDetails
-          .add(calcEventStats(tournamentID, division["id"]).then((teamStats) {
-        returnDivision.teamStats = teamStats[1];
+      divisionDetails.add(calcEventStats(tournamentID, division["id"]).then((teamStats) {
+        if (teamStats.length > 1) {
+          returnDivision.teamStats = teamStats[1];
+        } else {
+          returnDivision.teamStats = {};
+        }
         returnDivision.games = teamStats[0];
       }));
 
@@ -157,8 +156,7 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
     }).toList());
 
     Future<List<Team>> futureTeams = getTeams(tournamentID);
-    Map<int, TournamentSkills> skills =
-        await getSkillsRankings(tournamentID, futureTeams);
+    Map<int, TournamentSkills> skills = await getSkillsRankings(tournamentID, futureTeams);
 
     List<Team> teams = await futureTeams;
 
@@ -190,35 +188,32 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
   }
 }
 
-Future<Tournament> TMTournamentDetails(int tournamentID) async {
+Future<Tournament> TMTournamentDetails(int tournamentID, {bool forceRefresh = false}) async {
   Tournament tournament;
   if (prefs.getString("TMSavedTournament") == null) {
     tournament = await getTournamentDetails(tournamentID);
     prefs.setString("TMSavedTournament", jsonEncode(tournament.toJson()));
+    print("Getting new tournament");
     return tournament;
   } else {
     tournament = loadTournament(prefs.getString("TMSavedTournament")!);
+    print("Getting cached tournament");
 
-    DateTime? updateTime =
-        DateTime.tryParse(prefs.getString("updateTime") ?? "");
+    DateTime? updateTime = DateTime.tryParse(prefs.getString("updateTime") ?? "");
 
-    if (updateTime == null || DateTime.now().isAfter(updateTime)) {
+    if (updateTime == null || DateTime.now().isAfter(updateTime) || forceRefresh) {
       await updateTournament(tournament);
-      prefs.setString("updateTime",
-          DateTime.now().add(const Duration(minutes: 1)).toIso8601String());
+      prefs.setString("updateTime", DateTime.now().add(const Duration(seconds: 30)).toIso8601String());
       // Update every minute
     }
 
     prefs.setString("TMSavedTournament", jsonEncode(tournament.toJson()));
-    prefs.setString(
-        "recently-opened-tournament", jsonEncode(tournament.toJson()));
+    prefs.setString("recently-opened-tournament", jsonEncode(tournament.toJson()));
     return tournament;
   }
 }
 
 bool hasCachedTMTournamentDetails() {
   DateTime? updateTime = DateTime.tryParse(prefs.getString("updateTime") ?? "");
-  return prefs.getString("TMSavedTournament") != null &&
-      updateTime != null &&
-      DateTime.now().isBefore(updateTime);
+  return prefs.getString("TMSavedTournament") != null && updateTime != null && DateTime.now().isBefore(updateTime);
 }

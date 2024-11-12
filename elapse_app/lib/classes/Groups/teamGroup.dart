@@ -1,11 +1,16 @@
 // import 'package:elapse_app/classes/Miscellaneous/location.dart';
 // import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/classes/Team/team.dart';
+import 'package:elapse_app/classes/Users/user.dart';
 
 import 'dart:convert';
 import 'package:elapse_app/extras/token.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
+
+import '../../extras/database.dart';
+import '../../main.dart';
 
 class TeamGroup {
   // Name of the Team Group
@@ -14,23 +19,43 @@ class TeamGroup {
   String? groupId;
   String? adminId;
 
-  // Team of the Team Group
-  Team? team;
-
   // Members of the Team Group
-  List<String> members = [];
+  Map<String, String> members;
+
+  bool allowJoin;
+  String joinCode;
 
   TeamGroup({
     required this.groupId,
     required this.adminId,
-    required this.team,
+    required this.members,
+    required this.joinCode,
     this.groupName,
+    this.allowJoin = true,
   });
 
+  factory TeamGroup.fromJson(Map<String, dynamic> json) {
+    print(json);
+    return TeamGroup(
+      groupName: json["groupName"],
+      groupId: json["groupId"],
+      adminId: json["adminId"],
+      joinCode: json["joinCode"],
+      allowJoin: json["allowJoin"],
+      members: json["members"].map<String, String>((key, val) => MapEntry(key.toString(), val.toString())),
+    );
+  }
 
-  // factory TeamGroup() {
-
-  // }
+  Map<String, dynamic> toJson() {
+    return {
+      "groupName": groupName,
+      "groupId": groupId,
+      "adminId": adminId,
+      "joinCode": joinCode,
+      "allowJoin": allowJoin,
+      "members": members,
+    };
+  }
 
 
   void addMember() {
@@ -48,13 +73,16 @@ class TeamGroup {
   void joinTeamGroup() {
 
   }
+}
 
+Future<TeamGroup?> getUserTeamGroup(String userId) async {
+  if (!FirebaseAuth.instance.currentUser!.emailVerified) return null;
 
+  Database database = Database();
+  ElapseUser user = elapseUserDecode(jsonEncode(await database.getUserInfo(userId)));
+  if (user.groupID.isEmpty) return null;
 
-
-
-
-
-
-
+  TeamGroup group = TeamGroup.fromJson((await database.getGroupInfo(user.groupID[0]))!);
+  prefs.setString("teamGroup", jsonEncode(group.toJson()));
+  return group;
 }

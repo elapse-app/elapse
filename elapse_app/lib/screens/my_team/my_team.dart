@@ -38,30 +38,29 @@ class _MyTeamsState extends State<MyTeams> {
 
   @override
   void initState() {
+    super.initState();
+    reload();
+  }
+
+  void reload() {
     final String savedTeam = prefs.getString("savedTeam") ?? "";
     final parsed = jsonDecode(savedTeam);
-    savedTeamPreview =
-        TeamPreview(teamID: parsed["teamID"], teamNumber: parsed["teamNumber"]);
+    savedTeamPreview = TeamPreview(teamID: parsed["teamID"], teamNumber: parsed["teamNumber"]);
 
     savedTeamStrings = prefs.getStringList("savedTeams") ?? [];
     savedTeamPreviews.add(savedTeamPreview);
     savedTeamPreviews.addAll(savedTeamStrings
-        .map((e) => TeamPreview(
-            teamID: jsonDecode(e)["teamID"],
-            teamNumber: jsonDecode(e)["teamNumber"]))
+        .map((e) => TeamPreview(teamID: jsonDecode(e)["teamID"], teamNumber: jsonDecode(e)["teamNumber"]))
         .toList());
 
     selectedTeamPreview = savedTeamPreview;
 
     savedTeamPreviews = savedTeamPreviews.toSet().toList();
-    super.initState();
     season = seasons[0];
     team = fetchTeam(savedTeamPreview.teamID);
-    teamStats =
-        getTrueSkillDataForTeam(season.vrcId, savedTeamPreview.teamNumber);
+    teamStats = getTrueSkillDataForTeam(season.vrcId, savedTeamPreview.teamNumber);
     skillsStats = getWorldSkillsForTeam(season.vrcId, savedTeamPreview.teamID);
-    teamTournaments =
-        fetchTeamTournaments(savedTeamPreview.teamID, season.vrcId);
+    teamTournaments = fetchTeamTournaments(savedTeamPreview.teamID, season.vrcId);
     teamAwards = getAwards(savedTeamPreview.teamID, season.vrcId);
   }
 
@@ -100,20 +99,15 @@ class _MyTeamsState extends State<MyTeams> {
                         Season updated = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) =>
-                                SeasonFilterPage(selected: season),
+                            builder: (context) => SeasonFilterPage(selected: season),
                           ),
                         );
                         setState(() {
                           season = updated;
-                          skillsStats = getWorldSkillsForTeam(
-                              season.vrcId, savedTeamPreview.teamID);
-                          teamStats = getTrueSkillDataForTeam(
-                              season.vrcId, savedTeamPreview.teamNumber);
-                          teamTournaments = fetchTeamTournaments(
-                              savedTeamPreview.teamID, season.vrcId);
-                          teamAwards =
-                              getAwards(savedTeamPreview.teamID, season.vrcId);
+                          skillsStats = getWorldSkillsForTeam(season.vrcId, savedTeamPreview.teamID);
+                          teamStats = getTrueSkillDataForTeam(season.vrcId, savedTeamPreview.teamNumber);
+                          teamTournaments = fetchTeamTournaments(savedTeamPreview.teamID, season.vrcId);
+                          teamAwards = getAwards(savedTeamPreview.teamID, season.vrcId);
                         });
                       },
                       child: Row(children: [
@@ -126,7 +120,11 @@ class _MyTeamsState extends State<MyTeams> {
                         const Icon(Icons.arrow_right)
                       ])),
                   const Spacer(),
-                  const SettingsButton(),
+                  SettingsButton(callback: () {
+                    setState(() {
+                      reload();
+                    });
+                  }),
                 ],
               ),
             ),
@@ -137,10 +135,8 @@ class _MyTeamsState extends State<MyTeams> {
             sliver: SliverToBoxAdapter(
               child: Container(
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18),
-                    color: Theme.of(context).colorScheme.tertiary),
-                padding: const EdgeInsets.only(
-                    left: 18, right: 18, bottom: 18, top: 18),
+                    borderRadius: BorderRadius.circular(18), color: Theme.of(context).colorScheme.tertiary),
+                padding: const EdgeInsets.only(left: 18, right: 18, bottom: 18, top: 18),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -179,9 +175,7 @@ class _MyTeamsState extends State<MyTeams> {
                                       style: TextStyle(fontSize: 24),
                                     ),
                                     const Spacer(),
-                                    Container(
-                                        width: 75,
-                                        child: const LinearProgressIndicator()),
+                                    Container(width: 75, child: const LinearProgressIndicator()),
                                   ],
                                 ),
                                 const SizedBox(
@@ -194,9 +188,7 @@ class _MyTeamsState extends State<MyTeams> {
                                       style: TextStyle(fontSize: 24),
                                     ),
                                     const Spacer(),
-                                    Container(
-                                        width: 75,
-                                        child: const LinearProgressIndicator()),
+                                    Container(width: 75, child: const LinearProgressIndicator()),
                                   ],
                                 ),
                               ],
@@ -235,9 +227,7 @@ class _MyTeamsState extends State<MyTeams> {
                                     const Spacer(),
                                     Text(
                                       qualificationString,
-                                      style: const TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.w500),
+                                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                                     ),
                                   ],
                                 ),
@@ -253,9 +243,7 @@ class _MyTeamsState extends State<MyTeams> {
                                     const Spacer(),
                                     Text(
                                       "${stats.winPercent == null ? "" : stats.winPercent!.toStringAsFixed(1)}%",
-                                      style: const TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.w500),
+                                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                                     ),
                                   ],
                                 ),
@@ -292,11 +280,7 @@ class _MyTeamsState extends State<MyTeams> {
                             organization: "",
                           );
                         } else {
-                          return TeamBio(
-                              grade: "",
-                              location: Location(),
-                              teamName: "",
-                              organization: "");
+                          return TeamBio(grade: "", location: Location(), teamName: "", organization: "");
                         }
                       },
                     )
@@ -340,15 +324,13 @@ class _MyTeamsState extends State<MyTeams> {
                             return const Text("Skills Data Unavailable");
                           }
 
-                          WorldSkillsStats stats =
-                              snapshot.data as WorldSkillsStats;
+                          WorldSkillsStats stats = snapshot.data as WorldSkillsStats;
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 stats.rank.toString(),
-                                style: const TextStyle(
-                                    fontSize: 64, height: 1, letterSpacing: -2),
+                                style: const TextStyle(fontSize: 64, height: 1, letterSpacing: -2),
                               ),
                               const SizedBox(
                                 height: 5,
@@ -363,51 +345,39 @@ class _MyTeamsState extends State<MyTeams> {
                               Row(
                                 children: [
                                   Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         stats.score.toString(),
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                       ),
-                                      const Text("Score",
-                                          style: TextStyle(fontSize: 16))
+                                      const Text("Score", style: TextStyle(fontSize: 16))
                                     ],
                                   ),
                                   const SizedBox(
                                     width: 18,
                                   ),
                                   Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         stats.driver.toString(),
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                       ),
-                                      const Text("Driver",
-                                          style: TextStyle(fontSize: 16))
+                                      const Text("Driver", style: TextStyle(fontSize: 16))
                                     ],
                                   ),
                                   const SizedBox(
                                     width: 18,
                                   ),
                                   Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         stats.auton.toString(),
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                       ),
-                                      const Text("Auto",
-                                          style: TextStyle(fontSize: 16))
+                                      const Text("Auto", style: TextStyle(fontSize: 16))
                                     ],
                                   )
                                 ],
@@ -470,8 +440,7 @@ class _MyTeamsState extends State<MyTeams> {
                             children: [
                               Text(
                                 stats.trueSkillGlobalRank.toString(),
-                                style: const TextStyle(
-                                    fontSize: 64, height: 1, letterSpacing: -2),
+                                style: const TextStyle(fontSize: 64, height: 1, letterSpacing: -2),
                               ),
                               const SizedBox(
                                 height: 5,
@@ -486,34 +455,26 @@ class _MyTeamsState extends State<MyTeams> {
                               Row(
                                 children: [
                                   Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         stats.trueSkill.toString(),
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                       ),
-                                      const Text("Score",
-                                          style: TextStyle(fontSize: 16))
+                                      const Text("Score", style: TextStyle(fontSize: 16))
                                     ],
                                   ),
                                   const SizedBox(
                                     width: 18,
                                   ),
                                   Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         stats.trueSkillRegionRank.toString(),
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                       ),
-                                      const Text("Region Rank",
-                                          style: TextStyle(fontSize: 16))
+                                      const Text("Region Rank", style: TextStyle(fontSize: 16))
                                     ],
                                   ),
                                   const SizedBox(
@@ -527,51 +488,39 @@ class _MyTeamsState extends State<MyTeams> {
                               Row(
                                 children: [
                                   Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         stats.opr.toString(),
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                       ),
-                                      const Text("OPR",
-                                          style: TextStyle(fontSize: 16))
+                                      const Text("OPR", style: TextStyle(fontSize: 16))
                                     ],
                                   ),
                                   const SizedBox(
                                     width: 18,
                                   ),
                                   Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         stats.dpr.toString(),
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                       ),
-                                      const Text("DPR",
-                                          style: TextStyle(fontSize: 16))
+                                      const Text("DPR", style: TextStyle(fontSize: 16))
                                     ],
                                   ),
                                   const SizedBox(
                                     width: 18,
                                   ),
                                   Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         stats.ccwm.toString(),
-                                        style: const TextStyle(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.w500),
+                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                       ),
-                                      const Text("CCWM",
-                                          style: TextStyle(fontSize: 16))
+                                      const Text("CCWM", style: TextStyle(fontSize: 16))
                                     ],
                                   ),
                                 ],
@@ -640,12 +589,9 @@ class _MyTeamsState extends State<MyTeams> {
                                   children: [
                                     Text(
                                       stats.wins.toString(),
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500),
+                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                     ),
-                                    const Text("Wins",
-                                        style: TextStyle(fontSize: 16))
+                                    const Text("Wins", style: TextStyle(fontSize: 16))
                                   ],
                                 ),
                                 const SizedBox(width: 18),
@@ -654,12 +600,9 @@ class _MyTeamsState extends State<MyTeams> {
                                   children: [
                                     Text(
                                       stats.losses.toString(),
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500),
+                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                     ),
-                                    const Text("Losses",
-                                        style: TextStyle(fontSize: 16))
+                                    const Text("Losses", style: TextStyle(fontSize: 16))
                                   ],
                                 ),
                                 const SizedBox(width: 18),
@@ -668,12 +611,9 @@ class _MyTeamsState extends State<MyTeams> {
                                   children: [
                                     Text(
                                       stats.ties.toString(),
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500),
+                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                     ),
-                                    const Text("Ties",
-                                        style: TextStyle(fontSize: 16))
+                                    const Text("Ties", style: TextStyle(fontSize: 16))
                                   ],
                                 ),
                                 const SizedBox(width: 18),
@@ -682,12 +622,9 @@ class _MyTeamsState extends State<MyTeams> {
                                   children: [
                                     Text(
                                       stats.matches.toString(),
-                                      style: const TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w500),
+                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                     ),
-                                    const Text("Matches",
-                                        style: TextStyle(fontSize: 16))
+                                    const Text("Matches", style: TextStyle(fontSize: 16))
                                   ],
                                 ),
                                 const SizedBox(width: 18),
@@ -729,75 +666,68 @@ class _MyTeamsState extends State<MyTeams> {
                       }
 
                       List<Award> awards = snapshot.data as List<Award>;
-                      return Container(
-                        padding: const EdgeInsets.all(18),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(
-                            color: Theme.of(context).colorScheme.primary,
-                            width: 2,
+                      if (awards.isNotEmpty)
+                        return Container(
+                          padding: const EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(18),
+                            border: Border.all(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 2,
+                            ),
                           ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Text("Awards",
-                                    style: TextStyle(fontSize: 24)),
-                                Text(awards.length.toString(),
-                                    style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w500))
-                              ],
-                            ),
-                            const SizedBox(height: 18),
-                            Column(
-                              children: awards.map((e) {
-                                return Column(
-                                  children: [
-                                    Container(
-                                      alignment: Alignment.centerLeft,
-                                      height: 60,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Text(
-                                            e.name,
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: TextAlign.start,
-                                            maxLines: 1,
-                                            style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500),
-                                          ),
-                                          Text(
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            textAlign: TextAlign.start,
-                                            e.tournamentName ?? "",
-                                            style:
-                                                const TextStyle(fontSize: 16),
-                                          )
-                                        ],
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text("Awards", style: TextStyle(fontSize: 24)),
+                                  Text(awards.length.toString(),
+                                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500))
+                                ],
+                              ),
+                              const SizedBox(height: 18),
+                              Column(
+                                children: awards.map((e) {
+                                  return Column(
+                                    children: [
+                                      Container(
+                                        alignment: Alignment.centerLeft,
+                                        height: 60,
+                                        child: Column(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: [
+                                            Text(
+                                              e.name,
+                                              overflow: TextOverflow.ellipsis,
+                                              textAlign: TextAlign.start,
+                                              maxLines: 1,
+                                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                            ),
+                                            Text(
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                              textAlign: TextAlign.start,
+                                              e.tournamentName ?? "",
+                                              style: const TextStyle(fontSize: 16),
+                                            )
+                                          ],
+                                        ),
                                       ),
-                                    ),
-                                    Divider(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .surfaceDim,
-                                    )
-                                  ],
-                                );
-                              }).toList(),
-                            ),
-                          ],
-                        ),
-                      );
+                                      Divider(
+                                        color: Theme.of(context).colorScheme.surfaceDim,
+                                      )
+                                    ],
+                                  );
+                                }).toList(),
+                              ),
+                            ],
+                          ),
+                        );
+                      else
+                        return Container();
                   }
                 },
               ),
@@ -840,13 +770,11 @@ class _MyTeamsState extends State<MyTeams> {
                             return const Text("Tournaments Unavailable");
                           }
 
-                          List<TournamentPreview> tournaments =
-                              snapshot.data as List<TournamentPreview>;
+                          List<TournamentPreview> tournaments = snapshot.data as List<TournamentPreview>;
                           return Column(
                             children: tournaments
                                 .map(
-                                  (e) => TournamentPreviewWidget(
-                                      tournamentPreview: e),
+                                  (e) => TournamentPreviewWidget(tournamentPreview: e),
                                 )
                                 .toList(),
                           );
@@ -884,17 +812,17 @@ class TeamBio extends StatelessWidget {
       children: [
         Flex(
           direction: Axis.horizontal,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Flexible(
-              flex: 2,
+              flex: 10,
               fit: FlexFit.tight,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     getGrade(grade),
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w500),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                   const Text(
                     "Grade",
@@ -907,17 +835,16 @@ class TeamBio extends StatelessWidget {
             ),
             const SizedBox(width: 18),
             Flexible(
-              flex: 10,
+              flex: 12,
               fit: FlexFit.tight,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     getLocation(location),
-                    maxLines: 1,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w500),
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                   const Text(
                     "Location",
@@ -935,7 +862,29 @@ class TeamBio extends StatelessWidget {
         ),
         Flex(
           direction: Axis.horizontal,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Flexible(
+              flex: 10,
+              fit: FlexFit.tight,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    teamName,
+                    maxLines: 2,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  const Text(
+                    "Team Name",
+                    style: const TextStyle(
+                      fontSize: 16,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 18),
             Flexible(
               flex: 12,
               fit: FlexFit.tight,
@@ -943,13 +892,12 @@ class TeamBio extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    teamName,
-                    maxLines: 1,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.w500),
+                    organization,
+                    maxLines: 2,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                   const Text(
-                    "Team Name",
+                    "Organization",
                     style: const TextStyle(
                       fontSize: 16,
                     ),

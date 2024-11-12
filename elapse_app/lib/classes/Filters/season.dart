@@ -168,6 +168,7 @@ class _SeasonFilterPageState extends State<SeasonFilterPage> {
                             widget.selected = season;
                           }
                         });
+                        Navigator.pop(context, widget.selected);
                       }),
                   index != filteredSeason.length - 1
                       ? Divider(

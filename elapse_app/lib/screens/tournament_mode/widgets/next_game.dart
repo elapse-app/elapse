@@ -8,6 +8,7 @@ import 'package:elapse_app/extras/twelve_hour.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:collection/collection.dart';
 
 class NextGame extends StatelessWidget {
   const NextGame(
@@ -31,11 +32,9 @@ class NextGame extends StatelessWidget {
   Widget build(BuildContext context) {
     String timeString;
     if (game.startedTime != null) {
-      timeString =
-          twelveHour(DateFormat.Hm().format(game.startedTime!.toLocal()));
+      timeString = twelveHour(DateFormat.Hm().format(game.startedTime!.toLocal()));
     } else if (game.scheduledTime != null && game.startedTime == null) {
-      timeString =
-          twelveHour(DateFormat.Hm().format(game.scheduledTime!.toLocal()));
+      timeString = twelveHour(DateFormat.Hm().format(game.scheduledTime!.toLocal()));
     } else {
       timeString = "No Time";
     }
@@ -49,13 +48,11 @@ class NextGame extends StatelessWidget {
     }
 
     bool isBlue(String teamNumber) {
-      return game.blueAlliancePreview!
-          .any((element) => element.teamNumber == teamNumber);
+      return game.blueAlliancePreview!.any((element) => element.teamNumber == teamNumber);
     }
 
     bool isRed(String teamNumber) {
-      return game.redAlliancePreview!
-          .any((element) => element.teamNumber == teamNumber);
+      return game.redAlliancePreview!.any((element) => element.teamNumber == teamNumber);
     }
 
     if (targetTeam != null) {
@@ -66,8 +63,45 @@ class NextGame extends StatelessWidget {
       }
     }
 
-    Game currGame = games.lastWhere((e) => e.startedTime != null);
-    int gamesLeft = game.gameNum - currGame.gameNum;
+    Game? currGame = games.lastWhereOrNull((e) => (e.redScore != 0 && e.blueScore != 0) || e.startedTime != null);
+    int gamesLeft = games.indexOf(game);
+    if (currGame != null) {
+      gamesLeft -= games.indexOf(currGame);
+    }
+    // int gamesLeft = game.gameNum - currGame.gameNum;
+
+    Widget gameText;
+    if (game.gameName.substring(0, 1) == "R") {
+      gameText = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+        Text("R",
+            style: TextStyle(
+              fontSize: 64,
+              height: 1,
+              fontWeight: FontWeight.w400,
+            )),
+        Text("16",
+            style: TextStyle(
+              fontSize: 40,
+              height: 1.15,
+              letterSpacing: -1,
+              fontWeight: FontWeight.w400,
+            )),
+        Text(game.gameName.substring(3, 4),
+            style: TextStyle(
+              fontSize: 64,
+              height: 1,
+              fontWeight: FontWeight.w400,
+            ))
+      ]);
+    } else {
+      gameText = Text(game.gameName,
+          style: TextStyle(
+            letterSpacing: -1.75,
+            fontSize: 64,
+            height: 1,
+            fontWeight: FontWeight.w400,
+          ));
+    }
 
     return GestureDetector(
       onTap: () {
@@ -79,8 +113,7 @@ class NextGame extends StatelessWidget {
       },
       child: Container(
         padding: EdgeInsets.all(18),
-        decoration: BoxDecoration(
-            color: backgroundColor, borderRadius: BorderRadius.circular(18)),
+        decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(18)),
         child: Column(
           children: [
             Row(
@@ -89,13 +122,7 @@ class NextGame extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      game.gameName,
-                      style: TextStyle(
-                        fontSize: 64,
-                        height: 1,
-                      ),
-                    ),
+                    gameText,
                     const Text(
                       "Next Game",
                       style: TextStyle(
@@ -118,9 +145,7 @@ class NextGame extends StatelessWidget {
                       e.teamNumber,
                       style: TextStyle(
                           fontSize: 24,
-                          fontWeight: e.teamNumber == targetTeam?.teamNumber
-                              ? FontWeight.w500
-                              : FontWeight.normal),
+                          fontWeight: e.teamNumber == targetTeam?.teamNumber ? FontWeight.w500 : FontWeight.normal),
                     );
                   }).toList(),
                 ),
@@ -131,9 +156,7 @@ class NextGame extends StatelessWidget {
                       e.teamNumber,
                       style: TextStyle(
                           fontSize: 24,
-                          fontWeight: e.teamNumber == targetTeam?.teamNumber
-                              ? FontWeight.w600
-                              : FontWeight.normal),
+                          fontWeight: e.teamNumber == targetTeam?.teamNumber ? FontWeight.w600 : FontWeight.normal),
                     );
                   }).toList(),
                 )
@@ -145,11 +168,46 @@ class NextGame extends StatelessWidget {
               height: 3,
             ),
             SizedBox(height: 10),
-            Row(
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Row(
+                  children: [
+                    Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(
+                        timeString,
+                        style: TextStyle(
+                          fontSize: 24,
+                        ),
+                      ),
+                      Text(
+                        "Time",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ]),
+                    SizedBox(
+                      width: 25,
+                    ),
+                    Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(
+                        "$gamesLeft",
+                        style: const TextStyle(
+                          fontSize: 24,
+                        ),
+                      ),
+                      const Text(
+                        "Matches Remaining",
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ])
+                  ],
+                ),
+                SizedBox(
+                  height: 18,
+                ),
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Text(
-                    game.fieldName!,
+                    game.fieldName ?? "N/A",
                     style: TextStyle(fontSize: 24),
                   ),
                   Text(
@@ -157,35 +215,8 @@ class NextGame extends StatelessWidget {
                     style: TextStyle(fontSize: 16),
                   ),
                 ]),
-                SizedBox(
-                  width: 25,
-                ),
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(
-                    timeString,
-                    style: TextStyle(
-                      fontSize: 24,
-                    ),
-                  ),
-                  Text(
-                    "Time",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ]),
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(
-                    "$gamesLeft",
-                    style: const TextStyle(
-                      fontSize: 24,
-                    ),
-                  ),
-                  const Text(
-                    "Matches Remaining",
-                    style: TextStyle(fontSize: 16),
-                  ),
-                ])
               ],
-            )
+            ),
           ],
         ),
       ),

@@ -53,7 +53,7 @@ class RankingsWidget extends StatelessWidget {
         val1 = "${stats.wins}-${stats.losses}-${stats.ties}";
         val2 = "${stats.ap} AP";
         val3 = "${stats.awp} AWP";
-        val4 = "${stats.awpRate * 100} %";
+        val4 = "${(stats.awpRate * 100).toStringAsFixed(1)} %";
         break;
       case "OPR":
       case "DPR":

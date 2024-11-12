@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:elapse_app/classes/Users/user.dart';
 import 'package:elapse_app/extras/database.dart';
 import 'package:elapse_app/main.dart';
@@ -188,8 +190,8 @@ class _CreateTeamGroupState extends State<CreateTeamGroup> {
                               Database database = Database();
                               final currentUser =
                                   FirebaseAuth.instance.currentUser;
-                              ElapseUser currentElapseUser = elapseUserDecode(
-                                  prefs.getString("currentUser")!);
+                              ElapseUser currentElapseUser = ElapseUser.fromJson(
+                                  jsonDecode(prefs.getString("currentUser")!));
                               await database
                                   .createTeamGroup(
                                       currentUser!.uid,
@@ -197,7 +199,8 @@ class _CreateTeamGroupState extends State<CreateTeamGroup> {
                                       currentElapseUser.fname ?? "",
                                       currentElapseUser.lname ?? "")
                                   .then((value) {
-                                prefs.setString("teamGroup", value);
+                                    print(value?.toJson());
+                                prefs.setString("teamGroup", jsonEncode(value?.toJson()));
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(

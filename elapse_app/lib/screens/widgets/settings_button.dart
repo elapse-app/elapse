@@ -1,10 +1,14 @@
+import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/settings/settings.dart';
 import 'package:flutter/material.dart';
 
 class SettingsButton extends StatelessWidget {
   const SettingsButton({
     super.key,
+    this.callback,
   });
+
+  final void Function()? callback;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +24,7 @@ class SettingsButton extends StatelessWidget {
           MaterialPageRoute(
             builder: (context) => SettingsScreen(),
           ),
-        );
+        ).then((_) => (callback ?? (() {}))());
       },
     );
   }

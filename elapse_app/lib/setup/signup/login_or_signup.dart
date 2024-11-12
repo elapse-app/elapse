@@ -3,14 +3,12 @@ import 'package:elapse_app/setup/signup/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/setup/signup/create_account.dart';
 import '../../screens/widgets/app_bar.dart';
+import '../configure/join_team.dart';
 
 class SignUpPage extends StatelessWidget {
   const SignUpPage({
     super.key,
-    this.onboarding = false,
   });
-
-  final bool onboarding;
 
   @override
   Widget build(BuildContext context) {
@@ -42,180 +40,181 @@ class SignUpPage extends StatelessWidget {
         //     ),
         //   ),
         // ),
-        body: CustomScrollView(
-            physics: const NeverScrollableScrollPhysics(),
-            slivers: [
-              ElapseAppBar(
-                title: Row(children: [
-                  onboarding ? Row(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
-                        child: const Icon(Icons.arrow_back),
-                      ),
-                      const SizedBox(width: 12),
-                    ]
-                  ) : const SizedBox.shrink(),
-                  Text(
-                    'Sign up',
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontFamily: 'Manrope',
-                      fontWeight: FontWeight.w600,
-                      color: Theme.of(context).colorScheme.onSurface,
-                    ),
-                  ),
-                ]),
-                maxHeight: 60,
+        body: CustomScrollView(physics: const NeverScrollableScrollPhysics(), slivers: [
+          ElapseAppBar(
+            title: Row(children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: const Icon(Icons.arrow_back),
               ),
-              SliverFillRemaining(
-                hasScrollBody: false,
-                child: Container(
-                    height: double.infinity,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Theme.of(context).colorScheme.surface,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(30),
-                        topRight: Radius.circular(30),
+              const SizedBox(width: 12),
+              Text(
+                'Sign up',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontFamily: 'Manrope',
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ]),
+            maxHeight: 60,
+          ),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Container(
+                height: double.infinity,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.surface,
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(30),
+                    topRight: Radius.circular(30),
+                  ),
+                ),
+                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const SizedBox(height: 46),
+                      Center(
+                        child: Text(
+                          'Create an account',
+                          style: TextStyle(
+                            fontFamily: "Manrope",
+                            fontSize: 32,
+                            fontWeight: FontWeight.w300,
+                            color: Theme.of(context).colorScheme.secondary,
+                          ),
+                        ),
                       ),
-                    ),
-                    child: Column(
+                      const SizedBox(height: 20),
+                      Padding(
+                          padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
+                          child: Center(
+                              child: RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              children: <TextSpan>[
+                                TextSpan(
+                                  text: 'An Elapse account gives you',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: "Manrope",
+                                    fontSize: 16,
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: ' access to ',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: "Manrope",
+                                    fontSize: 16,
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: 'CloudScout ',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w500,
+                                    fontFamily: "Manrope",
+                                    fontSize: 16,
+                                    color: Theme.of(context).colorScheme.secondary,
+                                  ),
+                                ),
+                                TextSpan(
+                                  text: 'and more',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: "Manrope",
+                                    fontSize: 16,
+                                    color: Theme.of(context).colorScheme.onSurface,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ))),
+
+                      //buttons for user
+                      SizedBox(height: 20),
+                      Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          const SizedBox(height: 46),
-                          Center(
-                            child: Text(
-                              'Create an account',
-                              style: TextStyle(
-                                fontFamily: "Manrope",
-                                fontSize: 32,
-                                fontWeight: FontWeight.w300,
-                                color: Theme.of(context).colorScheme.secondary,
-                              ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 23.0,
+                              vertical: 6.0,
                             ),
+                            child: LongButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const CreateAccount(),
+                                    ),
+                                  );
+                                },
+                                icon: Icons.email_outlined,
+                                text: "Sign up with Email"),
                           ),
                           const SizedBox(height: 20),
+                        ],
+                      ),
+                      Text(
+                        "More sign up options coming soon",
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+                      ),
+                      const Spacer(),
+                      Column(
+                        children: [
                           Padding(
-                              padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
-                              child: Center(
-                                  child: RichText(
-                                textAlign: TextAlign.center,
-                                text: TextSpan(
-                                  children: <TextSpan>[
-                                    TextSpan(
-                                      text: 'An Elapse account gives you',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        fontFamily: "Manrope",
-                                        fontSize: 16,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: ' access to ',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        fontFamily: "Manrope",
-                                        fontSize: 16,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'CloudScout ',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        fontFamily: "Manrope",
-                                        fontSize: 16,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary,
-                                      ),
-                                    ),
-                                    TextSpan(
-                                      text: 'and more',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        fontFamily: "Manrope",
-                                        fontSize: 16,
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .onSurface,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ))),
-
-                          //buttons for user
-                          SizedBox(height: 20),
-                          Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 23.0,
-                                  vertical: 6.0,
-                                ),
-                                child: LongButton(
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              const CreateAccount(),
-                                        ),
-                                      );
-                                    },
-                                    icon: Icons.email_outlined,
-                                    text: "Sign up with Email"),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 23.0,
+                                vertical: 6.0,
                               ),
-                              const SizedBox(height: 20),
-                            ],
-                          ),
-                          Text(
-                            "More sign up options coming soon",
-                            style: TextStyle(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .onSurface
-                                    .withOpacity(0.5)),
-                          ),
-                          const Spacer(),
-                          Column(
-                            children: [
-                              Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 23.0,
-                                    vertical: 6.0,
-                                  ),
-                                  child: LongButton(
-                                    text: "Existing User? Sign in Here",
-                                    useForwardArrow: false,
-                                    centerAlign: true,
-                                    isGray: true,
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => LoginPage(onboarding: onboarding),
-                                        ),
-                                      );
-                                    },
-                                  )),
-                              const SizedBox(height: 64),
-                            ],
-                          ),
-                        ])),
-              ),
-            ]));
+                              child: LongButton(
+                                text: "Existing User? Sign in Here",
+                                useForwardArrow: false,
+                                centerAlign: true,
+                                isGray: false,
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const LoginPage(),
+                                    ),
+                                  );
+                                },
+                              )),
+                          const SizedBox(height: 12),
+                          Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 23.0,
+                                vertical: 6.0,
+                              ),
+                              child: LongButton(
+                                text: "Use Elapse without an account",
+                                useForwardArrow: false,
+                                centerAlign: true,
+                                isGray: true,
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const JoinTeamPage(),
+                                    ),
+                                  );
+                                },
+                              )),
+                          const SizedBox(height: 64),
+                        ],
+                      ),
+                    ])),
+          ),
+        ]));
   }
 }

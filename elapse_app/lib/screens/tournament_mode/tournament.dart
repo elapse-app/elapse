@@ -28,7 +28,7 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
   @override
   void initState() {
     super.initState();
-    tournament = TMTournamentDetails(widget.tournamentID);
+    tournament = TMTournamentDetails(widget.tournamentID, forceRefresh: true);
   }
 
   @override
@@ -56,9 +56,7 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
                         tag: "top",
                         child: Stack(
                           children: [
-                            Container(
-                                height: 300,
-                                color: Theme.of(context).colorScheme.primary),
+                            Container(height: 300, color: Theme.of(context).colorScheme.primary),
                             Container(
                               decoration: BoxDecoration(
                                 color: Theme.of(context).colorScheme.surface,
@@ -68,20 +66,14 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
                                 ),
                               ),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 25, vertical: 13),
+                                padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 13),
                                 child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
-                                    _buildIconButton(
-                                        context, Icons.schedule, 0),
-                                    _buildIconButton(context,
-                                        Icons.format_list_numbered_outlined, 1),
-                                    _buildIconButton(context,
-                                        Icons.sports_esports_outlined, 2),
-                                    _buildIconButton(
-                                        context, Icons.info_outlined, 3),
+                                    _buildIconButton(context, Icons.schedule, 0),
+                                    _buildIconButton(context, Icons.format_list_numbered_outlined, 1),
+                                    _buildIconButton(context, Icons.sports_esports_outlined, 2),
+                                    _buildIconButton(context, Icons.info_outlined, 3),
                                   ],
                                 ),
                               ),
@@ -113,6 +105,9 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
             isPreview: widget.isPreview,
           );
         } else {
+          print(snapshot.error.toString());
+          print(snapshot.error.toString());
+          debugPrintStack(stackTrace: snapshot.stackTrace);
           return const Center(
             child: Text("Failed to load tournament details"),
           );

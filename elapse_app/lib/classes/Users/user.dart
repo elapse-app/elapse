@@ -17,20 +17,34 @@ class ElapseUser {
   String? lname;
   // Team of the Team Group
   String? teamNumber;
-  String? age;
+  bool? verified;
 
   // Members of the Team Group
   List<String> groupID = [];
 
   // FirebaseAuth auth = FirebaseAuth.instance;
 
-  ElapseUser(
-      {required this.uid,
-      required this.email,
-      this.fname,
-      this.lname,
-      this.teamNumber,
-      this.age});
+  ElapseUser({
+    required this.uid,
+    required this.email,
+    this.fname,
+    this.lname,
+    this.teamNumber,
+    List<String>? groupID,
+    this.verified,
+  }) : this.groupID = groupID ?? [];
+
+  factory ElapseUser.fromJson(Map<String, dynamic> json) {
+    return ElapseUser(
+      uid: json["uid"],
+      email: json["email"],
+      fname: json["first-name"],
+      lname: json["last-name"],
+      teamNumber: json["team-number"],
+      groupID: json["group-id"] != null ? (json["group-id"] as List).map((e) => e.toString()).toList() : [],
+      verified: json["verified"],
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -39,7 +53,8 @@ class ElapseUser {
       "first-name": this.fname,
       "last-name": this.lname,
       "team-number": this.teamNumber,
-      "age": this.age
+      "group-id": this.groupID,
+      "verified": this.verified,
     };
   }
 }
@@ -47,10 +62,12 @@ class ElapseUser {
 ElapseUser elapseUserDecode(String json) {
   Map<String, dynamic> map = jsonDecode(json);
   return ElapseUser(
-      uid: map["uid"],
-      email: map["email"],
-      fname: map["first-name"],
-      lname: map["last-name"],
-      teamNumber: map["team-number"],
-      age: map["age"]);
+    uid: map["uid"],
+    email: map["email"],
+    fname: map["firstName"],
+    lname: map["lastName"],
+    teamNumber: map["team"]["teamNumber"],
+    groupID: (map["groupId"] as List).map((e) => e.toString()).toList(),
+    verified: map["verified"],
+  );
 }

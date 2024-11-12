@@ -14,7 +14,6 @@ List<Widget> EditState(
   void Function(String property, String value) updateProperty,
   ScoutSheetUI sheet,
 ) {
-
   Widget photosDisplay = GestureDetector(
     onTap: () async {
       final result = await getPhoto(context);
@@ -25,145 +24,78 @@ List<Widget> EditState(
     },
     child: Container(
       decoration: BoxDecoration(
-          borderRadius: BorderRadius.all(Radius.circular(9)),
-          color: Theme.of(context).colorScheme.tertiary),
+          borderRadius: const BorderRadius.all(Radius.circular(9)), color: Theme.of(context).colorScheme.tertiary),
       height: 175,
-      child: Row(
+      child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.add_photo_alternate_outlined),
-              SizedBox(height: 5),
-              Text("Add Photo")
-            ],
+            children: [Icon(Icons.add_photo_alternate_outlined), SizedBox(height: 5), Text("Add Photo")],
           ),
         ],
       ),
     ),
   );
 
-  if (photos.length == 1) {
-    photosDisplay = Flex(
-      direction: Axis.horizontal,
-      children: [
-        Flexible(
-          child: Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(9),
-                child: Image.network(
-                  photos[0],
-                  height: 175,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
-              ),
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    height: 36,
-                    width: 36,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.black.withOpacity(0.5)),
+  if (photos.isNotEmpty) {
+    photosDisplay = Row(children: [
+      Expanded(
+          child: GridView.count(
+        primary: false,
+        padding: const EdgeInsets.all(0),
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        crossAxisCount: 3,
+        shrinkWrap: true,
+        children: photos.map<Widget>((e) {
+              return Stack(alignment: Alignment.center, children: [
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(9),
+                  child: Image.network(
+                    e,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
                   ),
-                  IconButton(
-                      onPressed: () {
-                        removePhoto(0);
-                      },
-                      icon: Icon(
-                        Icons.close,
-                        color: Colors.white,
-                      )),
-                ],
-              ),
-            ],
-          ),
-        ),
-        SizedBox(width: 9),
-        Flexible(child: photosDisplay)
-      ],
-    );
-  } else if (photos.length == 2) {
-    photosDisplay = Flex(
-      direction: Axis.horizontal,
-      children: [
-        Flexible(
-          child: Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(9),
-                child: Image.network(
-                  photos[0],
-                  height: 175,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
                 ),
-              ),
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    height: 36,
-                    width: 36,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.black.withOpacity(0.5)),
-                  ),
-                  IconButton(
-                      onPressed: () {
-                        removePhoto(0);
-                      },
-                      icon: Icon(
-                        Icons.close,
-                        color: Colors.white,
-                      )),
-                ],
-              ),
-            ],
-          ),
-        ),
-        SizedBox(width: 9),
-        Flexible(
-          child: Stack(
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(9),
-                child: Image.network(
-                  photos[1],
-                  height: 175,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+                Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.black.withOpacity(0.5)),
                 ),
-              ),
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  Container(
-                    height: 36,
-                    width: 36,
-                    decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.black.withOpacity(0.5)),
-                  ),
-                  IconButton(
-                      onPressed: () {
-                        removePhoto(1);
+                IconButton(
+                    onPressed: () {
+                      removePhoto(photos.indexOf(e));
+                    },
+                    icon: const Icon(
+                      Icons.delete_forever,
+                      color: Colors.white,
+                      size: 30,
+                    )),
+              ]);
+            }).toList() +
+            (sheet.photos.length < 6
+                ? <Widget>[
+                    GestureDetector(
+                      onTap: () async {
+                        final result = await getPhoto(context);
+                        if (result != null) {
+                          addPhoto(result);
+                          print(photos.length);
+                        }
                       },
-                      icon: Icon(
-                        Icons.close,
-                        color: Colors.white,
-                      )),
-                ],
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
+                      child: Container(
+                        decoration: BoxDecoration(
+                            borderRadius: const BorderRadius.all(Radius.circular(9)),
+                            color: Theme.of(context).colorScheme.tertiary),
+                        height: 175,
+                        child: const Icon(Icons.add_photo_alternate_outlined, size: 40),
+                      ),
+                    )
+                  ]
+                : []),
+      ))
+    ]);
   }
 
   return [
@@ -297,24 +229,6 @@ List<Widget> EditState(
       ),
     ),
     SliverToBoxAdapter(
-      child: Container(
-        margin: EdgeInsets.only(top: 35, left: 23, right: 23),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [Text("Scouted Matches", style: TextStyle(fontSize: 24))],
-        ),
-      ),
-    ),
-    SliverToBoxAdapter(
-      child: Container(
-        margin: EdgeInsets.only(top: 15, left: 23, right: 23),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [Text("All Matches", style: TextStyle(fontSize: 24))],
-        ),
-      ),
-    ),
-    SliverToBoxAdapter(
       child: SizedBox(
         height: MediaQuery.of(context).padding.bottom,
       ),
@@ -334,8 +248,7 @@ InputDecoration ElapseInputDecoration(BuildContext context, String label) {
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(9)),
-      borderSide:
-      BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+      borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
     ),
   );
 }
