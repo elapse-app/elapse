@@ -43,12 +43,12 @@ Future<void> signIN(String email, String password) async {
   }
 
   ElapseUser currentUser = ElapseUser(
-      uid: user.uid,
-      email: userInfo["email"],
-      fname: userInfo["firstName"],
-      lname: userInfo["lastName"],
-      teamNumber: userInfo["team"]["teamNumber"],
-      verified: userInfo["verified"],
+    uid: user.uid,
+    email: userInfo["email"],
+    fname: userInfo["firstName"],
+    lname: userInfo["lastName"],
+    teamNumber: userInfo["team"]["teamNumber"],
+    verified: userInfo["verified"],
   );
   if (userInfo["groupId"].isNotEmpty) {
     Map<String, dynamic>? group = await database.getGroupInfo(userInfo["groupId"][0]);
@@ -81,7 +81,10 @@ Future<void> checkAccountDeleted() async {
       clearPrefs();
       FirebaseAuth.instance.signOut();
     }
-  } catch(e) {
+  } on FirebaseAuthException catch (e) {
+    if (e.code == "firebase_auth/network-request-failed") {}
+  } catch (e) {
+    print(e);
     print("User was deleted");
     clearPrefs();
     FirebaseAuth.instance.signOut();
