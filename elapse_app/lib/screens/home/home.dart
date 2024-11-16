@@ -114,7 +114,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         case ConnectionState.done:
                           if (snapshot.hasError) {
                             print(snapshot.error);
-                            return Column();
+                            return BigErrorMessage(
+                              icon: Icons.cloud_off_outlined,
+                              message: "Failed to load upcoming tournaments.",
+                            );
                           }
 
                           List<TournamentPreview> teamTournaments = snapshot.data as List<TournamentPreview>;

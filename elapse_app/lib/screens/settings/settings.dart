@@ -326,8 +326,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                     ),
                                                   );
                                                   setState(() {
-                                                    currentUser =
-                                                        ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
+                                                    currentUser = ElapseUser.fromJson(
+                                                        jsonDecode(prefs.getString("currentUser")!));
                                                     teamGroupFuture = getUserTeamGroup(currentUser!.uid!);
                                                   });
                                                 },
@@ -427,22 +427,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           prefs.setBool("useLiveTiming", value!);
                           setState(() {
                             useLiveTiming = value;
-                          });
-                        },
-                      )
-                    ]),
-                    Divider(
-                      color: Theme.of(context).colorScheme.surfaceDim,
-                    ),
-                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                      const Text("Send Live Timing Telemetry",
-                          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
-                      Switch(
-                        value: sendLTTelemetry,
-                        onChanged: (bool? value) {
-                          prefs.setBool("sendLTTelemetry", value!);
-                          setState(() {
-                            sendLTTelemetry = value;
                           });
                         },
                       )

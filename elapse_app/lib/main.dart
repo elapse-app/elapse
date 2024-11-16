@@ -47,6 +47,7 @@ void main() async {
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
   if ((prefs.getBool("isSetUp") ?? false) && FirebaseAuth.instance.currentUser != null) {
+    print(FirebaseAuth.instance.currentUser);
     await checkAccountDeleted();
   }
 

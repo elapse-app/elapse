@@ -89,43 +89,49 @@ class _MyTeamsState extends State<MyTeams> {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
             includeSettings: true,
-            background: Padding(
-              padding: const EdgeInsets.only(left: 23, right: 12, top: 2),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  GestureDetector(
-                      onTap: () async {
-                        Season updated = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SeasonFilterPage(selected: season),
-                          ),
-                        );
-                        setState(() {
-                          season = updated;
-                          skillsStats = getWorldSkillsForTeam(season.vrcId, savedTeamPreview.teamID);
-                          teamStats = getTrueSkillDataForTeam(season.vrcId, savedTeamPreview.teamNumber);
-                          teamTournaments = fetchTeamTournaments(savedTeamPreview.teamID, season.vrcId);
-                          teamAwards = getAwards(savedTeamPreview.teamID, season.vrcId);
-                        });
-                      },
-                      child: Row(children: [
-                        const Icon(Icons.event_note),
-                        const SizedBox(width: 4),
-                        Text(
-                          season.name.substring(10),
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        const Icon(Icons.arrow_right)
-                      ])),
-                  const Spacer(),
-                  SettingsButton(callback: () {
-                    setState(() {
-                      reload();
-                    });
-                  }),
-                ],
+            background: SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(left: 23, right: 12, top: 10),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    GestureDetector(
+                        onTap: () async {
+                          Season updated = await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => SeasonFilterPage(selected: season),
+                            ),
+                          );
+                          setState(() {
+                            season = updated;
+                            skillsStats = getWorldSkillsForTeam(season.vrcId, savedTeamPreview.teamID);
+                            teamStats = getTrueSkillDataForTeam(season.vrcId, savedTeamPreview.teamNumber);
+                            teamTournaments = fetchTeamTournaments(savedTeamPreview.teamID, season.vrcId);
+                            teamAwards = getAwards(savedTeamPreview.teamID, season.vrcId);
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            const Icon(Icons.event_note),
+                            const SizedBox(width: 4),
+                            Text(
+                              season.name.substring(10),
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            const Icon(Icons.arrow_right)
+                          ]),
+                        )),
+                    const Spacer(),
+                    SettingsButton(callback: () {
+                      setState(() {
+                        reload();
+                      });
+                    }),
+                  ],
+                ),
               ),
             ),
           ),
