@@ -22,18 +22,12 @@ class RankingsPage extends StatelessWidget {
     required this.sort,
     required this.divisionIndex,
     required this.filter,
-    required this.skills,
-    required this.worldSkills,
-    required this.vda,
   });
 
   final String searchQuery;
   final int divisionIndex;
   final String sort;
   final TournamentRankingsFilter filter;
-  final Map<int, TournamentSkills> skills;
-  final List<WorldSkillsStats> worldSkills;
-  final List<VDAStats> vda;
 
   @override
   Widget build(BuildContext context) {
@@ -102,29 +96,6 @@ class RankingsPage extends StatelessWidget {
       divisionTeams.sort((a, b) {
         return rankings[b.id]!.ccwm.compareTo(rankings[a.id]!.ccwm);
       });
-    } else if (sort == "Skills") {
-      divisionTeams.sort((a, b) {
-        return skills[b.id]?.score.compareTo(skills[a.id]?.score ?? 0) ?? 0;
-      });
-    } else if (sort == "World Skills") {
-      divisionTeams.sort((a, b) {
-        return worldSkills
-            .singleWhere((e) => e.teamId == b.id, orElse: () {
-              return WorldSkillsStats(teamId: b.id, teamNum: b.teamNumber ?? "");
-            })
-            .score
-            .compareTo(worldSkills.singleWhere((e) => e.teamId == a.id, orElse: () {
-              return WorldSkillsStats(teamId: b.id, teamNum: b.teamNumber ?? "");
-            }).score);
-      });
-    } else if (sort == "TrueSkill") {
-      divisionTeams.sort((a, b) {
-        return vda
-                .singleWhere((e) => e.id == b.id)
-                .trueSkill
-                ?.compareTo(vda.singleWhere((e) => e.id == a.id).trueSkill ?? 0) ??
-            0;
-      });
     }
 
     if (searchQuery.isNotEmpty) {
@@ -154,9 +125,6 @@ class RankingsPage extends StatelessWidget {
                 teamNumber: team.teamNumber!,
                 sort: sort,
                 allianceColor: Theme.of(context).colorScheme.onSurface,
-                skills: skills[team.id],
-                worldSkills: worldSkills.firstWhereOrNull((e) => e.teamId == team.id),
-                vda: vda.firstWhereOrNull((e) => e.id == team.id),
               ),
               Divider(
                 color: Theme.of(context).colorScheme.surfaceDim,
