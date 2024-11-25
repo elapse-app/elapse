@@ -41,7 +41,7 @@ class TeamGroup {
       groupId: json["groupId"],
       adminId: json["adminId"],
       joinCode: json["joinCode"],
-      allowJoin: json["allowJoin"],
+      allowJoin: json["allowJoin"] == true,
       members: json["members"].map<String, String>((key, val) => MapEntry(key.toString(), val.toString())),
     );
   }
@@ -57,22 +57,13 @@ class TeamGroup {
     };
   }
 
+  void addMember() {}
 
-  void addMember() {
+  void removeMember() {}
 
-  }
+  void changeAdmin() {}
 
-  void removeMember() {
-
-  }
-
-  void changeAdmin() {
-
-  }
-
-  void joinTeamGroup() {
-
-  }
+  void joinTeamGroup() {}
 }
 
 Future<TeamGroup?> getUserTeamGroup(String userId) async {

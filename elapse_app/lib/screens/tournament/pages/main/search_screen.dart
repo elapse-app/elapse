@@ -8,8 +8,7 @@ import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen(
-      {super.key, required this.tournament, required this.division});
+  const SearchScreen({super.key, required this.tournament, required this.division});
 
   final Tournament tournament;
   final Division division;
@@ -41,10 +40,8 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     List<Team> filteredTeams = widget.tournament.teams.where((e) {
       return (e.teamName!.toLowerCase().contains(searchQuery.toLowerCase()) ||
-              e.teamNumber!
-                  .toLowerCase()
-                  .contains(searchQuery.toLowerCase())) &&
-          (widget.division.teamStats![e.id] != null ||
+              e.teamNumber!.toLowerCase().contains(searchQuery.toLowerCase())) &&
+          ((widget.division.teamStats != null && widget.division.teamStats![e.id] != null) ||
               widget.division.teamStats?.isEmpty == true);
     }).toList();
     List<Game> filteredGames;
@@ -58,21 +55,16 @@ class _SearchScreenState extends State<SearchScreen> {
         if (searchQuery.isEmpty) {
           return true;
         }
-        bool gameContainsSearchQuery = e.blueAlliancePreview![0].teamNumber
-                .contains(searchQuery.toUpperCase()) ||
-            e.blueAlliancePreview![1].teamNumber
-                .contains(searchQuery.toUpperCase()) ||
-            e.redAlliancePreview![0].teamNumber
-                .contains(searchQuery.toUpperCase()) ||
-            e.redAlliancePreview![1].teamNumber
-                .contains(searchQuery.toUpperCase()) ||
+        bool gameContainsSearchQuery = e.blueAlliancePreview![0].teamNumber.contains(searchQuery.toUpperCase()) ||
+            e.blueAlliancePreview![1].teamNumber.contains(searchQuery.toUpperCase()) ||
+            e.redAlliancePreview![0].teamNumber.contains(searchQuery.toUpperCase()) ||
+            e.redAlliancePreview![1].teamNumber.contains(searchQuery.toUpperCase()) ||
             e.gameName.contains(searchQuery.toUpperCase());
 
-        bool gameContainsFilteredTeam =
-            teamNumbers.contains(e.blueAlliancePreview![0].teamNumber) ||
-                teamNumbers.contains(e.blueAlliancePreview![1].teamNumber) ||
-                teamNumbers.contains(e.redAlliancePreview![0].teamNumber) ||
-                teamNumbers.contains(e.redAlliancePreview![1].teamNumber);
+        bool gameContainsFilteredTeam = teamNumbers.contains(e.blueAlliancePreview![0].teamNumber) ||
+            teamNumbers.contains(e.blueAlliancePreview![1].teamNumber) ||
+            teamNumbers.contains(e.redAlliancePreview![0].teamNumber) ||
+            teamNumbers.contains(e.redAlliancePreview![1].teamNumber);
 
         return gameContainsSearchQuery || gameContainsFilteredTeam;
       }).toList();
@@ -108,8 +100,7 @@ class _SearchScreenState extends State<SearchScreen> {
                               Spacer(),
                               Flex(
                                 direction: Axis.horizontal,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
                                   Flexible(
                                       flex: 1,
@@ -131,13 +122,9 @@ class _SearchScreenState extends State<SearchScreen> {
                                           searchQuery = value;
                                         });
                                       },
-                                      cursorColor: Theme.of(context)
-                                          .colorScheme
-                                          .secondary,
+                                      cursorColor: Theme.of(context).colorScheme.secondary,
                                       decoration: InputDecoration(
-                                          hintText:
-                                              "Search ${widget.division.name}",
-                                          border: InputBorder.none),
+                                          hintText: "Search ${widget.division.name}", border: InputBorder.none),
                                     ),
                                   ),
                                 ],
@@ -145,26 +132,21 @@ class _SearchScreenState extends State<SearchScreen> {
                               Spacer(),
                               if (constraints.maxHeight - 135 + 45 > 0)
                                 Container(
-                                  height: containerHeight > 130
-                                      ? 45
-                                      : containerHeight - 130 + 45,
+                                  height: containerHeight > 130 ? 45 : containerHeight - 130 + 45,
                                   child: Flex(
                                     direction: Axis.horizontal,
                                     children: [
                                       Flexible(
                                         flex: 1,
-                                        child: FilterButton(
-                                            0, constraints.maxHeight, "All"),
+                                        child: FilterButton(0, constraints.maxHeight, "All"),
                                       ),
                                       Flexible(
                                         flex: 1,
-                                        child: FilterButton(
-                                            1, constraints.maxHeight, "Teams"),
+                                        child: FilterButton(1, constraints.maxHeight, "Teams"),
                                       ),
                                       Flexible(
                                         flex: 1,
-                                        child: FilterButton(
-                                            2, constraints.maxHeight, "Games"),
+                                        child: FilterButton(2, constraints.maxHeight, "Games"),
                                       ),
                                     ],
                                   ),
@@ -218,8 +200,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('"$searchQuery" in teams',
-                            style: TextStyle(fontSize: 16)),
+                        Text('"$searchQuery" in teams', style: TextStyle(fontSize: 16)),
                         Divider(
                           color: Theme.of(context).colorScheme.surfaceDim,
                           thickness: 1.5,
@@ -242,20 +223,16 @@ class _SearchScreenState extends State<SearchScreen> {
                                 ? EmptyRanking(
                                     teamName: team.teamNumber ?? "",
                                     teamID: team.id,
-                                    allianceColor:
-                                        Theme.of(context).colorScheme.onSurface)
+                                    allianceColor: Theme.of(context).colorScheme.onSurface)
                                 : RankingsWidget(
                                     teamNumber: team.teamNumber!,
                                     teamID: team.id,
-                                    allianceColor:
-                                        Theme.of(context).colorScheme.onSurface,
+                                    allianceColor: Theme.of(context).colorScheme.onSurface,
                                   ),
                             index != filteredTeams.length - 1
                                 ? Divider(
                                     height: 3,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .surfaceDim,
+                                    color: Theme.of(context).colorScheme.surfaceDim,
                                   )
                                 : Container(),
                           ],
@@ -280,8 +257,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('"$searchQuery" in games',
-                            style: TextStyle(fontSize: 16)),
+                        Text('"$searchQuery" in games', style: TextStyle(fontSize: 16)),
                         Divider(
                           color: Theme.of(context).colorScheme.surfaceDim,
                           thickness: 1.5,
@@ -306,9 +282,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             index != widget.division.games!.length - 1
                                 ? Divider(
                                     height: 3,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .surfaceDim,
+                                    color: Theme.of(context).colorScheme.surfaceDim,
                                   )
                                 : Container(),
                           ],
@@ -352,37 +326,38 @@ class _SearchScreenState extends State<SearchScreen> {
       },
       child: AnimatedContainer(
         curve: Curves.fastOutSlowIn,
-        duration:
-            const Duration(milliseconds: 300), // Duration of the animation
+        duration: const Duration(milliseconds: 300), // Duration of the animation
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: selectedIndex == buttonIndex
-              ? selectedContainerColor.withOpacity(
-                  ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)
-              : unselectedContainerColor.withOpacity(
-                  ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+              ? selectedContainerColor.withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)
+              : unselectedContainerColor.withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
           border: buttonIndex == 1
               ? Border.symmetric(
                   horizontal: BorderSide(
                     width: 1.5,
-                    color: Theme.of(context).colorScheme.primary.withOpacity(
-                        ((maxHeight - 85) / 40) > 1
-                            ? 1
-                            : (maxHeight - 85) / 40),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
                   ),
                 )
               : Border.all(
                   width: 1.5,
-                  color: Theme.of(context).colorScheme.primary.withOpacity(
-                      ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
                 ),
           borderRadius: borderRadius,
         ),
         child: Text(
           text,
           style: TextStyle(
-            color: Theme.of(context).colorScheme.secondary.withOpacity(
-                ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+            color: Theme.of(context)
+                .colorScheme
+                .secondary
+                .withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
