@@ -32,6 +32,5 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <uses-library android:name="com.google.android.maps" />
     </application>
 </manifest>
