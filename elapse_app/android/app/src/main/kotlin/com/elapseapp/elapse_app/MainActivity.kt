@@ -1,4 +1,4 @@
-package com.example.elapse_app
+package com.elapseapp.elapse_app
 
 import io.flutter.embedding.android.FlutterActivity
 
