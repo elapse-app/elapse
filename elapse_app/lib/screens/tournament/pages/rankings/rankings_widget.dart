@@ -90,7 +90,7 @@ class RankingsWidget extends StatelessWidget {
 
     return GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () => tournamentStatsPage(context, teamID, teamNumber),
+        onTap: () => tournamentStatsPage(context, teamID, teamNumber, teamName),
         child: SizedBox(
             height: 72,
             child: Flex(
@@ -106,10 +106,10 @@ class RankingsWidget extends StatelessWidget {
                         style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600, height: 1, color: allianceColor)),
                   ),
                   Flexible(
-                    flex: 100,
+                    flex: 90,
                     fit: FlexFit.tight,
                     child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(teamNumber,
@@ -120,15 +120,16 @@ class RankingsWidget extends StatelessWidget {
                                   fontWeight: FontWeight.w400,
                                   color: allianceColor)),
                           Text(teamName,
+                              softWrap: false,
                               style: TextStyle(
-                                fontSize: 16,
-                                height: 1,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w300,
-                                color: allianceColor,
-                                overflow: TextOverflow.ellipsis,
+                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                overflow: TextOverflow.fade,
                               ))
                         ]),
                   ),
+                  const Spacer(flex: 5),
                   Flexible(
                     flex: 45,
                     fit: FlexFit.tight,
