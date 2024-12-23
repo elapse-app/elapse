@@ -43,15 +43,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
   late int selectedIndex;
   int sortIndex = 0;
   List<String> titles = ["Schedule", "Rankings", "Skills", "Info"];
-  List<String> sorts = [
-    "Rank",
-    "AP",
-    "SP",
-    "AWP",
-    "OPR",
-    "DPR",
-    "CCWM",
-  ];
+  List<String> sorts = ["Rank", "AP", "SP", "AWP", "OPR", "DPR", "CCWM", "Skills", "World Skills", "TrueSkill"];
   TournamentRankingsFilter filter = TournamentRankingsFilter();
 
   bool showPractice = true;
@@ -139,12 +131,48 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
 
     List<Widget> pages = [
       SliverToBoxAdapter(),
-      RankingsPage(
-        searchQuery: searchQuery,
-        sort: sorts[sortIndex],
-        divisionIndex: division.order - 1,
-        filter: filter,
-      ),
+      hasCachedWorldSkillsRankings(
+                  getGradeLevel(prefs.getString("defaultGrade")) == gradeLevels["College"]
+                      ? seasons[0].vexUId!
+                      : seasons[0].vrcId,
+                  getGradeLevel(prefs.getString("defaultGrade"))) &&
+              hasCachedTrueSkillData()
+          ? RankingsPage(
+              searchQuery: searchQuery,
+              sort: sorts[sortIndex],
+              divisionIndex: division.order - 1,
+              filter: filter,
+              skills: widget.tournament.tournamentSkills!,
+              worldSkills: jsonDecode(prefs.getString("worldSkillsData")!)
+                  .map<WorldSkillsStats>((e) => WorldSkillsStats.fromJson(e))
+                  .toList(),
+              vda: jsonDecode(prefs.getString("vdaData")!).map<VDAStats>((json) => VDAStats.fromJson(json)).toList(),
+            )
+          : FutureBuilder(
+              future: Future.wait(sortIndex == 9 ? [worldSkillsStats, vdaStats] : [worldSkillsStats]),
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.none:
+                  case ConnectionState.waiting:
+                  case ConnectionState.active:
+                    return const SliverToBoxAdapter(child: LinearProgressIndicator());
+                  case ConnectionState.done:
+                    if (snapshot.hasError) {
+                      return const SliverToBoxAdapter(
+                          child: BigErrorMessage(icon: Icons.list_outlined, message: "Unable to load rankings"));
+                    }
+
+                    return RankingsPage(
+                      searchQuery: searchQuery,
+                      sort: sorts[sortIndex],
+                      divisionIndex: division.order - 1,
+                      filter: filter,
+                      skills: widget.tournament.tournamentSkills!,
+                      worldSkills: snapshot.data?[0] as List<WorldSkillsStats>,
+                      vda: sortIndex == 9 ? (snapshot.data?[1] as List<VDAStats>) : null,
+                    );
+                }
+              }),
       SkillsPage(
           skills: widget.tournament.tournamentSkills!,
           teams: widget.tournament.teams,
@@ -484,6 +512,43 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                                   ListView(
                                     scrollDirection: Axis.horizontal,
                                     children: List<Widget>.generate(sorts.length, (int index) {
+                                      if (index == 9) {
+                                        return FutureBuilder(
+                                            future: vdaStats,
+                                            builder: (context, snapshot) {
+                                              return Container(
+                                                padding: const EdgeInsets.only(right: 5),
+                                                child: ChoiceChip(
+                                                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                                                  label: Text(sorts[index],
+                                                      style: TextStyle(
+                                                        color: snapshot.connectionState == ConnectionState.done
+                                                            ? Theme.of(context).colorScheme.onSurface
+                                                            : Theme.of(context).colorScheme.onSurfaceVariant,
+                                                      )),
+                                                  selected: sortIndex == index,
+                                                  shape: RoundedRectangleBorder(
+                                                      side: BorderSide(
+                                                          color: snapshot.connectionState == ConnectionState.done
+                                                              ? Theme.of(context).colorScheme.primary
+                                                              : Theme.of(context).colorScheme.tertiary,
+                                                          width: 1.5),
+                                                      borderRadius: BorderRadius.circular(10)),
+                                                  selectedColor: Theme.of(context).colorScheme.primary,
+                                                  chipAnimationStyle: ChipAnimationStyle(
+                                                      enableAnimation: AnimationStyle(duration: Duration.zero),
+                                                      selectAnimation: AnimationStyle(duration: Duration.zero)),
+                                                  onSelected: snapshot.connectionState == ConnectionState.done
+                                                      ? (bool selected) {
+                                                          setState(() {
+                                                            sortIndex = index;
+                                                          });
+                                                        }
+                                                      : null,
+                                                ),
+                                              );
+                                            });
+                                      }
                                       return Container(
                                         padding: const EdgeInsets.only(right: 5),
                                         child: ChoiceChip(
@@ -498,6 +563,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                                                   BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
                                               borderRadius: BorderRadius.circular(10)),
                                           selectedColor: Theme.of(context).colorScheme.primary,
+                                          disabledColor: Theme.of(context).colorScheme.onSurfaceVariant,
                                           chipAnimationStyle: ChipAnimationStyle(
                                               enableAnimation: AnimationStyle(duration: Duration.zero),
                                               selectAnimation: AnimationStyle(duration: Duration.zero)),
@@ -516,10 +582,10 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                                       decoration: BoxDecoration(
                                         gradient: LinearGradient(
                                           colors: [
-                                            Theme.of(context).colorScheme.surface.withOpacity(0),
+                                            Theme.of(context).colorScheme.surface.withValues(alpha: 0),
                                             Theme.of(context).colorScheme.surface,
                                           ],
-                                          stops: const [0.9, 1.0],
+                                          stops: const [0.95, 1.0],
                                         ),
                                       ),
                                     ),
