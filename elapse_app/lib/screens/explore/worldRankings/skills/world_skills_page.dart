@@ -4,7 +4,7 @@ import '../../../../classes/Team/world_skills.dart';
 import '../../../team_screen/team_screen.dart';
 
 Future<void> worldSkillsPage(
-    BuildContext context, int teamID, String teamNum, WorldSkillsStats stats) {
+    BuildContext context, int teamID, String teamNum, String teamName, WorldSkillsStats stats) {
   final DraggableScrollableController dra = DraggableScrollableController();
 
   return showModalBottomSheet<void>(
@@ -33,18 +33,31 @@ Future<void> worldSkillsPage(
                   child: ListView(controller: scrollController, children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "$teamNum Skills",
-                          style: const TextStyle(
-                            fontSize: 24,
-                            height: 1,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "$teamNum Skills",
+                              style: const TextStyle(
+                                fontSize: 24,
+                                height: 1,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              teamName,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w300,
+                              ),
+                            ),
+                          ]
                         ),
-                        TextButton(
-                          iconAlignment: IconAlignment.end,
-                          onPressed: () {
+                        GestureDetector(
+                          onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -55,9 +68,7 @@ Future<void> worldSkillsPage(
                               ),
                             );
                           },
-                          child: Row(
-                            children: [
-                              Text(
+                          child: Text(
                                 "View More",
                                 style: TextStyle(
                                   fontSize: 16,
@@ -65,8 +76,6 @@ Future<void> worldSkillsPage(
                                       Theme.of(context).colorScheme.secondary,
                                 ),
                               ),
-                            ],
-                          ),
                         )
                       ],
                     ),
