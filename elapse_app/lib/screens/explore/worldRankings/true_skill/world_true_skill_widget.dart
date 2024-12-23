@@ -18,7 +18,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        worldTrueSkillPage(context, stats.id, stats.teamNum.isEmpty ? stats.teamName! : stats.teamNum, stats);
+        worldTrueSkillPage(context, stats.id, stats.teamNum, stats.teamName!, stats);
       },
       child: Container(
           height: 72,
@@ -36,7 +36,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
                           fit: FlexFit.tight,
                           flex: 30,
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(stats.teamNum,
