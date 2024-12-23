@@ -4,7 +4,7 @@ import '../../../../classes/Team/vdaStats.dart';
 import '../../../team_screen/team_screen.dart';
 
 Future<void> worldTrueSkillPage(
-    BuildContext context, int teamID, String teamNum, VDAStats stats) {
+    BuildContext context, int teamID, String teamNum, String teamName, VDAStats stats) {
   final DraggableScrollableController dra = DraggableScrollableController();
 
   return showModalBottomSheet<void>(
@@ -33,19 +33,32 @@ Future<void> worldTrueSkillPage(
                   child: ListView(controller: scrollController, children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          "$teamNum TrueSkill",
-                          style: const TextStyle(
-                            fontSize: 24,
-                            height: 1,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "$teamNum TrueSkill",
+                              style: const TextStyle(
+                                fontSize: 24,
+                                height: 1,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            Text(
+                              teamName,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w300,
+                              ),
+                            )
+                          ]
                         ),
                         teamID != 0
-                            ? TextButton(
-                          iconAlignment: IconAlignment.end,
-                          onPressed: () {
+                            ? GestureDetector(
+                          onTap: () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -56,9 +69,7 @@ Future<void> worldTrueSkillPage(
                               ),
                             );
                           },
-                          child: Row(
-                            children: [
-                              Text(
+                          child: Text(
                                 "View More",
                                 style: TextStyle(
                                   fontSize: 16,
@@ -66,10 +77,8 @@ Future<void> worldTrueSkillPage(
                                       Theme.of(context).colorScheme.secondary,
                                 ),
                               ),
-                            ],
-                          ),
                         )
-                            : TextButton(onPressed: () {}, child: const SizedBox(),),
+                            : const SizedBox(),
                       ],
                     ),
                     const SizedBox(

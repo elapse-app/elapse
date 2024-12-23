@@ -18,7 +18,7 @@ class WorldSkillsWidget extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        worldSkillsPage(context, stats.teamId, stats.teamNum, stats);
+        worldSkillsPage(context, stats.teamId, stats.teamNum, stats.teamName, stats);
       },
       child: Container(
           height: 72,
