@@ -196,6 +196,7 @@ class GameScreen extends StatelessWidget {
                                   RankingsWidget(
                                       teamID: e.teamID,
                                       teamNumber: e.teamNumber,
+                                      teamName: e.teamName!,
                                       allianceColor:
                                           colorPallete.redAllianceText),
                                   Divider(
@@ -250,6 +251,7 @@ class GameScreen extends StatelessWidget {
                                   RankingsWidget(
                                       teamID: e.teamID,
                                       teamNumber: e.teamNumber,
+                                      teamName: e.teamName!,
                                       allianceColor:
                                           colorPallete.blueAllianceText),
                                   Divider(
