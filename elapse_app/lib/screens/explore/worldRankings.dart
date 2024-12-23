@@ -49,6 +49,8 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
   List<String> skillsSort = ["Total", "Driver", "Auton", "Highest Driver", "Highest Auton"];
   List<String> tsSort = ["Score", "OPR", "DPR", "CCWM", "Win %"];
 
+  double _fadeStart = 0, _fadeEnd = 1;
+
   WorldRankingsFilter filter = WorldRankingsFilter();
 
   Season season = seasons[0];
@@ -235,6 +237,8 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
               setState(() {
                 selectedIndex = v;
                 sortIndex = 0;
+                _fadeStart = 0;
+                _fadeEnd = 1;
               });
             },
           ),
@@ -248,51 +252,67 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                       children: [
                         Flexible(
                           flex: 6,
-                          child: Stack(
-                            children: [
-                              ListView(
-                                scrollDirection: Axis.horizontal,
-                                children: List<Widget>.generate(5, (int index) {
-                                  return Container(
-                                    padding: const EdgeInsets.only(right: 5),
-                                    child: ChoiceChip(
-                                      padding: const EdgeInsets.symmetric(horizontal: 5),
-                                      label: Text(skillsSort[index],
-                                          style: TextStyle(
-                                            color: Theme.of(context).colorScheme.onSurface,
-                                          )),
-                                      selected: sortIndex == index,
-                                      shape: RoundedRectangleBorder(
-                                          side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
-                                          borderRadius: BorderRadius.circular(10)),
-                                      selectedColor: Theme.of(context).colorScheme.primary,
-                                      chipAnimationStyle: ChipAnimationStyle(
-                                          enableAnimation: AnimationStyle(duration: Duration.zero),
-                                          selectAnimation: AnimationStyle(duration: Duration.zero)),
-                                      onSelected: (bool selected) {
-                                        setState(() {
-                                          sortIndex = index;
-                                        });
-                                      },
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                              IgnorePointer(
-                                ignoring: true,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Theme.of(context).colorScheme.surface.withOpacity(0),
-                                        Theme.of(context).colorScheme.surface,
-                                      ],
-                                      stops: const [0.95, 1.0],
+                          child: NotificationListener<ScrollNotification>(
+                            onNotification: (scrollNotification) {
+                              setState(() {
+                                _fadeStart = scrollNotification.metrics.pixels / 10;
+                                _fadeEnd = (scrollNotification.metrics.maxScrollExtent -
+                                    scrollNotification.metrics.pixels) /
+                                    10;
+
+                                _fadeStart = _fadeStart.clamp(0.0, 1.0);
+                                _fadeEnd = _fadeEnd.clamp(0.0, 1.0);
+                              });
+                              return true;
+                            },
+                            child: Stack(
+                              children: [
+                                ListView(
+                                  scrollDirection: Axis.horizontal,
+                                  children: List<Widget>.generate(5, (int index) {
+                                    return Container(
+                                      padding: const EdgeInsets.only(right: 5),
+                                      child: ChoiceChip(
+                                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                                        label: Text(skillsSort[index],
+                                            style: TextStyle(
+                                              color: Theme.of(context).colorScheme.onSurface,
+                                            )),
+                                        selected: sortIndex == index,
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+                                            borderRadius: BorderRadius.circular(10)),
+                                        selectedColor: Theme.of(context).colorScheme.primary,
+                                        chipAnimationStyle: ChipAnimationStyle(
+                                            enableAnimation: AnimationStyle(duration: Duration.zero),
+                                            selectAnimation: AnimationStyle(duration: Duration.zero)),
+                                        onSelected: (bool selected) {
+                                          setState(() {
+                                            sortIndex = index;
+                                          });
+                                        },
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                                IgnorePointer(
+                                  ignoring: true,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Theme.of(context).colorScheme.surface,
+                                          Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                                          Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                                          Theme.of(context).colorScheme.surface,
+                                        ],
+                                        stops: [0, 0.05 * _fadeStart, 1 - 0.05 * _fadeEnd, 1.0],
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                         Flexible(
@@ -349,55 +369,73 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                           children: [
                             Flexible(
                               flex: 6,
-                              child: Stack(
-                                children: [
-                                  ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: List<Widget>.generate(5, (int index) {
-                                      return Container(
-                                        padding: const EdgeInsets.only(right: 5),
-                                        child: ChoiceChip(
-                                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                                          label: Text(tsSort[index],
-                                              style: TextStyle(
-                                                color: Theme.of(context).colorScheme.onSurface,
-                                              )),
-                                          shape: RoundedRectangleBorder(
-                                              side:
-                                                  BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
-                                              borderRadius: BorderRadius.circular(10)),
-                                          selected: sortIndex == index,
-                                          selectedColor: Theme.of(context).colorScheme.primary,
-                                          chipAnimationStyle: ChipAnimationStyle(
-                                              enableAnimation: AnimationStyle(duration: Duration.zero),
-                                              selectAnimation: AnimationStyle(duration: Duration.zero)),
-                                          onSelected: (bool selected) {
-                                            setState(() {
-                                              sortIndex = index;
-                                            });
-                                          },
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                  IgnorePointer(
-                                    ignoring: true,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Theme.of(context).colorScheme.surface.withOpacity(0),
-                                            Theme.of(context).colorScheme.surface,
-                                          ],
-                                          stops: const [
-                                            0.95,
-                                            1.0,
-                                          ],
+                              child: NotificationListener<ScrollNotification>(
+                                onNotification: (scrollNotification) {
+                                  setState(() {
+                                    _fadeStart = scrollNotification.metrics.pixels / 10;
+                                    _fadeEnd = (scrollNotification.metrics.maxScrollExtent -
+                                        scrollNotification.metrics.pixels) /
+                                        10;
+
+                                    _fadeStart = _fadeStart.clamp(0.0, 1.0);
+                                    _fadeEnd = _fadeEnd.clamp(0.0, 1.0);
+                                  });
+                                  return true;
+                                },
+                                child: Stack(
+                                  children: [
+                                    ListView(
+                                      scrollDirection: Axis.horizontal,
+                                      children: List<Widget>.generate(5, (int index) {
+                                        return Container(
+                                          padding: const EdgeInsets.only(right: 5),
+                                          child: ChoiceChip(
+                                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                                            label: Text(tsSort[index],
+                                                style: TextStyle(
+                                                  color: Theme.of(context).colorScheme.onSurface,
+                                                )),
+                                            shape: RoundedRectangleBorder(
+                                                side:
+                                                BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+                                                borderRadius: BorderRadius.circular(10)),
+                                            selected: sortIndex == index,
+                                            selectedColor: Theme.of(context).colorScheme.primary,
+                                            chipAnimationStyle: ChipAnimationStyle(
+                                                enableAnimation: AnimationStyle(duration: Duration.zero),
+                                                selectAnimation: AnimationStyle(duration: Duration.zero)),
+                                            onSelected: (bool selected) {
+                                              setState(() {
+                                                sortIndex = index;
+                                              });
+                                            },
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                    IgnorePointer(
+                                      ignoring: true,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Theme.of(context).colorScheme.surface,
+                                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                                              Theme.of(context).colorScheme.surface,
+                                            ],
+                                            stops: [
+                                              0,
+                                              0.05 * _fadeStart,
+                                              1 - 0.05 * _fadeEnd,
+                                              1.0,
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                             Flexible(
