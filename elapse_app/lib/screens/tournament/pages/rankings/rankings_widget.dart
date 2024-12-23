@@ -17,12 +17,18 @@ class RankingsWidget extends StatelessWidget {
     required this.teamNumber,
     required this.allianceColor,
     this.sort = "Rank",
+    this.skills,
+    this.worldSkills,
+    this.vda,
   });
 
   final int teamID;
   final String teamNumber;
   final Color allianceColor;
   final String sort;
+  final TournamentSkills? skills;
+  final WorldSkillsStats? worldSkills;
+  final VDAStats? vda;
 
   @override
   Widget build(BuildContext context) {
@@ -59,6 +65,24 @@ class RankingsWidget extends StatelessWidget {
         val2 = "${stats.dpr.toStringAsFixed(1)} DPR";
         val3 = stats.ccwm.toStringAsFixed(1);
         val4 = "CCWM";
+        break;
+      case "Skills":
+        val1 = "${stats.wins}-${stats.losses}-${stats.ties}";
+        val2 = "${stats.wp} WP";
+        val3 = skills != null ? "Rank ${skills?.rank}" : "N/A";
+        val4 = skills != null ? "${skills?.score} pts" : "N/A";
+        break;
+      case "World Skills":
+        val1 = "${stats.wins}-${stats.losses}-${stats.ties}";
+        val2 = "${stats.wp} WP";
+        val3 = worldSkills != null ? "Rank ${worldSkills?.rank}" : "N/A";
+        val4 = worldSkills != null ? "${worldSkills?.score} pts" : "N/A";
+        break;
+      case "TrueSkill":
+        val1 = "${stats.wins}-${stats.losses}-${stats.ties}";
+        val2 = "${stats.wp} WP";
+        val3 = vda != null ? "Rank ${vda?.trueSkillGlobalRank}" : "N/A";
+        val4 = vda != null ? "${vda?.trueSkill}" : "N/A";
         break;
     }
 

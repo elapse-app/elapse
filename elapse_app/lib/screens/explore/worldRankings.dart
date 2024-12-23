@@ -61,10 +61,22 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
 
     isSkillsLoaded = false;
     isVDALoaded = false;
-    futureSkillsStats = getWorldSkillsRankings((grade == gradeLevels["College"] ? season.vexUId! : season.vrcId), grade)
-        .whenComplete(() => isSkillsLoaded = true);
+    futureSkillsStats =
+        getWorldSkillsRankings((grade == gradeLevels["College"] ? season.vexUId! : season.vrcId), grade).then((data) {
+      setState(() {
+        isSkillsLoaded = true;
+        loadedSkills = data;
+      });
+      return data;
+    });
     futures.add(futureSkillsStats);
-    futureVDAStats = getTrueSkillData(season.vrcId).whenComplete(() => isVDALoaded = true);
+    futureVDAStats = getTrueSkillData(season.vrcId).then((data) {
+      setState(() {
+        isVDALoaded = true;
+        loadedVDA = data;
+      });
+      return data;
+    });
     futures.add(futureVDAStats);
     savedTeams = _getSavedTeams();
     picklistTeams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
@@ -157,8 +169,11 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                           futureSkillsStats = getWorldSkillsRankings(
                                   grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade)
                               .then((data) {
-                            isSkillsLoaded = true;
-                            return loadedSkills = data;
+                            setState(() {
+                              isSkillsLoaded = true;
+                              loadedSkills = data;
+                            });
+                            return data;
                           });
                           futures[0] = futureSkillsStats;
                         })
@@ -182,13 +197,19 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                           futureSkillsStats = getWorldSkillsRankings(
                                   grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade)
                               .then((data) {
-                            isSkillsLoaded = true;
-                            return loadedSkills = data;
+                            setState(() {
+                              isSkillsLoaded = true;
+                              loadedSkills = data;
+                            });
+                            return data;
                           });
                           isVDALoaded = false;
                           futureVDAStats = getTrueSkillData(season.vrcId).then((data) {
-                            isVDALoaded = true;
-                            return loadedVDA = data;
+                            setState(() {
+                              isVDALoaded = true;
+                              loadedVDA = data;
+                            });
+                            return data;
                           });
                           futures[0] = futureSkillsStats;
                           futures[1] = futureVDAStats;
@@ -209,6 +230,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
           ),
           CustomTabBar(
             tabs: pageTitles,
+            disabledTabs: [!isSkillsLoaded, !isVDALoaded],
             onPressed: (int v) {
               setState(() {
                 selectedIndex = v;
@@ -265,7 +287,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                         Theme.of(context).colorScheme.surface.withOpacity(0),
                                         Theme.of(context).colorScheme.surface,
                                       ],
-                                      stops: const [0.9, 1.0],
+                                      stops: const [0.95, 1.0],
                                     ),
                                   ),
                                 ),
@@ -368,7 +390,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                             Theme.of(context).colorScheme.surface,
                                           ],
                                           stops: const [
-                                            0.9,
+                                            0.95,
                                             1.0,
                                           ],
                                         ),
@@ -419,80 +441,35 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                       ),
                     )
                   : const SliverToBoxAdapter(),
-          isSkillsLoaded && isVDALoaded
-              ? Builder(builder: (context) {
-                  List<Widget> pages = [];
-                  if (loadedSkills != null && loadedVDA != null) {
-                    pages = [
-                      WorldSkillsPage(
-                        rankings: loadedSkills!,
-                        sort: sortIndex,
-                        filter: filter,
-                        savedTeams: savedTeams,
-                        picklistTeams: picklistTeams,
-                        tournament: inTM ? loadTournament(prefs.getString("TMSavedTournament")) : null,
-                        scoutedTeams: const [],
-                      ),
-                      WorldTrueSkillPage(
-                        stats: loadedVDA!,
-                        sort: sortIndex,
-                        filter: filter,
-                        savedTeams: savedTeams,
-                        picklistTeams: picklistTeams,
-                        tournament: inTM ? loadTournament(prefs.getString("TMSavedTournament")) : null,
-                      ),
-                    ];
-                  } else {
-                    pages = [SliverToBoxAdapter(), SliverToBoxAdapter()];
-                  }
+          Builder(builder: (context) {
+            List<Widget> pages = [
+              SliverToBoxAdapter(child: LinearProgressIndicator()),
+              SliverToBoxAdapter(child: LinearProgressIndicator())
+            ];
+            if (loadedSkills != null) {
+              pages[0] = WorldSkillsPage(
+                rankings: loadedSkills!,
+                sort: sortIndex,
+                filter: filter,
+                savedTeams: savedTeams,
+                picklistTeams: picklistTeams,
+                tournament: inTM ? loadTournament(prefs.getString("TMSavedTournament")) : null,
+                scoutedTeams: const [],
+              );
+            }
+            if (loadedVDA != null) {
+              pages[1] = WorldTrueSkillPage(
+                stats: loadedVDA!,
+                sort: sortIndex,
+                filter: filter,
+                savedTeams: savedTeams,
+                picklistTeams: picklistTeams,
+                tournament: inTM ? loadTournament(prefs.getString("TMSavedTournament")) : null,
+              );
+            }
 
-                  return pages[selectedIndex];
-                })
-              : FutureBuilder(
-                  future: Future.wait(futures),
-                  builder: (context, snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.none:
-                      case ConnectionState.waiting:
-                      case ConnectionState.active:
-                        return const SliverToBoxAdapter(
-                          child: LinearProgressIndicator(),
-                        );
-                      case ConnectionState.done:
-                        if (snapshot.hasError) {
-                          print(snapshot.error);
-                          return const SliverToBoxAdapter(
-                              child: BigErrorMessage(
-                            icon: Icons.list,
-                            message: "Failed to load world rankings",
-                          ));
-                        }
-
-                        loadedSkills = snapshot.data![0] as List<WorldSkillsStats>;
-                        loadedVDA = snapshot.data![1] as List<VDAStats>;
-
-                        List<Widget> pages = [
-                          WorldSkillsPage(
-                            rankings: snapshot.data![0] as List<WorldSkillsStats>,
-                            sort: sortIndex,
-                            filter: filter,
-                            savedTeams: savedTeams,
-                            picklistTeams: picklistTeams,
-                            tournament: inTM ? snapshot.data![2] as Tournament? : null,
-                            scoutedTeams: const [],
-                          ),
-                          WorldTrueSkillPage(
-                            stats: snapshot.data![1] as List<VDAStats>,
-                            sort: sortIndex,
-                            filter: filter,
-                            savedTeams: savedTeams,
-                            picklistTeams: picklistTeams,
-                            tournament: inTM ? snapshot.data![2] as Tournament? : null,
-                          ),
-                        ];
-                        return pages[selectedIndex];
-                    }
-                  })
+            return pages[selectedIndex];
+          })
         ],
       ),
     );
