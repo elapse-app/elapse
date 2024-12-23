@@ -15,6 +15,7 @@ class RankingsWidget extends StatelessWidget {
     super.key,
     required this.teamID,
     required this.teamNumber,
+    required this.teamName,
     required this.allianceColor,
     this.sort = "Rank",
     this.skills,
@@ -24,6 +25,7 @@ class RankingsWidget extends StatelessWidget {
 
   final int teamID;
   final String teamNumber;
+  final String teamName;
   final Color allianceColor;
   final String sort;
   final TournamentSkills? skills;
@@ -112,11 +114,19 @@ class RankingsWidget extends StatelessWidget {
                         children: [
                           Text(teamNumber,
                               style: TextStyle(
-                                  fontSize: 40,
+                                  fontSize: 32,
                                   height: 1,
                                   letterSpacing: -1.5,
                                   fontWeight: FontWeight.w400,
                                   color: allianceColor)),
+                          Text(teamName,
+                              style: TextStyle(
+                                fontSize: 16,
+                                height: 1,
+                                fontWeight: FontWeight.w300,
+                                color: allianceColor,
+                                overflow: TextOverflow.ellipsis,
+                              ))
                         ]),
                   ),
                   Flexible(
