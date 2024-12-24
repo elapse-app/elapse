@@ -5,8 +5,7 @@ import 'package:flutter/material.dart';
 import '../rankings/tournament_stats_page.dart';
 
 class SkillsWidget extends StatelessWidget {
-  const SkillsWidget({Key? key, required this.team, required this.stats})
-      : super(key: key);
+  const SkillsWidget({Key? key, required this.team, required this.stats}) : super(key: key);
 
   final Team team;
   final TournamentSkills stats;
@@ -30,31 +29,27 @@ class SkillsWidget extends StatelessWidget {
                           fit: FlexFit.tight,
                           flex: 30,
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(team.teamNumber!,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                      fontSize: 32,
-                                      height: 1,
-                                      letterSpacing: -1.5,
-                                      fontWeight: FontWeight.w400,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface)),
-                              Text(team.teamName!,
-                                softWrap: false,
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w300,
-                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                                  overflow: TextOverflow.fade,
-                                )
-                              )
-                            ]
-                          )),
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(team.teamNumber!,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        fontSize: 32,
+                                        height: 1,
+                                        letterSpacing: -1.5,
+                                        fontWeight: FontWeight.w400,
+                                        color: Theme.of(context).colorScheme.onSurface)),
+                                Text(team.teamName!,
+                                    softWrap: false,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w300,
+                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      overflow: TextOverflow.fade,
+                                    ))
+                              ])),
                       const Spacer(flex: 5),
                       Flexible(
                         flex: 10,
@@ -85,7 +80,7 @@ class SkillsWidget extends StatelessWidget {
                             ),
                           )),
                       Flexible(
-                        flex: 15,
+                        flex: 17,
                         fit: FlexFit.tight,
                         child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

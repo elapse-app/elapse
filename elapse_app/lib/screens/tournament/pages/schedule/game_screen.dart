@@ -1,20 +1,37 @@
+import 'dart:convert';
+
 import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
+import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
+import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/extras/twelve_hour.dart';
+import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class GameScreen extends StatelessWidget {
+class GameScreen extends StatefulWidget {
   const GameScreen({
     super.key,
     required this.game,
   });
 
   final Game game;
+
+  @override
+  State<GameScreen> createState() => _GameScreenState();
+}
+
+class _GameScreenState extends State<GameScreen> {
+  List<Team> teams = [];
+  void initState() {
+    super.initState();
+    Tournament tournament = loadTournament(prefs.getString("recently-opened-tournament"));
+    teams = tournament.teams;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -25,21 +42,20 @@ class GameScreen extends StatelessWidget {
       colorPallete = lightPallete;
     }
     String time = "No Time";
-    if (game.startedTime != null) {
-      time = DateFormat.Hm().format(game.startedTime!.toLocal());
+    if (widget.game.startedTime != null) {
+      time = DateFormat.Hm().format(widget.game.startedTime!.toLocal());
     }
-    if (game.scheduledTime != null) {
-      time = DateFormat.Hm().format(game.scheduledTime!.toLocal());
+    if (widget.game.scheduledTime != null) {
+      time = DateFormat.Hm().format(widget.game.scheduledTime!.toLocal());
     }
 
     String status = "Not played";
-    if ((game.redScore != 0 && game.blueScore != 0) ||
-        game.startedTime != null) {
+    if ((widget.game.redScore != 0 && widget.game.blueScore != 0) || widget.game.startedTime != null) {
       status = "Played";
     }
 
     Widget gameText;
-    if (game.gameName.substring(0, 1) == "R") {
+    if (widget.game.gameName.substring(0, 1) == "R") {
       gameText = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
         const Text("R",
             style: TextStyle(
@@ -54,7 +70,7 @@ class GameScreen extends StatelessWidget {
               letterSpacing: -1,
               fontWeight: FontWeight.w500,
             )),
-        Text(game.gameName.substring(3, 4),
+        Text(widget.game.gameName.substring(3, 4),
             style: const TextStyle(
               fontSize: 64,
               height: 1,
@@ -62,7 +78,7 @@ class GameScreen extends StatelessWidget {
             ))
       ]);
     } else {
-      gameText = Text(game.gameName,
+      gameText = Text(widget.game.gameName,
           style: const TextStyle(
             fontSize: 64,
             height: 1,
@@ -72,18 +88,16 @@ class GameScreen extends StatelessWidget {
 
     Color gameColor = Theme.of(context).colorScheme.tertiary;
 
-    if ((game.redScore ?? 0) > (game.blueScore ?? 0)) {
+    if ((widget.game.redScore ?? 0) > (widget.game.blueScore ?? 0)) {
       gameColor = colorPallete.redAllianceBackground;
-    } else if ((game.redScore ?? 0) < (game.blueScore ?? 0)) {
+    } else if ((widget.game.redScore ?? 0) < (widget.game.blueScore ?? 0)) {
       gameColor = colorPallete.blueAllianceBackground;
     }
     return Scaffold(
       body: CustomScrollView(
         slivers: [
           ElapseAppBar(
-            title: Text("Game Info",
-                style: const TextStyle(
-                    fontSize: 24, height: 1, fontWeight: FontWeight.w600)),
+            title: Text("Game Info", style: const TextStyle(fontSize: 24, height: 1, fontWeight: FontWeight.w600)),
             backNavigation: true,
           ),
           const RoundedTop(),
@@ -93,9 +107,7 @@ class GameScreen extends StatelessWidget {
               delegate: SliverChildListDelegate([
                 Container(
                   height: 220,
-                  decoration: BoxDecoration(
-                      color: gameColor,
-                      borderRadius: BorderRadius.circular(18)),
+                  decoration: BoxDecoration(color: gameColor, borderRadius: BorderRadius.circular(18)),
                   child: Padding(
                     padding: const EdgeInsets.all(18.0),
                     child: Column(
@@ -115,8 +127,7 @@ class GameScreen extends StatelessWidget {
                                 ),
                                 Text(
                                   status,
-                                  style:
-                                      const TextStyle(fontSize: 16, height: 1),
+                                  style: const TextStyle(fontSize: 16, height: 1),
                                 ),
                               ],
                             ),
@@ -124,35 +135,19 @@ class GameScreen extends StatelessWidget {
                         ),
                         Column(
                           children: [
-                            Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text("Start Time",
-                                      style:
-                                          TextStyle(fontSize: 24, height: 1)),
-                                  Text(twelveHour(time),
-                                      style: const TextStyle(
-                                          fontSize: 24,
-                                          height: 1,
-                                          fontWeight: FontWeight.w500))
-                                ]),
+                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                              const Text("Start Time", style: TextStyle(fontSize: 24, height: 1)),
+                              Text(twelveHour(time),
+                                  style: const TextStyle(fontSize: 24, height: 1, fontWeight: FontWeight.w500))
+                            ]),
                             SizedBox(
                               height: 20,
                             ),
-                            Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  const Text("Field",
-                                      style:
-                                          TextStyle(fontSize: 24, height: 1)),
-                                  Text(game.fieldName ?? "",
-                                      style: const TextStyle(
-                                          fontSize: 24,
-                                          height: 1,
-                                          fontWeight: FontWeight.w500))
-                                ])
+                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+                              const Text("Field", style: TextStyle(fontSize: 24, height: 1)),
+                              Text(widget.game.fieldName ?? "",
+                                  style: const TextStyle(fontSize: 24, height: 1, fontWeight: FontWeight.w500))
+                            ])
                           ],
                         ),
                       ],
@@ -176,7 +171,7 @@ class GameScreen extends StatelessWidget {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          Text(game.redScore?.toString() ?? "",
+                          Text(widget.game.redScore?.toString() ?? "",
                               style: TextStyle(
                                   fontSize: 32,
                                   height: 1,
@@ -188,21 +183,24 @@ class GameScreen extends StatelessWidget {
                         height: 8,
                       ),
                       Column(
-                        children: game.redAlliancePreview!.map(
+                        children: widget.game.redAlliancePreview!.map(
                           (e) {
                             {
+                              String teamName = "";
+                              for (Team team in teams) {
+                                if (team.id == e.teamID) {
+                                  teamName = team.teamName ?? "";
+                                }
+                              }
                               return Column(
                                 children: [
                                   RankingsWidget(
                                       teamID: e.teamID,
                                       teamNumber: e.teamNumber,
-                                      teamName: e.teamName!,
-                                      allianceColor:
-                                          colorPallete.redAllianceText),
+                                      teamName: teamName,
+                                      allianceColor: colorPallete.redAllianceText),
                                   Divider(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .surfaceDim,
+                                    color: Theme.of(context).colorScheme.surfaceDim,
                                     thickness: 1,
                                   )
                                 ],
@@ -231,7 +229,7 @@ class GameScreen extends StatelessWidget {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          Text(game.blueScore?.toString() ?? "",
+                          Text(widget.game.blueScore?.toString() ?? "",
                               style: TextStyle(
                                   fontSize: 32,
                                   height: 1,
@@ -243,21 +241,24 @@ class GameScreen extends StatelessWidget {
                         height: 20,
                       ),
                       Column(
-                        children: game.blueAlliancePreview!.map(
+                        children: widget.game.blueAlliancePreview!.map(
                           (e) {
                             {
+                              String teamName = "";
+                              for (Team team in teams) {
+                                if (team.id == e.teamID) {
+                                  teamName = team.teamName ?? "";
+                                }
+                              }
                               return Column(
                                 children: [
                                   RankingsWidget(
                                       teamID: e.teamID,
                                       teamNumber: e.teamNumber,
-                                      teamName: e.teamName!,
-                                      allianceColor:
-                                          colorPallete.blueAllianceText),
+                                      teamName: teamName,
+                                      allianceColor: colorPallete.blueAllianceText),
                                   Divider(
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .surfaceDim,
+                                    color: Theme.of(context).colorScheme.surfaceDim,
                                     thickness: 1,
                                   )
                                 ],
