@@ -34,7 +34,6 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
   late List<TeamPreview> savedTeams;
   late List<TeamPreview> picklistTeams;
   late bool inTM;
-  late Future<Tournament?> futureTournament;
   List<Future<dynamic>> futures = [];
 
   late bool isSkillsLoaded;
@@ -83,12 +82,6 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
     savedTeams = _getSavedTeams();
     picklistTeams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
     inTM = prefs.getBool("isTournamentMode") ?? false;
-
-    int? tournamentId = prefs.getInt("tournamentID");
-    if (inTM && tournamentId != null) {
-      futureTournament = TMTournamentDetails(tournamentId);
-      futures.add(futureTournament);
-    }
   }
 
   @override

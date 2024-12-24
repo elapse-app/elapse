@@ -7,10 +7,12 @@ class WorldSkillsWidget extends StatelessWidget {
   const WorldSkillsWidget({
     super.key,
     required this.stats,
+    required this.rank,
     this.sort = 0,
   });
 
   final WorldSkillsStats stats;
+  final int rank;
   final int sort;
 
   @override
@@ -71,7 +73,7 @@ class WorldSkillsWidget extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Rank ${stats.rank}",
+                            Text("Rank $rank",
                                 style: const TextStyle(
                                   fontSize: 16,
                                 )),

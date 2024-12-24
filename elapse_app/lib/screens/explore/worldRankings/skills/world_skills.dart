@@ -89,7 +89,7 @@ class WorldSkillsPage extends StatelessWidget {
             padding: const EdgeInsets.symmetric(horizontal: 23),
             child: Column(
               children: [
-                WorldSkillsWidget(stats: stats, sort: sort),
+                WorldSkillsWidget(stats: stats, rank: index + 1, sort: sort),
                 index != teams.length - 1
                     ? Divider(
                         height: 3,
