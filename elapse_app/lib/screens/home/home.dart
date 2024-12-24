@@ -191,7 +191,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         : Container()
                                   ],
                                 ),
-                                DateTime.now().compareTo(upcoming.endDate!.add(const Duration(days: 1))) <= 0 &&
+                                DateTime.now().compareTo(upcoming.endDate!) <= 0 &&
                                         DateTime.now().difference(upcoming.startDate!).inDays > -1
                                     ? Padding(
                                         padding: const EdgeInsets.only(top: 18.0),
