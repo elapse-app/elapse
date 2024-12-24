@@ -99,11 +99,14 @@ class RankingsWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Flexible(
-                    flex: 42,
+                    flex: 37,
                     fit: FlexFit.tight,
-                    child: Text("${stats.rank}",
-                        maxLines: 1,
-                        style: TextStyle(fontSize: 28, fontWeight: FontWeight.w600, height: 1, color: allianceColor)),
+                    child: Text(
+                      "${stats.rank}",
+                      maxLines: 1,
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, height: 1, color: allianceColor),
+                      textAlign: TextAlign.start,
+                    ),
                   ),
                   Flexible(
                     flex: 90,
@@ -124,7 +127,7 @@ class RankingsWidget extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w300,
-                                color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                color: allianceColor.withAlpha(200),
                                 overflow: TextOverflow.fade,
                               ))
                         ]),
