@@ -212,7 +212,7 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 23),
                         child: Column(
                           children: [
-                            WorldSkillsWidget(stats: ranking),
+                            WorldSkillsWidget(stats: ranking, rank: index + 1),
                             index != filteredSkills.length - 1
                                 ? Divider(
                                     height: 3,
@@ -262,7 +262,7 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 23),
                         child: Column(
                           children: [
-                            WorldTrueSkillWidget(stats: stats),
+                            WorldTrueSkillWidget(stats: stats, rank: index + 1),
                             index != filteredVDA.length - 1
                                 ? Divider(
                                     height: 3,
