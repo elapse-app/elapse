@@ -137,7 +137,7 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
                             TeamWidget(
                                 teamNumber: savedTeam.teamNumber,
                                 teamID: savedTeam.teamID,
-                                location: savedTeam.location,
+                                subInfo: '${savedTeam.location?.city ?? ""}${savedTeam.location?.city != null ? "," : ""} ${savedTeam.location?.region ?? ""}',
                                 teamName: savedTeam.teamName),
                             Divider(
                               color: Theme.of(context).colorScheme.surfaceDim,
