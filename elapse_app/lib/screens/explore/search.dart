@@ -381,7 +381,7 @@ class _ExploreSearchState extends State<ExploreSearch> with TickerProviderStateM
                                   teamNumber: team.teamNumber,
                                   teamID: team.teamID,
                                   teamName: team.teamName,
-                                  location: team.location,
+                                  subInfo: '${team.location?.city ?? ""}${team.location?.city != null ? "," : ""} ${team.location?.region ?? ""}',
                                   saveSearch: true,
                                   saveState: () {
                                     setState(() {
