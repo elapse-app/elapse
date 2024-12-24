@@ -159,6 +159,7 @@ class RankingsPage extends StatelessWidget {
                 teamID: team.id,
                 teamNumber: team.teamNumber!,
                 teamName: team.teamName!,
+                rank: index + 1,
                 sort: sort,
                 allianceColor: Theme.of(context).colorScheme.onSurface,
                 skills: skills[team.id],
