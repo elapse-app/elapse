@@ -7,10 +7,12 @@ class WorldTrueSkillWidget extends StatelessWidget {
   const WorldTrueSkillWidget({
     super.key,
     required this.stats,
+    required this.rank,
     this.sort = 0,
   });
 
   final VDAStats stats;
+  final int rank;
   final int sort;
 
   @override
@@ -70,7 +72,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Rank ${stats.trueSkillGlobalRank ?? "N/A"}",
+                            Text("Rank $rank",
                                 style: const TextStyle(
                                   fontSize: 16,
                                 )),

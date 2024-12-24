@@ -17,6 +17,7 @@ class RankingsWidget extends StatelessWidget {
     required this.teamNumber,
     required this.teamName,
     required this.allianceColor,
+    this.rank,
     this.sort = "Rank",
     this.skills,
     this.worldSkills,
@@ -26,6 +27,7 @@ class RankingsWidget extends StatelessWidget {
   final int teamID;
   final String teamNumber;
   final String teamName;
+  final int? rank;
   final Color allianceColor;
   final String sort;
   final TournamentSkills? skills;
@@ -102,7 +104,7 @@ class RankingsWidget extends StatelessWidget {
                     flex: 37,
                     fit: FlexFit.tight,
                     child: Text(
-                      "${stats.rank}",
+                      "${rank ?? stats.rank}",
                       maxLines: 1,
                       style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, height: 1, color: allianceColor),
                       textAlign: TextAlign.start,
