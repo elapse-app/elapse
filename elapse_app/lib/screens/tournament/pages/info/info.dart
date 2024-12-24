@@ -189,7 +189,7 @@ class InfoPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (context) => AllTeams(
-                              teams: tournament.teams,
+                              tournament: tournament,
                             )));
               },
               child: Container(
