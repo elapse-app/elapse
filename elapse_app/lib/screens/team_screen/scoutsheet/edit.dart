@@ -61,7 +61,7 @@ List<Widget> EditState(
                 Container(
                   height: 50,
                   width: 50,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.black.withOpacity(0.5)),
+                  decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.black.withValues(alpha: 0.5)),
                 ),
                 IconButton(
                     onPressed: () {
