@@ -40,13 +40,9 @@ class ExploreScreen extends StatelessWidget {
                         context,
                         PageRouteBuilder(
                           transitionDuration: const Duration(milliseconds: 300),
-                          reverseTransitionDuration:
-                              const Duration(milliseconds: 300),
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) =>
-                                  ExploreSearch(),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
+                          reverseTransitionDuration: const Duration(milliseconds: 300),
+                          pageBuilder: (context, animation, secondaryAnimation) => ExploreSearch(),
+                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
                             // Create a Tween that transitions the new screen from fully transparent to fully opaque
                             return FadeTransition(
                               opacity: animation,
@@ -178,17 +174,13 @@ class ExploreScreen extends StatelessWidget {
               margin: const EdgeInsets.symmetric(horizontal: 23),
               padding: EdgeInsets.symmetric(horizontal: 10),
               height: 64,
-              decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.tertiary,
-                  borderRadius: BorderRadius.circular(18)),
+              decoration:
+                  BoxDecoration(color: Theme.of(context).colorScheme.tertiary, borderRadius: BorderRadius.circular(18)),
               child: TextButton(
                 style: TextButton.styleFrom(overlayColor: Colors.transparent),
                 onPressed: () {
                   Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) =>
-                              const WorldRankingsScreen(initIndex: 0)));
+                      context, MaterialPageRoute(builder: (context) => const WorldRankingsScreen(initIndex: 0)));
                 },
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -232,8 +224,7 @@ class ExploreScreen extends StatelessWidget {
                       margin: const EdgeInsets.only(top: 18),
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
-                        border: Border.all(
-                            color: Theme.of(context).colorScheme.primary),
+                        border: Border.all(color: Theme.of(context).colorScheme.primary),
                         borderRadius: BorderRadius.circular(18),
                       ),
                       child: ShaderMask(
@@ -243,30 +234,18 @@ class ExploreScreen extends StatelessWidget {
                             end: Alignment.bottomCenter,
                             colors: [
                               Theme.of(context).colorScheme.surface,
-                              Theme.of(context)
-                                  .colorScheme
-                                  .surface
-                                  .withOpacity(0),
-                              Theme.of(context)
-                                  .colorScheme
-                                  .surface
-                                  .withOpacity(0),
+                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
                               Theme.of(context).colorScheme.surface
                             ],
-                            stops: const [
-                              0.0,
-                              0.1,
-                              0.9,
-                              1.0
-                            ], // 10% purple, 80% transparent, 10% purple
+                            stops: const [0.0, 0.1, 0.9, 1.0], // 10% purple, 80% transparent, 10% purple
                           ).createShader(rect);
                         },
                         blendMode: BlendMode.dstOut,
                         child: UpcomingTournaments(
                             filter: ExploreSearchFilter(
                                 startDate: DateTime.now(),
-                                endDate: DateTime.now()
-                                    .add(const Duration(days: 60)),
+                                endDate: DateTime.now().add(const Duration(days: 60)),
                                 location: loadTeamPreview(prefs.getString("savedTeam")).location)),
                       ))
                 ],
@@ -294,8 +273,7 @@ class ExploreScreen extends StatelessWidget {
                       margin: const EdgeInsets.only(top: 18),
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
-                        border: Border.all(
-                            color: Theme.of(context).colorScheme.primary),
+                        border: Border.all(color: Theme.of(context).colorScheme.primary),
                         borderRadius: BorderRadius.circular(18),
                       ),
                       child: ShaderMask(
@@ -305,22 +283,11 @@ class ExploreScreen extends StatelessWidget {
                             end: Alignment.bottomCenter,
                             colors: [
                               Theme.of(context).colorScheme.surface,
-                              Theme.of(context)
-                                  .colorScheme
-                                  .surface
-                                  .withOpacity(0),
-                              Theme.of(context)
-                                  .colorScheme
-                                  .surface
-                                  .withOpacity(0),
+                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
                               Theme.of(context).colorScheme.surface
                             ],
-                            stops: const [
-                              0.0,
-                              0.1,
-                              0.9,
-                              1.0
-                            ], // 10% purple, 80% transparent, 10% purple
+                            stops: const [0.0, 0.1, 0.9, 1.0], // 10% purple, 80% transparent, 10% purple
                           ).createShader(rect);
                         },
                         blendMode: BlendMode.dstOut,
@@ -328,8 +295,7 @@ class ExploreScreen extends StatelessWidget {
                             filter: ExploreSearchFilter(
                                 levelClass: levelClasses[4],
                                 startDate: DateTime.now(),
-                                endDate: DateTime.now()
-                                    .add(const Duration(days: 60)))),
+                                endDate: DateTime.now().add(const Duration(days: 60)))),
                       ))
                 ],
               ),
@@ -356,8 +322,7 @@ class ExploreScreen extends StatelessWidget {
                       margin: const EdgeInsets.only(top: 18),
                       padding: const EdgeInsets.symmetric(horizontal: 10),
                       decoration: BoxDecoration(
-                        border: Border.all(
-                            color: Theme.of(context).colorScheme.primary),
+                        border: Border.all(color: Theme.of(context).colorScheme.primary),
                         borderRadius: BorderRadius.circular(18),
                       ),
                       child: ShaderMask(
@@ -367,22 +332,11 @@ class ExploreScreen extends StatelessWidget {
                             end: Alignment.bottomCenter,
                             colors: [
                               Theme.of(context).colorScheme.surface,
-                              Theme.of(context)
-                                  .colorScheme
-                                  .surface
-                                  .withOpacity(0),
-                              Theme.of(context)
-                                  .colorScheme
-                                  .surface
-                                  .withOpacity(0),
+                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
                               Theme.of(context).colorScheme.surface
                             ],
-                            stops: const [
-                              0.0,
-                              0.1,
-                              0.9,
-                              1.0
-                            ], // 10% purple, 80% transparent, 10% purple
+                            stops: const [0.0, 0.1, 0.9, 1.0], // 10% purple, 80% transparent, 10% purple
                           ).createShader(rect);
                         },
                         blendMode: BlendMode.dstOut,

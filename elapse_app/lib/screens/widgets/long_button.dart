@@ -40,9 +40,7 @@ class LongButton extends StatelessWidget {
                 : null,
             border: Border.all(
               width: 2,
-              color: isGray
-                  ? Theme.of(context).colorScheme.surfaceDim
-                  : Theme.of(context).colorScheme.primary,
+              color: isGray ? Theme.of(context).colorScheme.surfaceDim : Theme.of(context).colorScheme.primary,
             ),
           ),
         ),
@@ -55,15 +53,14 @@ class LongButton extends StatelessWidget {
           child: InkWell(
             onTap: onPressed,
             borderRadius: BorderRadius.circular(30),
-            splashColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+            splashColor: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2),
             child: Container(
               height: 60,
               padding: const EdgeInsets.symmetric(horizontal: 18),
               child: Row(
                 children: [
                   centerAlign ? Spacer() : Container(),
-                  if (icon != null)
-                    Icon(icon, color: Theme.of(context).colorScheme.secondary),
+                  if (icon != null) Icon(icon, color: Theme.of(context).colorScheme.secondary),
                   if (icon != null) const SizedBox(width: 18),
                   Text(
                     text,
@@ -76,9 +73,7 @@ class LongButton extends StatelessWidget {
                   if (useForwardArrow)
                     Icon(
                       trailingIcon,
-                      color: isGray
-                          ? Theme.of(context).colorScheme.onSurface
-                          : Theme.of(context).colorScheme.secondary,
+                      color: isGray ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.secondary,
                     )
                 ],
               ),
