@@ -211,38 +211,42 @@ class _SearchScreenState extends State<SearchScreen> {
                 )
               : const SliverToBoxAdapter(),
           selectedIndex == 0 || selectedIndex == 1
-              ? SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final team = filteredTeams[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 23.0),
-                        child: Column(
-                          children: [
-                            widget.division.teamStats![team.id] == null
-                                ? EmptyRanking(
-                                    teamName: team.teamNumber ?? "",
-                                    teamID: team.id,
-                                    allianceColor: Theme.of(context).colorScheme.onSurface)
-                                : RankingsWidget(
-                                    teamNumber: team.teamNumber!,
-                                    teamID: team.id,
-                                    allianceColor: Theme.of(context).colorScheme.onSurface,
-                                  ),
-                            index != filteredTeams.length - 1
-                                ? Divider(
-                                    height: 3,
-                                    color: Theme.of(context).colorScheme.surfaceDim,
-                                  )
-                                : Container(),
-                          ],
-                        ),
-                      );
-                    },
-                    childCount: filteredTeams.length,
-                  ),
-                )
-              : SliverToBoxAdapter(),
+              ? filteredTeams.isNotEmpty
+                  ? SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final team = filteredTeams[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 23.0),
+                            child: Column(
+                              children: [
+                                widget.division.teamStats![team.id] == null
+                                    ? EmptyRanking(
+                                        teamName: team.teamNumber ?? "",
+                                        teamID: team.id,
+                                        allianceColor: Theme.of(context).colorScheme.onSurface)
+                                    : RankingsWidget(
+                                        teamNumber: team.teamNumber!,
+                                        teamName: team.teamName!,
+                                        teamID: team.id,
+                                        allianceColor: Theme.of(context).colorScheme.onSurface,
+                                      ),
+                                index != filteredTeams.length - 1
+                                    ? Divider(
+                                        height: 3,
+                                        color: Theme.of(context).colorScheme.surfaceDim,
+                                      )
+                                    : Container(),
+                              ],
+                            ),
+                          );
+                        },
+                        childCount: filteredTeams.length,
+                      ),
+                    )
+                  : const SliverToBoxAdapter(
+                      child: SizedBox(height: 15, child: Center(child: Text("No results found"))))
+              : const SliverToBoxAdapter(),
           SliverToBoxAdapter(
             child: selectedIndex == 0
                 ? const SizedBox(
@@ -268,31 +272,35 @@ class _SearchScreenState extends State<SearchScreen> {
                 )
               : SliverToBoxAdapter(),
           selectedIndex == 0 || selectedIndex == 2
-              ? SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final game = filteredGames[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 23.0),
-                        child: Column(
-                          children: [
-                            GameWidget(
-                              game: game,
+              ? filteredGames.isNotEmpty
+                  ? SliverList(
+                      delegate: SliverChildBuilderDelegate(
+                        (context, index) {
+                          final game = filteredGames[index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 23.0),
+                            child: Column(
+                              children: [
+                                GameWidget(
+                                  game: game,
+                                ),
+                                index != widget.division.games!.length - 1
+                                    ? Divider(
+                                        height: 3,
+                                        color: Theme.of(context).colorScheme.surfaceDim,
+                                      )
+                                    : Container(),
+                              ],
                             ),
-                            index != widget.division.games!.length - 1
-                                ? Divider(
-                                    height: 3,
-                                    color: Theme.of(context).colorScheme.surfaceDim,
-                                  )
-                                : Container(),
-                          ],
-                        ),
-                      );
-                    },
-                    childCount: filteredGames.length,
-                  ),
-                )
-              : SliverToBoxAdapter(),
+                          );
+                        },
+                        childCount: filteredGames.length,
+                      ),
+                    )
+                  : const SliverToBoxAdapter(
+                      child: SizedBox(height: 15, child: Center(child: Text("No results found"))))
+              : const SliverToBoxAdapter(),
+          const SliverToBoxAdapter(child: SizedBox(height: 40)),
         ],
       ),
     );
@@ -330,8 +338,8 @@ class _SearchScreenState extends State<SearchScreen> {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: selectedIndex == buttonIndex
-              ? selectedContainerColor.withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)
-              : unselectedContainerColor.withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+              ? selectedContainerColor.withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)
+              : unselectedContainerColor.withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
           border: buttonIndex == 1
               ? Border.symmetric(
                   horizontal: BorderSide(
@@ -339,7 +347,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     color: Theme.of(context)
                         .colorScheme
                         .primary
-                        .withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+                        .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
                   ),
                 )
               : Border.all(
@@ -347,7 +355,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   color: Theme.of(context)
                       .colorScheme
                       .primary
-                      .withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+                      .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
                 ),
           borderRadius: borderRadius,
         ),
@@ -357,7 +365,7 @@ class _SearchScreenState extends State<SearchScreen> {
             color: Theme.of(context)
                 .colorScheme
                 .secondary
-                .withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+                .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),

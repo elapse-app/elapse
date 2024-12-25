@@ -9,16 +9,19 @@ class TeamWidget extends StatelessWidget {
     required this.teamNumber,
     required this.teamID,
     this.teamName,
-    this.location,
+    this.subInfo,
     this.saveSearch = false,
     this.saveState,
+    this.sort = 0,
   });
   final String teamNumber;
   final int teamID;
   final String? teamName;
-  final Location? location;
+  final String? subInfo;
   final bool saveSearch;
   final Function? saveState;
+  final int sort;
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -83,14 +86,14 @@ class TeamWidget extends StatelessWidget {
                         fontSize: 16,
                       )),
                   Text(
-                      '${location?.city ?? ""}${location?.city != null ? "," : ""} ${location?.region ?? ""}',
+                      subInfo ?? "",
                       textAlign: TextAlign.end,
                       style: TextStyle(
                         fontSize: 16,
                         color: Theme.of(context)
                             .colorScheme
                             .onSurface
-                            .withOpacity(0.65),
+                            .withValues(alpha: 0.65),
                       ))
                 ],
               ),

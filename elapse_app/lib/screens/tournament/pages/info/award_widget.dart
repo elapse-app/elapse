@@ -37,23 +37,15 @@ class AwardWidget extends StatelessWidget {
               Flexible(
                 flex: 1,
                 child: Text(
-                  "${award.qualifications.join(", ")}",
-                  style: TextStyle(
-                      fontSize: 18,
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacity(0.7)),
+                  award.qualifications.join(", "),
+                  style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                 ),
               )
             ],
           ),
           Text(
-            "$winnersString",
-            style: TextStyle(
-                fontSize: 18,
-                color: Theme.of(context).colorScheme.secondary,
-                fontWeight: FontWeight.w500),
+            winnersString,
+            style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.secondary, fontWeight: FontWeight.w500),
           ),
           SizedBox(
             height: 5,

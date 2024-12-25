@@ -7,10 +7,12 @@ class WorldTrueSkillWidget extends StatelessWidget {
   const WorldTrueSkillWidget({
     super.key,
     required this.stats,
+    required this.rank,
     this.sort = 0,
   });
 
   final VDAStats stats;
+  final int rank;
   final int sort;
 
   @override
@@ -18,7 +20,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        worldTrueSkillPage(context, stats.id, stats.teamNum.isEmpty ? stats.teamName! : stats.teamNum, stats);
+        worldTrueSkillPage(context, stats.id, stats.teamNum, stats.teamName!, stats);
       },
       child: Container(
           height: 72,
@@ -34,18 +36,35 @@ class WorldTrueSkillWidget extends StatelessWidget {
                     child: Row(children: [
                       Flexible(
                           fit: FlexFit.tight,
-                          flex: 25,
-                          child: Text(stats.teamNum.isEmpty ? stats.teamName! : stats.teamNum,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontSize: 40,
-                                  height: 1,
-                                  letterSpacing: -1.5,
-                                  fontWeight: FontWeight.w400,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface))),
+                          flex: 30,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(stats.teamNum,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontSize: 32,
+                                      height: 1,
+                                      letterSpacing: -1.5,
+                                      fontWeight: FontWeight.w400,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface)),
+                              Text(stats.teamName!,
+                                softWrap: false,
+                                overflow: TextOverflow.fade,
+                                style: TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w300,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant)
+                              )
+                            ]
+                          )),
+                      const Spacer(flex: 5),
                       Flexible(
                         flex: 15,
                         fit: FlexFit.tight,
@@ -53,7 +72,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Rank ${stats.trueSkillGlobalRank ?? "N/A"}",
+                            Text("Rank $rank",
                                 style: const TextStyle(
                                   fontSize: 16,
                                 )),
@@ -65,7 +84,17 @@ class WorldTrueSkillWidget extends StatelessWidget {
                         ),
                       ),
                       Flexible(
-                        flex: 15,
+                          flex: 3,
+                          fit: FlexFit.tight,
+                          child: SizedBox(
+                            height: 50,
+                            child: VerticalDivider(
+                              thickness: 0.5,
+                              color: Theme.of(context).colorScheme.surfaceDim,
+                            ),
+                          )),
+                      Flexible(
+                        flex: 20,
                         fit: FlexFit.tight,
                         child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

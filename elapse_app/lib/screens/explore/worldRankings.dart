@@ -34,7 +34,6 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
   late List<TeamPreview> savedTeams;
   late List<TeamPreview> picklistTeams;
   late bool inTM;
-  late Future<Tournament?> futureTournament;
   List<Future<dynamic>> futures = [];
 
   late bool isSkillsLoaded;
@@ -49,6 +48,8 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
   List<String> skillsSort = ["Total", "Driver", "Auton", "Highest Driver", "Highest Auton"];
   List<String> tsSort = ["Score", "OPR", "DPR", "CCWM", "Win %"];
 
+  double _fadeStart = 0, _fadeEnd = 1;
+
   WorldRankingsFilter filter = WorldRankingsFilter();
 
   Season season = seasons[0];
@@ -61,20 +62,26 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
 
     isSkillsLoaded = false;
     isVDALoaded = false;
-    futureSkillsStats = getWorldSkillsRankings((grade == gradeLevels["College"] ? season.vexUId! : season.vrcId), grade)
-        .whenComplete(() => isSkillsLoaded = true);
+    futureSkillsStats =
+        getWorldSkillsRankings((grade == gradeLevels["College"] ? season.vexUId! : season.vrcId), grade).then((data) {
+      setState(() {
+        isSkillsLoaded = true;
+        loadedSkills = data;
+      });
+      return data;
+    });
     futures.add(futureSkillsStats);
-    futureVDAStats = getTrueSkillData(season.vrcId).whenComplete(() => isVDALoaded = true);
+    futureVDAStats = getTrueSkillData(season.vrcId).then((data) {
+      setState(() {
+        isVDALoaded = true;
+        loadedVDA = data;
+      });
+      return data;
+    });
     futures.add(futureVDAStats);
     savedTeams = _getSavedTeams();
     picklistTeams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
     inTM = prefs.getBool("isTournamentMode") ?? false;
-
-    int? tournamentId = prefs.getInt("tournamentID");
-    if (inTM && tournamentId != null) {
-      futureTournament = TMTournamentDetails(tournamentId);
-      futures.add(futureTournament);
-    }
   }
 
   @override
@@ -157,8 +164,11 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                           futureSkillsStats = getWorldSkillsRankings(
                                   grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade)
                               .then((data) {
-                            isSkillsLoaded = true;
-                            return loadedSkills = data;
+                            setState(() {
+                              isSkillsLoaded = true;
+                              loadedSkills = data;
+                            });
+                            return data;
                           });
                           futures[0] = futureSkillsStats;
                         })
@@ -182,13 +192,19 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                           futureSkillsStats = getWorldSkillsRankings(
                                   grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade)
                               .then((data) {
-                            isSkillsLoaded = true;
-                            return loadedSkills = data;
+                            setState(() {
+                              isSkillsLoaded = true;
+                              loadedSkills = data;
+                            });
+                            return data;
                           });
                           isVDALoaded = false;
                           futureVDAStats = getTrueSkillData(season.vrcId).then((data) {
-                            isVDALoaded = true;
-                            return loadedVDA = data;
+                            setState(() {
+                              isVDALoaded = true;
+                              loadedVDA = data;
+                            });
+                            return data;
                           });
                           futures[0] = futureSkillsStats;
                           futures[1] = futureVDAStats;
@@ -209,10 +225,13 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
           ),
           CustomTabBar(
             tabs: pageTitles,
+            disabledTabs: [!isSkillsLoaded, !isVDALoaded],
             onPressed: (int v) {
               setState(() {
                 selectedIndex = v;
                 sortIndex = 0;
+                _fadeStart = 0;
+                _fadeEnd = 1;
               });
             },
           ),
@@ -226,51 +245,67 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                       children: [
                         Flexible(
                           flex: 6,
-                          child: Stack(
-                            children: [
-                              ListView(
-                                scrollDirection: Axis.horizontal,
-                                children: List<Widget>.generate(5, (int index) {
-                                  return Container(
-                                    padding: const EdgeInsets.only(right: 5),
-                                    child: ChoiceChip(
-                                      padding: const EdgeInsets.symmetric(horizontal: 5),
-                                      label: Text(skillsSort[index],
-                                          style: TextStyle(
-                                            color: Theme.of(context).colorScheme.onSurface,
-                                          )),
-                                      selected: sortIndex == index,
-                                      shape: RoundedRectangleBorder(
-                                          side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
-                                          borderRadius: BorderRadius.circular(10)),
-                                      selectedColor: Theme.of(context).colorScheme.primary,
-                                      chipAnimationStyle: ChipAnimationStyle(
-                                          enableAnimation: AnimationStyle(duration: Duration.zero),
-                                          selectAnimation: AnimationStyle(duration: Duration.zero)),
-                                      onSelected: (bool selected) {
-                                        setState(() {
-                                          sortIndex = index;
-                                        });
-                                      },
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                              IgnorePointer(
-                                ignoring: true,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Theme.of(context).colorScheme.surface.withOpacity(0),
-                                        Theme.of(context).colorScheme.surface,
-                                      ],
-                                      stops: const [0.9, 1.0],
+                          child: NotificationListener<ScrollNotification>(
+                            onNotification: (scrollNotification) {
+                              setState(() {
+                                _fadeStart = scrollNotification.metrics.pixels / 10;
+                                _fadeEnd = (scrollNotification.metrics.maxScrollExtent -
+                                    scrollNotification.metrics.pixels) /
+                                    10;
+
+                                _fadeStart = _fadeStart.clamp(0.0, 1.0);
+                                _fadeEnd = _fadeEnd.clamp(0.0, 1.0);
+                              });
+                              return true;
+                            },
+                            child: Stack(
+                              children: [
+                                ListView(
+                                  scrollDirection: Axis.horizontal,
+                                  children: List<Widget>.generate(5, (int index) {
+                                    return Container(
+                                      padding: const EdgeInsets.only(right: 5),
+                                      child: ChoiceChip(
+                                        padding: const EdgeInsets.symmetric(horizontal: 5),
+                                        label: Text(skillsSort[index],
+                                            style: TextStyle(
+                                              color: Theme.of(context).colorScheme.onSurface,
+                                            )),
+                                        selected: sortIndex == index,
+                                        shape: RoundedRectangleBorder(
+                                            side: BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+                                            borderRadius: BorderRadius.circular(10)),
+                                        selectedColor: Theme.of(context).colorScheme.primary,
+                                        chipAnimationStyle: ChipAnimationStyle(
+                                            enableAnimation: AnimationStyle(duration: Duration.zero),
+                                            selectAnimation: AnimationStyle(duration: Duration.zero)),
+                                        onSelected: (bool selected) {
+                                          setState(() {
+                                            sortIndex = index;
+                                          });
+                                        },
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                                IgnorePointer(
+                                  ignoring: true,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Theme.of(context).colorScheme.surface,
+                                          Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                                          Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                                          Theme.of(context).colorScheme.surface,
+                                        ],
+                                        stops: [0, 0.05 * _fadeStart, 1 - 0.05 * _fadeEnd, 1.0],
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ),
                         Flexible(
@@ -327,55 +362,73 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                           children: [
                             Flexible(
                               flex: 6,
-                              child: Stack(
-                                children: [
-                                  ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: List<Widget>.generate(5, (int index) {
-                                      return Container(
-                                        padding: const EdgeInsets.only(right: 5),
-                                        child: ChoiceChip(
-                                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                                          label: Text(tsSort[index],
-                                              style: TextStyle(
-                                                color: Theme.of(context).colorScheme.onSurface,
-                                              )),
-                                          shape: RoundedRectangleBorder(
-                                              side:
-                                                  BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
-                                              borderRadius: BorderRadius.circular(10)),
-                                          selected: sortIndex == index,
-                                          selectedColor: Theme.of(context).colorScheme.primary,
-                                          chipAnimationStyle: ChipAnimationStyle(
-                                              enableAnimation: AnimationStyle(duration: Duration.zero),
-                                              selectAnimation: AnimationStyle(duration: Duration.zero)),
-                                          onSelected: (bool selected) {
-                                            setState(() {
-                                              sortIndex = index;
-                                            });
-                                          },
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                  IgnorePointer(
-                                    ignoring: true,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Theme.of(context).colorScheme.surface.withOpacity(0),
-                                            Theme.of(context).colorScheme.surface,
-                                          ],
-                                          stops: const [
-                                            0.9,
-                                            1.0,
-                                          ],
+                              child: NotificationListener<ScrollNotification>(
+                                onNotification: (scrollNotification) {
+                                  setState(() {
+                                    _fadeStart = scrollNotification.metrics.pixels / 10;
+                                    _fadeEnd = (scrollNotification.metrics.maxScrollExtent -
+                                        scrollNotification.metrics.pixels) /
+                                        10;
+
+                                    _fadeStart = _fadeStart.clamp(0.0, 1.0);
+                                    _fadeEnd = _fadeEnd.clamp(0.0, 1.0);
+                                  });
+                                  return true;
+                                },
+                                child: Stack(
+                                  children: [
+                                    ListView(
+                                      scrollDirection: Axis.horizontal,
+                                      children: List<Widget>.generate(5, (int index) {
+                                        return Container(
+                                          padding: const EdgeInsets.only(right: 5),
+                                          child: ChoiceChip(
+                                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                                            label: Text(tsSort[index],
+                                                style: TextStyle(
+                                                  color: Theme.of(context).colorScheme.onSurface,
+                                                )),
+                                            shape: RoundedRectangleBorder(
+                                                side:
+                                                BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+                                                borderRadius: BorderRadius.circular(10)),
+                                            selected: sortIndex == index,
+                                            selectedColor: Theme.of(context).colorScheme.primary,
+                                            chipAnimationStyle: ChipAnimationStyle(
+                                                enableAnimation: AnimationStyle(duration: Duration.zero),
+                                                selectAnimation: AnimationStyle(duration: Duration.zero)),
+                                            onSelected: (bool selected) {
+                                              setState(() {
+                                                sortIndex = index;
+                                              });
+                                            },
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                    IgnorePointer(
+                                      ignoring: true,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Theme.of(context).colorScheme.surface,
+                                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                                              Theme.of(context).colorScheme.surface,
+                                            ],
+                                            stops: [
+                                              0,
+                                              0.05 * _fadeStart,
+                                              1 - 0.05 * _fadeEnd,
+                                              1.0,
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                             Flexible(
@@ -419,80 +472,35 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                       ),
                     )
                   : const SliverToBoxAdapter(),
-          isSkillsLoaded && isVDALoaded
-              ? Builder(builder: (context) {
-                  List<Widget> pages = [];
-                  if (loadedSkills != null && loadedVDA != null) {
-                    pages = [
-                      WorldSkillsPage(
-                        rankings: loadedSkills!,
-                        sort: sortIndex,
-                        filter: filter,
-                        savedTeams: savedTeams,
-                        picklistTeams: picklistTeams,
-                        tournament: inTM ? loadTournament(prefs.getString("TMSavedTournament")) : null,
-                        scoutedTeams: const [],
-                      ),
-                      WorldTrueSkillPage(
-                        stats: loadedVDA!,
-                        sort: sortIndex,
-                        filter: filter,
-                        savedTeams: savedTeams,
-                        picklistTeams: picklistTeams,
-                        tournament: inTM ? loadTournament(prefs.getString("TMSavedTournament")) : null,
-                      ),
-                    ];
-                  } else {
-                    pages = [SliverToBoxAdapter(), SliverToBoxAdapter()];
-                  }
+          Builder(builder: (context) {
+            List<Widget> pages = [
+              SliverToBoxAdapter(child: LinearProgressIndicator()),
+              SliverToBoxAdapter(child: LinearProgressIndicator())
+            ];
+            if (loadedSkills != null) {
+              pages[0] = WorldSkillsPage(
+                rankings: loadedSkills!,
+                sort: sortIndex,
+                filter: filter,
+                savedTeams: savedTeams,
+                picklistTeams: picklistTeams,
+                tournament: inTM ? loadTournament(prefs.getString("TMSavedTournament")) : null,
+                scoutedTeams: const [],
+              );
+            }
+            if (loadedVDA != null) {
+              pages[1] = WorldTrueSkillPage(
+                stats: loadedVDA!,
+                sort: sortIndex,
+                filter: filter,
+                savedTeams: savedTeams,
+                picklistTeams: picklistTeams,
+                tournament: inTM ? loadTournament(prefs.getString("TMSavedTournament")) : null,
+              );
+            }
 
-                  return pages[selectedIndex];
-                })
-              : FutureBuilder(
-                  future: Future.wait(futures),
-                  builder: (context, snapshot) {
-                    switch (snapshot.connectionState) {
-                      case ConnectionState.none:
-                      case ConnectionState.waiting:
-                      case ConnectionState.active:
-                        return const SliverToBoxAdapter(
-                          child: LinearProgressIndicator(),
-                        );
-                      case ConnectionState.done:
-                        if (snapshot.hasError) {
-                          print(snapshot.error);
-                          return const SliverToBoxAdapter(
-                              child: BigErrorMessage(
-                            icon: Icons.list,
-                            message: "Failed to load world rankings",
-                          ));
-                        }
-
-                        loadedSkills = snapshot.data![0] as List<WorldSkillsStats>;
-                        loadedVDA = snapshot.data![1] as List<VDAStats>;
-
-                        List<Widget> pages = [
-                          WorldSkillsPage(
-                            rankings: snapshot.data![0] as List<WorldSkillsStats>,
-                            sort: sortIndex,
-                            filter: filter,
-                            savedTeams: savedTeams,
-                            picklistTeams: picklistTeams,
-                            tournament: inTM ? snapshot.data![2] as Tournament? : null,
-                            scoutedTeams: const [],
-                          ),
-                          WorldTrueSkillPage(
-                            stats: snapshot.data![1] as List<VDAStats>,
-                            sort: sortIndex,
-                            filter: filter,
-                            savedTeams: savedTeams,
-                            picklistTeams: picklistTeams,
-                            tournament: inTM ? snapshot.data![2] as Tournament? : null,
-                          ),
-                        ];
-                        return pages[selectedIndex];
-                    }
-                  })
+            return pages[selectedIndex];
+          })
         ],
       ),
     );

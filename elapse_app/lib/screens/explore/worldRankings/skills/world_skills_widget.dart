@@ -7,10 +7,12 @@ class WorldSkillsWidget extends StatelessWidget {
   const WorldSkillsWidget({
     super.key,
     required this.stats,
+    required this.rank,
     this.sort = 0,
   });
 
   final WorldSkillsStats stats;
+  final int rank;
   final int sort;
 
   @override
@@ -18,7 +20,7 @@ class WorldSkillsWidget extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        worldSkillsPage(context, stats.teamId, stats.teamNum, stats);
+        worldSkillsPage(context, stats.teamId, stats.teamNum, stats.teamName, stats);
       },
       child: Container(
           height: 72,
@@ -34,26 +36,44 @@ class WorldSkillsWidget extends StatelessWidget {
                     child: Row(children: [
                       Flexible(
                           fit: FlexFit.tight,
-                          flex: 25,
-                          child: Text(stats.teamNum,
+                          flex: 30,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(stats.teamNum,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                  fontSize: 40,
+                                  fontSize: 32,
                                   height: 1,
                                   letterSpacing: -1.5,
                                   fontWeight: FontWeight.w400,
                                   color: Theme.of(context)
                                       .colorScheme
-                                      .onSurface))),
+                                      .onSurface)),
+                              Text(stats.teamName,
+                                softWrap: false,
+                                overflow: TextOverflow.fade,
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w300,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant)
+                              )
+                            ]
+                          ),
+                      ),
+                      const Spacer(flex: 5),
                       Flexible(
-                        flex: 10,
+                        flex: 13,
                         fit: FlexFit.tight,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Rank ${stats.rank}",
+                            Text("Rank $rank",
                                 style: const TextStyle(
                                   fontSize: 16,
                                 )),
@@ -65,7 +85,7 @@ class WorldSkillsWidget extends StatelessWidget {
                         ),
                       ),
                       Flexible(
-                          flex: 5,
+                          flex: 2,
                           fit: FlexFit.tight,
                           child: SizedBox(
                             height: 50,
@@ -115,6 +135,7 @@ class WorldSkillsWidget extends StatelessWidget {
                                   ])
                             : const SizedBox(),
                       ),
+                      const Spacer(flex: 2),
                       Flexible(
                         flex: 10,
                         fit: FlexFit.tight,

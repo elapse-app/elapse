@@ -43,16 +43,11 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
   late int selectedIndex;
   int sortIndex = 0;
   List<String> titles = ["Schedule", "Rankings", "Skills", "Info"];
-  List<String> sorts = [
-    "Rank",
-    "AP",
-    "SP",
-    "AWP",
-    "OPR",
-    "DPR",
-    "CCWM",
-  ];
+  List<String> rankingSorts = ["Rank", "AP", "SP", "AWP", "OPR", "DPR", "CCWM", "Skills", "World Skills", "TrueSkill"];
+  List<String> skillsSorts = ["Rank", "Driver", "Auton", "Driver Attempts", "Auton Attempts"];
   TournamentRankingsFilter filter = TournamentRankingsFilter();
+
+  double _fadeStart = 0, _fadeEnd = 1;
 
   bool showPractice = true;
   bool showQualification = true;
@@ -139,16 +134,55 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
 
     List<Widget> pages = [
       SliverToBoxAdapter(),
-      RankingsPage(
-        searchQuery: searchQuery,
-        sort: sorts[sortIndex],
-        divisionIndex: division.order - 1,
-        filter: filter,
-      ),
+      hasCachedWorldSkillsRankings(
+                  getGradeLevel(prefs.getString("defaultGrade")) == gradeLevels["College"]
+                      ? seasons[0].vexUId!
+                      : seasons[0].vrcId,
+                  getGradeLevel(prefs.getString("defaultGrade"))) &&
+              hasCachedTrueSkillData()
+          ? RankingsPage(
+              searchQuery: searchQuery,
+              sort: rankingSorts[sortIndex],
+              divisionIndex: division.order - 1,
+              filter: filter,
+              skills: widget.tournament.tournamentSkills!,
+              worldSkills: jsonDecode(prefs.getString("worldSkillsData")!)
+                  .map<WorldSkillsStats>((e) => WorldSkillsStats.fromJson(e))
+                  .toList(),
+              vda: jsonDecode(prefs.getString("vdaData")!).map<VDAStats>((json) => VDAStats.fromJson(json)).toList(),
+            )
+          : FutureBuilder(
+              future: Future.wait(sortIndex == 9 ? [worldSkillsStats, vdaStats] : [worldSkillsStats]),
+              builder: (context, snapshot) {
+                switch (snapshot.connectionState) {
+                  case ConnectionState.none:
+                  case ConnectionState.waiting:
+                  case ConnectionState.active:
+                    return const SliverToBoxAdapter(child: LinearProgressIndicator());
+                  case ConnectionState.done:
+                    if (snapshot.hasError) {
+                      return const SliverToBoxAdapter(
+                          child: BigErrorMessage(icon: Icons.list_outlined, message: "Unable to load rankings"));
+                    }
+
+                    return RankingsPage(
+                      searchQuery: searchQuery,
+                      sort: rankingSorts[sortIndex],
+                      divisionIndex: division.order - 1,
+                      filter: filter,
+                      skills: widget.tournament.tournamentSkills!,
+                      worldSkills: snapshot.data?[0] as List<WorldSkillsStats>,
+                      vda: sortIndex == 9 ? (snapshot.data?[1] as List<VDAStats>) : null,
+                    );
+                }
+              }),
       SkillsPage(
           skills: widget.tournament.tournamentSkills!,
           teams: widget.tournament.teams,
-          divisions: widget.tournament.divisions),
+          divisions: widget.tournament.divisions,
+        sort: sortIndex,
+        filter: filter,
+      ),
       InfoPage(
         // InfoPage is a StatelessWidget
         tournament: widget.tournament,
@@ -479,52 +513,106 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                           children: [
                             Flexible(
                               flex: 6,
-                              child: Stack(
-                                children: [
-                                  ListView(
-                                    scrollDirection: Axis.horizontal,
-                                    children: List<Widget>.generate(sorts.length, (int index) {
-                                      return Container(
-                                        padding: const EdgeInsets.only(right: 5),
-                                        child: ChoiceChip(
-                                          padding: const EdgeInsets.symmetric(horizontal: 5),
-                                          label: Text(sorts[index],
-                                              style: TextStyle(
-                                                color: Theme.of(context).colorScheme.onSurface,
-                                              )),
-                                          selected: sortIndex == index,
-                                          shape: RoundedRectangleBorder(
-                                              side:
-                                                  BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
-                                              borderRadius: BorderRadius.circular(10)),
-                                          selectedColor: Theme.of(context).colorScheme.primary,
-                                          chipAnimationStyle: ChipAnimationStyle(
-                                              enableAnimation: AnimationStyle(duration: Duration.zero),
-                                              selectAnimation: AnimationStyle(duration: Duration.zero)),
-                                          onSelected: (bool selected) {
-                                            setState(() {
-                                              sortIndex = index;
-                                            });
-                                          },
-                                        ),
-                                      );
-                                    }).toList(),
-                                  ),
-                                  IgnorePointer(
-                                    ignoring: true,
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Theme.of(context).colorScheme.surface.withOpacity(0),
-                                            Theme.of(context).colorScheme.surface,
-                                          ],
-                                          stops: const [0.9, 1.0],
+                              child: NotificationListener<ScrollNotification>(
+                                onNotification: (scrollNotification) {
+                                  setState(() {
+                                    _fadeStart = scrollNotification.metrics.pixels / 10;
+                                    _fadeEnd = (scrollNotification.metrics.maxScrollExtent -
+                                        scrollNotification.metrics.pixels) /
+                                        10;
+
+                                    _fadeStart = _fadeStart.clamp(0.0, 1.0);
+                                    _fadeEnd = _fadeEnd.clamp(0.0, 1.0);
+                                  });
+                                  return true;
+                                },
+                                child: Stack(
+                                  children: [
+                                    ListView(
+                                      scrollDirection: Axis.horizontal,
+                                      children: List<Widget>.generate(rankingSorts.length, (int index) {
+                                        if (index == 9) {
+                                          return FutureBuilder(
+                                              future: vdaStats,
+                                              builder: (context, snapshot) {
+                                                return Container(
+                                                  padding: const EdgeInsets.only(right: 5),
+                                                  child: ChoiceChip(
+                                                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                                                    label: Text(rankingSorts[index],
+                                                        style: TextStyle(
+                                                          color: snapshot.connectionState == ConnectionState.done
+                                                              ? Theme.of(context).colorScheme.onSurface
+                                                              : Theme.of(context).colorScheme.onSurfaceVariant,
+                                                        )),
+                                                    selected: sortIndex == index,
+                                                    shape: RoundedRectangleBorder(
+                                                        side: BorderSide(
+                                                            color: snapshot.connectionState == ConnectionState.done
+                                                                ? Theme.of(context).colorScheme.primary
+                                                                : Theme.of(context).colorScheme.tertiary,
+                                                            width: 1.5),
+                                                        borderRadius: BorderRadius.circular(10)),
+                                                    selectedColor: Theme.of(context).colorScheme.primary,
+                                                    chipAnimationStyle: ChipAnimationStyle(
+                                                        enableAnimation: AnimationStyle(duration: Duration.zero),
+                                                        selectAnimation: AnimationStyle(duration: Duration.zero)),
+                                                    onSelected: snapshot.connectionState == ConnectionState.done
+                                                        ? (bool selected) {
+                                                      setState(() {
+                                                        sortIndex = index;
+                                                      });
+                                                    }
+                                                        : null,
+                                                  ),
+                                                );
+                                              });
+                                        }
+                                        return Container(
+                                          padding: const EdgeInsets.only(right: 5),
+                                          child: ChoiceChip(
+                                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                                            label: Text(rankingSorts[index],
+                                                style: TextStyle(
+                                                  color: Theme.of(context).colorScheme.onSurface,
+                                                )),
+                                            selected: sortIndex == index,
+                                            shape: RoundedRectangleBorder(
+                                                side:
+                                                BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+                                                borderRadius: BorderRadius.circular(10)),
+                                            selectedColor: Theme.of(context).colorScheme.primary,
+                                            disabledColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                                            chipAnimationStyle: ChipAnimationStyle(
+                                                enableAnimation: AnimationStyle(duration: Duration.zero),
+                                                selectAnimation: AnimationStyle(duration: Duration.zero)),
+                                            onSelected: (bool selected) {
+                                              setState(() {
+                                                sortIndex = index;
+                                              });
+                                            },
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                    IgnorePointer(
+                                      ignoring: true,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Theme.of(context).colorScheme.surface,
+                                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                                              Theme.of(context).colorScheme.surface,
+                                            ],
+                                            stops: [0.0, 0.05 * _fadeStart, 1 - 0.05 * _fadeEnd, 1.0],
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                             Flexible(
@@ -548,6 +636,103 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                         ),
                       ),
                     )
+                  : const SliverToBoxAdapter(),
+              selectedIndex == 2
+                  ? SliverToBoxAdapter(
+                child: Container(
+                  padding: const EdgeInsets.only(left: 23),
+                  height: 50,
+                  child: Flex(
+                    direction: Axis.horizontal,
+                    children: [
+                      Flexible(
+                        flex: 6,
+                        child: NotificationListener<ScrollNotification>(
+                          onNotification: (scrollNotification) {
+                            setState(() {
+                              _fadeStart = scrollNotification.metrics.pixels / 10;
+                              _fadeEnd = (scrollNotification.metrics.maxScrollExtent -
+                                  scrollNotification.metrics.pixels) /
+                                  10;
+
+                              _fadeStart = _fadeStart.clamp(0.0, 1.0);
+                              _fadeEnd = _fadeEnd.clamp(0.0, 1.0);
+                            });
+                            return true;
+                          },
+                          child: Stack(
+                            children: [
+                              ListView(
+                                scrollDirection: Axis.horizontal,
+                                children: List<Widget>.generate(skillsSorts.length, (int index) {
+                                  return Container(
+                                    padding: const EdgeInsets.only(right: 5),
+                                    child: ChoiceChip(
+                                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                                      label: Text(skillsSorts[index],
+                                          style: TextStyle(
+                                            color: Theme.of(context).colorScheme.onSurface,
+                                          )),
+                                      selected: sortIndex == index,
+                                      shape: RoundedRectangleBorder(
+                                          side:
+                                          BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+                                          borderRadius: BorderRadius.circular(10)),
+                                      selectedColor: Theme.of(context).colorScheme.primary,
+                                      disabledColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      chipAnimationStyle: ChipAnimationStyle(
+                                          enableAnimation: AnimationStyle(duration: Duration.zero),
+                                          selectAnimation: AnimationStyle(duration: Duration.zero)),
+                                      onSelected: (bool selected) {
+                                        setState(() {
+                                          sortIndex = index;
+                                        });
+                                      },
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                              IgnorePointer(
+                                ignoring: true,
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        Theme.of(context).colorScheme.surface,
+                                        Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                                        Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                                        Theme.of(context).colorScheme.surface,
+                                      ],
+                                      stops: [0, 0.05 * _fadeStart, 1 - 0.05 * _fadeEnd, 1.0],
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Flexible(
+                          flex: 1,
+                          child: IconButton(
+                              icon: const Icon(
+                                Icons.filter_list,
+                                size: 30,
+                              ),
+                              onPressed: () async {
+                                TournamentRankingsFilter updatedFilter = await worldRankingsFilter(
+                                  context,
+                                  filter,
+                                  prefs.getBool("isTournamentMode") ?? false,
+                                );
+                                setState(() {
+                                  filter = updatedFilter;
+                                });
+                              })),
+                    ],
+                  ),
+                ),
+              )
                   : const SliverToBoxAdapter(),
               // selectedIndex == 0 &&
               //         division.games != null &&
@@ -727,6 +912,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
           onPressed: () {
             setState(() {
               selectedIndex = index;
+              sortIndex = 0;
+              _fadeStart = 0;
+              _fadeEnd = 1;
               _scrollController.animateTo(
                 0.0,
                 duration: const Duration(milliseconds: 500),

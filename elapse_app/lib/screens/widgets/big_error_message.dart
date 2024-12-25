@@ -25,7 +25,7 @@ class BigErrorMessage extends StatelessWidget {
           icon,
           size: 128,
           weight: 0.1,
-          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3),
         ),
         SizedBox(
           height: textPadding,
@@ -33,7 +33,7 @@ class BigErrorMessage extends StatelessWidget {
         Text(
           message,
           style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.75),
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
           ),
         ),
       ],

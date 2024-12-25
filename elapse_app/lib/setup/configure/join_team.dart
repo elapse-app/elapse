@@ -138,7 +138,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(9),
                               borderSide: BorderSide(
-                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
                                 width: 2.0,
                               ),
                             ),
@@ -173,25 +173,24 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                       ),
                       SizedBox(height: 16.0),
                       SizedBox(
-                        height: 30,
-                        child: FutureBuilder<List<TeamPreview>>(
-                          future: teamSearch,
-                          builder: (context, snapshot) {
-                            switch (snapshot.connectionState) {
-                              case ConnectionState.none:
-                                return SizedBox.shrink();
-                              case ConnectionState.waiting:
-                              case ConnectionState.active:
-                                return SizedBox(
-                                  width: 30,
-                                  child: CircularProgressIndicator(),
-                                );
-                              case ConnectionState.done:
-                                return Text("Press confirm to continue");
-                            }
-                          },
-                        )
-                      ),
+                          height: 30,
+                          child: FutureBuilder<List<TeamPreview>>(
+                            future: teamSearch,
+                            builder: (context, snapshot) {
+                              switch (snapshot.connectionState) {
+                                case ConnectionState.none:
+                                  return SizedBox.shrink();
+                                case ConnectionState.waiting:
+                                case ConnectionState.active:
+                                  return SizedBox(
+                                    width: 30,
+                                    child: CircularProgressIndicator(),
+                                  );
+                                case ConnectionState.done:
+                                  return Text("Press confirm to continue");
+                              }
+                            },
+                          )),
                       SizedBox(height: 16.0),
                       Padding(
                         padding: EdgeInsets.symmetric(horizontal: 23),
