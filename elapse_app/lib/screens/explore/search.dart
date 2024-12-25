@@ -162,8 +162,8 @@ class _ExploreSearchState extends State<ExploreSearch> with TickerProviderStateM
                                                   icon: Icon(
                                                     Icons.filter_list_outlined,
                                                     size: 20,
-                                                    color: Theme.of(context).colorScheme.secondary.withOpacity(
-                                                        ((constraints.maxHeight - 110) / 20) > 1
+                                                    color: Theme.of(context).colorScheme.secondary.withValues(
+                                                        alpha: ((constraints.maxHeight - 110) / 20) > 1
                                                             ? 1
                                                             : (constraints.maxHeight - 110) / 20),
                                                   ),
@@ -262,8 +262,11 @@ class _ExploreSearchState extends State<ExploreSearch> with TickerProviderStateM
                                               child: Icon(
                                                 Icons.arrow_back_ios_outlined,
                                                 color: currentPage != 1
-                                                    ? Theme.of(context).colorScheme.secondary.withOpacity(rightOpacity)
-                                                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                                                    ? Theme.of(context)
+                                                        .colorScheme
+                                                        .secondary
+                                                        .withValues(alpha: rightOpacity)
+                                                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                                                 size: 20,
                                               ),
                                             ),
@@ -311,8 +314,11 @@ class _ExploreSearchState extends State<ExploreSearch> with TickerProviderStateM
                                               child: Icon(
                                                 Icons.arrow_forward_ios_rounded,
                                                 color: currentPage != snapshot.data?.maxPage
-                                                    ? Theme.of(context).colorScheme.secondary.withOpacity(rightOpacity)
-                                                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.5),
+                                                    ? Theme.of(context)
+                                                        .colorScheme
+                                                        .secondary
+                                                        .withValues(alpha: rightOpacity)
+                                                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
                                                 size: 20,
                                               ),
                                             ),
@@ -381,7 +387,8 @@ class _ExploreSearchState extends State<ExploreSearch> with TickerProviderStateM
                                   teamNumber: team.teamNumber,
                                   teamID: team.teamID,
                                   teamName: team.teamName,
-                                  subInfo: '${team.location?.city ?? ""}${team.location?.city != null ? "," : ""} ${team.location?.region ?? ""}',
+                                  subInfo:
+                                      '${team.location?.city ?? ""}${team.location?.city != null ? "," : ""} ${team.location?.region ?? ""}',
                                   saveSearch: true,
                                   saveState: () {
                                     setState(() {
@@ -427,7 +434,7 @@ class _ExploreSearchState extends State<ExploreSearch> with TickerProviderStateM
                                         children: [
                                           Icon(
                                             Icons.history_rounded,
-                                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                           ),
                                           const SizedBox(
                                             width: 15,
@@ -436,7 +443,7 @@ class _ExploreSearchState extends State<ExploreSearch> with TickerProviderStateM
                                             e.searchTerm,
                                             style: TextStyle(
                                               fontSize: 24,
-                                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                             ),
                                           ),
                                         ],
@@ -552,7 +559,7 @@ class _ExploreSearchState extends State<ExploreSearch> with TickerProviderStateM
                                         children: [
                                           Icon(
                                             Icons.history_rounded,
-                                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                           ),
                                           const SizedBox(
                                             width: 15,
@@ -562,7 +569,7 @@ class _ExploreSearchState extends State<ExploreSearch> with TickerProviderStateM
                                               e.searchTerm,
                                               style: TextStyle(
                                                 fontSize: 18,
-                                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                               ),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
@@ -653,14 +660,14 @@ class _ExploreSearchState extends State<ExploreSearch> with TickerProviderStateM
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: selectedIndex == buttonIndex
-              ? selectedContainerColor.withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)
-              : unselectedContainerColor.withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+              ? selectedContainerColor.withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)
+              : unselectedContainerColor.withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
           border: Border.all(
               width: 1.5,
               color: Theme.of(context)
                   .colorScheme
                   .primary
-                  .withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)),
+                  .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)),
           borderRadius: borderRadius,
         ),
         child: Text(
@@ -669,7 +676,7 @@ class _ExploreSearchState extends State<ExploreSearch> with TickerProviderStateM
             color: Theme.of(context)
                 .colorScheme
                 .secondary
-                .withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+                .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),

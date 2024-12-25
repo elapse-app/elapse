@@ -179,14 +179,14 @@ class _HomeScreenState extends State<HomeScreen> {
                                             "${DateFormat("EEE, MMM d, y").format(upcoming.startDate!)}",
                                             style: TextStyle(
                                                 fontSize: 16,
-                                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+                                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                                           )
                                         : Container(),
                                     upcoming.endDate != null && upcoming.endDate != upcoming.startDate
                                         ? Text(" - ${DateFormat("EEE, MMM d, y").format(upcoming.endDate!)}",
                                             style: TextStyle(
                                               fontSize: 16,
-                                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                             ))
                                         : Container()
                                   ],

@@ -17,8 +17,7 @@ class WorldRankingsSearchScreen extends StatefulWidget {
   final List<VDAStats> vda;
 
   @override
-  State<WorldRankingsSearchScreen> createState() =>
-      _WorldRankingsSearchScreenState();
+  State<WorldRankingsSearchScreen> createState() => _WorldRankingsSearchScreenState();
 }
 
 class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
@@ -48,9 +47,7 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
           e.teamNum.toLowerCase().contains(searchQuery.toLowerCase()));
     }).toList();
     List<VDAStats> filteredVDA = widget.vda.where((e) {
-      return ((e.teamName ?? "")
-              .toLowerCase()
-              .contains(searchQuery.toLowerCase()) ||
+      return ((e.teamName ?? "").toLowerCase().contains(searchQuery.toLowerCase()) ||
           e.teamNum.toLowerCase().contains(searchQuery.toLowerCase()));
     }).toList();
 
@@ -85,14 +82,12 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                               const Spacer(),
                               Flex(
                                   direction: Axis.horizontal,
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   children: [
                                     Flexible(
                                       flex: 1,
                                       child: IconButton(
-                                        icon: const Icon(Icons.arrow_back,
-                                            size: 24),
+                                        icon: const Icon(Icons.arrow_back, size: 24),
                                         onPressed: () => Navigator.pop(context),
                                       ),
                                     ),
@@ -105,9 +100,7 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                                               searchQuery = value;
                                             });
                                           },
-                                          cursorColor: Theme.of(context)
-                                              .colorScheme
-                                              .secondary,
+                                          cursorColor: Theme.of(context).colorScheme.secondary,
                                           decoration: const InputDecoration(
                                             hintText: "Search world rankings",
                                             border: InputBorder.none,
@@ -117,32 +110,21 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                               const Spacer(),
                               if (constraints.maxHeight - 135 + 45 > 0)
                                 SizedBox(
-                                    height: containerHeight > 130
-                                        ? 45
-                                        : containerHeight - 130 + 45,
-                                    child: Flex(
-                                        direction: Axis.horizontal,
-                                        children: [
-                                          Flexible(
-                                            flex: 1,
-                                            child: _filterButton(0,
-                                                constraints.maxHeight, "All"),
-                                          ),
-                                          Flexible(
-                                            flex: 1,
-                                            child: _filterButton(
-                                                1,
-                                                constraints.maxHeight,
-                                                "Skills"),
-                                          ),
-                                          Flexible(
-                                            flex: 1,
-                                            child: _filterButton(
-                                                2,
-                                                constraints.maxHeight,
-                                                "TrueSkill"),
-                                          ),
-                                        ]))
+                                    height: containerHeight > 130 ? 45 : containerHeight - 130 + 45,
+                                    child: Flex(direction: Axis.horizontal, children: [
+                                      Flexible(
+                                        flex: 1,
+                                        child: _filterButton(0, constraints.maxHeight, "All"),
+                                      ),
+                                      Flexible(
+                                        flex: 1,
+                                        child: _filterButton(1, constraints.maxHeight, "Skills"),
+                                      ),
+                                      Flexible(
+                                        flex: 1,
+                                        child: _filterButton(2, constraints.maxHeight, "TrueSkill"),
+                                      ),
+                                    ]))
                               else
                                 const Spacer(),
                               const Spacer(),
@@ -216,9 +198,7 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                             index != filteredSkills.length - 1
                                 ? Divider(
                                     height: 3,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .surfaceDim,
+                                    color: Theme.of(context).colorScheme.surfaceDim,
                                   )
                                 : Container(),
                           ],
@@ -266,9 +246,7 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                             index != filteredVDA.length - 1
                                 ? Divider(
                                     height: 3,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .surfaceDim,
+                                    color: Theme.of(context).colorScheme.surfaceDim,
                                   )
                                 : Container(),
                           ],
@@ -312,37 +290,38 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
       },
       child: AnimatedContainer(
         curve: Curves.fastOutSlowIn,
-        duration:
-            const Duration(milliseconds: 300), // Duration of the animation
+        duration: const Duration(milliseconds: 300), // Duration of the animation
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: selectedIndex == buttonIndex
-              ? selectedContainerColor.withOpacity(
-                  ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)
-              : unselectedContainerColor.withOpacity(
-                  ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+              ? selectedContainerColor.withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)
+              : unselectedContainerColor.withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
           border: buttonIndex == 1
               ? Border.symmetric(
                   horizontal: BorderSide(
                     width: 1.5,
-                    color: Theme.of(context).colorScheme.primary.withOpacity(
-                        ((maxHeight - 85) / 40) > 1
-                            ? 1
-                            : (maxHeight - 85) / 40),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
                   ),
                 )
               : Border.all(
                   width: 1.5,
-                  color: Theme.of(context).colorScheme.primary.withOpacity(
-                      ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
                 ),
           borderRadius: borderRadius,
         ),
         child: Text(
           text,
           style: TextStyle(
-            color: Theme.of(context).colorScheme.secondary.withOpacity(
-                ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+            color: Theme.of(context)
+                .colorScheme
+                .secondary
+                .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),

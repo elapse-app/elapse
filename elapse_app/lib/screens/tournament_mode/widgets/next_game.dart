@@ -164,7 +164,7 @@ class NextGame extends StatelessWidget {
             ),
             SizedBox(height: 10),
             Divider(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
               height: 3,
             ),
             SizedBox(height: 10),

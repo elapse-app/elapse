@@ -176,7 +176,8 @@ class _ManageTeamPageState extends State<ManageTeamPage> {
                                                 textAlign: TextAlign.end,
                                                 style: TextStyle(
                                                   fontSize: 16,
-                                                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.65),
+                                                  color:
+                                                      Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65),
                                                 ))
                                           ],
                                         ),
@@ -266,7 +267,7 @@ class _ManageTeamPageState extends State<ManageTeamPage> {
                                         textAlign: TextAlign.end,
                                         style: TextStyle(
                                           fontSize: 16,
-                                          color: Theme.of(context).colorScheme.onSurface.withOpacity(0.65),
+                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65),
                                         ))
                                   ],
                                 ),

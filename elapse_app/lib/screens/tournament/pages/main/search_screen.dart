@@ -338,8 +338,8 @@ class _SearchScreenState extends State<SearchScreen> {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: selectedIndex == buttonIndex
-              ? selectedContainerColor.withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)
-              : unselectedContainerColor.withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+              ? selectedContainerColor.withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)
+              : unselectedContainerColor.withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
           border: buttonIndex == 1
               ? Border.symmetric(
                   horizontal: BorderSide(
@@ -347,7 +347,7 @@ class _SearchScreenState extends State<SearchScreen> {
                     color: Theme.of(context)
                         .colorScheme
                         .primary
-                        .withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+                        .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
                   ),
                 )
               : Border.all(
@@ -355,7 +355,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   color: Theme.of(context)
                       .colorScheme
                       .primary
-                      .withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+                      .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
                 ),
           borderRadius: borderRadius,
         ),
@@ -365,7 +365,7 @@ class _SearchScreenState extends State<SearchScreen> {
             color: Theme.of(context)
                 .colorScheme
                 .secondary
-                .withOpacity(((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+                .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),
