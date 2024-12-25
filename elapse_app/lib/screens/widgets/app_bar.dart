@@ -123,7 +123,7 @@ class ElapseAppBar extends StatelessWidget {
                             color: Theme.of(context)
                                 .colorScheme
                                 .onSurface
-                                .withOpacity(((constraints.maxHeight -
+                                .withValues(alpha: ((constraints.maxHeight -
                                             MediaQuery.of(context).padding.top -
                                             125) /
                                         -62)

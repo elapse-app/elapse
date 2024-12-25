@@ -144,7 +144,7 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(9),
                             borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
                               width: 2.0,
                             ),
                           ),
@@ -191,7 +191,7 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(9),
                             borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
                               width: 2.0,
                             ),
                           ),
@@ -263,11 +263,10 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                             });
                           } else {
                             Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const JoinTeamPage(),
-                              )
-                            );
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const JoinTeamPage(),
+                                ));
                           }
                         },
                       ),

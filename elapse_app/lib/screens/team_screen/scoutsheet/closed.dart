@@ -109,7 +109,7 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
                                       BackdropFilter(
                                           filter: ImageFilter.blur(sigmaX: 2.5, sigmaY: 2.5),
                                           child: Container(
-                                              decoration: BoxDecoration(color: Colors.white.withOpacity(0.1)))),
+                                              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.1)))),
                                       Center(
                                           child: DefaultTextStyle(
                                               style: const TextStyle(),
@@ -152,13 +152,13 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("${teamNumber} Specs", style: TextStyle(fontSize: 24)),
+            Text("$teamNumber Specs", style: TextStyle(fontSize: 24)),
             SizedBox(height: 18),
             Text(sheet.intakeType, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             Text("Intake Type", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400)),
             SizedBox(height: 12),
             Divider(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
             ),
             SizedBox(height: 12),
             Row(
@@ -189,7 +189,7 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
             SizedBox(height: 12),
             sheet.otherNotes != ""
                 ? Divider(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                   )
                 : SizedBox(),
             sheet.otherNotes != "" ? SizedBox(height: 12) : SizedBox(),
