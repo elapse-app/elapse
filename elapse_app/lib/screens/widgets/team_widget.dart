@@ -9,16 +9,31 @@ class TeamWidget extends StatelessWidget {
     required this.teamNumber,
     required this.teamID,
     this.teamName,
+<<<<<<< HEAD
     this.location,
     this.saveSearch = false,
     this.saveState,
+=======
+    this.subInfo,
+    this.saveSearch = false,
+    this.saveState,
+    this.sort = 0,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
   });
   final String teamNumber;
   final int teamID;
   final String? teamName;
+<<<<<<< HEAD
   final Location? location;
   final bool saveSearch;
   final Function? saveState;
+=======
+  final String? subInfo;
+  final bool saveSearch;
+  final Function? saveState;
+  final int sort;
+
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -83,14 +98,22 @@ class TeamWidget extends StatelessWidget {
                         fontSize: 16,
                       )),
                   Text(
+<<<<<<< HEAD
                       '${location?.city ?? ""}${location?.city != null ? "," : ""} ${location?.region ?? ""}',
+=======
+                      subInfo ?? "",
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                       textAlign: TextAlign.end,
                       style: TextStyle(
                         fontSize: 16,
                         color: Theme.of(context)
                             .colorScheme
                             .onSurface
+<<<<<<< HEAD
                             .withOpacity(0.65),
+=======
+                            .withValues(alpha: 0.65),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                       ))
                 ],
               ),

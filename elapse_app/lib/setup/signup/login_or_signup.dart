@@ -166,7 +166,11 @@ class SignUpPage extends StatelessWidget {
                       ),
                       Text(
                         "More sign up options coming soon",
+<<<<<<< HEAD
                         style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.5)),
+=======
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5)),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                       ),
                       const Spacer(),
                       Column(

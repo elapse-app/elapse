@@ -7,7 +7,11 @@ import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:flutter/material.dart';
 
+<<<<<<< HEAD
 Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNumber) {
+=======
+Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNumber, String teamName) {
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
   Tournament tournament = loadTournament(prefs.getString("recently-opened-tournament"));
 
   int divisionIndex = getTeamDivisionIndex(tournament.divisions, teamID);
@@ -59,6 +63,7 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
               children: [
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+<<<<<<< HEAD
                   children: [
                     Text(
                       "$teamNumber Stats",
@@ -67,6 +72,25 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                     TextButton(
                       iconAlignment: IconAlignment.end,
                       onPressed: () {
+=======
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "$teamNumber Stats",
+                            style: const TextStyle(fontSize: 24, height: 1, fontWeight: FontWeight.w500),
+                          ),
+                          Text(
+                            teamName,
+                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w300),
+                          )
+                        ]),
+                    GestureDetector(
+                      onTap: () {
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -77,6 +101,7 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                           ),
                         );
                       },
+<<<<<<< HEAD
                       child: Row(
                         children: [
                           Text(
@@ -84,6 +109,11 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                             style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.secondary),
                           ),
                         ],
+=======
+                      child: Text(
+                        "View More",
+                        style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.secondary),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                       ),
                     )
                   ],
@@ -92,6 +122,7 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                   height: 20,
                 ),
                 Container(
+<<<<<<< HEAD
                     height: 300,
                     decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(18), color: Theme.of(context).colorScheme.primary),
@@ -102,10 +133,161 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+=======
+                  height: 300,
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(18), color: Theme.of(context).colorScheme.primary),
+                  padding: EdgeInsets.all(18),
+                  child: Column(children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "$rank",
+                              style: const TextStyle(fontSize: 64, letterSpacing: -2, height: 1),
+                            ),
+                            const SizedBox(
+                              height: 4,
+                            ),
+                            const Text(
+                              "Rank",
+                              style: TextStyle(fontSize: 16, height: 1),
+                            )
+                          ],
+                        ),
+                        SizedBox(
+                          width: 125,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "${teamStats.wp}",
+                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500, height: 1),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  const Text(
+                                    "WP",
+                                    style: TextStyle(fontSize: 16),
+                                  )
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "${teamStats.ap}",
+                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500, height: 1),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  const Text(
+                                    "AP",
+                                    style: TextStyle(fontSize: 16),
+                                  )
+                                ],
+                              ),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "${teamStats.sp}",
+                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500, height: 1),
+                                  ),
+                                  const SizedBox(height: 4),
+                                  const Text(
+                                    "SP",
+                                    textAlign: TextAlign.left,
+                                    style: TextStyle(fontSize: 16),
+                                  )
+                                ],
+                              ),
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                    Spacer(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Record",
+                          style: TextStyle(fontSize: 24),
+                        ),
+                        Text("$wins-$losses-$ties", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500))
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 2,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          "Skills Rank",
+                          style: TextStyle(fontSize: 24),
+                        ),
+                        Text("${tournament.tournamentSkills![teamID]?.rank ?? "N/A"}",
+                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500))
+                      ],
+                    ),
+                    const SizedBox(
+                      height: 18,
+                    ),
+                    Divider(
+                      height: 3,
+                    ),
+                    const SizedBox(
+                      height: 18,
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Row(children: [
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "$awp",
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                              ),
+                              const Text(
+                                "AWP",
+                                style: TextStyle(fontSize: 16),
+                              )
+                            ],
+                          ),
+                          const SizedBox(
+                            width: 18,
+                          ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "${(awpRate * 100).toStringAsFixed(1)}%",
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                              ),
+                              const Text(
+                                "AWP %",
+                                style: TextStyle(fontSize: 16),
+                              )
+                            ],
+                          ),
+                        ]),
+                        Row(
+                          children: [
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
+<<<<<<< HEAD
                                   "$rank",
                                   style: const TextStyle(fontSize: 64, letterSpacing: -2, height: 1),
                                 ),
@@ -291,6 +473,52 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                   ]
                     ),
           ),
+=======
+                                  "$opr",
+                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                ),
+                                const Text(
+                                  "OPR",
+                                  style: TextStyle(fontSize: 16),
+                                )
+                              ],
+                            ),
+                            const SizedBox(
+                              width: 18,
+                            ),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "$dpr",
+                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                ),
+                                Text(
+                                  "DPR",
+                                  style: TextStyle(fontSize: 16),
+                                )
+                              ],
+                            ),
+                            const SizedBox(
+                              width: 18,
+                            ),
+                            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                              Text(
+                                "$ccwm",
+                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                              ),
+                              Text(
+                                "CCWM",
+                                style: TextStyle(fontSize: 16),
+                              )
+                            ])
+                          ],
+                        ),
+                      ],
+                    ),
+                  ]),
+                ),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                 const SizedBox(
                   height: 25,
                 ),

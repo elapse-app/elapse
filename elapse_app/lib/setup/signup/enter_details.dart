@@ -144,7 +144,11 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(9),
                             borderSide: BorderSide(
+<<<<<<< HEAD
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+=======
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                               width: 2.0,
                             ),
                           ),
@@ -191,7 +195,11 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(9),
                             borderSide: BorderSide(
+<<<<<<< HEAD
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+=======
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                               width: 2.0,
                             ),
                           ),
@@ -263,11 +271,18 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                             });
                           } else {
                             Navigator.push(
+<<<<<<< HEAD
                               context,
                               MaterialPageRoute(
                                 builder: (context) => const JoinTeamPage(),
                               )
                             );
+=======
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const JoinTeamPage(),
+                                ));
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                           }
                         },
                       ),

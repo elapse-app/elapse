@@ -17,8 +17,12 @@ class WorldRankingsSearchScreen extends StatefulWidget {
   final List<VDAStats> vda;
 
   @override
+<<<<<<< HEAD
   State<WorldRankingsSearchScreen> createState() =>
       _WorldRankingsSearchScreenState();
+=======
+  State<WorldRankingsSearchScreen> createState() => _WorldRankingsSearchScreenState();
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
 }
 
 class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
@@ -48,9 +52,13 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
           e.teamNum.toLowerCase().contains(searchQuery.toLowerCase()));
     }).toList();
     List<VDAStats> filteredVDA = widget.vda.where((e) {
+<<<<<<< HEAD
       return ((e.teamName ?? "")
               .toLowerCase()
               .contains(searchQuery.toLowerCase()) ||
+=======
+      return ((e.teamName ?? "").toLowerCase().contains(searchQuery.toLowerCase()) ||
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
           e.teamNum.toLowerCase().contains(searchQuery.toLowerCase()));
     }).toList();
 
@@ -85,14 +93,22 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                               const Spacer(),
                               Flex(
                                   direction: Axis.horizontal,
+<<<<<<< HEAD
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
+=======
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                   children: [
                                     Flexible(
                                       flex: 1,
                                       child: IconButton(
+<<<<<<< HEAD
                                         icon: const Icon(Icons.arrow_back,
                                             size: 24),
+=======
+                                        icon: const Icon(Icons.arrow_back, size: 24),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                         onPressed: () => Navigator.pop(context),
                                       ),
                                     ),
@@ -105,9 +121,13 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                                               searchQuery = value;
                                             });
                                           },
+<<<<<<< HEAD
                                           cursorColor: Theme.of(context)
                                               .colorScheme
                                               .secondary,
+=======
+                                          cursorColor: Theme.of(context).colorScheme.secondary,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                           decoration: const InputDecoration(
                                             hintText: "Search world rankings",
                                             border: InputBorder.none,
@@ -117,6 +137,7 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                               const Spacer(),
                               if (constraints.maxHeight - 135 + 45 > 0)
                                 SizedBox(
+<<<<<<< HEAD
                                     height: containerHeight > 130
                                         ? 45
                                         : containerHeight - 130 + 45,
@@ -143,6 +164,23 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                                                 "TrueSkill"),
                                           ),
                                         ]))
+=======
+                                    height: containerHeight > 130 ? 45 : containerHeight - 130 + 45,
+                                    child: Flex(direction: Axis.horizontal, children: [
+                                      Flexible(
+                                        flex: 1,
+                                        child: _filterButton(0, constraints.maxHeight, "All"),
+                                      ),
+                                      Flexible(
+                                        flex: 1,
+                                        child: _filterButton(1, constraints.maxHeight, "Skills"),
+                                      ),
+                                      Flexible(
+                                        flex: 1,
+                                        child: _filterButton(2, constraints.maxHeight, "TrueSkill"),
+                                      ),
+                                    ]))
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                               else
                                 const Spacer(),
                               const Spacer(),
@@ -212,6 +250,7 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 23),
                         child: Column(
                           children: [
+<<<<<<< HEAD
                             WorldSkillsWidget(stats: ranking),
                             index != filteredSkills.length - 1
                                 ? Divider(
@@ -219,6 +258,13 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                                     color: Theme.of(context)
                                         .colorScheme
                                         .surfaceDim,
+=======
+                            WorldSkillsWidget(stats: ranking, rank: index + 1),
+                            index != filteredSkills.length - 1
+                                ? Divider(
+                                    height: 3,
+                                    color: Theme.of(context).colorScheme.surfaceDim,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                   )
                                 : Container(),
                           ],
@@ -262,6 +308,7 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 23),
                         child: Column(
                           children: [
+<<<<<<< HEAD
                             WorldTrueSkillWidget(stats: stats),
                             index != filteredVDA.length - 1
                                 ? Divider(
@@ -269,6 +316,13 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                                     color: Theme.of(context)
                                         .colorScheme
                                         .surfaceDim,
+=======
+                            WorldTrueSkillWidget(stats: stats, rank: index + 1),
+                            index != filteredVDA.length - 1
+                                ? Divider(
+                                    height: 3,
+                                    color: Theme.of(context).colorScheme.surfaceDim,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                   )
                                 : Container(),
                           ],
@@ -312,6 +366,7 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
       },
       child: AnimatedContainer(
         curve: Curves.fastOutSlowIn,
+<<<<<<< HEAD
         duration:
             const Duration(milliseconds: 300), // Duration of the animation
         alignment: Alignment.center,
@@ -321,28 +376,57 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                   ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)
               : unselectedContainerColor.withOpacity(
                   ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+=======
+        duration: const Duration(milliseconds: 300), // Duration of the animation
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selectedIndex == buttonIndex
+              ? selectedContainerColor.withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)
+              : unselectedContainerColor.withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
           border: buttonIndex == 1
               ? Border.symmetric(
                   horizontal: BorderSide(
                     width: 1.5,
+<<<<<<< HEAD
                     color: Theme.of(context).colorScheme.primary.withOpacity(
                         ((maxHeight - 85) / 40) > 1
                             ? 1
                             : (maxHeight - 85) / 40),
+=======
+                    color: Theme.of(context)
+                        .colorScheme
+                        .primary
+                        .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                   ),
                 )
               : Border.all(
                   width: 1.5,
+<<<<<<< HEAD
                   color: Theme.of(context).colorScheme.primary.withOpacity(
                       ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+=======
+                  color: Theme.of(context)
+                      .colorScheme
+                      .primary
+                      .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                 ),
           borderRadius: borderRadius,
         ),
         child: Text(
           text,
           style: TextStyle(
+<<<<<<< HEAD
             color: Theme.of(context).colorScheme.secondary.withOpacity(
                 ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+=======
+            color: Theme.of(context)
+                .colorScheme
+                .secondary
+                .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),

@@ -124,6 +124,7 @@ class MyAppState extends State<MyApp> {
     if (!(prefs.getBool("isSetUp") ?? false)) {
       return Consumer<ColorProvider>(
         builder: (context, value, child) {
+<<<<<<< HEAD
           bool systemDefined = false;
           ColorScheme systemTheme =
               MediaQuery.of(context).platformBrightness == Brightness.dark ? darkScheme : lightScheme;
@@ -134,6 +135,13 @@ class MyAppState extends State<MyApp> {
           }
 
           ColorScheme chosenTheme = systemDefined ? systemTheme : value.colorScheme;
+=======
+          prefs.setString("theme", "system");
+          ColorScheme systemTheme =
+              MediaQuery.of(context).platformBrightness == Brightness.dark ? darkScheme : lightScheme;
+
+          ColorScheme chosenTheme = systemTheme;
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
 
           return MaterialApp(
             home: const FirstSetupPage(),

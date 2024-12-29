@@ -37,6 +37,7 @@ class AwardWidget extends StatelessWidget {
               Flexible(
                 flex: 1,
                 child: Text(
+<<<<<<< HEAD
                   "${award.qualifications.join(", ")}",
                   style: TextStyle(
                       fontSize: 18,
@@ -44,16 +45,25 @@ class AwardWidget extends StatelessWidget {
                           .colorScheme
                           .onSurface
                           .withOpacity(0.7)),
+=======
+                  award.qualifications.join(", "),
+                  style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                 ),
               )
             ],
           ),
           Text(
+<<<<<<< HEAD
             "$winnersString",
             style: TextStyle(
                 fontSize: 18,
                 color: Theme.of(context).colorScheme.secondary,
                 fontWeight: FontWeight.w500),
+=======
+            winnersString,
+            style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.secondary, fontWeight: FontWeight.w500),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
           ),
           SizedBox(
             height: 5,

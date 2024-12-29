@@ -19,8 +19,12 @@ class ExploreSearch extends StatefulWidget {
   State<ExploreSearch> createState() => _ExploreSearchState();
 }
 
+<<<<<<< HEAD
 class _ExploreSearchState extends State<ExploreSearch>
     with TickerProviderStateMixin {
+=======
+class _ExploreSearchState extends State<ExploreSearch> with TickerProviderStateMixin {
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
   final FocusNode _focusNode = FocusNode();
   String searchQuery = "";
   int selectedIndex = 0;
@@ -43,8 +47,12 @@ class _ExploreSearchState extends State<ExploreSearch>
       _focusNode.requestFocus();
     });
 
+<<<<<<< HEAD
     List<String> recentTeamStrings =
         prefs.getStringList("recentTeamSearches") ?? <String>[];
+=======
+    List<String> recentTeamStrings = prefs.getStringList("recentTeamSearches") ?? <String>[];
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
 
     for (int i = recentTeamStrings.length - 1; i >= 0; i--) {
       var json = jsonDecode(recentTeamStrings[i]);
@@ -54,8 +62,12 @@ class _ExploreSearchState extends State<ExploreSearch>
       ));
     }
 
+<<<<<<< HEAD
     List<String> recentTournamentStrings =
         prefs.getStringList("recentTournamentSearches") ?? <String>[];
+=======
+    List<String> recentTournamentStrings = prefs.getStringList("recentTournamentSearches") ?? <String>[];
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
 
     for (int i = recentTournamentStrings.length - 1; i >= 0; i--) {
       var json = jsonDecode(recentTournamentStrings[i]);
@@ -115,8 +127,12 @@ class _ExploreSearchState extends State<ExploreSearch>
                               Spacer(),
                               Flex(
                                 direction: Axis.horizontal,
+<<<<<<< HEAD
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
+=======
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                 children: [
                                   Flexible(
                                       flex: 1,
@@ -134,6 +150,7 @@ class _ExploreSearchState extends State<ExploreSearch>
                                       focusNode: _focusNode,
                                       textInputAction: TextInputAction.search,
                                       onSubmitted: _onSearchSubmitted,
+<<<<<<< HEAD
                                       cursorColor: Theme.of(context)
                                           .colorScheme
                                           .secondary,
@@ -141,6 +158,11 @@ class _ExploreSearchState extends State<ExploreSearch>
                                           hintText:
                                               "Search teams or tournaments",
                                           border: InputBorder.none),
+=======
+                                      cursorColor: Theme.of(context).colorScheme.secondary,
+                                      decoration: const InputDecoration(
+                                          hintText: "Search teams or tournaments", border: InputBorder.none),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                     ),
                                   ),
                                 ],
@@ -148,6 +170,7 @@ class _ExploreSearchState extends State<ExploreSearch>
                               Spacer(),
                               if (constraints.maxHeight - 135 + 45 > 0)
                                 Container(
+<<<<<<< HEAD
                                   height: containerHeight > 130
                                       ? 45
                                       : containerHeight - 130 + 45,
@@ -169,6 +192,21 @@ class _ExploreSearchState extends State<ExploreSearch>
                                             1,
                                             constraints.maxHeight,
                                             "Tournaments"),
+=======
+                                  height: containerHeight > 130 ? 45 : containerHeight - 130 + 45,
+                                  child: Flex(
+                                    direction: Axis.horizontal,
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: [
+                                      Flexible(
+                                        flex: 3,
+                                        child: FilterButton(0, constraints.maxHeight, "Teams"),
+                                      ),
+                                      Flexible(
+                                        flex: 3,
+                                        child: FilterButton(1, constraints.maxHeight, "Tournaments"),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                       ),
                                       Flexible(
                                           flex: 1,
@@ -178,6 +216,7 @@ class _ExploreSearchState extends State<ExploreSearch>
                                                   icon: Icon(
                                                     Icons.filter_list_outlined,
                                                     size: 20,
+<<<<<<< HEAD
                                                     color: Theme.of(context)
                                                         .colorScheme
                                                         .secondary
@@ -202,6 +241,18 @@ class _ExploreSearchState extends State<ExploreSearch>
                                                           getTournaments(
                                                               searchQuery,
                                                               filter);
+=======
+                                                    color: Theme.of(context).colorScheme.secondary.withValues(
+                                                        alpha: ((constraints.maxHeight - 110) / 20) > 1
+                                                            ? 1
+                                                            : (constraints.maxHeight - 110) / 20),
+                                                  ),
+                                                  onPressed: () async {
+                                                    final result = await exploreFilter(context, filter);
+                                                    setState(() {
+                                                      filter = result;
+                                                      tournamentSearch = getTournaments(searchQuery, filter);
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                                     });
                                                   },
                                                 )
@@ -237,8 +288,12 @@ class _ExploreSearchState extends State<ExploreSearch>
                     ),
                     Container(
                       height: 60,
+<<<<<<< HEAD
                       padding: const EdgeInsets.symmetric(
                           horizontal: 23, vertical: 10),
+=======
+                      padding: const EdgeInsets.symmetric(horizontal: 23, vertical: 10),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                       decoration: BoxDecoration(
                         color: Theme.of(context).colorScheme.surface,
                         borderRadius: const BorderRadius.only(
@@ -251,8 +306,12 @@ class _ExploreSearchState extends State<ExploreSearch>
                         children: [
                           Text(
                             titles[selectedIndex + 1],
+<<<<<<< HEAD
                             style: const TextStyle(
                                 fontSize: 18, fontWeight: FontWeight.w500),
+=======
+                            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                           ),
                           selectedIndex == 1
                               ? FutureBuilder(
@@ -268,9 +327,13 @@ class _ExploreSearchState extends State<ExploreSearch>
                                                   () {
                                                     currentPage -= 1;
                                                     tournamentSearch =
+<<<<<<< HEAD
                                                         getTournaments(
                                                             searchQuery, filter,
                                                             page: currentPage);
+=======
+                                                        getTournaments(searchQuery, filter, page: currentPage);
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                                   },
                                                 );
                                               }
@@ -292,20 +355,29 @@ class _ExploreSearchState extends State<ExploreSearch>
                                             },
                                             child: AnimatedOpacity(
                                               opacity: leftOpacity,
+<<<<<<< HEAD
                                               duration: const Duration(
                                                   milliseconds: 150),
+=======
+                                              duration: const Duration(milliseconds: 150),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                               child: Icon(
                                                 Icons.arrow_back_ios_outlined,
                                                 color: currentPage != 1
                                                     ? Theme.of(context)
                                                         .colorScheme
                                                         .secondary
+<<<<<<< HEAD
                                                         .withOpacity(
                                                             rightOpacity)
                                                     : Theme.of(context)
                                                         .colorScheme
                                                         .onSurface
                                                         .withOpacity(0.5),
+=======
+                                                        .withValues(alpha: rightOpacity)
+                                                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                                 size: 20,
                                               ),
                                             ),
@@ -322,15 +394,23 @@ class _ExploreSearchState extends State<ExploreSearch>
                                           ),
                                           GestureDetector(
                                             onTap: () {
+<<<<<<< HEAD
                                               if (currentPage !=
                                                   snapshot.data?.maxPage) {
+=======
+                                              if (currentPage != snapshot.data?.maxPage) {
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                                 setState(
                                                   () {
                                                     currentPage += 1;
                                                     tournamentSearch =
+<<<<<<< HEAD
                                                         getTournaments(
                                                             searchQuery, filter,
                                                             page: currentPage);
+=======
+                                                        getTournaments(searchQuery, filter, page: currentPage);
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                                   },
                                                 );
                                               }
@@ -352,6 +432,7 @@ class _ExploreSearchState extends State<ExploreSearch>
                                             },
                                             child: AnimatedOpacity(
                                               opacity: rightOpacity,
+<<<<<<< HEAD
                                               duration: const Duration(
                                                   milliseconds: 150),
                                               child: Icon(
@@ -367,6 +448,17 @@ class _ExploreSearchState extends State<ExploreSearch>
                                                         .colorScheme
                                                         .onSurface
                                                         .withOpacity(0.5),
+=======
+                                              duration: const Duration(milliseconds: 150),
+                                              child: Icon(
+                                                Icons.arrow_forward_ios_rounded,
+                                                color: currentPage != snapshot.data?.maxPage
+                                                    ? Theme.of(context)
+                                                        .colorScheme
+                                                        .secondary
+                                                        .withValues(alpha: rightOpacity)
+                                                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                                 size: 20,
                                               ),
                                             ),
@@ -378,9 +470,13 @@ class _ExploreSearchState extends State<ExploreSearch>
                                         children: [
                                           Icon(
                                             Icons.arrow_back_ios_outlined,
+<<<<<<< HEAD
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .surfaceDim,
+=======
+                                            color: Theme.of(context).colorScheme.surfaceDim,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                             size: 20,
                                           ),
                                           const SizedBox(
@@ -388,9 +484,13 @@ class _ExploreSearchState extends State<ExploreSearch>
                                           ),
                                           Icon(
                                             Icons.arrow_forward_ios_outlined,
+<<<<<<< HEAD
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .surfaceDim,
+=======
+                                            color: Theme.of(context).colorScheme.surfaceDim,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                             size: 20,
                                           ),
                                         ],
@@ -428,12 +528,17 @@ class _ExploreSearchState extends State<ExploreSearch>
               );
             } else if (snapshot.hasData) {
               if (snapshot.data?.isEmpty ?? true) {
+<<<<<<< HEAD
                 return const BigErrorMessage(
                     icon: Icons.search_off_outlined, message: "No Teams Found");
+=======
+                return const BigErrorMessage(icon: Icons.search_off_outlined, message: "No Teams Found");
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
               }
               final uniqueTeams = snapshot.data!.toSet().toList();
               return Column(
                 children: uniqueTeams
+<<<<<<< HEAD
                     .map((team) => Column(
                           children: [
                             TeamWidget(
@@ -456,6 +561,31 @@ class _ExploreSearchState extends State<ExploreSearch>
                           ],
                         ))
                     .toList(),
+=======
+                        .map<Widget>((team) => Column(
+                              children: [
+                                TeamWidget(
+                                  teamNumber: team.teamNumber,
+                                  teamID: team.teamID,
+                                  teamName: team.teamName,
+                                  subInfo:
+                                      '${team.location?.city ?? ""}${team.location?.city != null ? "," : ""} ${team.location?.region ?? ""}',
+                                  saveSearch: true,
+                                  saveState: () {
+                                    setState(() {
+                                      recentTeamSearches
+                                          .add(RecentTeamSearch(searchTerm: team.teamNumber, teamID: team.teamID));
+                                    });
+                                  },
+                                ),
+                                Divider(
+                                  color: Theme.of(context).colorScheme.surfaceDim,
+                                )
+                              ],
+                            ))
+                        .toList() +
+                    [const SizedBox(height: 15)],
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
               );
             } else {
               if (recentTeamSearches.isNotEmpty) {
@@ -486,10 +616,14 @@ class _ExploreSearchState extends State<ExploreSearch>
                                         children: [
                                           Icon(
                                             Icons.history_rounded,
+<<<<<<< HEAD
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .onSurface
                                                 .withOpacity(0.7),
+=======
+                                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                           ),
                                           const SizedBox(
                                             width: 15,
@@ -498,18 +632,26 @@ class _ExploreSearchState extends State<ExploreSearch>
                                             e.searchTerm,
                                             style: TextStyle(
                                               fontSize: 24,
+<<<<<<< HEAD
                                               color: Theme.of(context)
                                                   .colorScheme
                                                   .onSurface
                                                   .withOpacity(0.7),
+=======
+                                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                             ),
                                           ),
                                         ],
                                       ),
                                       Divider(
+<<<<<<< HEAD
                                         color: Theme.of(context)
                                             .colorScheme
                                             .surfaceDim,
+=======
+                                        color: Theme.of(context).colorScheme.surfaceDim,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                       )
                                     ],
                                   ),
@@ -519,8 +661,12 @@ class _ExploreSearchState extends State<ExploreSearch>
                     ),
                     TextButton(
                       style: TextButton.styleFrom(
+<<<<<<< HEAD
                           padding: const EdgeInsets.only(
                               left: 0, top: 10, right: 10, bottom: 10),
+=======
+                          padding: const EdgeInsets.only(left: 0, top: 10, right: 10, bottom: 10),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                           minimumSize: Size(50, 30),
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           alignment: Alignment.centerLeft),
@@ -533,9 +679,13 @@ class _ExploreSearchState extends State<ExploreSearch>
                       child: Text(
                         "Clear Searches",
                         style: TextStyle(
+<<<<<<< HEAD
                             color: Theme.of(context).colorScheme.secondary,
                             fontWeight: FontWeight.w500,
                             fontSize: 14),
+=======
+                            color: Theme.of(context).colorScheme.secondary, fontWeight: FontWeight.w500, fontSize: 14),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                       ),
                     )
                   ],
@@ -575,6 +725,7 @@ class _ExploreSearchState extends State<ExploreSearch>
             }
             if (snapshot.hasData) {
               if (snapshot.data?.tournaments.isEmpty == true) {
+<<<<<<< HEAD
                 return const BigErrorMessage(
                     icon: Icons.search_off_outlined,
                     message: "No Tournaments Found");
@@ -596,6 +747,25 @@ class _ExploreSearchState extends State<ExploreSearch>
                             },
                           ))
                       .toList());
+=======
+                return const BigErrorMessage(icon: Icons.search_off_outlined, message: "No Tournaments Found");
+              }
+              List<TournamentPreview> tournaments = snapshot.data?.tournaments ?? [];
+              return Column(
+                  children: tournaments
+                          .map<Widget>((e) => TournamentPreviewWidget(
+                                tournamentPreview: e,
+                                saveSearch: true,
+                                saveState: () {
+                                  setState(() {
+                                    recentTournamentSearches
+                                        .add(RecentTournamentSearch(searchTerm: e.name, tournamentID: e.id));
+                                  });
+                                },
+                              ))
+                          .toList() +
+                      [const SizedBox(height: 15)]);
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
             } else if (snapshot.hasError) {
               return Center(child: Text("Error: ${snapshot.error}"));
             } else {
@@ -626,10 +796,14 @@ class _ExploreSearchState extends State<ExploreSearch>
                                         children: [
                                           Icon(
                                             Icons.history_rounded,
+<<<<<<< HEAD
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .onSurface
                                                 .withOpacity(0.7),
+=======
+                                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                           ),
                                           const SizedBox(
                                             width: 15,
@@ -639,10 +813,14 @@ class _ExploreSearchState extends State<ExploreSearch>
                                               e.searchTerm,
                                               style: TextStyle(
                                                 fontSize: 18,
+<<<<<<< HEAD
                                                 color: Theme.of(context)
                                                     .colorScheme
                                                     .onSurface
                                                     .withOpacity(0.7),
+=======
+                                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                               ),
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
@@ -651,9 +829,13 @@ class _ExploreSearchState extends State<ExploreSearch>
                                         ],
                                       ),
                                       Divider(
+<<<<<<< HEAD
                                         color: Theme.of(context)
                                             .colorScheme
                                             .surfaceDim,
+=======
+                                        color: Theme.of(context).colorScheme.surfaceDim,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                       )
                                     ],
                                   ),
@@ -663,8 +845,12 @@ class _ExploreSearchState extends State<ExploreSearch>
                     ),
                     TextButton(
                       style: TextButton.styleFrom(
+<<<<<<< HEAD
                           padding: const EdgeInsets.only(
                               left: 0, top: 10, right: 10, bottom: 10),
+=======
+                          padding: const EdgeInsets.only(left: 0, top: 10, right: 10, bottom: 10),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                           minimumSize: Size(50, 30),
                           tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           alignment: Alignment.centerLeft),
@@ -677,9 +863,13 @@ class _ExploreSearchState extends State<ExploreSearch>
                       child: Text(
                         "Clear Searches",
                         style: TextStyle(
+<<<<<<< HEAD
                             color: Theme.of(context).colorScheme.secondary,
                             fontWeight: FontWeight.w500,
                             fontSize: 14),
+=======
+                            color: Theme.of(context).colorScheme.secondary, fontWeight: FontWeight.w500, fontSize: 14),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                       ),
                     )
                   ],
@@ -734,6 +924,7 @@ class _ExploreSearchState extends State<ExploreSearch>
       },
       child: AnimatedContainer(
         curve: Curves.fastOutSlowIn,
+<<<<<<< HEAD
         duration:
             const Duration(milliseconds: 300), // Duration of the animation
         alignment: Alignment.center,
@@ -747,13 +938,34 @@ class _ExploreSearchState extends State<ExploreSearch>
               width: 1.5,
               color: Theme.of(context).colorScheme.primary.withOpacity(
                   ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)),
+=======
+        duration: const Duration(milliseconds: 300), // Duration of the animation
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: selectedIndex == buttonIndex
+              ? selectedContainerColor.withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)
+              : unselectedContainerColor.withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+          border: Border.all(
+              width: 1.5,
+              color: Theme.of(context)
+                  .colorScheme
+                  .primary
+                  .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
           borderRadius: borderRadius,
         ),
         child: Text(
           text,
           style: TextStyle(
+<<<<<<< HEAD
             color: Theme.of(context).colorScheme.secondary.withOpacity(
                 ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+=======
+            color: Theme.of(context)
+                .colorScheme
+                .secondary
+                .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
             fontSize: 14,
             fontWeight: FontWeight.w500,
           ),

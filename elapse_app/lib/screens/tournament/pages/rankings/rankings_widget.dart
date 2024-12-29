@@ -15,14 +15,34 @@ class RankingsWidget extends StatelessWidget {
     super.key,
     required this.teamID,
     required this.teamNumber,
+<<<<<<< HEAD
     required this.allianceColor,
     this.sort = "Rank",
+=======
+    required this.teamName,
+    required this.allianceColor,
+    this.rank,
+    this.sort = "Rank",
+    this.skills,
+    this.worldSkills,
+    this.vda,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
   });
 
   final int teamID;
   final String teamNumber;
+<<<<<<< HEAD
   final Color allianceColor;
   final String sort;
+=======
+  final String teamName;
+  final int? rank;
+  final Color allianceColor;
+  final String sort;
+  final TournamentSkills? skills;
+  final WorldSkillsStats? worldSkills;
+  final VDAStats? vda;
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
 
   @override
   Widget build(BuildContext context) {
@@ -60,11 +80,36 @@ class RankingsWidget extends StatelessWidget {
         val3 = stats.ccwm.toStringAsFixed(1);
         val4 = "CCWM";
         break;
+<<<<<<< HEAD
+=======
+      case "Skills":
+        val1 = "${stats.wins}-${stats.losses}-${stats.ties}";
+        val2 = "${stats.wp} WP";
+        val3 = skills != null ? "Rank ${skills?.rank}" : "N/A";
+        val4 = skills != null ? "${skills?.score} pts" : "N/A";
+        break;
+      case "World Skills":
+        val1 = "${stats.wins}-${stats.losses}-${stats.ties}";
+        val2 = "${stats.wp} WP";
+        val3 = worldSkills != null ? "Rank ${worldSkills?.rank}" : "N/A";
+        val4 = worldSkills != null ? "${worldSkills?.score} pts" : "N/A";
+        break;
+      case "TrueSkill":
+        val1 = "${stats.wins}-${stats.losses}-${stats.ties}";
+        val2 = "${stats.wp} WP";
+        val3 = vda != null ? "Rank ${vda?.trueSkillGlobalRank}" : "N/A";
+        val4 = vda != null ? "${vda?.trueSkill}" : "N/A";
+        break;
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
     }
 
     return GestureDetector(
         behavior: HitTestBehavior.opaque,
+<<<<<<< HEAD
         onTap: () => tournamentStatsPage(context, teamID, teamNumber),
+=======
+        onTap: () => tournamentStatsPage(context, teamID, teamNumber, teamName),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
         child: SizedBox(
             height: 72,
             child: Flex(
@@ -73,6 +118,7 @@ class RankingsWidget extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Flexible(
+<<<<<<< HEAD
                     flex: 42,
                     fit: FlexFit.tight,
                     child: Text("${stats.rank}",
@@ -84,17 +130,51 @@ class RankingsWidget extends StatelessWidget {
                     fit: FlexFit.tight,
                     child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
+=======
+                    flex: 37,
+                    fit: FlexFit.tight,
+                    child: Text(
+                      "${rank ?? stats.rank}",
+                      maxLines: 1,
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, height: 1, color: allianceColor),
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
+                  Flexible(
+                    flex: 90,
+                    fit: FlexFit.tight,
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(teamNumber,
                               style: TextStyle(
+<<<<<<< HEAD
                                   fontSize: 40,
+=======
+                                  fontSize: 32,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                   height: 1,
                                   letterSpacing: -1.5,
                                   fontWeight: FontWeight.w400,
                                   color: allianceColor)),
+<<<<<<< HEAD
                         ]),
                   ),
+=======
+                          Text(teamName,
+                              softWrap: false,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w300,
+                                color: allianceColor.withAlpha(200),
+                                overflow: TextOverflow.fade,
+                              ))
+                        ]),
+                  ),
+                  const Spacer(flex: 5),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                   Flexible(
                     flex: 45,
                     fit: FlexFit.tight,

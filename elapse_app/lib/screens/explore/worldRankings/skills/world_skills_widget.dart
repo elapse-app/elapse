@@ -7,10 +7,18 @@ class WorldSkillsWidget extends StatelessWidget {
   const WorldSkillsWidget({
     super.key,
     required this.stats,
+<<<<<<< HEAD
+=======
+    required this.rank,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
     this.sort = 0,
   });
 
   final WorldSkillsStats stats;
+<<<<<<< HEAD
+=======
+  final int rank;
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
   final int sort;
 
   @override
@@ -18,7 +26,11 @@ class WorldSkillsWidget extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
+<<<<<<< HEAD
         worldSkillsPage(context, stats.teamId, stats.teamNum, stats);
+=======
+        worldSkillsPage(context, stats.teamId, stats.teamNum, stats.teamName, stats);
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
       },
       child: Container(
           height: 72,
@@ -34,26 +46,63 @@ class WorldSkillsWidget extends StatelessWidget {
                     child: Row(children: [
                       Flexible(
                           fit: FlexFit.tight,
+<<<<<<< HEAD
                           flex: 25,
                           child: Text(stats.teamNum,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                   fontSize: 40,
+=======
+                          flex: 30,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(stats.teamNum,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                  fontSize: 32,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                   height: 1,
                                   letterSpacing: -1.5,
                                   fontWeight: FontWeight.w400,
                                   color: Theme.of(context)
                                       .colorScheme
+<<<<<<< HEAD
                                       .onSurface))),
                       Flexible(
                         flex: 10,
+=======
+                                      .onSurface)),
+                              Text(stats.teamName,
+                                softWrap: false,
+                                overflow: TextOverflow.fade,
+                                  style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w300,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant)
+                              )
+                            ]
+                          ),
+                      ),
+                      const Spacer(flex: 5),
+                      Flexible(
+                        flex: 13,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                         fit: FlexFit.tight,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+<<<<<<< HEAD
                             Text("Rank ${stats.rank}",
+=======
+                            Text("Rank $rank",
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                 style: const TextStyle(
                                   fontSize: 16,
                                 )),
@@ -65,7 +114,11 @@ class WorldSkillsWidget extends StatelessWidget {
                         ),
                       ),
                       Flexible(
+<<<<<<< HEAD
                           flex: 5,
+=======
+                          flex: 2,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                           fit: FlexFit.tight,
                           child: SizedBox(
                             height: 50,
@@ -115,6 +168,10 @@ class WorldSkillsWidget extends StatelessWidget {
                                   ])
                             : const SizedBox(),
                       ),
+<<<<<<< HEAD
+=======
+                      const Spacer(flex: 2),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                       Flexible(
                         flex: 10,
                         fit: FlexFit.tight,

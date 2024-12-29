@@ -45,8 +45,12 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                   ),
                   const Text(
                     "Welcome to Elapse!",
+<<<<<<< HEAD
                     style: TextStyle(
                         fontSize: 64, fontWeight: FontWeight.w500, height: 1),
+=======
+                    style: TextStyle(fontSize: 64, fontWeight: FontWeight.w500, height: 1),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                   ),
                   const SizedBox(
                     height: 15,
@@ -71,20 +75,29 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                             });
                           }),
                           cursorColor: Theme.of(context).colorScheme.secondary,
+<<<<<<< HEAD
                           style: TextStyle(
                               fontSize: 32, fontWeight: FontWeight.w500),
                           decoration: const InputDecoration(
                               hintText: "Enter your team"),
+=======
+                          style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500),
+                          decoration: const InputDecoration(hintText: "Enter your team"),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                         ),
                       ),
                       Flexible(
                         flex: 1,
                         child: TextButton(
                           child: Text("Search",
+<<<<<<< HEAD
                               style: TextStyle(
                                   fontSize: 18,
                                   color:
                                       Theme.of(context).colorScheme.secondary)),
+=======
+                              style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.secondary)),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                           onPressed: searchTeam,
                         ),
                       )
@@ -96,8 +109,12 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                   FutureBuilder(
                       future: teamSearch,
                       builder: (context, snapshot) {
+<<<<<<< HEAD
                         if (snapshot.connectionState ==
                             ConnectionState.waiting) {
+=======
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                           return Container();
                         }
                         if (snapshot.hasData) {
@@ -105,19 +122,27 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                             return Text(
                               "No teams found",
                               style: TextStyle(
+<<<<<<< HEAD
                                   color: Theme.of(context)
                                       .colorScheme
                                       .onSurface
                                       .withOpacity(0.75),
                                   fontSize: 18),
+=======
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75), fontSize: 18),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                             );
                           } else {
                             return TextButton(
                                 style: ButtonStyle(
+<<<<<<< HEAD
                                     foregroundColor: WidgetStateProperty.all(
                                         Theme.of(context)
                                             .colorScheme
                                             .secondary)),
+=======
+                                    foregroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.secondary)),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                 onPressed: () {
                                   saveTeam(snapshot.data![0]);
                                 },

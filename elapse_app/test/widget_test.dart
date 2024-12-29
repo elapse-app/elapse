@@ -13,7 +13,11 @@ import 'package:elapse_app/main.dart';
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
+<<<<<<< HEAD
     await tester.pumpWidget(const MyApp(prefs: null,));
+=======
+    await tester.pumpWidget(const MyApp());
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

@@ -55,6 +55,7 @@ class _JoinTeamGroupState extends State<JoinTeamGroup> {
         //     ),
         //   ),
         // ),
+<<<<<<< HEAD
         body: CustomScrollView(
             physics: const NeverScrollableScrollPhysics(),
             slivers: [
@@ -235,5 +236,173 @@ class _JoinTeamGroupState extends State<JoinTeamGroup> {
                 ),
               ),
             ]));
+=======
+        body: CustomScrollView(physics: const NeverScrollableScrollPhysics(), slivers: [
+          ElapseAppBar(
+            title: Row(children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: const Icon(Icons.arrow_back),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Sign up',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontFamily: 'Manrope',
+                  fontWeight: FontWeight.w600,
+                  color: Theme.of(context).colorScheme.onSurface,
+                ),
+              ),
+            ]),
+            maxHeight: 60,
+          ),
+          SliverFillRemaining(
+            hasScrollBody: false,
+            child: Container(
+              height: double.infinity,
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(30),
+                  topRight: Radius.circular(30),
+                ),
+              ),
+              child: Container(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 23.0),
+                  child: Column(
+                    children: [
+                      SizedBox(height: 46),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                        child: Center(
+                          child: RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              text: 'Join a group.',
+                              style: TextStyle(
+                                fontFamily: "Manrope",
+                                fontSize: 32,
+                                fontWeight: FontWeight.w300,
+                                color: Theme.of(context).colorScheme.secondary,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                        child: Center(
+                          child: RichText(
+                            textAlign: TextAlign.center,
+                            text: TextSpan(
+                              text: 'Enter the join code. Make sure to include all characters including the hyphen',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w400,
+                                fontFamily: "Manrope",
+                                fontSize: 16,
+                                color: Color.fromARGB(255, 117, 117, 117),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 24),
+                      TextField(
+                        onChanged: ((value) {
+                          setState(() {
+                            joinCode = value;
+                          });
+                        }),
+                        decoration: InputDecoration(
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(9),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
+                              width: 2.0,
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(9),
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 2.0,
+                            ),
+                          ),
+                          errorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.error,
+                              width: 1.0,
+                            ),
+                          ),
+                          focusedErrorBorder: OutlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Theme.of(context).colorScheme.error,
+                              width: 2.0,
+                            ),
+                          ),
+                          labelText: 'Join Code',
+                          labelStyle: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.w400,
+                            fontFamily: "Manrope",
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                      Spacer(),
+                      SizedBox(
+                        height: 32,
+                      ),
+                      LongButton(
+                        text: "Continue",
+                        onPressed: () async {
+                          Database database = Database();
+                          final currentUser = FirebaseAuth.instance.currentUser;
+                          await database.joinTeamGroup(joinCode, currentUser!.uid).then((value) {
+                            prefs.setString("teamGroup", jsonEncode(value?.toJson()));
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CompleteSetupPage(),
+                              ),
+                            );
+                          }).catchError((onError) {
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text("Error Occured"),
+                                    content: Text("An error occured when creating your account, please try again"),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text(
+                                            "Cancel",
+                                            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                          ))
+                                    ],
+                                  );
+                                });
+                          });
+                        },
+                      ),
+                      SizedBox(height: 38),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ]));
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
   }
 }

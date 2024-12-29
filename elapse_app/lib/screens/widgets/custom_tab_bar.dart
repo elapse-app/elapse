@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 
 class CustomTabBar extends StatefulWidget {
+<<<<<<< HEAD
   const CustomTabBar(
       {super.key,
       required this.tabs,
       required this.onPressed,
       this.initIndex = 0});
   final List<String> tabs;
+=======
+  const CustomTabBar({super.key, required this.tabs, required this.onPressed, this.disabledTabs, this.initIndex = 0});
+  final List<String> tabs;
+  final List<bool>? disabledTabs;
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
   final void Function(int value) onPressed;
   final int initIndex;
 
@@ -21,6 +27,16 @@ class _CustomTabBarState extends State<CustomTabBar> {
   void initState() {
     super.initState();
     selectedItem = widget.initIndex;
+<<<<<<< HEAD
+=======
+    while (widget.disabledTabs != null && widget.disabledTabs![selectedItem]) {
+      selectedItem++;
+      if (selectedItem >= widget.disabledTabs!.length) {
+        selectedItem = 0;
+        break;
+      }
+    }
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
   }
 
   @override
@@ -53,12 +69,23 @@ class _CustomTabBarState extends State<CustomTabBar> {
                     bool isSelected = selectedItem == widget.tabs.indexOf(e);
                     return IntrinsicWidth(
                       child: TextButton(
+<<<<<<< HEAD
                         onPressed: () {
                           setState(() {
                             selectedItem = widget.tabs.indexOf(e);
                           });
                           widget.onPressed(selectedItem);
                         },
+=======
+                        onPressed: widget.disabledTabs == null || !widget.disabledTabs![widget.tabs.indexOf(e)]
+                            ? () {
+                                setState(() {
+                                  selectedItem = widget.tabs.indexOf(e);
+                                });
+                                widget.onPressed(selectedItem);
+                              }
+                            : null,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                         child: Column(
                           children: [
                             Spacer(),
@@ -67,9 +94,15 @@ class _CustomTabBarState extends State<CustomTabBar> {
                               style: TextStyle(
                                   color: isSelected
                                       ? Theme.of(context).colorScheme.secondary
+<<<<<<< HEAD
                                       : Theme.of(context)
                                           .colorScheme
                                           .onSurfaceVariant),
+=======
+                                      : widget.disabledTabs == null || !widget.disabledTabs![widget.tabs.indexOf(e)]
+                                          ? Theme.of(context).colorScheme.onSurface
+                                          : Theme.of(context).colorScheme.onSurfaceVariant),
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                             ),
                             Spacer(),
                             AnimatedContainer(
@@ -77,9 +110,13 @@ class _CustomTabBarState extends State<CustomTabBar> {
                               curve: Curves.easeInOut,
                               height: 3,
                               decoration: BoxDecoration(
+<<<<<<< HEAD
                                 color: isSelected
                                     ? Theme.of(context).colorScheme.secondary
                                     : Colors.transparent,
+=======
+                                color: isSelected ? Theme.of(context).colorScheme.secondary : Colors.transparent,
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                 borderRadius: const BorderRadius.only(
                                   topLeft: Radius.circular(3),
                                   topRight: Radius.circular(3),
@@ -120,15 +157,23 @@ class SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => maxHeight;
 
   @override
+<<<<<<< HEAD
   Widget build(
       BuildContext context, double shrinkOffset, bool overlapsContent) {
+=======
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
     return SizedBox.expand(child: child);
   }
 
   @override
   bool shouldRebuild(SliverHeaderDelegate oldDelegate) {
+<<<<<<< HEAD
     return oldDelegate.minHeight != minHeight ||
         oldDelegate.maxHeight != maxHeight ||
         oldDelegate.child != child;
+=======
+    return oldDelegate.minHeight != minHeight || oldDelegate.maxHeight != maxHeight || oldDelegate.child != child;
+>>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
   }
 }
