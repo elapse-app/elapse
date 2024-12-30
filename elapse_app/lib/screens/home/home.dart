@@ -179,31 +179,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                             "${DateFormat("EEE, MMM d, y").format(upcoming.startDate!)}",
                                             style: TextStyle(
                                                 fontSize: 16,
-<<<<<<< HEAD
                                                 color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
-=======
-                                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                           )
                                         : Container(),
                                     upcoming.endDate != null && upcoming.endDate != upcoming.startDate
                                         ? Text(" - ${DateFormat("EEE, MMM d, y").format(upcoming.endDate!)}",
                                             style: TextStyle(
                                               fontSize: 16,
-<<<<<<< HEAD
                                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
-=======
-                                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                             ))
                                         : Container()
                                   ],
                                 ),
-<<<<<<< HEAD
                                 DateTime.now().compareTo(upcoming.endDate!.add(const Duration(days: 1))) <= 0 &&
-=======
-                                DateTime.now().compareTo(upcoming.endDate!) <= 0 &&
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                         DateTime.now().difference(upcoming.startDate!).inDays > -1
                                     ? Padding(
                                         padding: const EdgeInsets.only(top: 18.0),

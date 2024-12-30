@@ -107,7 +107,6 @@ class _GroupSettingsState extends State<GroupSettings> {
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-<<<<<<< HEAD
                                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                                       IntrinsicWidth(
                                           child: SizedBox(
@@ -164,73 +163,6 @@ class _GroupSettingsState extends State<GroupSettings> {
                                             )
                                           : const SizedBox.shrink(),
                                     ]),
-=======
-                                    SizedBox(
-                                      height: 40,
-                                      child: Flex(
-                                          direction: Axis.horizontal,
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Flexible(
-                                              flex: 5,
-                                              child: editing
-                                                  ? TextFormField(
-                                                      controller: nameEditController,
-                                                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
-                                                      textAlignVertical: TextAlignVertical.center,
-                                                      decoration: InputDecoration(
-                                                        enabledBorder: OutlineInputBorder(
-                                                          borderRadius: BorderRadius.circular(9),
-                                                          borderSide: BorderSide(
-                                                            color: Theme.of(context).colorScheme.primary,
-                                                            width: 2.0,
-                                                          ),
-                                                        ),
-                                                        focusedBorder: OutlineInputBorder(
-                                                          borderRadius: BorderRadius.circular(9),
-                                                          borderSide: BorderSide(
-                                                            color: Theme.of(context).colorScheme.primary,
-                                                            width: 2.0,
-                                                          ),
-                                                        ),
-                                                        contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                                                      ),
-                                                      onFieldSubmitted: (val) {
-                                                        if (val.isEmpty) {
-                                                          nameEditController.text = group.groupName!;
-                                                        }
-                                                      },
-                                                    )
-                                                  : Text("${group.groupName}",
-                                                      style:
-                                                          const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
-                                            ),
-                                            isAdmin
-                                                ? Flexible(
-                                                    flex: 1,
-                                                    child: GestureDetector(
-                                                      onTap: () {
-                                                        setState(() {
-                                                          editing = !editing;
-                                                          if (editing) {
-                                                            nameEditController.text = group.groupName!;
-                                                          } else if (group.groupName != nameEditController.text) {
-                                                            if (nameEditController.text.isEmpty) return;
-
-                                                            group.groupName = nameEditController.text;
-                                                            prefs.setString("teamGroup", jsonEncode(group.toJson()));
-                                                            database.updateGroupName(group.groupId!, group.groupName!);
-                                                          }
-                                                        });
-                                                      },
-                                                      child: Icon(editing ? Icons.done : Icons.edit_outlined,
-                                                          color: Theme.of(context).colorScheme.secondary, size: 24),
-                                                    ),
-                                                  )
-                                                : const SizedBox.shrink(),
-                                          ]),
-                                    ),
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                     const SizedBox(height: 23),
                                     SizedBox(
                                       height: 25,
@@ -652,12 +584,7 @@ class _GroupSettingsState extends State<GroupSettings> {
                                                       child: Text("Delete",
                                                           style: TextStyle(color: Theme.of(context).colorScheme.error)),
                                                       onPressed: () {
-<<<<<<< HEAD
                                                         ElapseUser user = ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
-=======
-                                                        ElapseUser user = ElapseUser.fromJson(
-                                                            jsonDecode(prefs.getString("currentUser")!));
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                                         user.groupID.remove(group.groupId!);
                                                         prefs.setString("currentUser", jsonEncode(user.toJson()));
                                                         database.deleteTeamGroup(group.groupId!);

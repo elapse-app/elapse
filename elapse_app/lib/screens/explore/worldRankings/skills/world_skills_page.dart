@@ -4,11 +4,7 @@ import '../../../../classes/Team/world_skills.dart';
 import '../../../team_screen/team_screen.dart';
 
 Future<void> worldSkillsPage(
-<<<<<<< HEAD
     BuildContext context, int teamID, String teamNum, WorldSkillsStats stats) {
-=======
-    BuildContext context, int teamID, String teamNum, String teamName, WorldSkillsStats stats) {
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
   final DraggableScrollableController dra = DraggableScrollableController();
 
   return showModalBottomSheet<void>(
@@ -37,7 +33,6 @@ Future<void> worldSkillsPage(
                   child: ListView(controller: scrollController, children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-<<<<<<< HEAD
                       children: [
                         Text(
                           "$teamNum Skills",
@@ -50,33 +45,6 @@ Future<void> worldSkillsPage(
                         TextButton(
                           iconAlignment: IconAlignment.end,
                           onPressed: () {
-=======
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "$teamNum Skills",
-                              style: const TextStyle(
-                                fontSize: 24,
-                                height: 1,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              teamName,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w300,
-                              ),
-                            ),
-                          ]
-                        ),
-                        GestureDetector(
-                          onTap: () {
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -87,13 +55,9 @@ Future<void> worldSkillsPage(
                               ),
                             );
                           },
-<<<<<<< HEAD
                           child: Row(
                             children: [
                               Text(
-=======
-                          child: Text(
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                 "View More",
                                 style: TextStyle(
                                   fontSize: 16,
@@ -101,11 +65,8 @@ Future<void> worldSkillsPage(
                                       Theme.of(context).colorScheme.secondary,
                                 ),
                               ),
-<<<<<<< HEAD
                             ],
                           ),
-=======
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                         )
                       ],
                     ),

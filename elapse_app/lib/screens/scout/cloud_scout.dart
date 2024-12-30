@@ -78,11 +78,7 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
                         ),
                         child: InkWell(
                           borderRadius: BorderRadius.circular(18),
-<<<<<<< HEAD
                           splashColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.05),
-=======
-                          splashColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                           onTap: () {
                             Navigator.push(
                                 context,
@@ -124,11 +120,7 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
               ),
             ),
           ),
-<<<<<<< HEAD
           savedTeams == null || savedTeams.isEmpty
-=======
-          savedTeams.isEmpty
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
               ? SliverToBoxAdapter(
                   child: BigErrorMessage(
                       icon: Icons.bookmark_add_outlined, message: "Add some teams from the explore menu"),
@@ -145,12 +137,7 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
                             TeamWidget(
                                 teamNumber: savedTeam.teamNumber,
                                 teamID: savedTeam.teamID,
-<<<<<<< HEAD
                                 location: savedTeam.location,
-=======
-                                subInfo:
-                                    '${savedTeam.location?.city ?? ""}${savedTeam.location?.city != null ? "," : ""} ${savedTeam.location?.region ?? ""}',
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                 teamName: savedTeam.teamName),
                             Divider(
                               color: Theme.of(context).colorScheme.surfaceDim,

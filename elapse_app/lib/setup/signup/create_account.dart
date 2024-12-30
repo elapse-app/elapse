@@ -141,11 +141,7 @@ class _CreateAccountState extends State<CreateAccount> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(9),
                             borderSide: BorderSide(
-<<<<<<< HEAD
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
-=======
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                               width: 2.0,
                             ),
                           ),
@@ -194,11 +190,7 @@ class _CreateAccountState extends State<CreateAccount> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(9),
                             borderSide: BorderSide(
-<<<<<<< HEAD
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
-=======
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                               width: 2.0,
                             ),
                           ),
@@ -252,11 +244,7 @@ class _CreateAccountState extends State<CreateAccount> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(9),
                             borderSide: BorderSide(
-<<<<<<< HEAD
                               color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
-=======
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                               width: 2.0,
                             ),
                           ),
@@ -424,15 +412,8 @@ class _CreateAccountState extends State<CreateAccount> {
                                                                   actions: [
                                                                     TextButton(
                                                                         onPressed: () async {
-<<<<<<< HEAD
                                                                           await FirebaseAuth.instance.currentUser!.reload();
                                                                           await FirebaseAuth.instance.currentUser!.delete();
-=======
-                                                                          await FirebaseAuth.instance.currentUser!
-                                                                              .reload();
-                                                                          await FirebaseAuth.instance.currentUser!
-                                                                              .delete();
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                                                           Navigator.pop(context);
                                                                         },
                                                                         child: Text(

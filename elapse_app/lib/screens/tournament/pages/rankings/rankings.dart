@@ -22,24 +22,12 @@ class RankingsPage extends StatelessWidget {
     required this.sort,
     required this.divisionIndex,
     required this.filter,
-<<<<<<< HEAD
-=======
-    required this.skills,
-    required this.worldSkills,
-    required this.vda,
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
   });
 
   final String searchQuery;
   final int divisionIndex;
   final String sort;
   final TournamentRankingsFilter filter;
-<<<<<<< HEAD
-=======
-  final Map<int, TournamentSkills> skills;
-  final List<WorldSkillsStats> worldSkills;
-  final List<VDAStats>? vda;
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
 
   @override
   Widget build(BuildContext context) {
@@ -108,38 +96,6 @@ class RankingsPage extends StatelessWidget {
       divisionTeams.sort((a, b) {
         return rankings[b.id]!.ccwm.compareTo(rankings[a.id]!.ccwm);
       });
-<<<<<<< HEAD
-=======
-    } else if (sort == "Skills") {
-      divisionTeams.sort((a, b) {
-        return skills[b.id]?.score.compareTo(skills[a.id]?.score ?? 0) ?? 0;
-      });
-    } else if (sort == "World Skills") {
-      divisionTeams.sort((a, b) {
-        return worldSkills
-            .singleWhere((e) => e.teamId == b.id, orElse: () {
-              return WorldSkillsStats(teamId: b.id, teamNum: b.teamNumber ?? "");
-            })
-            .score
-            .compareTo(worldSkills.singleWhere((e) => e.teamId == a.id, orElse: () {
-              return WorldSkillsStats(teamId: b.id, teamNum: b.teamNumber ?? "");
-            }).score);
-      });
-    } else if (sort == "TrueSkill") {
-      if (vda != null) {
-        divisionTeams.sort((a, b) {
-          return vda!
-                  .singleWhere((e) => e.id == b.id)
-                  .trueSkill
-                  ?.compareTo(vda!.singleWhere((e) => e.id == a.id).trueSkill ?? 0) ??
-              0;
-        });
-      } else {
-        divisionTeams.sort((a, b) {
-          return rankings[a.id]!.rank.compareTo(rankings[b.id]!.rank);
-        });
-      }
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
     }
 
     if (searchQuery.isNotEmpty) {
@@ -167,18 +123,8 @@ class RankingsPage extends StatelessWidget {
               RankingsWidget(
                 teamID: team.id,
                 teamNumber: team.teamNumber!,
-<<<<<<< HEAD
                 sort: sort,
                 allianceColor: Theme.of(context).colorScheme.onSurface,
-=======
-                teamName: team.teamName!,
-                rank: index + 1,
-                sort: sort,
-                allianceColor: Theme.of(context).colorScheme.onSurface,
-                skills: skills[team.id],
-                worldSkills: worldSkills.firstWhereOrNull((e) => e.teamId == team.id),
-                vda: vda?.firstWhereOrNull((e) => e.id == team.id),
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
               ),
               Divider(
                 color: Theme.of(context).colorScheme.surfaceDim,

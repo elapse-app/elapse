@@ -4,11 +4,7 @@ import '../../../../classes/Team/vdaStats.dart';
 import '../../../team_screen/team_screen.dart';
 
 Future<void> worldTrueSkillPage(
-<<<<<<< HEAD
     BuildContext context, int teamID, String teamNum, VDAStats stats) {
-=======
-    BuildContext context, int teamID, String teamNum, String teamName, VDAStats stats) {
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
   final DraggableScrollableController dra = DraggableScrollableController();
 
   return showModalBottomSheet<void>(
@@ -37,7 +33,6 @@ Future<void> worldTrueSkillPage(
                   child: ListView(controller: scrollController, children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-<<<<<<< HEAD
                       children: [
                         Text(
                           "$teamNum TrueSkill",
@@ -51,34 +46,6 @@ Future<void> worldTrueSkillPage(
                             ? TextButton(
                           iconAlignment: IconAlignment.end,
                           onPressed: () {
-=======
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "$teamNum TrueSkill",
-                              style: const TextStyle(
-                                fontSize: 24,
-                                height: 1,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            Text(
-                              teamName,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w300,
-                              ),
-                            )
-                          ]
-                        ),
-                        teamID != 0
-                            ? GestureDetector(
-                          onTap: () {
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                             Navigator.push(
                               context,
                               MaterialPageRoute(
@@ -89,13 +56,9 @@ Future<void> worldTrueSkillPage(
                               ),
                             );
                           },
-<<<<<<< HEAD
                           child: Row(
                             children: [
                               Text(
-=======
-                          child: Text(
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                 "View More",
                                 style: TextStyle(
                                   fontSize: 16,
@@ -103,15 +66,10 @@ Future<void> worldTrueSkillPage(
                                       Theme.of(context).colorScheme.secondary,
                                 ),
                               ),
-<<<<<<< HEAD
                             ],
                           ),
                         )
                             : TextButton(onPressed: () {}, child: const SizedBox(),),
-=======
-                        )
-                            : const SizedBox(),
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                       ],
                     ),
                     const SizedBox(

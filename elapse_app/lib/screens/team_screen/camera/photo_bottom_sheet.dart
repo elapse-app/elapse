@@ -10,14 +10,9 @@ import 'package:path/path.dart' as p;
 const int maxFileSize = 5 * 1024 * 1024; // 5 MB
 
 Future<String?> getPhoto(BuildContext context) async {
-<<<<<<< HEAD
   Color redColor = Theme.of(context).brightness == Brightness.light
       ? lightPallete.redAllianceText
       : darkPallete.redAllianceText;
-=======
-  Color redColor =
-      Theme.of(context).brightness == Brightness.light ? lightPallete.redAllianceText : darkPallete.redAllianceText;
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
 
   File? image;
   XFile? imageData;
@@ -75,13 +70,9 @@ Future<String?> getPhoto(BuildContext context) async {
                                             height: 36,
                                             width: 36,
                                             decoration: BoxDecoration(
-<<<<<<< HEAD
                                                 shape: BoxShape.circle,
                                                 color: Colors.black
                                                     .withOpacity(0.5)),
-=======
-                                                shape: BoxShape.circle, color: Colors.black.withValues(alpha: 0.5)),
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                           ),
                                           IconButton(
                                             onPressed: () {
@@ -107,7 +98,6 @@ Future<String?> getPhoto(BuildContext context) async {
                                   children: [
                                     TextButton.icon(
                                       style: TextButton.styleFrom(
-<<<<<<< HEAD
                                         foregroundColor: Theme.of(context)
                                             .colorScheme
                                             .secondary,
@@ -120,15 +110,6 @@ Future<String?> getPhoto(BuildContext context) async {
                                           ),
                                           borderRadius:
                                               BorderRadius.circular(30),
-=======
-                                        foregroundColor: Theme.of(context).colorScheme.secondary,
-                                        shape: RoundedRectangleBorder(
-                                          side: BorderSide(
-                                            color: Theme.of(context).colorScheme.primary,
-                                            width: 2,
-                                          ),
-                                          borderRadius: BorderRadius.circular(30),
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                         ),
                                       ),
                                       onPressed: () async {
@@ -137,12 +118,8 @@ Future<String?> getPhoto(BuildContext context) async {
                                           builder: (context) {
                                             return AlertDialog(
                                               title: Text("Uploading Photo"),
-<<<<<<< HEAD
                                               content: Text(
                                                   "You will be navigated back once the photo is uploaded"),
-=======
-                                              content: Text("You will be navigated back once the photo is uploaded"),
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                                             );
                                           },
                                         );
@@ -161,17 +138,11 @@ Future<String?> getPhoto(BuildContext context) async {
                       SizedBox(height: 36),
                       LongButton(
                         onPressed: () async {
-<<<<<<< HEAD
                           final returnedImage = await ImagePicker()
                               .pickImage(source: ImageSource.camera);
                           if (returnedImage != null) {
                             if (await File(returnedImage.path).length() <=
                                 maxFileSize) {
-=======
-                          final returnedImage = await ImagePicker().pickImage(source: ImageSource.camera);
-                          if (returnedImage != null) {
-                            if (await File(returnedImage.path).length() <= maxFileSize) {
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                               setState(() {
                                 imageData = returnedImage;
                                 image = File(returnedImage.path);
@@ -187,17 +158,11 @@ Future<String?> getPhoto(BuildContext context) async {
                       SizedBox(height: 18),
                       LongButton(
                         onPressed: () async {
-<<<<<<< HEAD
                           final returnedImage = await ImagePicker()
                               .pickImage(source: ImageSource.gallery);
                           if (returnedImage != null) {
                             if (await File(returnedImage.path).length() <=
                                 maxFileSize) {
-=======
-                          final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
-                          if (returnedImage != null) {
-                            if (await File(returnedImage.path).length() <= maxFileSize) {
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                               setState(() {
                                 imageData = returnedImage;
                                 image = File(returnedImage.path);
@@ -238,12 +203,7 @@ Future<String?> uploadFile(XFile? pic) async {
   final file = File(pic.path);
 
   final ref = FirebaseStorage.instance.ref().child(path);
-<<<<<<< HEAD
   final snapshot = await ref.putData(file.readAsBytesSync(), SettableMetadata(contentType: 'image/${p.extension(path).substring(1)}'));
-=======
-  final snapshot = await ref.putData(
-      file.readAsBytesSync(), SettableMetadata(contentType: 'image/${p.extension(path).substring(1)}'));
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
 
   return await snapshot.ref.getDownloadURL();
 

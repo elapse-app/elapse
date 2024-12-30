@@ -6,10 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pinput/pinput.dart';
 
-<<<<<<< HEAD
-=======
-import '../../classes/Groups/teamGroup.dart';
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
 import '../../extras/database.dart';
 import '../../main.dart';
 import '../widgets/app_bar.dart';
@@ -108,33 +104,6 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
               onPressed: () async {
                 Database database = Database();
                 final currentUser = FirebaseAuth.instance.currentUser;
-<<<<<<< HEAD
-=======
-                TeamGroup group = TeamGroup.fromJson((await database.getGroupInfo("${joinCodeController.text.substring(0, 4)}-${joinCodeController.text.substring(4)}"))!);
-                if (!group.allowJoin) {
-                  showDialog(
-                      barrierDismissible: false,
-                      context: context,
-                      builder: (context) {
-                        return AlertDialog(
-                          title: Text("Unable to Join"),
-                          content: Text("This Team Group does not allow others to join."),
-                          actions: [
-                            TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                                child: Text(
-                                  "Close",
-                                  style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-                                ))
-                          ],
-                        );
-                      });
-                  return;
-                }
-
->>>>>>> dbed9adbabfc43517d099a5b670964e9a9abba77
                 await database
                     .joinTeamGroup("${joinCodeController.text.substring(0, 4)}-${joinCodeController.text.substring(4)}",
                         currentUser!.uid)
