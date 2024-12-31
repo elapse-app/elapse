@@ -114,7 +114,10 @@ class _HomeScreenState extends State<HomeScreen> {
                         case ConnectionState.done:
                           if (snapshot.hasError) {
                             print(snapshot.error);
-                            return Column();
+                            return BigErrorMessage(
+                              icon: Icons.cloud_off_outlined,
+                              message: "Failed to load upcoming tournaments.",
+                            );
                           }
 
                           List<TournamentPreview> teamTournaments = snapshot.data as List<TournamentPreview>;
@@ -176,19 +179,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                             "${DateFormat("EEE, MMM d, y").format(upcoming.startDate!)}",
                                             style: TextStyle(
                                                 fontSize: 16,
-                                                color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7)),
+                                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                                           )
                                         : Container(),
                                     upcoming.endDate != null && upcoming.endDate != upcoming.startDate
                                         ? Text(" - ${DateFormat("EEE, MMM d, y").format(upcoming.endDate!)}",
                                             style: TextStyle(
                                               fontSize: 16,
-                                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.7),
+                                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                                             ))
                                         : Container()
                                   ],
                                 ),
-                                DateTime.now().compareTo(upcoming.endDate!.add(const Duration(days: 1))) <= 0 &&
+                                DateTime.now().compareTo(upcoming.endDate!) <= 0 &&
                                         DateTime.now().difference(upcoming.startDate!).inDays > -1
                                     ? Padding(
                                         padding: const EdgeInsets.only(top: 18.0),

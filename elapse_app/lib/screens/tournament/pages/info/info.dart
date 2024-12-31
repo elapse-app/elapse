@@ -29,8 +29,7 @@ class InfoPage extends StatelessWidget {
           children: [
             Container(
               decoration: BoxDecoration(
-                  border: Border.all(
-                      color: Theme.of(context).colorScheme.primary, width: 1),
+                  border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
                   borderRadius: BorderRadius.circular(18)),
               padding: EdgeInsets.all(18),
               child: Column(
@@ -47,7 +46,22 @@ class InfoPage extends StatelessWidget {
                         fontSize: 24,
                         fontWeight: FontWeight.w500,
                       )),
-                  const SizedBox(height: 25),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  TextButton(
+                    style: TextButton.styleFrom(
+                        foregroundColor: Theme.of(context).colorScheme.secondary,
+                        padding: EdgeInsets.only(right: 10, bottom: 10)),
+                    onPressed: () {
+                      launchUrl(Uri.https("www.robotevents.com",
+                          "/robot-competitions/vex-robotics-competition/${tournament.sku}.html"));
+                    },
+                    child: const Text("View on RobotEvents"),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
                   const Text("Location"),
                   SizedBox(
                     height: 5,
@@ -80,8 +94,7 @@ class InfoPage extends StatelessWidget {
                   ),
                   TextButton(
                     style: TextButton.styleFrom(
-                        foregroundColor:
-                            Theme.of(context).colorScheme.secondary,
+                        foregroundColor: Theme.of(context).colorScheme.secondary,
                         padding: EdgeInsets.only(right: 10, bottom: 10)),
                     onPressed: () {
                       MapsLauncher.launchQuery(
@@ -90,7 +103,7 @@ class InfoPage extends StatelessWidget {
                     child: const Text("View in Maps"),
                   ),
                   const SizedBox(
-                    height: 15,
+                    height: 20,
                   ),
                   const Text("Date"),
                   SizedBox(
@@ -106,11 +119,9 @@ class InfoPage extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      tournament.endDate != null &&
-                              tournament.endDate != tournament.startDate
+                      tournament.endDate != null && tournament.endDate != tournament.startDate
                           ? Text(
-                              DateFormat("EEE, MMM d, y")
-                                  .format(tournament.endDate!),
+                              DateFormat("EEE, MMM d, y").format(tournament.endDate!),
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w500,
@@ -119,46 +130,50 @@ class InfoPage extends StatelessWidget {
                           : Container(),
                     ],
                   ),
-                  const SizedBox(
-                    height: 45,
-                  ),
                   FutureBuilder(
                       future: livestream,
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
-                          return const Text(
-                            "No livestream available",
-                            style: TextStyle(fontSize: 20),
-                          );
+                          return Container();
                         }
                         switch (snapshot.connectionState) {
                           case ConnectionState.none:
                           case ConnectionState.waiting:
                           case ConnectionState.active:
-                            return const CircularProgressIndicator();
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                const SizedBox(
+                                  height: 45,
+                                ),
+                                const CircularProgressIndicator(),
+                              ],
+                            );
                           case ConnectionState.done:
                             if (snapshot.data as bool) {
-                              return TextButton.icon(
-                                style: TextButton.styleFrom(
-                                    foregroundColor:
-                                        Theme.of(context).colorScheme.secondary,
-                                    padding: const EdgeInsets.only(
-                                        right: 10, bottom: 10)),
-                                onPressed: () {
-                                  launchUrl(Uri.parse(
-                                      "https://www.robotevents.com/robot-competitions/vex-robotics-competition/${tournament.sku}.html#webcast"));
-                                },
-                                icon: const Icon(Icons.live_tv),
-                                label: const Text(
-                                  "View Livestream",
-                                  style: TextStyle(fontSize: 20),
-                                ),
+                              return Column(
+                                children: [
+                                  const SizedBox(
+                                    height: 45,
+                                  ),
+                                  TextButton.icon(
+                                    style: TextButton.styleFrom(
+                                        foregroundColor: Theme.of(context).colorScheme.secondary,
+                                        padding: const EdgeInsets.only(right: 10, bottom: 10)),
+                                    onPressed: () {
+                                      launchUrl(Uri.parse(
+                                          "https://www.robotevents.com/robot-competitions/vex-robotics-competition/${tournament.sku}.html#webcast"));
+                                    },
+                                    icon: const Icon(Icons.live_tv),
+                                    label: const Text(
+                                      "View Livestream",
+                                      style: TextStyle(fontSize: 20),
+                                    ),
+                                  ),
+                                ],
                               );
                             } else {
-                              return const Text(
-                                "No livestream available",
-                                style: TextStyle(fontSize: 20),
-                              );
+                              return Container();
                             }
                         }
                       })
@@ -174,7 +189,7 @@ class InfoPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (context) => AllTeams(
-                              teams: tournament.teams,
+                              tournament: tournament,
                             )));
               },
               child: Container(
@@ -199,9 +214,8 @@ class InfoPage extends StatelessWidget {
             ),
             Container(
               width: double.infinity,
-              decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.tertiary,
-                  borderRadius: BorderRadius.circular(18)),
+              decoration:
+                  BoxDecoration(color: Theme.of(context).colorScheme.tertiary, borderRadius: BorderRadius.circular(18)),
               padding: EdgeInsets.all(18),
               child: Column(
                 children: [
@@ -216,9 +230,7 @@ class InfoPage extends StatelessWidget {
                     height: 15,
                   ),
                   Column(
-                    children: awards
-                        .map((award) => AwardWidget(award: award))
-                        .toList(),
+                    children: awards.map((award) => AwardWidget(award: award)).toList(),
                   )
                 ],
               ),
@@ -234,8 +246,8 @@ class InfoPage extends StatelessWidget {
 }
 
 Future<bool> hasLivestream(String sku) async {
-  final response = await http.get(Uri.parse(
-      "https://www.robotevents.com/robot-competitions/vex-robotics-competition/$sku.html#general-info"));
+  final response = await http
+      .get(Uri.parse("https://www.robotevents.com/robot-competitions/vex-robotics-competition/$sku.html#general-info"));
   print(response.body.contains("<h4>Webcast</h4>"));
   return response.body.contains("<h4>Webcast</h4>");
 }

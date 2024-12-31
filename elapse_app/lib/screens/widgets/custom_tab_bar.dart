@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 
 class CustomTabBar extends StatefulWidget {
-  const CustomTabBar(
-      {super.key,
-      required this.tabs,
-      required this.onPressed,
-      this.initIndex = 0});
+  const CustomTabBar({super.key, required this.tabs, required this.onPressed, this.disabledTabs, this.initIndex = 0});
   final List<String> tabs;
+  final List<bool>? disabledTabs;
   final void Function(int value) onPressed;
   final int initIndex;
 
@@ -21,6 +18,13 @@ class _CustomTabBarState extends State<CustomTabBar> {
   void initState() {
     super.initState();
     selectedItem = widget.initIndex;
+    while (widget.disabledTabs != null && widget.disabledTabs![selectedItem]) {
+      selectedItem++;
+      if (selectedItem >= widget.disabledTabs!.length) {
+        selectedItem = 0;
+        break;
+      }
+    }
   }
 
   @override
@@ -53,12 +57,14 @@ class _CustomTabBarState extends State<CustomTabBar> {
                     bool isSelected = selectedItem == widget.tabs.indexOf(e);
                     return IntrinsicWidth(
                       child: TextButton(
-                        onPressed: () {
-                          setState(() {
-                            selectedItem = widget.tabs.indexOf(e);
-                          });
-                          widget.onPressed(selectedItem);
-                        },
+                        onPressed: widget.disabledTabs == null || !widget.disabledTabs![widget.tabs.indexOf(e)]
+                            ? () {
+                                setState(() {
+                                  selectedItem = widget.tabs.indexOf(e);
+                                });
+                                widget.onPressed(selectedItem);
+                              }
+                            : null,
                         child: Column(
                           children: [
                             Spacer(),
@@ -67,9 +73,9 @@ class _CustomTabBarState extends State<CustomTabBar> {
                               style: TextStyle(
                                   color: isSelected
                                       ? Theme.of(context).colorScheme.secondary
-                                      : Theme.of(context)
-                                          .colorScheme
-                                          .onSurfaceVariant),
+                                      : widget.disabledTabs == null || !widget.disabledTabs![widget.tabs.indexOf(e)]
+                                          ? Theme.of(context).colorScheme.onSurface
+                                          : Theme.of(context).colorScheme.onSurfaceVariant),
                             ),
                             Spacer(),
                             AnimatedContainer(
@@ -77,9 +83,7 @@ class _CustomTabBarState extends State<CustomTabBar> {
                               curve: Curves.easeInOut,
                               height: 3,
                               decoration: BoxDecoration(
-                                color: isSelected
-                                    ? Theme.of(context).colorScheme.secondary
-                                    : Colors.transparent,
+                                color: isSelected ? Theme.of(context).colorScheme.secondary : Colors.transparent,
                                 borderRadius: const BorderRadius.only(
                                   topLeft: Radius.circular(3),
                                   topRight: Radius.circular(3),
@@ -120,15 +124,12 @@ class SliverHeaderDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => maxHeight;
 
   @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return SizedBox.expand(child: child);
   }
 
   @override
   bool shouldRebuild(SliverHeaderDelegate oldDelegate) {
-    return oldDelegate.minHeight != minHeight ||
-        oldDelegate.maxHeight != maxHeight ||
-        oldDelegate.child != child;
+    return oldDelegate.minHeight != minHeight || oldDelegate.maxHeight != maxHeight || oldDelegate.child != child;
   }
 }

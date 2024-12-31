@@ -9,7 +9,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:1085802258375:android:a445f127ec8ae9650c03e2",
         "android_client_info": {
-          "package_name": "com.example.elapse_app"
+          "package_name": "com.elapseapp.elapse_app"
         }
       },
       "oauth_client": [
@@ -34,7 +34,7 @@
               "client_id": "1085802258375-f1vau2e0ddrdtti51ublrs33jrgnhv23.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.example.elapseApp.RunnerTests"
+                "bundle_id": "com.elapseapp.elapse_app.RunnerTests"
               }
             }
           ]

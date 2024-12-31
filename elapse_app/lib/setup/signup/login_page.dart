@@ -112,7 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(9),
                             borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
                               width: 2.0,
                             ),
                           ),
@@ -155,7 +155,7 @@ class _LoginPageState extends State<LoginPage> {
                           enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(9),
                             borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
                               width: 2.0,
                             ),
                           ),
@@ -210,7 +210,7 @@ class _LoginPageState extends State<LoginPage> {
                                         enabledBorder: OutlineInputBorder(
                                           borderRadius: BorderRadius.circular(9),
                                           borderSide: BorderSide(
-                                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.25),
+                                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
                                             width: 2.0,
                                           ),
                                         ),
@@ -278,7 +278,8 @@ class _LoginPageState extends State<LoginPage> {
                                       onPressed: () async {
                                         FocusManager.instance.primaryFocus?.unfocus();
                                         try {
-                                          await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text);
+                                          await FirebaseAuth.instance
+                                              .sendPasswordResetEmail(email: emailController.text);
                                         } on FirebaseAuthException catch (e) {
                                           print(e.code);
                                           setState(() {
@@ -342,8 +343,9 @@ class _LoginPageState extends State<LoginPage> {
                                     builder: (context) => const CompleteSetupPage(),
                                   ));
                             }
-                          }).catchError((onError) {
+                          }).catchError((onError, stackTrace) {
                             print(onError);
+                            print(stackTrace);
                             showDialog(
                                 barrierDismissible: false,
                                 context: context,

@@ -33,7 +33,7 @@ class RankingsPage extends StatelessWidget {
   final TournamentRankingsFilter filter;
   final Map<int, TournamentSkills> skills;
   final List<WorldSkillsStats> worldSkills;
-  final List<VDAStats> vda;
+  final List<VDAStats>? vda;
 
   @override
   Widget build(BuildContext context) {
@@ -118,13 +118,19 @@ class RankingsPage extends StatelessWidget {
             }).score);
       });
     } else if (sort == "TrueSkill") {
-      divisionTeams.sort((a, b) {
-        return vda
-                .singleWhere((e) => e.id == b.id)
-                .trueSkill
-                ?.compareTo(vda.singleWhere((e) => e.id == a.id).trueSkill ?? 0) ??
-            0;
-      });
+      if (vda != null) {
+        divisionTeams.sort((a, b) {
+          return vda!
+                  .singleWhere((e) => e.id == b.id)
+                  .trueSkill
+                  ?.compareTo(vda!.singleWhere((e) => e.id == a.id).trueSkill ?? 0) ??
+              0;
+        });
+      } else {
+        divisionTeams.sort((a, b) {
+          return rankings[a.id]!.rank.compareTo(rankings[b.id]!.rank);
+        });
+      }
     }
 
     if (searchQuery.isNotEmpty) {
@@ -152,11 +158,13 @@ class RankingsPage extends StatelessWidget {
               RankingsWidget(
                 teamID: team.id,
                 teamNumber: team.teamNumber!,
+                teamName: team.teamName!,
+                rank: index + 1,
                 sort: sort,
                 allianceColor: Theme.of(context).colorScheme.onSurface,
                 skills: skills[team.id],
                 worldSkills: worldSkills.firstWhereOrNull((e) => e.teamId == team.id),
-                vda: vda.firstWhereOrNull((e) => e.id == team.id),
+                vda: vda?.firstWhereOrNull((e) => e.id == team.id),
               ),
               Divider(
                 color: Theme.of(context).colorScheme.surfaceDim,

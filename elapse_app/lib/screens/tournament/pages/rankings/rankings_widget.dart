@@ -15,7 +15,9 @@ class RankingsWidget extends StatelessWidget {
     super.key,
     required this.teamID,
     required this.teamNumber,
+    required this.teamName,
     required this.allianceColor,
+    this.rank,
     this.sort = "Rank",
     this.skills,
     this.worldSkills,
@@ -24,6 +26,8 @@ class RankingsWidget extends StatelessWidget {
 
   final int teamID;
   final String teamNumber;
+  final String teamName;
+  final int? rank;
   final Color allianceColor;
   final String sort;
   final TournamentSkills? skills;
@@ -39,7 +43,10 @@ class RankingsWidget extends StatelessWidget {
     Map<int, TeamStats> rankings = tournament.divisions[divisionIndex].teamStats!;
     TeamStats stats = rankings[teamID]!;
 
-    String val1 = "${stats.wins}-${stats.losses}-${stats.ties}", val2 = "${stats.wp} WP", val3 = "${stats.ap} AP", val4 = "${stats.sp} SP";
+    String val1 = "${stats.wins}-${stats.losses}-${stats.ties}",
+        val2 = "${stats.wp} WP",
+        val3 = "${stats.ap} AP",
+        val4 = "${stats.sp} SP";
     switch (sort) {
       case "Rank":
       case "AP":
@@ -84,106 +91,104 @@ class RankingsWidget extends StatelessWidget {
     }
 
     return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () => tournamentStatsPage(context, teamID, teamNumber),
-      child: SizedBox(
-        height: 72,
-        child: Flex(
-          direction: Axis.horizontal,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Flexible(
-              flex: 42,
-              fit: FlexFit.tight,
-              child: Text("${stats.rank}",
-                maxLines: 1,
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w600,
-                  height: 1,
-                  color: allianceColor
-                )
-              ),
-            ),
-            Flexible(
-              flex: 100,
-              fit: FlexFit.tight,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.start,
+        behavior: HitTestBehavior.opaque,
+        onTap: () => tournamentStatsPage(context, teamID, teamNumber, teamName),
+        child: SizedBox(
+            height: 72,
+            child: Flex(
+                direction: Axis.horizontal,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Text(teamNumber,
-                      style: TextStyle(
-                          fontSize: 40,
-                          height: 1,
-                          letterSpacing: -1.5,
-                          fontWeight: FontWeight.w400,
-                          color: allianceColor)),
-                ]
-              ),
-            ),
-            Flexible(
-              flex: 45,
-              fit: FlexFit.tight,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(val1,
-                      style: const TextStyle(
-                        fontSize: 16,
-                      )),
-                  Text(val2,
-                      style: const TextStyle(
-                        fontSize: 16,
-                      )),
-                ],
-              ),
-            ),
-            Flexible(
-              flex: 2,
-              fit: FlexFit.tight,
-              child: SizedBox(
-                  height: 50,
-                  child: VerticalDivider(
-                    thickness: 0.5,
-                    color: Theme.of(context).colorScheme.surfaceDim,
-                  )),
-            ),
-            Flexible(
-              flex: 45,
-              fit: FlexFit.tight,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(val3,
-                      textAlign: TextAlign.right,
-                      style: const TextStyle(
-                        fontSize: 16,
-                      )),
-                  Text(val4,
-                      textAlign: TextAlign.right,
-                      style: const TextStyle(
-                        fontSize: 16,
-                      )),
-                ],
-              ),
-            )
-          ]
-        )
-      )
-    );
+                  Flexible(
+                    flex: 37,
+                    fit: FlexFit.tight,
+                    child: Text(
+                      "${rank ?? stats.rank}",
+                      maxLines: 1,
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, height: 1, color: allianceColor),
+                      textAlign: TextAlign.start,
+                    ),
+                  ),
+                  Flexible(
+                    flex: 90,
+                    fit: FlexFit.tight,
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(teamNumber,
+                              style: TextStyle(
+                                  fontSize: 32,
+                                  height: 1,
+                                  letterSpacing: -1.5,
+                                  fontWeight: FontWeight.w400,
+                                  color: allianceColor)),
+                          Text(teamName,
+                              softWrap: false,
+                              style: TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w300,
+                                color: allianceColor.withAlpha(200),
+                                overflow: TextOverflow.fade,
+                              ))
+                        ]),
+                  ),
+                  const Spacer(flex: 5),
+                  Flexible(
+                    flex: 45,
+                    fit: FlexFit.tight,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(val1,
+                            style: const TextStyle(
+                              fontSize: 16,
+                            )),
+                        Text(val2,
+                            style: const TextStyle(
+                              fontSize: 16,
+                            )),
+                      ],
+                    ),
+                  ),
+                  Flexible(
+                    flex: 2,
+                    fit: FlexFit.tight,
+                    child: SizedBox(
+                        height: 50,
+                        child: VerticalDivider(
+                          thickness: 0.5,
+                          color: Theme.of(context).colorScheme.surfaceDim,
+                        )),
+                  ),
+                  Flexible(
+                    flex: 45,
+                    fit: FlexFit.tight,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(val3,
+                            textAlign: TextAlign.right,
+                            style: const TextStyle(
+                              fontSize: 16,
+                            )),
+                        Text(val4,
+                            textAlign: TextAlign.right,
+                            style: const TextStyle(
+                              fontSize: 16,
+                            )),
+                      ],
+                    ),
+                  )
+                ])));
   }
 }
 
 class EmptyRanking extends StatelessWidget {
-  const EmptyRanking(
-      {super.key,
-        required this.teamName,
-        required this.teamID,
-        required this.allianceColor});
+  const EmptyRanking({super.key, required this.teamName, required this.teamID, required this.allianceColor});
 
   final String teamName;
   final int teamID;
@@ -207,11 +212,7 @@ class EmptyRanking extends StatelessWidget {
         height: 72,
         child: Text(
           teamName,
-          style: TextStyle(
-              fontSize: 40,
-              height: 1,
-              fontWeight: FontWeight.w400,
-              color: allianceColor),
+          style: TextStyle(fontSize: 40, height: 1, fontWeight: FontWeight.w400, color: allianceColor),
         ),
       ),
     );
