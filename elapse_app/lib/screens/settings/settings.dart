@@ -5,6 +5,7 @@ import 'package:elapse_app/screens/settings/setup_group.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:provider/provider.dart';
@@ -37,6 +38,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   int mainTeamId = jsonDecode(prefs.getString("savedTeam") ?? "")["teamID"];
   bool useLiveTiming = prefs.getBool("useLiveTiming") ?? true;
+  bool useMatchNotifs = prefs.getBool("useMatchNotifs") ?? true;
   bool autoRefresh = prefs.getBool("autoRefresh") ?? true;
   String defaultGrade = prefs.getString("defaultGrade") ?? "Main Team";
   bool sendLTTelemetry = prefs.getBool("sendLTTelemetry") ?? false;
@@ -50,7 +52,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     if (prefs.getString("currentUser") != null) {
-      currentUser = ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
+      currentUser =
+          ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
       teamGroupFuture = getUserTeamGroup(currentUser!.uid!);
     }
   }
@@ -64,7 +67,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
           if (prefs.getString("currentUser") != null) {
             await FirebaseAuth.instance.currentUser!.reload();
             setState(() {
-              currentUser = ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
+              currentUser = ElapseUser.fromJson(
+                  jsonDecode(prefs.getString("currentUser")!));
               teamGroupFuture = getUserTeamGroup(currentUser!.uid!);
             });
           }
@@ -85,7 +89,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onTap: () {
                           Navigator.pop(context);
                         },
-                        child: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
+                        child: Icon(Icons.arrow_back,
+                            color: Theme.of(context).colorScheme.onSurface),
                       ))),
             ),
             const RoundedTop(),
@@ -97,39 +102,66 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Container(
                         height: currentUser != null ? 320 : 400,
                         decoration: BoxDecoration(
-                          border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
+                          border: Border.all(
+                              color: Theme.of(context).colorScheme.primary,
+                              width: 2),
                           borderRadius: BorderRadius.circular(18),
                         ),
                         padding: const EdgeInsets.all(18),
                         child: currentUser != null
                             ? Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                     Column(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
                                           CircleAvatar(
                                             radius: 33,
                                           ),
-                                          Text('${currentUser!.fname!} ${currentUser!.lname!}',
-                                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                                          Text(
+                                              '${currentUser!.fname!} ${currentUser!.lname!}',
+                                              style: const TextStyle(
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.w500)),
                                           GestureDetector(
-                                              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                                Text(currentUser!.email!,
-                                                    style: TextStyle(
-                                                      fontSize: 16,
-                                                      foreground: showEmail
-                                                          ? (Paint()..color = Theme.of(context).colorScheme.secondary)
-                                                          : (Paint()
-                                                            ..style = PaintingStyle.fill
-                                                            ..color = Colors.grey
-                                                            ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 3)),
-                                                    )),
-                                                Text(showEmail ? "Tap to hide email" : "Tap to show email",
-                                                    style: const TextStyle(fontSize: 12)),
-                                              ]),
+                                              child: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(currentUser!.email!,
+                                                        style: TextStyle(
+                                                          fontSize: 16,
+                                                          foreground: showEmail
+                                                              ? (Paint()
+                                                                ..color = Theme.of(
+                                                                        context)
+                                                                    .colorScheme
+                                                                    .secondary)
+                                                              : (Paint()
+                                                                ..style =
+                                                                    PaintingStyle
+                                                                        .fill
+                                                                ..color =
+                                                                    Colors.grey
+                                                                ..maskFilter =
+                                                                    const MaskFilter
+                                                                        .blur(
+                                                                        BlurStyle
+                                                                            .normal,
+                                                                        3)),
+                                                        )),
+                                                    Text(
+                                                        showEmail
+                                                            ? "Tap to hide email"
+                                                            : "Tap to show email",
+                                                        style: const TextStyle(
+                                                            fontSize: 12)),
+                                                  ]),
                                               onTap: () {
                                                 setState(() {
                                                   showEmail = !showEmail;
@@ -144,41 +176,63 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                               mainTeamId = value;
                                             })),
                                     Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 5),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 5),
                                         child: Divider(
-                                          color: Theme.of(context).colorScheme.surfaceDim,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .surfaceDim,
                                         )),
                                     GestureDetector(
                                       onTap: () async {
                                         await Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) => AccountSettings(user: currentUser!),
+                                              builder: (context) =>
+                                                  AccountSettings(
+                                                      user: currentUser!),
                                             ));
                                         setState(() {
-                                          currentUser =
-                                              ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
-                                          mainTeamId = jsonDecode(prefs.getString("savedTeam") ?? "")["teamID"];
+                                          currentUser = ElapseUser.fromJson(
+                                              jsonDecode(prefs
+                                                  .getString("currentUser")!));
+                                          mainTeamId = jsonDecode(
+                                              prefs.getString("savedTeam") ??
+                                                  "")["teamID"];
                                         });
                                       },
                                       behavior: HitTestBehavior.translucent,
-                                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                        const Text("Account Settings",
-                                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
-                                        Icon(Icons.arrow_forward_outlined,
-                                            color: Theme.of(context).colorScheme.onSurfaceVariant),
-                                      ]),
+                                      child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            const Text("Account Settings",
+                                                style: TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight:
+                                                        FontWeight.w300)),
+                                            Icon(Icons.arrow_forward_outlined,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .onSurfaceVariant),
+                                          ]),
                                     ),
                                   ])
                             : Column(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                    Text("Sign Up", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                                    Text("Sign Up",
+                                        style: const TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.w500)),
                                     const SizedBox(height: 18),
                                     Text(
                                         "Currently you are using Elapse without an account. To fully utilise Elapse and gain access to ScoutSheets and Match Notes, create an account or login to an existing one.",
-                                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                        style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: FontWeight.w300),
                                         softWrap: true),
                                     const SizedBox(height: 18),
                                     Row(children: [
@@ -188,14 +242,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                             await Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) => const CreateAccount(),
+                                                  builder: (context) =>
+                                                      const CreateAccount(),
                                                 ));
-                                            if (prefs.getString("currentUser") != null) {
-                                              await FirebaseAuth.instance.currentUser!.reload();
+                                            if (prefs
+                                                    .getString("currentUser") !=
+                                                null) {
+                                              await FirebaseAuth
+                                                  .instance.currentUser!
+                                                  .reload();
                                               setState(() {
-                                                currentUser =
-                                                    ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
-                                                teamGroupFuture = getUserTeamGroup(currentUser!.uid!);
+                                                currentUser = ElapseUser
+                                                    .fromJson(jsonDecode(
+                                                        prefs.getString(
+                                                            "currentUser")!));
+                                                teamGroupFuture =
+                                                    getUserTeamGroup(
+                                                        currentUser!.uid!);
                                               });
                                             }
                                           },
@@ -211,14 +274,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                             await Navigator.push(
                                                 context,
                                                 MaterialPageRoute(
-                                                  builder: (context) => const LoginPage(),
+                                                  builder: (context) =>
+                                                      const LoginPage(),
                                                 ));
-                                            if (prefs.getString("currentUser") != null) {
-                                              await FirebaseAuth.instance.currentUser!.reload();
+                                            if (prefs
+                                                    .getString("currentUser") !=
+                                                null) {
+                                              await FirebaseAuth
+                                                  .instance.currentUser!
+                                                  .reload();
                                               setState(() {
-                                                currentUser =
-                                                    ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
-                                                teamGroupFuture = getUserTeamGroup(currentUser!.uid!);
+                                                currentUser = ElapseUser
+                                                    .fromJson(jsonDecode(
+                                                        prefs.getString(
+                                                            "currentUser")!));
+                                                teamGroupFuture =
+                                                    getUserTeamGroup(
+                                                        currentUser!.uid!);
                                               });
                                             }
                                           },
@@ -231,9 +303,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ]),
                                     const SizedBox(height: 13),
                                     Padding(
-                                        padding: const EdgeInsets.symmetric(vertical: 5),
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 5),
                                         child: Divider(
-                                          color: Theme.of(context).colorScheme.surfaceDim,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .surfaceDim,
                                         )),
                                     buildTeamDropdown(
                                         context,
@@ -247,18 +322,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           await Navigator.push(
                                             context,
                                             MaterialPageRoute(
-                                              builder: (context) => const ManageTeamPage(),
+                                              builder: (context) =>
+                                                  const ManageTeamPage(),
                                             ),
                                           );
                                           setState(() {});
                                         },
                                         behavior: HitTestBehavior.translucent,
-                                        child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                          const Text("Manage Teams",
-                                              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
-                                          Icon(Icons.arrow_forward,
-                                              color: Theme.of(context).colorScheme.onSurfaceVariant),
-                                        ])),
+                                        child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              const Text("Manage Teams",
+                                                  style: TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.w300)),
+                                              Icon(Icons.arrow_forward,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant),
+                                            ])),
                                   ])),
                     const SizedBox(height: 23),
                     currentUser != null
@@ -266,7 +350,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             height: currentUser!.groupID.isNotEmpty ? 200 : 230,
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              border: Border.all(color: Theme.of(context).colorScheme.primary, width: 2),
+                              border: Border.all(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 2),
                               borderRadius: BorderRadius.circular(18),
                             ),
                             padding: const EdgeInsets.all(18),
@@ -278,7 +364,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     case ConnectionState.waiting:
                                     case ConnectionState.active:
                                       return const Center(
-                                          child: SizedBox(height: 30, width: 30, child: CircularProgressIndicator()));
+                                          child: SizedBox(
+                                              height: 30,
+                                              width: 30,
+                                              child:
+                                                  CircularProgressIndicator()));
                                     case ConnectionState.done:
                                       if (snapshot.hasError) {
                                         print(snapshot.error);
@@ -294,102 +384,194 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                                       if (teamGroup != null) {
                                         return Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
                                               Text("${teamGroup.groupName}",
-                                                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                                                  style: const TextStyle(
+                                                      fontSize: 24,
+                                                      fontWeight:
+                                                          FontWeight.w500)),
                                               const SizedBox(height: 18),
-                                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                                const Text("Admin",
-                                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300)),
-                                                Text(teamGroup.members[teamGroup.adminId]!,
-                                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-                                              ]),
-                                              Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                                const Text("Members",
-                                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w300)),
-                                                Text("${teamGroup.members.length}",
-                                                    style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-                                              ]),
+                                              Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    const Text("Admin",
+                                                        style: TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w300)),
+                                                    Text(
+                                                        teamGroup.members[
+                                                            teamGroup.adminId]!,
+                                                        style: const TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500)),
+                                                  ]),
+                                              Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    const Text("Members",
+                                                        style: TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w300)),
+                                                    Text(
+                                                        "${teamGroup.members.length}",
+                                                        style: const TextStyle(
+                                                            fontSize: 18,
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .w500)),
+                                                  ]),
                                               Padding(
-                                                  padding: const EdgeInsets.symmetric(vertical: 5),
+                                                  padding: const EdgeInsets
+                                                      .symmetric(vertical: 5),
                                                   child: Divider(
-                                                    color: Theme.of(context).colorScheme.surfaceDim,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .surfaceDim,
                                                   )),
                                               GestureDetector(
                                                 onTap: () async {
                                                   await Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
-                                                      builder: (context) => GroupSettings(uid: currentUser!.uid!),
+                                                      builder: (context) =>
+                                                          GroupSettings(
+                                                              uid: currentUser!
+                                                                  .uid!),
                                                     ),
                                                   );
                                                   setState(() {
-                                                    currentUser = ElapseUser.fromJson(
-                                                        jsonDecode(prefs.getString("currentUser")!));
-                                                    teamGroupFuture = getUserTeamGroup(currentUser!.uid!);
+                                                    currentUser = ElapseUser
+                                                        .fromJson(jsonDecode(
+                                                            prefs.getString(
+                                                                "currentUser")!));
+                                                    teamGroupFuture =
+                                                        getUserTeamGroup(
+                                                            currentUser!.uid!);
                                                   });
                                                 },
-                                                behavior: HitTestBehavior.translucent,
-                                                child:
-                                                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                                  const Text("Group Settings",
-                                                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
-                                                  Icon(Icons.arrow_forward_outlined,
-                                                      color: Theme.of(context).colorScheme.onSurfaceVariant),
-                                                ]),
+                                                behavior:
+                                                    HitTestBehavior.translucent,
+                                                child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .spaceBetween,
+                                                    children: [
+                                                      const Text(
+                                                          "Group Settings",
+                                                          style: TextStyle(
+                                                              fontSize: 20,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w300)),
+                                                      Icon(
+                                                          Icons
+                                                              .arrow_forward_outlined,
+                                                          color: Theme.of(
+                                                                  context)
+                                                              .colorScheme
+                                                              .onSurfaceVariant),
+                                                    ]),
                                               ),
                                             ]);
                                       }
 
                                       return Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text("Set Up a Group",
-                                                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                                                style: const TextStyle(
+                                                    fontSize: 24,
+                                                    fontWeight:
+                                                        FontWeight.w500)),
                                             const SizedBox(height: 18),
                                             Text(
                                                 "Currently you are not part of a group. To get access to ScoutSheets and MatchNotes, create a new group or join an existing one.",
-                                                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300),
+                                                style: TextStyle(
+                                                    fontSize: 14,
+                                                    fontWeight:
+                                                        FontWeight.w300),
                                                 softWrap: true),
                                             const SizedBox(height: 18),
                                             LongButton(
                                               onPressed: () async {
-                                                if (!FirebaseAuth.instance.currentUser!.emailVerified) {
+                                                if (!FirebaseAuth
+                                                    .instance
+                                                    .currentUser!
+                                                    .emailVerified) {
                                                   showDialog(
                                                       context: context,
                                                       builder: (context) {
                                                         return AlertDialog(
-                                                          title: const Text("Not Verified"),
-                                                          content: const Text("Go to account settings?"),
+                                                          title: const Text(
+                                                              "Not Verified"),
+                                                          content: const Text(
+                                                              "Go to account settings?"),
                                                           contentPadding:
-                                                              const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                                                              const EdgeInsets
+                                                                  .symmetric(
+                                                                  horizontal:
+                                                                      24,
+                                                                  vertical: 10),
                                                           actions: [
                                                             TextButton(
-                                                              child: Text("Cancel",
+                                                              child: Text(
+                                                                  "Cancel",
                                                                   style: TextStyle(
-                                                                      color: Theme.of(context).colorScheme.secondary)),
-                                                              onPressed: () => Navigator.pop(context),
+                                                                      color: Theme.of(
+                                                                              context)
+                                                                          .colorScheme
+                                                                          .secondary)),
+                                                              onPressed: () =>
+                                                                  Navigator.pop(
+                                                                      context),
                                                             ),
                                                             TextButton(
-                                                                child: Text("Yes",
+                                                                child: Text(
+                                                                    "Yes",
                                                                     style: TextStyle(
-                                                                        color:
-                                                                            Theme.of(context).colorScheme.secondary)),
-                                                                onPressed: () => Navigator.pushReplacement(
-                                                                    context,
-                                                                    MaterialPageRoute(
-                                                                      builder: (context) =>
-                                                                          AccountSettings(user: currentUser!),
-                                                                    )))
+                                                                        color: Theme.of(context)
+                                                                            .colorScheme
+                                                                            .secondary)),
+                                                                onPressed: () =>
+                                                                    Navigator.pushReplacement(
+                                                                        context,
+                                                                        MaterialPageRoute(
+                                                                          builder: (context) =>
+                                                                              AccountSettings(user: currentUser!),
+                                                                        )))
                                                           ],
-                                                          actionsPadding: const EdgeInsets.only(bottom: 8, right: 16),
+                                                          actionsPadding:
+                                                              const EdgeInsets
+                                                                  .only(
+                                                                  bottom: 8,
+                                                                  right: 16),
                                                           shape: RoundedRectangleBorder(
                                                               side: BorderSide(
-                                                                  color: Theme.of(context).colorScheme.primary),
-                                                              borderRadius: BorderRadius.circular(18)),
+                                                                  color: Theme.of(
+                                                                          context)
+                                                                      .colorScheme
+                                                                      .primary),
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          18)),
                                                         );
                                                       });
                                                   return;
@@ -397,11 +579,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                 await Navigator.push(
                                                     context,
                                                     MaterialPageRoute(
-                                                      builder: (context) => GroupSetupPage(),
+                                                      builder: (context) =>
+                                                          GroupSetupPage(),
                                                     ));
                                                 setState(() {
-                                                  teamGroup = prefs.getString("teamGroup") != null
-                                                      ? TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup")!))
+                                                  teamGroup = prefs.getString(
+                                                              "teamGroup") !=
+                                                          null
+                                                      ? TeamGroup.fromJson(
+                                                          jsonDecode(
+                                                              prefs.getString(
+                                                                  "teamGroup")!))
                                                       : null;
                                                 });
                                               },
@@ -416,78 +604,165 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     const SizedBox(height: 32),
                     const SizedBox(
                       width: double.infinity,
-                      child: Text("Tournament", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                      child: Text("Tournament",
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.w500)),
                     ),
                     const SizedBox(height: 25),
-                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                      const Text("Use Live Timing", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
-                      Switch(
-                        value: useLiveTiming,
-                        onChanged: (bool? value) {
-                          prefs.setBool("useLiveTiming", value!);
-                          setState(() {
-                            useLiveTiming = value;
-                          });
-                        },
-                      )
-                    ]),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text("Use Live Timing",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w400)),
+                          Switch(
+                            value: useLiveTiming,
+                            onChanged: (bool? value) {
+                              prefs.setBool("useLiveTiming", value!);
+                              setState(() {
+                                useLiveTiming = value;
+                              });
+                            },
+                          )
+                        ]),
+                    Divider(
+                      color: Theme.of(context).colorScheme.surfaceDim,
+                    ),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text("Match Notifications",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w400)),
+                          Switch(
+                            value: useMatchNotifs,
+                            onChanged: (bool? value) async {
+                              prefs.setBool("useMatchNotifs", value!);
+                              setState(() {
+                                useMatchNotifs = value;
+                              });
+                              if (value) {
+                                subToTeamPushNotifs(
+                                    getSavedTeams()[0].teamNumber);
+                              } else {
+                                unsubFromTeamPushNotifs(
+                                    getSavedTeams()[0].teamNumber);
+                              }
+                            },
+                          )
+                        ]),
                     Divider(
                       color: Theme.of(context).colorScheme.surfaceDim,
                     ),
                     const SizedBox(height: 32),
                     const SizedBox(
                       width: double.infinity,
-                      child: Text("General", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                      child: Text("General",
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.w500)),
                     ),
                     const SizedBox(height: 25),
-                    Consumer<ColorProvider>(builder: (context, colorProvider, snapshot) {
-                      return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        const Text("Theme", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
-                        DropdownButtonHideUnderline(
-                          child: DropdownButton(
-                            elevation: 2,
-                            value: theme,
+                    Consumer<ColorProvider>(
+                        builder: (context, colorProvider, snapshot) {
+                      return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text("Theme",
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.w400)),
+                            DropdownButtonHideUnderline(
+                              child: DropdownButton(
+                                elevation: 2,
+                                value: theme,
+                                items: const [
+                                  DropdownMenuItem(
+                                    value: "system",
+                                    child: Text(
+                                      "Follow system",
+                                      textAlign: TextAlign
+                                          .right, // Align text to the right
+                                    ),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: "dark",
+                                    child: Text(
+                                      "Dark",
+                                      textAlign: TextAlign
+                                          .right, // Align text to the right
+                                    ),
+                                  ),
+                                  DropdownMenuItem(
+                                    value: "light",
+                                    child: Text(
+                                      "Light",
+                                      textAlign: TextAlign
+                                          .right, // Align text to the right
+                                    ),
+                                  ),
+                                ],
+                                onChanged: (String? value) {
+                                  switch (value) {
+                                    case "system":
+                                      colorProvider.setSystem();
+                                      break;
+                                    case "dark":
+                                      colorProvider.setDark();
+                                      break;
+                                    case "light":
+                                      colorProvider.setLight();
+                                      break;
+                                    default:
+                                      colorProvider.setSystem();
+                                      break;
+                                  }
+
+                                  setState(() {
+                                    theme = value!;
+                                  });
+                                },
+                                style: TextStyle(
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w400),
+                                icon: const SizedBox.shrink(),
+                                borderRadius: BorderRadius.circular(23),
+
+                                alignment: Alignment
+                                    .centerRight, // Keep dropdown button content aligned
+                              ),
+                            )
+                          ]);
+                    }),
+                    Divider(
+                      color: Theme.of(context).colorScheme.surfaceDim,
+                    ),
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text("Default grade",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w400)),
+                          DropdownButtonHideUnderline(
+                              child: DropdownButton(
+                            value: defaultGrade,
                             items: const [
                               DropdownMenuItem(
-                                value: "system",
-                                child: Text(
-                                  "Follow system",
-                                  textAlign: TextAlign.right, // Align text to the right
-                                ),
-                              ),
+                                  value: "Main Team", child: Text("Main Team")),
                               DropdownMenuItem(
-                                value: "dark",
-                                child: Text(
-                                  "Dark",
-                                  textAlign: TextAlign.right, // Align text to the right
-                                ),
-                              ),
+                                  value: "Middle School",
+                                  child: Text("Middle School")),
                               DropdownMenuItem(
-                                value: "light",
-                                child: Text(
-                                  "Light",
-                                  textAlign: TextAlign.right, // Align text to the right
-                                ),
-                              ),
+                                  value: "High School",
+                                  child: Text("High School")),
+                              DropdownMenuItem(
+                                  value: "College", child: Text("College"))
                             ],
                             onChanged: (String? value) {
-                              switch (value) {
-                                case "system":
-                                  colorProvider.setSystem();
-                                  break;
-                                case "dark":
-                                  colorProvider.setDark();
-                                  break;
-                                case "light":
-                                  colorProvider.setLight();
-                                  break;
-                                default:
-                                  colorProvider.setSystem();
-                                  break;
-                              }
+                              prefs.setString("defaultGrade", value!);
 
                               setState(() {
-                                theme = value!;
+                                defaultGrade = value;
                               });
                             },
                             style: TextStyle(
@@ -495,60 +770,38 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 fontSize: 18,
                                 fontWeight: FontWeight.w400),
                             icon: const SizedBox.shrink(),
-                            borderRadius: BorderRadius.circular(23),
-
-                            alignment: Alignment.centerRight, // Keep dropdown button content aligned
-                          ),
-                        )
-                      ]);
-                    }),
-                    Divider(
-                      color: Theme.of(context).colorScheme.surfaceDim,
-                    ),
-                    Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                      const Text("Default grade", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
-                      DropdownButtonHideUnderline(
-                          child: DropdownButton(
-                        value: defaultGrade,
-                        items: const [
-                          DropdownMenuItem(value: "Main Team", child: Text("Main Team")),
-                          DropdownMenuItem(value: "Middle School", child: Text("Middle School")),
-                          DropdownMenuItem(value: "High School", child: Text("High School")),
-                          DropdownMenuItem(value: "College", child: Text("College"))
-                        ],
-                        onChanged: (String? value) {
-                          prefs.setString("defaultGrade", value!);
-
-                          setState(() {
-                            defaultGrade = value;
-                          });
-                        },
-                        style: TextStyle(
-                            color: Theme.of(context).colorScheme.secondary, fontSize: 18, fontWeight: FontWeight.w400),
-                        icon: const SizedBox.shrink(),
-                        borderRadius: BorderRadius.circular(10),
-                        alignment: Alignment.centerRight,
-                      )),
-                    ]),
+                            borderRadius: BorderRadius.circular(10),
+                            alignment: Alignment.centerRight,
+                          )),
+                        ]),
                     Divider(
                       color: Theme.of(context).colorScheme.surfaceDim,
                     ),
                     const SizedBox(height: 32),
                     const SizedBox(
                       width: double.infinity,
-                      child: Text("Other", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                      child: Text("Other",
+                          style: TextStyle(
+                              fontSize: 24, fontWeight: FontWeight.w500)),
                     ),
                     const SizedBox(height: 25),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 9),
-                      child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                        const Text("Version", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
-                        Text("${appInfo.version} (Build ${appInfo.buildNumber})",
-                            style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w400,
-                                color: Theme.of(context).colorScheme.onSurfaceVariant))
-                      ]),
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text("Version",
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.w400)),
+                            Text(
+                                "${appInfo.version} (Build ${appInfo.buildNumber})",
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w400,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurfaceVariant))
+                          ]),
                     ),
                     Divider(
                       color: Theme.of(context).colorScheme.surfaceDim,
@@ -557,11 +810,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 9),
                       child: GestureDetector(
                         onTap: () {
-                          launchUrl(Uri.parse("https://forms.gle/MF3K7JYG572AQvKh8"));
+                          launchUrl(
+                              Uri.parse("https://forms.gle/MF3K7JYG572AQvKh8"));
                         },
                         child: const SizedBox(
                           width: double.infinity,
-                          child: Text("Send Feedback", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w400)),
+                          child: Text("Send Feedback",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w400)),
                         ),
                       ),
                     ),
@@ -584,14 +840,38 @@ List<TeamPreview> getSavedTeams() {
   List<TeamPreview> savedTeamsList = [];
 
   final List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
-  savedTeamsList.addAll(
-      savedTeams.map((e) => TeamPreview(teamID: jsonDecode(e)["teamID"], teamNumber: jsonDecode(e)["teamNumber"])));
+  savedTeamsList.addAll(savedTeams.map((e) => TeamPreview(
+      teamID: jsonDecode(e)["teamID"],
+      teamNumber: jsonDecode(e)["teamNumber"])));
   savedTeamsList.insert(0, loadTeamPreview(savedTeam));
 
   return savedTeamsList;
 }
 
-Widget buildTeamDropdown(BuildContext context, int mainTeamId, void Function(int) update) {
+Future<void> subToTeamPushNotifs(String teamNum) async {
+  print('Attempting to subscribe to topic: $teamNum');
+  try {
+    // Subscribing the user to the specified topic
+    await FirebaseMessaging.instance.subscribeToTopic(teamNum);
+    print('Successfully subscribed to topic: $teamNum');
+  } catch (e) {
+    print('Failed to subscribe to topic: $e');
+  }
+}
+
+Future<void> unsubFromTeamPushNotifs(String teamNum) async {
+  print('Attempting to unsubscribe from topic: $teamNum');
+  try {
+    // Subscribing the user to the specified topic
+    await FirebaseMessaging.instance.unsubscribeFromTopic(teamNum);
+    print('Successfully unsubscribed from topic: $teamNum');
+  } catch (e) {
+    print('Failed to unsubscribe from topic: $e');
+  }
+}
+
+Widget buildTeamDropdown(
+    BuildContext context, int mainTeamId, void Function(int) update) {
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
     decoration: BoxDecoration(
@@ -599,7 +879,8 @@ Widget buildTeamDropdown(BuildContext context, int mainTeamId, void Function(int
       borderRadius: BorderRadius.circular(10),
     ),
     child: Row(children: [
-      Icon(Icons.group_outlined, color: Theme.of(context).colorScheme.secondary),
+      Icon(Icons.group_outlined,
+          color: Theme.of(context).colorScheme.secondary),
       const SizedBox(width: 15),
       Expanded(
         child: getSavedTeams().length > 1
@@ -608,60 +889,82 @@ Widget buildTeamDropdown(BuildContext context, int mainTeamId, void Function(int
                   isExpanded: true,
                   value: mainTeamId,
                   items: getSavedTeams()
-                      .map((e) => DropdownMenuItem(value: e.teamID, child: Text("Team ${e.teamNumber}")))
+                      .map((e) => DropdownMenuItem(
+                          value: e.teamID, child: Text("Team ${e.teamNumber}")))
                       .toList(),
                   onChanged: (int? value) {
                     final String savedTeam = prefs.getString("savedTeam") ?? "";
-                    final List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
-                    String? selected = savedTeams.firstWhereOrNull((e) => jsonDecode(e)["teamID"] == value);
+                    final List<String> savedTeams =
+                        prefs.getStringList("savedTeams") ?? [];
+                    String? selected = savedTeams.firstWhereOrNull(
+                        (e) => jsonDecode(e)["teamID"] == value);
                     if (selected == null) return;
 
                     Tournament? tournament;
                     if (prefs.getBool("isTournamentMode") ?? false) {
-                      tournament = loadTournament(prefs.getString("TMSavedTournament"));
+                      tournament =
+                          loadTournament(prefs.getString("TMSavedTournament"));
                     }
 
                     if (tournament != null &&
-                        tournament.teams.singleWhereOrNull((e) => e.id == loadTeamPreview(selected).teamID) == null) {
+                        tournament.teams.singleWhereOrNull((e) =>
+                                e.id == loadTeamPreview(selected).teamID) ==
+                            null) {
                       showDialog(
                           context: context,
                           builder: (context) {
                             return AlertDialog(
                               title: const Text("Switch main team"),
-                              content: const Text("You will be exiting Tournament Mode."),
-                              contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+                              content: const Text(
+                                  "You will be exiting Tournament Mode."),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  horizontal: 24, vertical: 10),
                               actions: [
                                 TextButton(
-                                  child:
-                                      Text("Cancel", style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                                  child: Text("Cancel",
+                                      style: TextStyle(
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .secondary)),
                                   onPressed: () => Navigator.pop(context),
                                 ),
                                 TextButton(
                                     child: Text("Switch",
-                                        style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
+                                        style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondary)),
                                     onPressed: () {
-                                      savedTeams.removeWhere((e) => jsonDecode(e)["teamID"] == value);
+                                      savedTeams.removeWhere((e) =>
+                                          jsonDecode(e)["teamID"] == value);
                                       savedTeams.add(savedTeam);
-                                      prefs.setStringList("savedTeams", savedTeams);
+                                      prefs.setStringList(
+                                          "savedTeams", savedTeams);
                                       prefs.setString("savedTeam", selected);
 
                                       update(value!);
 
                                       prefs.setBool("isTournamentMode", false);
-                                      prefs.remove("tournament-${tournament!.id}");
+                                      prefs.remove(
+                                          "tournament-${tournament!.id}");
                                       prefs.remove("TMSavedTournament");
                                       myAppKey.currentState!.reloadApp();
                                       Navigator.pop(context);
                                     })
                               ],
-                              actionsPadding: const EdgeInsets.only(bottom: 8, right: 16),
+                              actionsPadding:
+                                  const EdgeInsets.only(bottom: 8, right: 16),
                               shape: RoundedRectangleBorder(
-                                  side: BorderSide(color: Theme.of(context).colorScheme.primary),
+                                  side: BorderSide(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
                                   borderRadius: BorderRadius.circular(18)),
                             );
                           });
                     } else {
-                      savedTeams.removeWhere((e) => jsonDecode(e)["teamID"] == value);
+                      savedTeams
+                          .removeWhere((e) => jsonDecode(e)["teamID"] == value);
                       savedTeams.add(savedTeam);
                       prefs.setStringList("savedTeams", savedTeams);
                       prefs.setString("savedTeam", selected);
@@ -670,16 +973,21 @@ Widget buildTeamDropdown(BuildContext context, int mainTeamId, void Function(int
                     }
                   },
                   style: TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.w400, color: Theme.of(context).colorScheme.secondary),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w400,
+                      color: Theme.of(context).colorScheme.secondary),
                   borderRadius: BorderRadius.circular(10),
-                  icon: Icon(Icons.arrow_drop_down, color: Theme.of(context).colorScheme.secondary),
+                  icon: Icon(Icons.arrow_drop_down,
+                      color: Theme.of(context).colorScheme.secondary),
                 ),
               )
             : Padding(
                 padding: const EdgeInsets.all(10),
                 child: Text("Team ${getSavedTeams()[0].teamNumber}",
                     style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.w400, color: Theme.of(context).colorScheme.secondary))),
+                        fontSize: 18,
+                        fontWeight: FontWeight.w400,
+                        color: Theme.of(context).colorScheme.secondary))),
       )
     ]),
   );
