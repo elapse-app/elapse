@@ -2,7 +2,7 @@ import 'package:elapse_app/main.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/long_button.dart';
-import 'package:elapse_app/setup/configure/tournament_mode_setup.dart';
+import 'package:elapse_app/setup/configure/match_notifs_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -137,7 +137,7 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => TournamentModeSetupPage(),
+                                    builder: (context) => NotifsSetup(),
                                   ),
                                 );
                               },

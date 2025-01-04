@@ -20,6 +20,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
@@ -27,6 +28,17 @@ import 'firebase_options.dart';
 final GlobalKey<MyAppState> myAppKey = GlobalKey<MyAppState>();
 late SharedPreferences prefs;
 late PackageInfo appInfo;
+
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `initializeApp` before using other Firebase services.
+  await Firebase.initializeApp();
+
+  print("Handling a background message: ${message.messageId}");
+}
+
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
@@ -46,7 +58,8 @@ void main() async {
 
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-  if ((prefs.getBool("isSetUp") ?? false) && FirebaseAuth.instance.currentUser != null) {
+  if ((prefs.getBool("isSetUp") ?? false) &&
+      FirebaseAuth.instance.currentUser != null) {
     print(FirebaseAuth.instance.currentUser);
     await checkAccountDeleted();
   }
@@ -54,7 +67,7 @@ void main() async {
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return ErrorPage();
   };
-
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(
     MultiProvider(
       providers: [
@@ -126,7 +139,9 @@ class MyAppState extends State<MyApp> {
         builder: (context, value, child) {
           prefs.setString("theme", "system");
           ColorScheme systemTheme =
-              MediaQuery.of(context).platformBrightness == Brightness.dark ? darkScheme : lightScheme;
+              MediaQuery.of(context).platformBrightness == Brightness.dark
+                  ? darkScheme
+                  : lightScheme;
 
           ColorScheme chosenTheme = systemTheme;
 
@@ -180,31 +195,38 @@ class MyAppState extends State<MyApp> {
       builder: (context, colorProvider, tournamentModeProvider, child) {
         bool systemDefined = false;
         ColorScheme systemTheme =
-            MediaQuery.of(context).platformBrightness == Brightness.dark ? darkScheme : lightScheme;
+            MediaQuery.of(context).platformBrightness == Brightness.dark
+                ? darkScheme
+                : lightScheme;
 
         if (prefs.getString("theme") == "system") {
           systemDefined = true;
         }
 
-        ColorScheme chosenTheme = systemDefined ? systemTheme : colorProvider.colorScheme;
+        ColorScheme chosenTheme =
+            systemDefined ? systemTheme : colorProvider.colorScheme;
 
         // Build the list of destinations dynamically
         List<NavigationDestination> destinations = [
           NavigationDestination(
-              selectedIcon: Icon(Icons.home_rounded, color: chosenTheme.secondary),
+              selectedIcon:
+                  Icon(Icons.home_rounded, color: chosenTheme.secondary),
               icon: const Icon(Icons.home_outlined),
               label: "Home"),
           NavigationDestination(
-              selectedIcon: Icon(Icons.bubble_chart, color: chosenTheme.secondary),
+              selectedIcon:
+                  Icon(Icons.bubble_chart, color: chosenTheme.secondary),
               icon: const Icon(Icons.bubble_chart_outlined),
               label: "Scout"),
           NavigationDestination(
-            selectedIcon: Icon(Icons.people_alt_rounded, color: chosenTheme.secondary),
+            selectedIcon:
+                Icon(Icons.people_alt_rounded, color: chosenTheme.secondary),
             icon: const Icon(Icons.people_alt_outlined),
             label: "My Team",
           ),
           NavigationDestination(
-            selectedIcon: Icon(Icons.explore_rounded, color: chosenTheme.secondary),
+            selectedIcon:
+                Icon(Icons.explore_rounded, color: chosenTheme.secondary),
             icon: const Icon(Icons.explore_outlined),
             label: "Explore",
           ),
@@ -217,7 +239,8 @@ class MyAppState extends State<MyApp> {
           destinations.insert(
             1, // Add it to the second position
             NavigationDestination(
-              selectedIcon: Icon(Icons.emoji_events_rounded, color: chosenTheme.secondary),
+              selectedIcon: Icon(Icons.emoji_events_rounded,
+                  color: chosenTheme.secondary),
               icon: const Icon(Icons.emoji_events_outlined),
               label: "Tournament",
             ),
@@ -242,8 +265,10 @@ class MyAppState extends State<MyApp> {
               selectedIndex: selectedIndex,
               indicatorColor: chosenTheme.primary,
               animationDuration: const Duration(milliseconds: 500),
-              labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
-              onDestinationSelected: (value) => setState(() => selectedIndex = value),
+              labelBehavior:
+                  NavigationDestinationLabelBehavior.onlyShowSelected,
+              onDestinationSelected: (value) =>
+                  setState(() => selectedIndex = value),
               destinations: destinations,
             ),
           ),
@@ -252,3 +277,5 @@ class MyAppState extends State<MyApp> {
     );
   }
 }
+
+
