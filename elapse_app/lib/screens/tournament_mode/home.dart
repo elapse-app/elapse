@@ -377,7 +377,8 @@ class _TMHomePageState extends State<TMHomePage> {
                             division.teamStats!.isNotEmpty &&
                             snapshot.data!.tournamentSkills!.isNotEmpty
                         ? RankingOverviewWidget(
-                            teamStats: division.teamStats![widget.teamID]!,
+                            // teamStats: division.teamStats![widget.teamID]!,
+                            teamStats: snapshot.data!.divisions[0].teamStats![widget.teamID]!,
                             skills: snapshot.data!.tournamentSkills!,
                             teamID: widget.teamID,
                           )
