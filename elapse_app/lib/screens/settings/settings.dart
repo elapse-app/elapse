@@ -849,22 +849,18 @@ List<TeamPreview> getSavedTeams() {
 }
 
 Future<void> subToTeamPushNotifs(String teamNum) async {
-  print('Attempting to subscribe to topic: $teamNum');
   try {
     // Subscribing the user to the specified topic
     await FirebaseMessaging.instance.subscribeToTopic(teamNum);
-    print('Successfully subscribed to topic: $teamNum');
   } catch (e) {
     print('Failed to subscribe to topic: $e');
   }
 }
 
 Future<void> unsubFromTeamPushNotifs(String teamNum) async {
-  print('Attempting to unsubscribe from topic: $teamNum');
   try {
     // Subscribing the user to the specified topic
     await FirebaseMessaging.instance.unsubscribeFromTopic(teamNum);
-    print('Successfully unsubscribed from topic: $teamNum');
   } catch (e) {
     print('Failed to unsubscribe from topic: $e');
   }
