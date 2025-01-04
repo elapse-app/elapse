@@ -11,6 +11,9 @@ import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
 
+import '../../classes/Tournament/division.dart';
+import '../../classes/Tournament/tstats.dart';
+
 class TMHomePage extends StatefulWidget {
   const TMHomePage({super.key, required this.tournamentID, required this.teamID, required this.teamNumber});
   final int tournamentID;
@@ -110,6 +113,7 @@ class _TMHomePageState extends State<TMHomePage> {
                               future: tournament,
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
+                                  Division division = snapshot.data!.divisions.firstWhere((d) => d.teamStats!.containsKey(widget.teamID));
                                   return GestureDetector(
                                     onTap: () {
                                       Navigator.push(
@@ -118,7 +122,7 @@ class _TMHomePageState extends State<TMHomePage> {
                                           transitionDuration: const Duration(milliseconds: 300),
                                           reverseTransitionDuration: const Duration(milliseconds: 300),
                                           pageBuilder: (context, animation, secondaryAnimation) => SearchScreen(
-                                              tournament: snapshot.data!, division: snapshot.data!.divisions[0]),
+                                              tournament: snapshot.data!, division: division),
                                           transitionsBuilder: (context, animation, secondaryAnimation, child) {
                                             // Create a Tween that transitions the new screen from fully transparent to fully opaque
                                             return FadeTransition(
@@ -217,7 +221,9 @@ class _TMHomePageState extends State<TMHomePage> {
                     child: SizedBox(height: 50, width: 50, child: Center(child: CircularProgressIndicator())),
                   );
                 case ConnectionState.done:
-                  if (snapshot.data!.divisions[0].games!.isEmpty) {
+                  Division division = snapshot.data!.divisions.firstWhere((d) => d.teamStats!.containsKey(widget.teamID));
+
+                  if (division.games!.isEmpty) {
                     return SliverToBoxAdapter(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 23),
@@ -233,7 +239,7 @@ class _TMHomePageState extends State<TMHomePage> {
                     );
                   }
 
-                  List<Game> upcomingGames = getTeamGames(snapshot.data!.divisions[0].games!, widget.teamNumber).where(
+                  List<Game> upcomingGames = getTeamGames(division.games!, widget.teamNumber).where(
                         (element) {
                       return element.startedTime == null && element.redScore == 0 && element.blueScore == 0;
                     },
@@ -262,8 +268,8 @@ class _TMHomePageState extends State<TMHomePage> {
                         children: [
                           NextGame(
                             game: game,
-                            games: snapshot.data!.divisions[0].games!,
-                            rankings: snapshot.data!.divisions[0].teamStats!,
+                            games: division.games!,
+                            rankings: division.teamStats!,
                             skills: snapshot.data!.tournamentSkills!,
                             targetTeam: TeamPreview(teamNumber: widget.teamNumber, teamID: widget.teamID),
                           ),
@@ -301,7 +307,8 @@ class _TMHomePageState extends State<TMHomePage> {
             future: tournament,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
-                List<Game> upcomingGames = getTeamGames(snapshot.data!.divisions[0].games!, widget.teamNumber).where(
+                Division division = snapshot.data!.divisions.firstWhere((d) => d.teamStats!.containsKey(widget.teamID));
+                List<Game> upcomingGames = getTeamGames(division.games!, widget.teamNumber).where(
                   (element) {
                     return element.startedTime == null && element.redScore == 0 && element.blueScore == 0;
                   },
@@ -362,14 +369,15 @@ class _TMHomePageState extends State<TMHomePage> {
             future: tournament,
             builder: (context, snapshot) {
               if (snapshot.hasData) {
+                Division division = snapshot.data!.divisions.firstWhere((d) => d.teamStats!.containsKey(widget.teamID));
                 return SliverPadding(
                   padding: EdgeInsets.symmetric(horizontal: 23),
                   sliver: SliverToBoxAdapter(
-                    child: snapshot.data!.divisions[0].teamStats != null &&
-                            snapshot.data!.divisions[0].teamStats!.isNotEmpty &&
+                    child: division.teamStats != null &&
+                            division.teamStats!.isNotEmpty &&
                             snapshot.data!.tournamentSkills!.isNotEmpty
                         ? RankingOverviewWidget(
-                            teamStats: snapshot.data!.divisions[0].teamStats![widget.teamID]!,
+                            teamStats: division.teamStats![widget.teamID]!,
                             skills: snapshot.data!.tournamentSkills!,
                             teamID: widget.teamID,
                           )
