@@ -175,6 +175,12 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                             fontSize: 16,
                           ),
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your first name';
+                          }
+                          return null;
+                        },
                       ),
                     ),
                     SizedBox(height: 12),
@@ -222,6 +228,12 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                             fontSize: 16,
                           ),
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your last name';
+                          }
+                          return null;
+                        },
                       ),
                     ),
                     SizedBox(height: 12),
