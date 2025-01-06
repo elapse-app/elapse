@@ -139,6 +139,9 @@ class _NotifsSetupState extends State<NotifsSetup> {
                                     askForNotifPerms();
                                     subToTeamPushNotifs(
                                         getSavedTeams()[0].teamNumber);
+                                      setState(() {
+                                useMatchNotifs = value;
+                              });
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
