@@ -59,6 +59,8 @@ dependencies:
   pinput: ^5.0.0
   photo_view: ^0.15.0
   flutter_staggered_grid_view: ^0.7.0
+  firebase_messaging: ^15.1.6
+  lottie: ^3.3.0
 
 dev_dependencies:
   flutter_test:
@@ -113,6 +115,8 @@ flutter:
     - assets/darkMode.png
     - assets/enabled.png
     - assets/disabled.png
+
+    - assets/lottie/setup-match-notifs.json
 
   #   - images/a_dot_ham.jpeg
 

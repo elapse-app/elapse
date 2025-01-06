@@ -18,12 +18,17 @@ class TournamentModeSetupPage extends StatefulWidget {
 
 class _TournamentModeSetupPageState extends State<TournamentModeSetupPage> {
   bool useLiveTiming = true;
+  bool useMatchNotifs = false;
 
   @override
   void initState() {
     super.initState();
     prefs.setBool("useLiveTiming", useLiveTiming);
+    super.initState();
+    prefs.setBool("useMatchNotifs", useMatchNotifs);
   }
+
+
 
   @override
   Widget build(BuildContext context) {
