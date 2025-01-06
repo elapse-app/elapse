@@ -113,7 +113,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           CircleAvatar(
                                             radius: 33,
                                           ),
-                                          Text('${currentUser!.fname!} ${currentUser!.lname!}',
+                                          Text('${currentUser!.fname ?? ""} ${currentUser!.lname ?? ""}',
                                               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                                           GestureDetector(
                                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
