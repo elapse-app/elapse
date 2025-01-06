@@ -21,6 +21,9 @@ class NotifsSetup extends StatefulWidget {
 
 class _NotifsSetupState extends State<NotifsSetup> {
   _NotifsSetupState();
+
+  bool useMatchNotifs = prefs.getBool("useMatchNotifs") ?? true;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -139,9 +142,9 @@ class _NotifsSetupState extends State<NotifsSetup> {
                                     askForNotifPerms();
                                     subToTeamPushNotifs(
                                         getSavedTeams()[0].teamNumber);
-                                      setState(() {
-                                useMatchNotifs = value;
-                              });
+                                    setState(() {
+                                      useMatchNotifs = true;
+                                    });
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
