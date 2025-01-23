@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart' show FirebaseOptions;
 import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
+import 'package:elapse_app/extras/firebase_token.dart';
 
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
@@ -41,9 +42,9 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyB1X33mMM1BDnFetoI17fzxU8hhSsX7t8k',
-    appId: '1:1085802258375:web:c343ecbb473702310c03e2',
-    messagingSenderId: '1085802258375',
+    apiKey: firebaseTokens.web_api_key,
+    appId: firebaseTokens.web_app_id,
+    messagingSenderId: firebaseTokens.messagingSenderID,
     projectId: 'elapse',
     authDomain: 'elapse.firebaseapp.com',
     storageBucket: 'elapse.appspot.com',
@@ -51,41 +52,42 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDoRS0lYO4_ljPK5G9KJcYdo-33FRUNjec',
-    appId: '1:1085802258375:android:a445f127ec8ae9650c03e2',
-    messagingSenderId: '1085802258375',
+    apiKey: firebaseTokens.android_api_key,
+    appId: firebaseTokens.android_app_id,
+    messagingSenderId: firebaseTokens.messagingSenderID,
     projectId: 'elapse',
     storageBucket: 'elapse.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyA9NIyftybAfImb8wteA0s1UV0t_gqZgB4',
-    appId: '1:1085802258375:ios:ca34fc646b6a50bf0c03e2',
-    messagingSenderId: '1085802258375',
+    apiKey: firebaseTokens.ios_api_key,
+    appId: firebaseTokens.ios_app_id,
+    messagingSenderId:firebaseTokens.messagingSenderID,
     projectId: 'elapse',
     storageBucket: 'elapse.appspot.com',
-    iosClientId: '1085802258375-f1vau2e0ddrdtti51ublrs33jrgnhv23.apps.googleusercontent.com',
+    iosClientId:
+        '1085802258375-f1vau2e0ddrdtti51ublrs33jrgnhv23.apps.googleusercontent.com',
     iosBundleId: 'com.example.elapseApp.RunnerTests',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyA9NIyftybAfImb8wteA0s1UV0t_gqZgB4',
-    appId: '1:1085802258375:ios:ad62a372ff6464ea0c03e2',
-    messagingSenderId: '1085802258375',
+    apiKey: firebaseTokens.mac_api_key,
+    appId: firebaseTokens.mac_app_id,
+    messagingSenderId: firebaseTokens.messagingSenderID,
     projectId: 'elapse',
     storageBucket: 'elapse.appspot.com',
-    iosClientId: '1085802258375-vmdr3i7hneb8a3lvenlgvdq8ae9vi1kt.apps.googleusercontent.com',
+    iosClientId:
+        '1085802258375-vmdr3i7hneb8a3lvenlgvdq8ae9vi1kt.apps.googleusercontent.com',
     iosBundleId: 'com.example.elapseApp',
   );
 
   static const FirebaseOptions windows = FirebaseOptions(
-    apiKey: 'AIzaSyB1X33mMM1BDnFetoI17fzxU8hhSsX7t8k',
-    appId: '1:1085802258375:web:12a6e56feecf5b6e0c03e2',
-    messagingSenderId: '1085802258375',
+    apiKey: firebaseTokens.windows_api_key,
+    appId: firebaseTokens.windows_app_id,
+    messagingSenderId: firebaseTokens.messagingSenderID,
     projectId: 'elapse',
     authDomain: 'elapse.firebaseapp.com',
     storageBucket: 'elapse.appspot.com',
     measurementId: 'G-2V9D8WQ6K6',
   );
-
 }
