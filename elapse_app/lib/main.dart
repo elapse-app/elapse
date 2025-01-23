@@ -248,7 +248,7 @@ class MyAppState extends State<MyApp> {
         }
 
         return MaterialApp(
-          title: 'Flutter Demo',
+          title: 'Elapse',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             colorScheme: chosenTheme,

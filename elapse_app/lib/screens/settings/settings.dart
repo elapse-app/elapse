@@ -125,8 +125,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           ),
 
                                           Text('${currentUser!.fname ?? ""} ${currentUser!.lname ?? ""}',
-                                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500))
-                                          ,GestureDetector(
+
+                                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                                          GestureDetector(
+
                                               child: Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
