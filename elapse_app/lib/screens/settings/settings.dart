@@ -126,7 +126,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                                           Text('${currentUser!.fname ?? ""} ${currentUser!.lname ?? ""}',
                                               style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500))
-                                          GestureDetector(
+                                          ,GestureDetector(
                                               child: Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
@@ -642,6 +642,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               if (value) {
                                 subToTeamPushNotifs(
                                     getSavedTeams()[0].teamNumber);
+                                askForNotifPerms();
                               } else {
                                 unsubFromTeamPushNotifs(
                                     getSavedTeams()[0].teamNumber);
@@ -984,5 +985,20 @@ Widget buildTeamDropdown(
                         color: Theme.of(context).colorScheme.secondary))),
       )
     ]),
+  );
+}
+
+
+Future<void> askForNotifPerms() async {
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
   );
 }
