@@ -51,3 +51,4 @@ app.*.map.json
 
 /token.txt
 /lib/extras/token.dart
+/lib/extras/firebase_token.dart
