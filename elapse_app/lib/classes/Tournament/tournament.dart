@@ -85,6 +85,8 @@ Future<void> updateTournament(Tournament tournament) async {
 }
 
 Tournament loadTournament(json) {
+
+  print("PRINT tournament loading...");
   List<Division> divisions = [];
   final tournament = jsonDecode(json);
   for (var a in tournament["divisions"]) {
@@ -190,7 +192,7 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
 
 Future<Tournament> TMTournamentDetails(int tournamentID, {bool forceRefresh = false}) async {
   Tournament tournament;
-  if (prefs.getString("TMSavedTournament") == null) {
+  if (prefs.getString("TMSavedTournament") == null || prefs.getString("TMSavedTournament") == "") {
     tournament = await getTournamentDetails(tournamentID);
     prefs.setString("TMSavedTournament", jsonEncode(tournament.toJson()));
     print("Getting new tournament");
