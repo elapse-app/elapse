@@ -51,15 +51,23 @@ Division loadDivision(division) {
     teamStats = stringedTeamStats.map((key, value) {
       return MapEntry(int.parse(key), loadTeamStats(value));
     });
+    return Division(
+      id: division["id"],
+      name: division["name"],
+      order: division["order"],
+      games: games,
+      teamStats: teamStats,
+    );
+  } else {
+    print('PRINT stringedTeamStats is null');
+    return Division(
+      id: division["id"],
+      name: division["name"],
+      order: division["order"],
+      games: games,
+      teamStats: null,
+    );
   }
-
-  return Division(
-    id: division["id"],
-    name: division["name"],
-    order: division["order"],
-    games: games,
-    teamStats: teamStats,
-  );
 }
 
 int getTeamDivisionIndex(List<Division> divisions, int teamID) {
