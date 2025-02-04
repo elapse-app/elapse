@@ -1,19 +1,22 @@
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:elapse_app/main.dart';
+import 'package:elapse_app/classes/Miscellaneous/remote_config.dart';
 
 class ElapseAppBar extends StatelessWidget {
-  const ElapseAppBar(
-      {super.key,
-      required this.title,
-      this.includeSettings = false,
-      this.backNavigation = false,
-      this.returnData,
-      this.background,
-      this.maxHeight = 125,
-      this.backBehavior,
-        this.settingsCallback,
-      });
+  const ElapseAppBar({
+    super.key,
+    required this.title,
+    this.includeSettings = false,
+    this.backNavigation = false,
+    this.returnData,
+    this.background,
+    this.maxHeight = 125,
+    this.backBehavior,
+    this.settingsCallback,
+  });
   final Widget title;
   final Widget? background;
   final bool includeSettings;
@@ -25,6 +28,10 @@ class ElapseAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final remoteConfig = FirebaseRemoteConfigService();
+    final showVDAWarn =
+        !remoteConfig.getBool(FirebaseRemoteConfigKeys.vdaStatusKey);
+    print("PRINT showVDAWarm $showVDAWarn");
     Widget? appBarBackground = background;
     if (includeSettings && background == null) {
       appBarBackground = SafeArea(
@@ -109,10 +116,68 @@ class ElapseAppBar extends StatelessWidget {
               title: Stack(
                 alignment: AlignmentDirectional.centerStart,
                 children: [
-                  Padding(
-                    padding: EdgeInsets.only(left: leftPadding),
-                    child: title,
-                  ),
+                  Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(left: leftPadding),
+                          child: title,
+                        ),
+                        Padding(
+                            padding: EdgeInsets.only(right: leftPadding + 5),
+                            child: showVDAWarn
+                                ? IconButton(
+                                    icon: const Icon(Icons.sync_problem,
+                                        size: 24,
+                                        color: Color.fromRGBO(0, 0, 0, 1)),
+                                    onPressed: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          18)),
+                                              title: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "Some experiences may be limited",
+                                                      style: TextStyle(
+                                                          fontSize: 20),
+                                                    ),
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                          top: 5),
+                                                      child: Text(
+                                                        "One of our data sources, vrc-data-analysis, isn't functioning properly right now. Some features may be temporarily unavailable.",
+                                                        style: TextStyle(
+                                                            fontSize: 15),
+                                                      ),
+                                                    ),
+                                                  ]),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Text(
+                                                    "OK",
+                                                    style: TextStyle(
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .secondary),
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          });
+                                    },
+                                  )
+                                : Container(height:1))
+                      ]),
                   backNavigation
                       ? GestureDetector(
                           onTap: () {
@@ -123,11 +188,14 @@ class ElapseAppBar extends StatelessWidget {
                             color: Theme.of(context)
                                 .colorScheme
                                 .onSurface
-                                .withValues(alpha: ((constraints.maxHeight -
-                                            MediaQuery.of(context).padding.top -
-                                            125) /
-                                        -62)
-                                    .clamp(0, 1)),
+                                .withValues(
+                                    alpha: ((constraints.maxHeight -
+                                                MediaQuery.of(context)
+                                                    .padding
+                                                    .top -
+                                                125) /
+                                            -62)
+                                        .clamp(0, 1)),
                           ),
                         )
                       : Container(
