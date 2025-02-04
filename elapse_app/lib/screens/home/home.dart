@@ -15,6 +15,9 @@ import '../../classes/Filters/season.dart';
 import '../../classes/Team/teamPreview.dart';
 import '../widgets/big_error_message.dart';
 
+import 'package:firebase_remote_config/firebase_remote_config.dart';
+
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 

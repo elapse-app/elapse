@@ -24,6 +24,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:elapse_app/classes/Miscellaneous/remote_config.dart';
 
 final GlobalKey<MyAppState> myAppKey = GlobalKey<MyAppState>();
 late SharedPreferences prefs;
@@ -33,11 +35,9 @@ late PackageInfo appInfo;
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // If you're going  use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
-  await Firebase.initializeApp();
 
   print("Handling a background message: ${message.messageId}");
 }
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -45,9 +45,12 @@ void main() async {
     DeviceOrientation.portraitUp,
   ]);
 
+
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await FirebaseRemoteConfigService().initialize();
 
   prefs = await SharedPreferences.getInstance();
 
@@ -68,17 +71,15 @@ void main() async {
     return ErrorPage();
   };
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) => ColorProvider(),
-        ),
-        ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
-      ],
-      child: MyApp(key: myAppKey),
-    ),
-  );
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (context) => ColorProvider(),
+      ),
+      ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
+    ],
+    child: MyApp(key: myAppKey),
+  ));
 }
 
 class MyApp extends StatefulWidget {
@@ -277,5 +278,3 @@ class MyAppState extends State<MyApp> {
     );
   }
 }
-
-
