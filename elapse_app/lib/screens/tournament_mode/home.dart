@@ -14,6 +14,8 @@ import 'package:flutter/material.dart';
 import '../../classes/Tournament/division.dart';
 import '../../classes/Tournament/tstats.dart';
 
+import 'package:elapse_app/classes/Miscellaneous/remote_config.dart';
+
 class TMHomePage extends StatefulWidget {
   const TMHomePage(
       {super.key,
@@ -38,6 +40,10 @@ class _TMHomePageState extends State<TMHomePage> {
   Future<Tournament>? tournament;
   @override
   Widget build(BuildContext context) {
+    final remoteConfig = FirebaseRemoteConfigService();
+    final showVDAWarn =
+        !remoteConfig.getBool(FirebaseRemoteConfigKeys.vdaStatusKey);
+
     String welcomeMessage = "Good Afternoon";
     if (DateTime.now().hour < 12) {
       welcomeMessage = "Good Morning";
@@ -79,16 +85,73 @@ class _TMHomePageState extends State<TMHomePage> {
                     child: Column(
                       children: [
                         const Spacer(),
+                        
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          crossAxisAlignment: CrossAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
+                            
                             Text(
                               welcomeMessage,
                               style: TextStyle(
                                   fontSize: 24, fontWeight: FontWeight.w600),
                             ),
-                            Spacer(),
+                            showVDAWarn
+                                ? IconButton(
+                                      splashRadius:2,
+                                      icon: const Icon(Icons.sync_problem,
+                                          size: 24,
+                                          color: Color.fromRGBO(0, 0, 0, 1)),
+                                      onPressed: () {
+                                        showDialog(
+                                            context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            18)),
+                                                title: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        "Some experiences may be limited",
+                                                        style: TextStyle(
+                                                            fontSize: 20),
+                                                      ),
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.only(
+                                                                top: 5),
+                                                        child: Text(
+                                                          "One of our data sources, vrc-data-analysis, isn't functioning properly right now. Some features may be temporarily unavailable.",
+                                                          style: TextStyle(
+                                                              fontSize: 15),
+                                                        ),
+                                                      ),
+                                                    ]),
+                                                actions: [
+                                                  TextButton(
+                                                    onPressed: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    child: Text(
+                                                      "OK",
+                                                      style: TextStyle(
+                                                          color:
+                                                              Theme.of(context)
+                                                                  .colorScheme
+                                                                  .secondary),
+                                                    ),
+                                                  ),
+                                                ],
+                                              );
+                                            });
+                                      },
+                                    )
+                                : Container(height: 1)
                           ],
                         ),
                         SizedBox(
@@ -346,25 +409,23 @@ class _TMHomePageState extends State<TMHomePage> {
                           ),
                         ),
                       );
-                    } else {
-                    }
+                    } else {}
                   }
               }
               return SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 23),
-                            child: Container(
-                                padding: EdgeInsets.all(18),
-                                decoration: BoxDecoration(
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
-                                    borderRadius: BorderRadius.circular(18)),
-                                child: Text(
-                                  "Tournament data is not available yet",
-                                  style: TextStyle(fontSize: 16),
-                                )),
-                          ),
-                        );
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 23),
+                  child: Container(
+                      padding: EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                          color: Theme.of(context).colorScheme.tertiary,
+                          borderRadius: BorderRadius.circular(18)),
+                      child: Text(
+                        "Tournament data is not available yet",
+                        style: TextStyle(fontSize: 16),
+                      )),
+                ),
+              );
             },
           ),
           const SliverToBoxAdapter(
@@ -372,7 +433,6 @@ class _TMHomePageState extends State<TMHomePage> {
               height: 25,
             ),
           ),
-          
           const SliverPadding(
             padding: EdgeInsets.symmetric(horizontal: 23),
             sliver: SliverToBoxAdapter(
@@ -442,20 +502,19 @@ class _TMHomePageState extends State<TMHomePage> {
                   );
                 } else {
                   return SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 23),
-                            child: Container(
-                                padding: EdgeInsets.all(18),
-                                decoration: BoxDecoration(
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
-                                    borderRadius: BorderRadius.circular(18)),
-                                child: Text(
-                                  "No games currently available",
-                                  style: TextStyle(fontSize: 16),
-                                )),
-                          ),
-                        );
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 23),
+                      child: Container(
+                          padding: EdgeInsets.all(18),
+                          decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.tertiary,
+                              borderRadius: BorderRadius.circular(18)),
+                          child: Text(
+                            "No games currently available",
+                            style: TextStyle(fontSize: 16),
+                          )),
+                    ),
+                  );
                 }
               } else {
                 return const SliverToBoxAdapter(

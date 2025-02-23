@@ -16,6 +16,7 @@ class ElapseAppBar extends StatelessWidget {
     this.maxHeight = 125,
     this.backBehavior,
     this.settingsCallback,
+    this.showVDAWarning = true,
   });
   final Widget title;
   final Widget? background;
@@ -23,6 +24,7 @@ class ElapseAppBar extends StatelessWidget {
   final bool backNavigation;
   final Object? returnData;
   final double maxHeight;
+  final bool showVDAWarning;
   final void Function()? backBehavior;
   final void Function()? settingsCallback;
 
@@ -97,6 +99,7 @@ class ElapseAppBar extends StatelessWidget {
       automaticallyImplyLeading: false,
       expandedHeight: maxHeight,
       centerTitle: false,
+      
       flexibleSpace: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           double leftPadding = backNavigation
@@ -116,7 +119,7 @@ class ElapseAppBar extends StatelessWidget {
               title: Stack(
                 alignment: AlignmentDirectional.centerStart,
                 children: [
-                  Row(
+                  showVDAWarning ? Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Padding(
@@ -177,7 +180,11 @@ class ElapseAppBar extends StatelessWidget {
                                     },
                                   )
                                 : Container(height:1))
-                      ]),
+                        
+                      ]) : Padding(
+                          padding: EdgeInsets.only(left: leftPadding),
+                          child: title,
+                        ),
                   backNavigation
                       ? GestureDetector(
                           onTap: () {
