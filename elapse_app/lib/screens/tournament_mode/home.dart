@@ -349,7 +349,7 @@ class _TMHomePageState extends State<TMHomePage> {
                                         Theme.of(context).colorScheme.tertiary,
                                     borderRadius: BorderRadius.circular(18)),
                                 child: Text(
-                                  "No games currently available",
+                                  "No matches currently available",
                                   style: TextStyle(fontSize: 16),
                                 )),
                           ),
@@ -376,7 +376,7 @@ class _TMHomePageState extends State<TMHomePage> {
                                         Theme.of(context).colorScheme.tertiary,
                                     borderRadius: BorderRadius.circular(18)),
                                 child: Text(
-                                  "No games currently available",
+                                  "No matches currently available",
                                   style: TextStyle(fontSize: 16),
                                 )),
                           ),
@@ -470,7 +470,7 @@ class _TMHomePageState extends State<TMHomePage> {
                                 color: Theme.of(context).colorScheme.tertiary,
                                 borderRadius: BorderRadius.circular(18)),
                             child: Text(
-                              "No Upcoming Games",
+                              "No upcoming matches",
                               style: TextStyle(fontSize: 16),
                             )),
                       ),
@@ -510,7 +510,7 @@ class _TMHomePageState extends State<TMHomePage> {
                               color: Theme.of(context).colorScheme.tertiary,
                               borderRadius: BorderRadius.circular(18)),
                           child: Text(
-                            "No games currently available",
+                            "No matches currently available",
                             style: TextStyle(fontSize: 16),
                           )),
                     ),
