@@ -628,6 +628,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Divider(
                       color: Theme.of(context).colorScheme.surfaceDim,
                     ),
+
+                    // ---- THE FOLLOWING IS MATCH NOTIFICATIONS CODE. UNCOMMENT TO ENABLE MATCH NOTIFICATIONS UI ---- //
+                    /*
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -655,6 +658,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Divider(
                       color: Theme.of(context).colorScheme.surfaceDim,
                     ),
+                    */
                     const SizedBox(height: 32),
                     const SizedBox(
                       width: double.infinity,

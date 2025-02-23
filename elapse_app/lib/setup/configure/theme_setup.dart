@@ -3,6 +3,7 @@ import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/long_button.dart';
 import 'package:elapse_app/setup/configure/match_notifs_setup.dart';
+import 'package:elapse_app/setup/configure/tournament_mode_setup.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -137,7 +138,12 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                    builder: (context) => NotifsSetup(),
+                                    builder: (context) => 
+                                    // ---- THE FOLLOWING IS MATCH NOTIFICATIONS CODE. UNCOMMENT TO ENABLE MATCH NOTIFICATIONS UI ---- //
+                                    /*
+                                      NotifsSetup(),
+                                    */
+                                    TournamentModeSetupPage(),
                                   ),
                                 );
                               },
