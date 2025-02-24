@@ -672,7 +672,7 @@ class _MyTeamsState extends State<MyTeams> {
                       }
 
                       List<Award> awards = snapshot.data as List<Award>;
-                      if (awards.isNotEmpty)
+                      if (awards.isNotEmpty) {
                         return Container(
                           padding: const EdgeInsets.all(18),
                           decoration: BoxDecoration(
@@ -732,8 +732,9 @@ class _MyTeamsState extends State<MyTeams> {
                             ],
                           ),
                         );
-                      else
+                      } else {
                         return Container();
+                      }
                   }
                 },
               ),
@@ -826,12 +827,22 @@ class TeamBio extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    getGrade(grade),
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  SizedBox(
+                    height: 24,
+                    child: 
+                    Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Text(
+                        teamName,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        textAlign: TextAlign.left,
+                    ),
+                    ),
                   ),
                   const Text(
-                    "Grade",
+                    "Team Name",
                     style: const TextStyle(
                       fontSize: 16,
                     ),
@@ -844,19 +855,28 @@ class TeamBio extends StatelessWidget {
               flex: 12,
               fit: FlexFit.tight,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
-                    getLocation(location),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  SizedBox(
+                    height: 24,
+                    child: 
+                    Align(
+                      alignment: Alignment.bottomRight,
+                      child: Text(
+                        getGrade(grade),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
                   ),
                   const Text(
-                    "Location",
+                    "Grade",
                     style: const TextStyle(
                       fontSize: 16,
                     ),
+                    textAlign: TextAlign.right,
                   ),
                 ],
               ),
@@ -876,13 +896,22 @@ class TeamBio extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    teamName,
-                    maxLines: 2,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  SizedBox(
+                    height: 48,
+                    child: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: 
+                      Text(
+                        getLocation(location),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        textAlign: TextAlign.left,
+                      ),
+                    ),
                   ),
                   const Text(
-                    "Team Name",
+                    "Location",
                     style: const TextStyle(
                       fontSize: 16,
                     ),
@@ -895,18 +924,27 @@ class TeamBio extends StatelessWidget {
               flex: 12,
               fit: FlexFit.tight,
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
-                  Text(
-                    organization,
-                    maxLines: 2,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  SizedBox(
+                    height: 48,
+                    child: Align(
+                      alignment: Alignment.bottomLeft,
+                      child: Text(
+                        organization,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                        textAlign: TextAlign.right,
+                      ),
+                    ),
                   ),
                   const Text(
                     "Organization",
                     style: const TextStyle(
                       fontSize: 16,
                     ),
+                    textAlign: TextAlign.right,
                   ),
                 ],
               ),
