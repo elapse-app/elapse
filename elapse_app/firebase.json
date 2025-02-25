@@ -3,7 +3,7 @@
         "platforms": {
             "android": {
                 "default": {
-                    "appId": "1:1085802258375:android:a445f127ec8ae9650c03e2",
+                    "appId": "1:1085802258375:android:8fbdd8abaf2aa46d0c03e2",
                     "fileOutput": "android/app/google-services.json",
                     "projectId": "elapse"
                 }
@@ -11,7 +11,7 @@
             "dart": {
                 "lib/firebase_options.dart": {
                     "configurations": {
-                        "android": "1:1085802258375:android:a445f127ec8ae9650c03e2",
+                        "android": "1:1085802258375:android:8fbdd8abaf2aa46d0c03e2",
                         "ios": "1:1085802258375:ios:ca34fc646b6a50bf0c03e2",
                         "macos": "1:1085802258375:ios:ad62a372ff6464ea0c03e2",
                         "web": "1:1085802258375:web:c343ecbb473702310c03e2",
