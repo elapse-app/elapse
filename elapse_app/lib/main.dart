@@ -28,6 +28,7 @@ import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:elapse_app/classes/Miscellaneous/remote_config.dart';
 
 final GlobalKey<MyAppState> myAppKey = GlobalKey<MyAppState>();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 late SharedPreferences prefs;
 late PackageInfo appInfo;
 
@@ -44,7 +45,6 @@ void main() async {
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
-
 
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
@@ -74,12 +74,28 @@ void main() async {
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-  print('Got a message whilst in the foreground!');
-  print('Message data: ${message.data}');
+    print('Got a message whilst in the foreground!');
+    print('Message data: ${message.data}');
 
-  if (message.notification != null) {
-    print('Message also contained a notification: ${message.notification}');
-  }
+    if (message.notification != null) {
+      print('Message also contained a notification: ${message.notification}');
+    }
+
+    if (message.notification!.title != "" && message.notification!.body != "") {
+      showDialog(
+        context: navigatorKey.currentContext!,
+        builder: (context) => AlertDialog(
+          title: Text(message.notification!.title ?? 'Upcoming match'),
+          content: Text(message.notification!.body ?? 'No content'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
+        ),
+      );
+    }
   });
 
   runApp(MultiProvider(
@@ -118,6 +134,7 @@ class MyAppState extends State<MyApp> {
       initializeTournamentMode();
     }
   }
+
 
   void initializeTournamentMode() {
     if (prefs.getBool("isTournamentMode") ?? false) {
@@ -158,6 +175,7 @@ class MyAppState extends State<MyApp> {
           ColorScheme chosenTheme = systemTheme;
 
           return MaterialApp(
+            navigatorKey: navigatorKey,
             home: const FirstSetupPage(),
             theme: ThemeData(
               colorScheme: chosenTheme,
@@ -258,8 +276,8 @@ class MyAppState extends State<MyApp> {
             ),
           );
         }
-
         return MaterialApp(
+          navigatorKey: navigatorKey,
           title: 'Elapse',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
