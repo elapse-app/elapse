@@ -67,7 +67,7 @@ class DefaultFirebaseOptions {
     storageBucket: 'elapse.appspot.com',
     iosClientId:
         '1085802258375-f1vau2e0ddrdtti51ublrs33jrgnhv23.apps.googleusercontent.com',
-    iosBundleId: 'com.example.elapseApp.RunnerTests',
+    iosBundleId: 'com.elapse.elapse-app',
   );
 
   static const FirebaseOptions macos = FirebaseOptions(

@@ -123,12 +123,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                           CircleAvatar(
                                             radius: 33,
                                           ),
-
-                                          Text('${currentUser!.fname ?? ""} ${currentUser!.lname ?? ""}',
-
-                                              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+                                          Text(
+                                              '${currentUser!.fname ?? ""} ${currentUser!.lname ?? ""}',
+                                              style: const TextStyle(
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.w500)),
                                           GestureDetector(
-
                                               child: Column(
                                                   crossAxisAlignment:
                                                       CrossAxisAlignment.start,
@@ -852,6 +852,12 @@ List<TeamPreview> getSavedTeams() {
 Future<void> subToTeamPushNotifs(String teamNum) async {
   try {
     // Subscribing the user to the specified topic
+// For apple platforms, ensure the APNS token is available before making any FCM plugin API calls
+    final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+    if (apnsToken != null) {
+    } else {
+      print('Could not access APNs when subscribing to topic: $teamNum');
+    }
     await FirebaseMessaging.instance.subscribeToTopic(teamNum);
   } catch (e) {
     print('Failed to subscribe to topic: $e');
@@ -989,7 +995,6 @@ Widget buildTeamDropdown(
     ]),
   );
 }
-
 
 Future<void> askForNotifPerms() async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
