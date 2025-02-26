@@ -140,10 +140,10 @@ class _ThemeSetupState extends State<ThemeSetup> {
                                   MaterialPageRoute(
                                     builder: (context) => 
                                     // ---- THE FOLLOWING IS MATCH NOTIFICATIONS CODE. UNCOMMENT TO ENABLE MATCH NOTIFICATIONS UI ---- //
-                                    /*
+                                    
                                       NotifsSetup(),
-                                    */
-                                    TournamentModeSetupPage(),
+                                    
+                                    //TournamentModeSetupPage(),
                                   ),
                                 );
                               },
