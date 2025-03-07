@@ -39,6 +39,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   int mainTeamId = jsonDecode(prefs.getString("savedTeam") ?? "")["teamID"];
   bool useLiveTiming = prefs.getBool("useLiveTiming") ?? true;
   bool useMatchNotifs = prefs.getBool("useMatchNotifs") ?? true;
+  bool useMatchProbabilities = prefs.getBool("useMatchProbabilities") ?? true;
   bool autoRefresh = prefs.getBool("autoRefresh") ?? true;
   String defaultGrade = prefs.getString("defaultGrade") ?? "Main Team";
   bool sendLTTelemetry = prefs.getBool("sendLTTelemetry") ?? false;
@@ -652,6 +653,26 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 unsubFromTeamPushNotifs(
                                     getSavedTeams()[0].teamNumber);
                               }
+                            },
+                          )
+                        ]),
+                    Divider(
+                      color: Theme.of(context).colorScheme.surfaceDim,
+                    ),
+
+                    Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text("Match Probabilities",
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w400)),
+                          Switch(
+                            value: useMatchProbabilities,
+                            onChanged: (bool? value) async {
+                              prefs.setBool("useMatchProbabilities", value!);
+                              setState(() {
+                                useMatchProbabilities = value;
+                              });
                             },
                           )
                         ]),
