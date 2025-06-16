@@ -22,11 +22,14 @@ class EnterDetailsPage extends StatefulWidget {
 }
 
 class _EnterDetailsPageState extends State<EnterDetailsPage> {
-  @override
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+
   final firebaseUser = FirebaseAuth.instance.currentUser;
   ElapseUser currentUser = ElapseUser(uid: "", email: "");
+
+  @override
   void initState() {
     currentUser = ElapseUser(
       uid: firebaseUser!.uid,
@@ -97,6 +100,7 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                 ),
               ),
               child: Form(
+                key: _formKey,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.start,
                   crossAxisAlignment: CrossAxisAlignment.center,
@@ -175,6 +179,12 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                             fontSize: 16,
                           ),
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your first name';
+                          }
+                          return null;
+                        },
                       ),
                     ),
                     SizedBox(height: 12),
@@ -222,6 +232,12 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                             fontSize: 16,
                           ),
                         ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter your last name';
+                          }
+                          return null;
+                        },
                       ),
                     ),
                     SizedBox(height: 12),
@@ -231,6 +247,10 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                       child: LongButton(
                         text: "Continue",
                         onPressed: () async {
+                          if (!_formKey.currentState!.validate()) {
+                            return;
+                          }
+
                           prefs.setString("currentUser", jsonEncode(currentUser.toJson()));
 
                           if (prefs.getBool("isSetUp") ?? false) {

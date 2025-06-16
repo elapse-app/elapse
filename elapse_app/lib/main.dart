@@ -24,20 +24,21 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:firebase_remote_config/firebase_remote_config.dart';
+import 'package:elapse_app/classes/Miscellaneous/remote_config.dart';
 
 final GlobalKey<MyAppState> myAppKey = GlobalKey<MyAppState>();
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 late SharedPreferences prefs;
 late PackageInfo appInfo;
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // If you're going to use other Firebase services in the background, such as Firestore,
+  // If you're going  use other Firebase services in the background, such as Firestore,
   // make sure you call `initializeApp` before using other Firebase services.
-  await Firebase.initializeApp();
 
   print("Handling a background message: ${message.messageId}");
 }
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,6 +49,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  await FirebaseRemoteConfigService().initialize();
 
   prefs = await SharedPreferences.getInstance();
 
@@ -67,18 +70,43 @@ void main() async {
   ErrorWidget.builder = (FlutterErrorDetails details) {
     return ErrorPage();
   };
+
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(
-    MultiProvider(
-      providers: [
-        ChangeNotifierProvider(
-          create: (context) => ColorProvider(),
+
+  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print('Got a message whilst in the foreground!');
+    print('Message data: ${message.data}');
+
+    if (message.notification != null) {
+      print('Message also contained a notification: ${message.notification}');
+    }
+
+    if (message.notification!.title != "" && message.notification!.body != "") {
+      showDialog(
+        context: navigatorKey.currentContext!,
+        builder: (context) => AlertDialog(
+          title: Text(message.notification!.title ?? 'Upcoming match'),
+          content: Text(message.notification!.body ?? 'No content'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text('OK'),
+            ),
+          ],
         ),
-        ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
-      ],
-      child: MyApp(key: myAppKey),
-    ),
-  );
+      );
+    }
+  });
+
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (context) => ColorProvider(),
+      ),
+      ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
+    ],
+    child: MyApp(key: myAppKey),
+  ));
 }
 
 class MyApp extends StatefulWidget {
@@ -106,6 +134,7 @@ class MyAppState extends State<MyApp> {
       initializeTournamentMode();
     }
   }
+
 
   void initializeTournamentMode() {
     if (prefs.getBool("isTournamentMode") ?? false) {
@@ -146,6 +175,7 @@ class MyAppState extends State<MyApp> {
           ColorScheme chosenTheme = systemTheme;
 
           return MaterialApp(
+            navigatorKey: navigatorKey,
             home: const FirstSetupPage(),
             theme: ThemeData(
               colorScheme: chosenTheme,
@@ -246,9 +276,9 @@ class MyAppState extends State<MyApp> {
             ),
           );
         }
-
         return MaterialApp(
-          title: 'Flutter Demo',
+          navigatorKey: navigatorKey,
+          title: 'Elapse',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
             colorScheme: chosenTheme,
@@ -277,5 +307,3 @@ class MyAppState extends State<MyApp> {
     );
   }
 }
-
-

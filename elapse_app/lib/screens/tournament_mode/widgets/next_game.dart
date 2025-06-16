@@ -124,7 +124,7 @@ class NextGame extends StatelessWidget {
                   children: [
                     gameText,
                     const Text(
-                      "Next Game",
+                      "Next Match",
                       style: TextStyle(
                         fontSize: 16,
                       ),
@@ -167,7 +167,7 @@ class NextGame extends StatelessWidget {
               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
               height: 3,
             ),
-            SizedBox(height: 10),
+            SizedBox(height: 10, width: 50),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -185,21 +185,26 @@ class NextGame extends StatelessWidget {
                         style: TextStyle(fontSize: 16),
                       ),
                     ]),
-                    SizedBox(
-                      width: 25,
-                    ),
-                    Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(
-                        "$gamesLeft",
-                        style: const TextStyle(
-                          fontSize: 24,
+                    Spacer(),
+                    Align(
+                    alignment: Alignment.centerRight,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end, 
+                      children: [
+                        Text(
+                          "$gamesLeft",
+                          style: const TextStyle(
+                            fontSize: 24,
+                          ),
+                          textAlign: TextAlign.right,
                         ),
-                      ),
-                      const Text(
-                        "Matches Remaining",
-                        style: TextStyle(fontSize: 16),
-                      ),
-                    ])
+                        const Text(
+                          "Matches Remaining",
+                          style: TextStyle(fontSize: 16),
+                          textAlign: TextAlign.right,
+                        ),  
+                      ])
+                    ),
                   ],
                 ),
                 SizedBox(

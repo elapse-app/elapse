@@ -87,7 +87,8 @@ Future<List<TournamentPreview>> fetchTeamTournaments(
   return tournaments;
 }
 
-Future<TournamentList> getTournaments(String eventName, ExploreSearchFilter filters, {bool getAllPages = false, int page = 1}) async {
+Future<TournamentList> getTournaments(String eventName, ExploreSearchFilter filters,
+    {bool getAllPages = false, int page = 1}) async {
   try {
     dynamic parser, regions;
     List<Future<dynamic>> futures = [];

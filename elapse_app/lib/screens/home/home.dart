@@ -15,6 +15,9 @@ import '../../classes/Filters/season.dart';
 import '../../classes/Team/teamPreview.dart';
 import '../widgets/big_error_message.dart';
 
+import 'package:firebase_remote_config/firebase_remote_config.dart';
+
+
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -191,7 +194,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         : Container()
                                   ],
                                 ),
-                                DateTime.now().compareTo(upcoming.endDate!) <= 0 &&
+                                DateTime.now().compareTo(upcoming.endDate!) <= 4 &&
                                         DateTime.now().difference(upcoming.startDate!).inDays > -1
                                     ? Padding(
                                         padding: const EdgeInsets.only(top: 18.0),

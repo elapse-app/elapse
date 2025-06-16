@@ -7,7 +7,7 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1085802258375:android:a445f127ec8ae9650c03e2",
+        "mobilesdk_app_id": "1:1085802258375:android:8fbdd8abaf2aa46d0c03e2",
         "android_client_info": {
           "package_name": "com.elapseapp.elapse_app"
         }
@@ -31,10 +31,10 @@
               "client_type": 3
             },
             {
-              "client_id": "1085802258375-f1vau2e0ddrdtti51ublrs33jrgnhv23.apps.googleusercontent.com",
+              "client_id": "1085802258375-kjcdc6688skm32a5sl39m0ps24qaun7j.apps.googleusercontent.com",
               "client_type": 2,
               "ios_info": {
-                "bundle_id": "com.elapseapp.elapse_app.RunnerTests"
+                "bundle_id": "com.elapseapp.elapse-app"
               }
             }
           ]

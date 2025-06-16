@@ -124,7 +124,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                             radius: 33,
                                           ),
                                           Text(
-                                              '${currentUser!.fname!} ${currentUser!.lname!}',
+                                              '${currentUser!.fname ?? ""} ${currentUser!.lname ?? ""}',
                                               style: const TextStyle(
                                                   fontSize: 24,
                                                   fontWeight: FontWeight.w500)),
@@ -628,6 +628,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Divider(
                       color: Theme.of(context).colorScheme.surfaceDim,
                     ),
+
+                    // ---- THE FOLLOWING IS MATCH NOTIFICATIONS CODE. UNCOMMENT TO ENABLE MATCH NOTIFICATIONS UI ---- //
+                    
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -644,6 +647,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               if (value) {
                                 subToTeamPushNotifs(
                                     getSavedTeams()[0].teamNumber);
+                                askForNotifPerms();
                               } else {
                                 unsubFromTeamPushNotifs(
                                     getSavedTeams()[0].teamNumber);
@@ -654,6 +658,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Divider(
                       color: Theme.of(context).colorScheme.surfaceDim,
                     ),
+                    
                     const SizedBox(height: 32),
                     const SizedBox(
                       width: double.infinity,
@@ -851,6 +856,12 @@ List<TeamPreview> getSavedTeams() {
 Future<void> subToTeamPushNotifs(String teamNum) async {
   try {
     // Subscribing the user to the specified topic
+// For apple platforms, ensure the APNS token is available before making any FCM plugin API calls
+    final apnsToken = await FirebaseMessaging.instance.getAPNSToken();
+    if (apnsToken != null) {
+    } else {
+      print('Could not access APNs when subscribing to topic: $teamNum');
+    }
     await FirebaseMessaging.instance.subscribeToTopic(teamNum);
   } catch (e) {
     print('Failed to subscribe to topic: $e');
@@ -986,5 +997,19 @@ Widget buildTeamDropdown(
                         color: Theme.of(context).colorScheme.secondary))),
       )
     ]),
+  );
+}
+
+Future<void> askForNotifPerms() async {
+  FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+  NotificationSettings settings = await messaging.requestPermission(
+    alert: true,
+    announcement: false,
+    badge: true,
+    carPlay: false,
+    criticalAlert: false,
+    provisional: false,
+    sound: true,
   );
 }

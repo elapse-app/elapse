@@ -210,6 +210,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
             controller: _scrollController,
             slivers: [
               ElapseAppBar(
+                showVDAWarning: false,
                 title: Row(
                   children: [
                     Text(
