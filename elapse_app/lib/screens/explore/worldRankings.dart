@@ -15,7 +15,6 @@ import '../../classes/Team/world_skills.dart';
 import '../../classes/Tournament/tournament.dart';
 import '../my_team/my_team.dart';
 import '../widgets/app_bar.dart';
-import '../widgets/big_error_message.dart';
 import '../widgets/custom_tab_bar.dart';
 
 class WorldRankingsScreen extends StatefulWidget {
@@ -484,7 +483,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                 filter: filter,
                 savedTeams: savedTeams,
                 picklistTeams: picklistTeams,
-                tournament: inTM ? loadTournament(prefs.getString("TMSavedTournament")) : null,
+                tournament: inTM ? getLastLoadedTournament() : null,
                 scoutedTeams: const [],
               );
             }
@@ -495,7 +494,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                 filter: filter,
                 savedTeams: savedTeams,
                 picklistTeams: picklistTeams,
-                tournament: inTM ? loadTournament(prefs.getString("TMSavedTournament")) : null,
+                tournament: inTM ? getLastLoadedTournament() : null,
               );
             }
 

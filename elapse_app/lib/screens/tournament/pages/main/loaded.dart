@@ -24,7 +24,6 @@ import '../../../../classes/Filters/gradeLevel.dart';
 import '../../../../classes/Filters/season.dart';
 import '../../../../classes/Team/vdaStats.dart';
 import '../../../../classes/Team/world_skills.dart';
-import '../../../../classes/Tournament/tskills.dart';
 
 class TournamentLoadedScreen extends StatefulWidget {
   final Tournament tournament;
@@ -40,6 +39,7 @@ class TournamentLoadedScreen extends StatefulWidget {
 }
 
 class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with TickerProviderStateMixin {
+  late Tournament tournament; // mutable tournament so refreshes propagate across the screen
   late int selectedIndex;
   int sortIndex = 0;
   List<String> titles = ["Schedule", "Rankings", "Skills", "Info"];
@@ -86,11 +86,11 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
         savedTeams.addAll(savedTeamsString
             .map((e) => TeamPreview(teamID: jsonDecode(e)["teamID"], teamNumber: jsonDecode(e)["teamNumber"]))
             .toList());
-        rankingsTeams = widget.tournament.teams
+        rankingsTeams = tournament.teams
             .where((element) => savedTeams.any((element2) => element2.teamID == element.id))
             .toList();
       } else {
-        rankingsTeams = widget.tournament.teams;
+        rankingsTeams = tournament.teams;
       }
     });
   }
@@ -98,18 +98,18 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
   @override
   void initState() {
     super.initState();
-    rankingsTeams = widget.tournament.teams;
-    division = widget.tournament.divisions[0];
+    tournament = widget.tournament;
+    rankingsTeams = tournament.teams;
+    division = tournament.divisions[0];
     inSearch = false;
     searchQuery = "";
     savedQuery = "";
     _scrollController = ScrollController();
 
-    worldSkillsStats =
-        getWorldSkillsRankings(widget.tournament.seasonID, getGradeLevel(prefs.getString("defaultGrade")));
-    vdaStats = getTrueSkillData(widget.tournament.seasonID);
+    worldSkillsStats = getWorldSkillsRankings(tournament.seasonID, getGradeLevel(prefs.getString("defaultGrade")));
+    vdaStats = getTrueSkillData(tournament.seasonID);
 
-    if (widget.tournament.divisions[0].games == null || widget.tournament.divisions[0].games!.isEmpty) {
+    if (tournament.divisions[0].games == null || tournament.divisions[0].games!.isEmpty) {
       selectedIndex = 3;
     } else {
       selectedIndex = 0;
@@ -145,7 +145,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
               sort: rankingSorts[sortIndex],
               divisionIndex: division.order - 1,
               filter: filter,
-              skills: widget.tournament.tournamentSkills!,
+              skills: tournament.tournamentSkills!,
               worldSkills: jsonDecode(prefs.getString("worldSkillsData")!)
                   .map<WorldSkillsStats>((e) => WorldSkillsStats.fromJson(e))
                   .toList(),
@@ -170,23 +170,23 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                       sort: rankingSorts[sortIndex],
                       divisionIndex: division.order - 1,
                       filter: filter,
-                      skills: widget.tournament.tournamentSkills!,
+                      skills: tournament.tournamentSkills!,
                       worldSkills: snapshot.data?[0] as List<WorldSkillsStats>,
                       vda: sortIndex == 9 ? (snapshot.data?[1] as List<VDAStats>) : null,
                     );
                 }
               }),
       SkillsPage(
-          skills: widget.tournament.tournamentSkills!,
-          teams: widget.tournament.teams,
-          divisions: widget.tournament.divisions,
+          skills: tournament.tournamentSkills!,
+          teams: tournament.teams,
+          divisions: tournament.divisions,
         sort: sortIndex,
         filter: filter,
       ),
       InfoPage(
         // InfoPage is a StatelessWidget
-        tournament: widget.tournament,
-        awards: widget.tournament.awards,
+        tournament: tournament,
+        awards: tournament.awards,
       ),
     ];
 
@@ -194,8 +194,13 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: RefreshIndicator(
           onRefresh: () async {
-            Tournament tournament = await getTournamentDetails(widget.tournament.id);
+            // Use TMTournamentDetails with forceRefresh checks to ensure correct caching behavior
+            // This fetches from API, saves to SQLite, and updates the in-memory CacheManager
+            final updatedTournament = await TMTournamentDetails(tournament.id, forceRefresh: true);
+
             setState(() {
+              tournament = updatedTournament;
+              division = tournament.divisions.isNotEmpty ? tournament.divisions[0] : division;
               rankingsTeams = tournament.teams;
               inSearch = false;
               searchQuery = "";
@@ -229,7 +234,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                             transitionDuration: Duration(milliseconds: 300),
                             reverseTransitionDuration: Duration(milliseconds: 300),
                             pageBuilder: (context, animation, secondaryAnimation) => SearchScreen(
-                              tournament: widget.tournament,
+                              tournament: tournament,
                               division: division,
                             ),
                             transitionsBuilder: (context, animation, secondaryAnimation, child) {
@@ -265,12 +270,12 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                                     child: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
                                   ),
                                   Spacer(),
-                                  widget.tournament.divisions.isNotEmpty
-                                      ? DropdownButton<Division>(
+                                  tournament.divisions.isNotEmpty
+                                        ? DropdownButton<Division>(
                                           value: division,
                                           borderRadius: BorderRadius.circular(20),
                                           items:
-                                              widget.tournament.divisions.map<DropdownMenuItem<Division>>((division) {
+                                            tournament.divisions.map<DropdownMenuItem<Division>>((division) {
                                             return DropdownMenuItem(
                                                 value: division,
                                                 child: Row(
@@ -300,7 +305,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                                   DropdownButton<Division>(
                                     value: division,
                                     borderRadius: BorderRadius.circular(20),
-                                    items: widget.tournament.divisions.map<DropdownMenuItem<Division>>((division) {
+                                    items: tournament.divisions.map<DropdownMenuItem<Division>>((division) {
                                       return DropdownMenuItem(
                                           value: division,
                                           child: Row(

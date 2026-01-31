@@ -909,8 +909,7 @@ Widget buildTeamDropdown(
 
                     Tournament? tournament;
                     if (prefs.getBool("isTournamentMode") ?? false) {
-                      tournament =
-                          loadTournament(prefs.getString("TMSavedTournament"));
+                      tournament = getLastLoadedTournament();
                     }
 
                     if (tournament != null &&
@@ -952,9 +951,7 @@ Widget buildTeamDropdown(
                                       update(value!);
 
                                       prefs.setBool("isTournamentMode", false);
-                                      prefs.remove(
-                                          "tournament-${tournament!.id}");
-                                      prefs.remove("TMSavedTournament");
+                                      clearLastLoadedTournament();
                                       myAppKey.currentState!.reloadApp();
                                       Navigator.pop(context);
                                     })

@@ -70,7 +70,7 @@ class _AllTeamsState extends State<AllTeams> {
     });
 
     inTM = prefs.getBool("isTournamentMode") ?? false;
-    tmTournament = inTM ? loadTournament(prefs.getString("TMSavedTournament")) : null;
+    tmTournament = inTM ? getLastLoadedTournament() : null;
     savedTeams = _getSavedTeams();
     picklistTeams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
     scoutedTeams = [];
@@ -89,7 +89,7 @@ class _AllTeamsState extends State<AllTeams> {
     if (filter.onPicklist && picklistTeams.isNotEmpty) {
       teams = teams.where((e) => picklistTeams.any((e2) => e2.teamID == e.id)).toList();
     }
-    if (filter.atTournament && inTM) {
+    if (filter.atTournament && tmTournament != null) {
       teams = teams.where((e) => tmTournament!.teams.any((e2) => e2.id == e.id)).toList();
     }
     if (filter.scouted) {

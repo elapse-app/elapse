@@ -26,6 +26,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:elapse_app/classes/Miscellaneous/remote_config.dart';
+import 'package:elapse_app/database/database_helper.dart';
+import 'package:elapse_app/database/cache_manager.dart';
+import 'package:elapse_app/database/tournament_repository.dart';
 
 final GlobalKey<MyAppState> myAppKey = GlobalKey<MyAppState>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
@@ -53,6 +56,27 @@ void main() async {
   await FirebaseRemoteConfigService().initialize();
 
   prefs = await SharedPreferences.getInstance();
+
+  // Initialize SQLite database for tournament caching
+  await DatabaseHelper().database;
+
+  // Restore tournament to in-memory cache if tournament mode is active
+  // This ensures getLastLoadedTournament() returns data after app restart
+  // Uses offline-only load (no network) for instant startup
+  if (prefs.getBool("isTournamentMode") ?? false) {
+    final tournamentId = prefs.getInt("tournamentID");
+    if (tournamentId != null) {
+      try {
+        // Load directly from SQLite - no network call, no expiry check
+        final cached = await TournamentRepository().getCachedTournament(tournamentId);
+        if (cached != null) {
+          CacheManager.setLastLoadedTournament(cached);
+        }
+      } catch (_) {
+        // Silently fail - screens will handle null gracefully
+      }
+    }
+  }
 
   // Set android system navbar colour
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(

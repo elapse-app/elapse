@@ -12,7 +12,6 @@ import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
 
 import '../../classes/Tournament/division.dart';
-import '../../classes/Tournament/tstats.dart';
 
 import 'package:elapse_app/classes/Miscellaneous/remote_config.dart';
 
@@ -187,8 +186,9 @@ class _TMHomePageState extends State<TMHomePage> {
                               builder: (context, snapshot) {
                                 if (snapshot.hasData) {
                                   Division division = snapshot.data!.divisions
-                                      .firstWhere((d) => d.teamStats!
-                                          .containsKey(widget.teamID));
+                                      .firstWhere(
+                                          (d) => d.teamStats?.containsKey(widget.teamID) ?? false,
+                                          orElse: () => snapshot.data!.divisions.first);
                                   return GestureDetector(
                                     onTap: () {
                                       Navigator.push(
@@ -336,7 +336,8 @@ class _TMHomePageState extends State<TMHomePage> {
                     if (snapshot.data?.divisions.first.teamStats != null) {
                       final divisions = snapshot.data!.divisions;
                       Division? division = divisions.firstWhere(
-                          (d) => d.teamStats!.containsKey(widget.teamID));
+                          (d) => d.teamStats?.containsKey(widget.teamID) ?? false,
+                          orElse: () => divisions.first);
 
                       if (division.games!.isEmpty) {
                         return SliverToBoxAdapter(
@@ -393,7 +394,7 @@ class _TMHomePageState extends State<TMHomePage> {
                                 game: game,
                                 games: division.games!,
                                 rankings: division.teamStats!,
-                                skills: snapshot.data!.tournamentSkills!,
+                                skills: snapshot.data!.tournamentSkills ?? {},
                                 targetTeam: TeamPreview(
                                     teamNumber: widget.teamNumber,
                                     teamID: widget.teamID),
@@ -451,7 +452,8 @@ class _TMHomePageState extends State<TMHomePage> {
               if (snapshot.hasData) {
                 if (snapshot.data?.divisions.first.teamStats != null) {
                   Division division = snapshot.data!.divisions.firstWhere(
-                      (d) => d.teamStats!.containsKey(widget.teamID));
+                      (d) => d.teamStats?.containsKey(widget.teamID) ?? false,
+                      orElse: () => snapshot.data!.divisions.first);
                   List<Game> upcomingGames =
                       getTeamGames(division.games!, widget.teamNumber).where(
                     (element) {
@@ -538,13 +540,14 @@ class _TMHomePageState extends State<TMHomePage> {
               if (snapshot.hasData) {
                 if (snapshot.data?.divisions.first.teamStats != null) {
                   Division division = snapshot.data!.divisions.firstWhere(
-                      (d) => d.teamStats!.containsKey(widget.teamID));
+                      (d) => d.teamStats?.containsKey(widget.teamID) ?? false,
+                      orElse: () => snapshot.data!.divisions.first);
                   return SliverPadding(
                     padding: EdgeInsets.symmetric(horizontal: 23),
                     sliver: SliverToBoxAdapter(
                       child: division.teamStats != null &&
                               division.teamStats!.isNotEmpty &&
-                              snapshot.data!.tournamentSkills!.isNotEmpty
+                              (snapshot.data!.tournamentSkills?.isNotEmpty ?? false)
                           ? RankingOverviewWidget(
                               teamStats: division.teamStats![widget.teamID]!,
                               skills: snapshot.data!.tournamentSkills!,
@@ -591,7 +594,7 @@ class _TMHomePageState extends State<TMHomePage> {
                   ),
                   onPressed: () {
                     prefs.setBool("isTournamentMode", false);
-                    prefs.remove("TMSavedTournament");
+                    clearLastLoadedTournament();
                     myAppKey.currentState!.reloadApp();
                   }),
               Spacer(),

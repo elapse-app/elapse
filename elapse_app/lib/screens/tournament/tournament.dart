@@ -1,11 +1,8 @@
-import 'dart:convert';
-
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/screens/tournament/pages/main/loaded.dart';
 import 'package:elapse_app/screens/tournament/pages/main/loading.dart';
 import 'package:flutter/material.dart';
-import 'package:elapse_app/main.dart';
 
 class TournamentScreen extends StatefulWidget {
   final int tournamentID;
@@ -38,7 +35,9 @@ class _TournamentScreenState extends State<TournamentScreen> {
     if (widget.tournamentFuture != null) {
       tournament = widget.tournamentFuture;
     } else {
-      tournament = getTournamentDetails(widget.tournamentID);
+      // Use TMTournamentDetails to leverage SQLite caching
+      // This ensures previewed tournaments are cached for offline access
+      tournament = TMTournamentDetails(widget.tournamentID);
     }
   }
 
@@ -50,11 +49,10 @@ class _TournamentScreenState extends State<TournamentScreen> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const TournamentLoadingScreen();
         } else if (snapshot.hasData) {
-          Tournament tournament = snapshot.data! as Tournament;
-          prefs.setString(
-              "recently-opened-tournament", jsonEncode(tournament.toJson()));
+          // Note: TMTournamentDetails already sets the in-memory cache via CacheManager
+          // No need to call setLastLoadedTournament here
           return TournamentLoadedScreen(
-            tournament: tournament,
+            tournament: snapshot.data!,
             isPreview: widget.isPreview,
           );
         } else if (snapshot.hasError) {

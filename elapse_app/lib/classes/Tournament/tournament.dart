@@ -3,12 +3,13 @@ import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/tskills.dart';
+import 'package:flutter/foundation.dart';
 
 import 'dart:convert';
 
 import 'package:elapse_app/classes/Tournament/tstats.dart';
+import 'package:elapse_app/database/cache_manager.dart';
 import 'package:elapse_app/extras/token.dart';
-import 'package:elapse_app/main.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 
@@ -190,32 +191,52 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
   }
 }
 
+/// Gets tournament details with SQLite caching.
+///
+/// Uses CacheManager for persistent storage with:
+/// - 30-second cache expiry for fresh data
+/// - Graceful degradation (returns stale cache if API fails)
+/// - Never crashes on malformed data
 Future<Tournament> TMTournamentDetails(int tournamentID, {bool forceRefresh = false}) async {
-  Tournament tournament;
-  if (prefs.getString("TMSavedTournament") == null || prefs.getString("TMSavedTournament") == "") {
-    tournament = await getTournamentDetails(tournamentID);
-    prefs.setString("TMSavedTournament", jsonEncode(tournament.toJson()));
-    print("Getting new tournament");
-    return tournament;
-  } else {
-    tournament = loadTournament(prefs.getString("TMSavedTournament")!);
-    print("Getting cached tournament");
+  final cacheManager = CacheManager();
+  final result = await cacheManager.getTournamentWithCache(
+    tournamentID,
+    forceRefresh: forceRefresh,
+  );
 
-    DateTime? updateTime = DateTime.tryParse(prefs.getString("updateTime") ?? "");
+  if (result.hasData) {
+    final tournament = result.tournament!;
 
-    if (updateTime == null || DateTime.now().isAfter(updateTime) || forceRefresh) {
-      await updateTournament(tournament);
-      prefs.setString("updateTime", DateTime.now().add(const Duration(seconds: 30)).toIso8601String());
-      // Update every minute
+    // Log data source for debugging (only in debug builds)
+    if (kDebugMode) {
+      if (result.isStale) {
+        print("TMTournamentDetails: Using stale cache (API failed)");
+      } else if (result.source == DataSource.cache) {
+        print("TMTournamentDetails: Using valid cache");
+      } else {
+        print("TMTournamentDetails: Fresh data from API");
+      }
     }
 
-    prefs.setString("TMSavedTournament", jsonEncode(tournament.toJson()));
-    prefs.setString("recently-opened-tournament", jsonEncode(tournament.toJson()));
+    // Store in memory for sync access by other screens
+    CacheManager.setLastLoadedTournament(tournament);
+
     return tournament;
   }
+
+  // No data available - throw to maintain existing error behavior
+  throw Exception("Failed to load tournament: ${result.errors.map((e) => e.message).join(', ')}");
 }
 
-bool hasCachedTMTournamentDetails() {
-  DateTime? updateTime = DateTime.tryParse(prefs.getString("updateTime") ?? "");
-  return prefs.getString("TMSavedTournament") != null && updateTime != null && DateTime.now().isBefore(updateTime);
+/// Gets the last loaded tournament from memory (sync access).
+/// Returns null if no tournament has been loaded yet.
+/// Use this instead of loadTournament(prefs.getString("recently-opened-tournament")).
+Tournament? getLastLoadedTournament() {
+  return CacheManager.lastLoadedTournament;
+}
+
+/// Clears the in-memory tournament cache.
+/// Call this when exiting tournament mode.
+void clearLastLoadedTournament() {
+  CacheManager.clearLastLoadedTournament();
 }
