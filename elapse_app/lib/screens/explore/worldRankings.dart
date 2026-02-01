@@ -90,135 +90,137 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
       body: CustomScrollView(
         slivers: [
           ElapseAppBar(
-            title: Padding(
-              padding: const EdgeInsets.only(right: 16.5),
-              child: Row(
-                children: [
-                  const Text(
-                    "World Rankings",
-                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
-                  ),
-                  const Spacer(),
-                  FutureBuilder(
-                      future: Future.wait([futureSkillsStats, futureVDAStats]),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          return GestureDetector(
-                              child: const Icon(
-                                Icons.search,
-                              ),
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  PageRouteBuilder(
-                                    transitionDuration: const Duration(milliseconds: 300),
-                                    reverseTransitionDuration: const Duration(milliseconds: 300),
-                                    pageBuilder: (context, animation, secondaryAnimation) => WorldRankingsSearchScreen(
-                                        skills: snapshot.data![0] as List<WorldSkillsStats>,
-                                        vda: snapshot.data![1] as List<VDAStats>),
-                                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                      return FadeTransition(
-                                        opacity: animation,
-                                        child: child,
-                                      );
-                                    },
-                                  ),
-                                );
-                              });
-                        }
-                        return const Icon(Icons.search);
-                      })
-                ],
-              ),
+            title: const Text(
+              "Rankings",
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
             backNavigation: true,
-            background: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.5),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
-                  ),
-                  const Spacer(),
-                  Row(children: [
-                    const Icon(Icons.school),
-                    const SizedBox(width: 4),
-                    DropdownButton<GradeLevel>(
-                      value: grade,
-                      items: gradeLevels.values.map((grade) {
-                        return DropdownMenuItem(
-                          value: grade,
-                          child: Text(getGrade(grade.name),
-                              overflow: TextOverflow.fade, style: const TextStyle(fontSize: 16)),
-                        );
-                      }).toList(),
-                      onChanged: (GradeLevel? value) => {
-                        setState(() {
-                          grade = value!;
-                          isSkillsLoaded = false;
-                          futureSkillsStats = getWorldSkillsRankings(
-                                  grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade)
-                              .then((data) {
-                            setState(() {
-                              isSkillsLoaded = true;
-                              loadedSkills = data;
-                            });
-                            return data;
-                          });
-                          futures[0] = futureSkillsStats;
-                        })
-                      },
-                    ),
-                  ]),
-                  const SizedBox(width: 15),
-                  GestureDetector(
-                      onTap: () async {
-                        Season updated = await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SeasonFilterPage(
-                                selected: season,
-                                seasonsList: seasons.sublist(0, seasons.indexWhere((e) => e.vrcId == 115) + 1)),
-                          ),
-                        );
-                        setState(() {
-                          season = updated;
-                          isSkillsLoaded = false;
-                          futureSkillsStats = getWorldSkillsRankings(
-                                  grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade)
-                              .then((data) {
-                            setState(() {
-                              isSkillsLoaded = true;
-                              loadedSkills = data;
-                            });
-                            return data;
-                          });
-                          isVDALoaded = false;
-                          futureVDAStats = getTrueSkillData(season.vrcId).then((data) {
-                            setState(() {
-                              isVDALoaded = true;
-                              loadedVDA = data;
-                            });
-                            return data;
-                          });
-                          futures[0] = futureSkillsStats;
-                          futures[1] = futureVDAStats;
-                        });
-                      },
-                      child: Row(children: [
-                        const Icon(Icons.event_note),
-                        const SizedBox(width: 4),
-                        Text(
-                          season.name.substring(10),
-                          style: const TextStyle(fontSize: 16),
+            background: SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 23.0, vertical: 20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.pop(context);
+                          },
+                          child: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
                         ),
-                        const Icon(Icons.arrow_right)
-                      ]))
-                ],
+                        const Spacer(),
+                        Row(children: [
+                          const Icon(Icons.school),
+                          const SizedBox(width: 4),
+                          DropdownButton<GradeLevel>(
+                            value: grade,
+                            items: gradeLevels.values.map((grade) {
+                              return DropdownMenuItem(
+                                value: grade,
+                                child: Text(getGrade(grade.name),
+                                    overflow: TextOverflow.fade, style: const TextStyle(fontSize: 16)),
+                              );
+                            }).toList(),
+                            onChanged: (GradeLevel? value) => {
+                              setState(() {
+                                grade = value!;
+                                isSkillsLoaded = false;
+                                futureSkillsStats = getWorldSkillsRankings(
+                                        grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade)
+                                    .then((data) {
+                                  setState(() {
+                                    isSkillsLoaded = true;
+                                    loadedSkills = data;
+                                  });
+                                  return data;
+                                });
+                                futures[0] = futureSkillsStats;
+                              })
+                            },
+                          ),
+                        ]),
+                        const SizedBox(width: 15),
+                        GestureDetector(
+                            onTap: () async {
+                              Season updated = await Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => SeasonFilterPage(
+                                      selected: season,
+                                      seasonsList: seasons.sublist(0, seasons.indexWhere((e) => e.vrcId == 115) + 1)),
+                                ),
+                              );
+                              setState(() {
+                                season = updated;
+                                isSkillsLoaded = false;
+                                futureSkillsStats = getWorldSkillsRankings(
+                                        grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade)
+                                    .then((data) {
+                                  setState(() {
+                                    isSkillsLoaded = true;
+                                    loadedSkills = data;
+                                  });
+                                  return data;
+                                });
+                                isVDALoaded = false;
+                                futureVDAStats = getTrueSkillData(season.vrcId).then((data) {
+                                  setState(() {
+                                    isVDALoaded = true;
+                                    loadedVDA = data;
+                                  });
+                                  return data;
+                                });
+                                futures[0] = futureSkillsStats;
+                                futures[1] = futureVDAStats;
+                              });
+                            },
+                            child: Row(children: [
+                              const Icon(Icons.event_note),
+                              const SizedBox(width: 4),
+                              Text(
+                                season.name.substring(10),
+                                style: const TextStyle(fontSize: 16),
+                              ),
+                              const Icon(Icons.arrow_right)
+                            ])),
+                        const SizedBox(width: 8),
+                        FutureBuilder(
+                            future: Future.wait([futureSkillsStats, futureVDAStats]),
+                            builder: (context, snapshot) {
+                              if (snapshot.hasData) {
+                                return IconButton(
+                                    icon: const Icon(
+                                      Icons.search,
+                                    ),
+                                    onPressed: () {
+                                      Navigator.push(
+                                        context,
+                                        PageRouteBuilder(
+                                          transitionDuration: const Duration(milliseconds: 300),
+                                          reverseTransitionDuration: const Duration(milliseconds: 300),
+                                          pageBuilder: (context, animation, secondaryAnimation) =>
+                                              WorldRankingsSearchScreen(
+                                                  skills: snapshot.data![0] as List<WorldSkillsStats>,
+                                                  vda: snapshot.data![1] as List<VDAStats>),
+                                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                            return FadeTransition(
+                                              opacity: animation,
+                                              child: child,
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    });
+                              }
+                              return Icon(Icons.search, color: Theme.of(context).colorScheme.onSurface.withAlpha(128));
+                            })
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -248,9 +250,9 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                             onNotification: (scrollNotification) {
                               setState(() {
                                 _fadeStart = scrollNotification.metrics.pixels / 10;
-                                _fadeEnd = (scrollNotification.metrics.maxScrollExtent -
-                                    scrollNotification.metrics.pixels) /
-                                    10;
+                                _fadeEnd =
+                                    (scrollNotification.metrics.maxScrollExtent - scrollNotification.metrics.pixels) /
+                                        10;
 
                                 _fadeStart = _fadeStart.clamp(0.0, 1.0);
                                 _fadeEnd = _fadeEnd.clamp(0.0, 1.0);
@@ -366,7 +368,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                   setState(() {
                                     _fadeStart = scrollNotification.metrics.pixels / 10;
                                     _fadeEnd = (scrollNotification.metrics.maxScrollExtent -
-                                        scrollNotification.metrics.pixels) /
+                                            scrollNotification.metrics.pixels) /
                                         10;
 
                                     _fadeStart = _fadeStart.clamp(0.0, 1.0);
@@ -388,8 +390,8 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                                   color: Theme.of(context).colorScheme.onSurface,
                                                 )),
                                             shape: RoundedRectangleBorder(
-                                                side:
-                                                BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+                                                side: BorderSide(
+                                                    color: Theme.of(context).colorScheme.primary, width: 1.5),
                                                 borderRadius: BorderRadius.circular(10)),
                                             selected: sortIndex == index,
                                             selectedColor: Theme.of(context).colorScheme.primary,
