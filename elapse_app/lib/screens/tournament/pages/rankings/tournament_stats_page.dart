@@ -1,20 +1,24 @@
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
-import 'package:elapse_app/classes/Tournament/tstats.dart';
-import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:flutter/material.dart';
 
 Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNumber, String teamName) {
-  Tournament tournament = loadTournament(prefs.getString("recently-opened-tournament"));
+  final tournament = getLastLoadedTournament();
+  if (tournament == null) return Future.value();
 
   int divisionIndex = getTeamDivisionIndex(tournament.divisions, teamID);
 
-  List<Game> games = tournament.divisions[divisionIndex].games!;
-  Map<int, TeamStats> rankings = tournament.divisions[divisionIndex].teamStats!;
-  TeamStats teamStats = rankings[teamID]!;
+  // Safely access division data - return early if missing
+  final division = tournament.divisions[divisionIndex];
+  final games = division.games;
+  final rankings = division.teamStats;
+  if (games == null || rankings == null) return Future.value();
+
+  final teamStats = rankings[teamID];
+  if (teamStats == null) return Future.value();
   int rank = teamStats.rank;
   int wins = teamStats.wins;
   int losses = teamStats.losses;
@@ -196,7 +200,7 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                           "Skills Rank",
                           style: TextStyle(fontSize: 24),
                         ),
-                        Text("${tournament.tournamentSkills![teamID]?.rank ?? "N/A"}",
+                        Text("${tournament.tournamentSkills?[teamID]?.rank ?? "N/A"}",
                             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500))
                       ],
                     ),

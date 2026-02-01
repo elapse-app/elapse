@@ -37,7 +37,8 @@ class RankingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Tournament tournament = loadTournament(prefs.getString("recently-opened-tournament"));
+    final tournament = getLastLoadedTournament();
+    if (tournament == null) return const SizedBox.shrink();
 
     List<Team> teams = tournament.teams;
     List<TeamPreview> savedTeams = [];

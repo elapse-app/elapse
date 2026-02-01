@@ -28,7 +28,9 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
   @override
   void initState() {
     super.initState();
-    tournament = TMTournamentDetails(widget.tournamentID, forceRefresh: true);
+    // Use cache when valid (30s expiry) for offline resilience
+    // forceRefresh only used on explicit pull-to-refresh
+    tournament = TMTournamentDetails(widget.tournamentID);
   }
 
   @override
