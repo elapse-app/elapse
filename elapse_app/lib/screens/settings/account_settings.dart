@@ -100,8 +100,10 @@ class _AccountSettingsState extends State<AccountSettings> {
                       Row(children: [
                         Expanded(
                           child: LongButton(
-                            onPressed: () {
-                              FirebaseAuth.instance.currentUser?.sendEmailVerification().then((e) {
+                            onPressed: () async {
+                              try {
+                                await FirebaseAuth.instance.currentUser?.sendEmailVerification();
+                                if (!mounted) return;
                                 showDialog(
                                     context: context,
                                     builder: (context) {
@@ -118,7 +120,8 @@ class _AccountSettingsState extends State<AccountSettings> {
                                         ],
                                       );
                                     });
-                              }).catchError((e) {
+                              } catch (e) {
+                                if (!mounted) return;
                                 showDialog(
                                     context: context,
                                     builder: (context) {
@@ -136,7 +139,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                                         ],
                                       );
                                     });
-                              });
+                              }
                             },
                             text: "Send Email",
                             useForwardArrow: false,
@@ -148,6 +151,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                           child: LongButton(
                             onPressed: () async {
                               await FirebaseAuth.instance.currentUser!.reload();
+                              if (!mounted) return;
                               if (FirebaseAuth.instance.currentUser!.emailVerified) {
                                 Database database = Database();
                                 database.verifyUser(widget.user.uid!);

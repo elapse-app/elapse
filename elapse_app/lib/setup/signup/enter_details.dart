@@ -257,12 +257,14 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
 
                           if (prefs.getBool("isSetUp") ?? false) {
                             Database database = Database();
-                            await database
-                                .createUser(currentUser, loadTeamPreview(prefs.getString("savedTeam")))
-                                .then((_) => Navigator.of(context)
-                                  ..pop()
-                                  ..pop())
-                                .catchError((onError) {
+                            try {
+                              await database.createUser(currentUser, loadTeamPreview(prefs.getString("savedTeam")));
+                              if (!mounted) return;
+                              Navigator.of(context)
+                                ..pop()
+                                ..pop();
+                            } catch (e) {
+                              if (!mounted) return;
                               showDialog(
                                   barrierDismissible: false,
                                   context: context,
@@ -282,7 +284,7 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                                       ],
                                     );
                                   });
-                            });
+                            }
                           } else {
                             Navigator.push(
                                 context,

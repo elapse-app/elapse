@@ -69,6 +69,7 @@ class _CreateAccountState extends State<CreateAccount> {
                     await FirebaseAuth.instance.currentUser!.reload();
                     await FirebaseAuth.instance.currentUser!.delete();
                   }
+                  if (!mounted) return;
                   Navigator.pop(context);
                 },
                 child: const Icon(Icons.arrow_back),
@@ -297,6 +298,7 @@ class _CreateAccountState extends State<CreateAccount> {
                           FocusManager.instance.primaryFocus?.unfocus();
                           if (_formKey.currentState!.validate()) {
                             String? signUpState = await signUp(_emailController.text, _passwordController.text);
+                            if (!mounted) return;
 
                             if (signUpState == "email-already-in-use") {
                               showDialog(

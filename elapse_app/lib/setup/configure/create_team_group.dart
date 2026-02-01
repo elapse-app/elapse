@@ -184,11 +184,10 @@ class _CreateTeamGroupState extends State<CreateTeamGroup> {
                           final currentUser = FirebaseAuth.instance.currentUser;
                           ElapseUser currentElapseUser =
                               ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
-                          await database
-                              .createTeamGroup(currentUser!.uid, groupName, currentElapseUser.fname ?? "",
-                                  currentElapseUser.lname ?? "")
-                              .then((value) {
-                            print(value?.toJson());
+                          try {
+                            final value = await database.createTeamGroup(currentUser!.uid, groupName,
+                                currentElapseUser.fname ?? "", currentElapseUser.lname ?? "");
+                            if (!mounted) return;
                             prefs.setString("teamGroup", jsonEncode(value?.toJson()));
                             Navigator.push(
                               context,
@@ -196,7 +195,8 @@ class _CreateTeamGroupState extends State<CreateTeamGroup> {
                                 builder: (context) => CompleteSetupPage(),
                               ),
                             );
-                          }).catchError((onError) {
+                          } catch (e) {
+                            if (!mounted) return;
                             showDialog(
                                 barrierDismissible: false,
                                 context: context,
@@ -216,7 +216,7 @@ class _CreateTeamGroupState extends State<CreateTeamGroup> {
                                     ],
                                   );
                                 });
-                          });
+                          }
                         },
                       ),
                       SizedBox(height: 38),
