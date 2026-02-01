@@ -34,6 +34,7 @@ final GlobalKey<SetupGateState> setupGateKey = GlobalKey<SetupGateState>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 late SharedPreferences prefs;
 late PackageInfo appInfo;
+const bool debugShowCompleteSetup = true;
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -155,7 +156,8 @@ class MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return Consumer2<ColorProvider, TournamentModeProvider>(
       builder: (context, colorProvider, tournamentModeProvider, child) {
-        if (!(prefs.getBool("isSetUp") ?? false)) {
+        if (!(prefs.getBool("isSetUp") ?? false) &&
+            prefs.getString("theme") == null) {
           prefs.setString("theme", "system");
         }
 
@@ -241,6 +243,9 @@ class SetupGateState extends State<SetupGate> {
 
   @override
   Widget build(BuildContext context) {
+    // if (debugShowCompleteSetup) {
+    //   return const FirstSetupPage();
+    // }
     if (!(prefs.getBool("isSetUp") ?? false)) {
       return const FirstSetupPage();
     }
