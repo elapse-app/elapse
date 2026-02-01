@@ -31,7 +31,17 @@ class AccountSettings extends StatefulWidget {
 }
 
 class _AccountSettingsState extends State<AccountSettings> {
-  int mainTeamId = jsonDecode(prefs.getString("savedTeam") ?? "")["teamID"];
+  int mainTeamId = _getSavedTeamId();
+
+  static int _getSavedTeamId() {
+    final saved = prefs.getString("savedTeam");
+    if (saved == null || saved.isEmpty) return 0;
+    try {
+      return jsonDecode(saved)["teamID"] ?? 0;
+    } catch (_) {
+      return 0;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,10 +82,10 @@ class _AccountSettingsState extends State<AccountSettings> {
                     radius: 50,
                   ),
                   const SizedBox(height: 9),
-                  Text("${widget.user.fname!} ${widget.user.lname!}",
+                  Text("${widget.user.fname ?? ''} ${widget.user.lname ?? ''}",
                       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
                   const SizedBox(height: 9),
-                  Text(widget.user.email!, style: const TextStyle(fontSize: 18)),
+                  Text(widget.user.email ?? '', style: const TextStyle(fontSize: 18)),
                 ])),
             const SizedBox(height: 23),
             widget.user.verified == false
@@ -150,11 +160,15 @@ class _AccountSettingsState extends State<AccountSettings> {
                         Expanded(
                           child: LongButton(
                             onPressed: () async {
-                              await FirebaseAuth.instance.currentUser!.reload();
+                              final user = FirebaseAuth.instance.currentUser;
+                              if (user == null) return;
+                              await user.reload();
                               if (!mounted) return;
-                              if (FirebaseAuth.instance.currentUser!.emailVerified) {
+                              if (user.emailVerified) {
                                 Database database = Database();
-                                database.verifyUser(widget.user.uid!);
+                                if (widget.user.uid != null) {
+                                  database.verifyUser(widget.user.uid!);
+                                }
                                 showDialog(
                                     context: context,
                                     builder: (context) {
@@ -239,7 +253,9 @@ class _AccountSettingsState extends State<AccountSettings> {
             const SizedBox(height: 18),
             GestureDetector(
                 onTap: () {
-                  FirebaseAuth.instance.sendPasswordResetEmail(email: FirebaseAuth.instance.currentUser!.email!);
+                  final email = FirebaseAuth.instance.currentUser?.email;
+                  if (email == null) return;
+                  FirebaseAuth.instance.sendPasswordResetEmail(email: email);
                   showDialog(
                       context: context,
                       builder: (context) {
@@ -435,10 +451,12 @@ class _AccountSettingsState extends State<AccountSettings> {
                                             child: Text("Delete",
                                                 style: TextStyle(color: Theme.of(context).colorScheme.error)),
                                             onPressed: () async {
+                                              final user = FirebaseAuth.instance.currentUser;
+                                              if (user == null || user.email == null) return;
                                               try {
-                                                await FirebaseAuth.instance.currentUser!.reauthenticateWithCredential(
+                                                await user.reauthenticateWithCredential(
                                                     EmailAuthProvider.credential(
-                                                        email: FirebaseAuth.instance.currentUser!.email!,
+                                                        email: user.email!,
                                                         password: passwordController.text));
                                               } on FirebaseAuthException catch (e) {
                                                 setState(() {
@@ -453,7 +471,7 @@ class _AccountSettingsState extends State<AccountSettings> {
                                               );
                                               Database database = Database();
                                               database.deleteCurrentUser();
-                                              FirebaseAuth.instance.currentUser!.delete();
+                                              user.delete();
                                               clearPrefs();
                                             },
                                           ),

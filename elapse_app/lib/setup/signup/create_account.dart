@@ -65,9 +65,10 @@ class _CreateAccountState extends State<CreateAccount> {
             title: Row(children: [
               GestureDetector(
                 onTap: () async {
-                  if (FirebaseAuth.instance.currentUser != null) {
-                    await FirebaseAuth.instance.currentUser!.reload();
-                    await FirebaseAuth.instance.currentUser!.delete();
+                  final user = FirebaseAuth.instance.currentUser;
+                  if (user != null) {
+                    await user.reload();
+                    await user.delete();
                   }
                   if (!mounted) return;
                   Navigator.pop(context);
@@ -375,7 +376,7 @@ class _CreateAccountState extends State<CreateAccount> {
                                             Navigator.pop(context);
 
                                             bool initBuild = false;
-                                            FirebaseAuth.instance.currentUser!.sendEmailVerification();
+                                            FirebaseAuth.instance.currentUser?.sendEmailVerification();
                                             showDialog(
                                                 context: context,
                                                 builder: (context) {
@@ -384,13 +385,16 @@ class _CreateAccountState extends State<CreateAccount> {
                                                       initBuild = true;
                                                       verify() async {
                                                         DateTime timeout = DateTime.now().add(Duration(minutes: 3));
-                                                        while (!FirebaseAuth.instance.currentUser!.emailVerified &&
+                                                        var user = FirebaseAuth.instance.currentUser;
+                                                        while (user != null &&
+                                                            !user.emailVerified &&
                                                             DateTime.now().isBefore(timeout)) {
                                                           await Future.delayed(Duration(seconds: 5));
-                                                          await FirebaseAuth.instance.currentUser!.reload();
+                                                          await user.reload();
+                                                          user = FirebaseAuth.instance.currentUser;
                                                         }
 
-                                                        if (FirebaseAuth.instance.currentUser!.emailVerified) {
+                                                        if (user?.emailVerified == true) {
                                                           setState(() {
                                                             verified = true;
                                                           });
@@ -414,10 +418,11 @@ class _CreateAccountState extends State<CreateAccount> {
                                                                   actions: [
                                                                     TextButton(
                                                                         onPressed: () async {
-                                                                          await FirebaseAuth.instance.currentUser!
-                                                                              .reload();
-                                                                          await FirebaseAuth.instance.currentUser!
-                                                                              .delete();
+                                                                          final user =
+                                                                              FirebaseAuth.instance.currentUser;
+                                                                          if (user == null) return;
+                                                                          await user.reload();
+                                                                          await user.delete();
                                                                           Navigator.pop(context);
                                                                         },
                                                                         child: Text(
@@ -459,8 +464,11 @@ class _CreateAccountState extends State<CreateAccount> {
                                                       actions: [
                                                         TextButton(
                                                             onPressed: () async {
-                                                              await FirebaseAuth.instance.currentUser!.reload();
-                                                              await FirebaseAuth.instance.currentUser!.delete();
+                                                              final user = FirebaseAuth.instance.currentUser;
+                                                              if (user != null) {
+                                                                await user.reload();
+                                                                await user.delete();
+                                                              }
                                                               Navigator.pop(context);
                                                             },
                                                             child: Text(

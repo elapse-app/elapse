@@ -32,13 +32,16 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
   @override
   void initState() {
     super.initState();
-    currentUser = ElapseUser(
-      uid: firebaseUser!.uid,
-      email: firebaseUser!.email,
-      verified: firebaseUser!.emailVerified,
-    );
-    if (prefs.getString("savedTeam") != null) {
-      TeamPreview team = loadTeamPreview(prefs.getString("savedTeam"));
+    if (firebaseUser != null) {
+      currentUser = ElapseUser(
+        uid: firebaseUser!.uid,
+        email: firebaseUser!.email,
+        verified: firebaseUser!.emailVerified,
+      );
+    }
+    final savedTeam = prefs.getString("savedTeam");
+    if (savedTeam != null) {
+      TeamPreview team = loadTeamPreview(savedTeam);
       currentUser.teamNumber = team.teamNumber;
     }
   }
