@@ -5,7 +5,9 @@ import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
+import 'package:elapse_app/classes/Tournament/league_session.dart';
 import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
+import 'package:intl/intl.dart';
 import 'package:elapse_app/screens/tournament/pages/info/info.dart';
 import 'package:elapse_app/screens/tournament/pages/main/search_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings.dart';
@@ -66,6 +68,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   List<Game> practice = [];
   List<Game> qualifications = [];
   List<Game> eliminations = [];
+
+  LeagueSession? _selectedSession;  // null = show all sessions (for leagues)
 
   List<Widget> widgets = [SliverToBoxAdapter(), SliverToBoxAdapter()];
 
@@ -182,14 +186,91 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   void _processGames() {
     if (division.games != null && division.games!.isNotEmpty) {
       adjustMatchTiming(division.games!);
-      practice = division.games!.where((game) => game.roundNum == 1).toList();
-      qualifications = division.games!.where((game) => game.roundNum == 2).toList();
-      eliminations = division.games!.where((game) => game.roundNum > 2).toList();
+
+      // Filter games by selected session (for leagues)
+      List<Game> filteredGames = _filterGamesBySession(division.games!);
+
+      practice = filteredGames.where((game) => game.roundNum == 1).toList();
+      qualifications = filteredGames.where((game) => game.roundNum == 2).toList();
+      eliminations = filteredGames.where((game) => game.roundNum > 2).toList();
     } else {
       practice = [];
       qualifications = [];
       eliminations = [];
     }
+  }
+
+  /// Filter games by selected session date (for leagues)
+  List<Game> _filterGamesBySession(List<Game> games) {
+    // If no session selected or not a league, show all games
+    if (_selectedSession == null || !tournament.isLeague) {
+      return games;
+    }
+
+    return games.where((game) {
+      // Include games scheduled for the selected session
+      if (game.scheduledTime != null) {
+        return _isSameDay(game.scheduledTime!, _selectedSession!.date);
+      }
+      // Include unscheduled games in session view as well
+      // (they may be matches pending scheduling for this session)
+      return true;
+    }).toList();
+  }
+
+  /// Check if two dates are the same day
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  /// Builds the session dropdown for leagues (returns empty widget for tournaments)
+  Widget _buildSessionDropdown() {
+    // Only show for leagues with sessions
+    if (!tournament.isLeague || tournament.sessions == null || tournament.sessions!.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    return DropdownButton<LeagueSession?>(
+      value: _selectedSession,
+      borderRadius: BorderRadius.circular(20),
+      hint: Row(
+        children: [
+          const Icon(Icons.calendar_today, size: 24),
+          const SizedBox(width: 10),
+          Text("All Sessions"),
+        ],
+      ),
+      items: [
+        DropdownMenuItem<LeagueSession?>(
+          value: null,
+          child: Row(
+            children: [
+              const Icon(Icons.calendar_today, size: 24),
+              const SizedBox(width: 10),
+              Text("All Sessions"),
+            ],
+          ),
+        ),
+        ...tournament.sessions!.map<DropdownMenuItem<LeagueSession?>>((session) {
+          return DropdownMenuItem(
+            value: session,
+            child: Row(
+              children: [
+                const Icon(Icons.event, size: 24),
+                const SizedBox(width: 10),
+                Text(DateFormat('MMM d').format(session.date)),
+              ],
+            ),
+          );
+        }),
+      ],
+      onChanged: (LeagueSession? value) {
+        setState(() {
+          _selectedSession = value;
+          _processGames();
+        });
+      },
+    );
   }
 
   @override
@@ -322,8 +403,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             // Note: RefreshIndicator shows its own spinner, but we could optionally set _isLoading here
             final updatedTournament = await TMTournamentDetails(widget.tournamentId, forceRefresh: true);
 
-            // Preserve the user's current division selection by finding matching division in updated data
+            // Preserve the user's current division and session selection
             final currentDivisionId = division.id;
+            final currentSessionDate = _selectedSession?.date;
 
             setState(() {
               tournament = updatedTournament;
@@ -334,6 +416,17 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                   (d) => d.id == currentDivisionId,
                   orElse: () => tournament.divisions[0],
                 );
+              }
+
+              // Preserve session selection for leagues
+              if (currentSessionDate != null && tournament.isLeague && 
+                  tournament.sessions != null && tournament.sessions!.isNotEmpty) {
+                _selectedSession = tournament.sessions!.firstWhere(
+                  (s) => _isSameDay(s.date, currentSessionDate),
+                  orElse: () => tournament.sessions!.first,
+                );
+              } else {
+                _selectedSession = null;
               }
 
               rankingsTeams = tournament.teams;
@@ -408,6 +501,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                                     child: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
                                   ),
                                   Spacer(),
+                                  _buildSessionDropdown(),
                                   tournament.divisions.isNotEmpty
                                         ? DropdownButton<Division>(
                                           value: division,
@@ -468,6 +562,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                                       }
                                     },
                                   ),
+                                  _buildSessionDropdown(),
                                   Spacer(),
                                   SettingsButton()
                                 ],

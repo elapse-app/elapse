@@ -3,6 +3,7 @@ import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/tskills.dart';
+import 'package:elapse_app/classes/Tournament/league_session.dart';
 import 'package:flutter/foundation.dart';
 
 import 'dart:convert';
@@ -31,6 +32,11 @@ class Tournament {
   Map<int, TournamentSkills>? tournamentSkills;
   List<Award> awards;
 
+  List<LeagueSession>? sessions;
+
+  /// Returns true if this is a league event with multiple sessions
+  bool get isLeague => sessions != null && sessions!.isNotEmpty;
+
   Tournament({
     required this.id,
     required this.name,
@@ -43,6 +49,7 @@ class Tournament {
     required this.awards,
     this.endDate,
     this.tournamentSkills,
+    this.sessions,
   });
 
   Map<String, dynamic> toJson() {
@@ -59,7 +66,8 @@ class Tournament {
       "awards": awards.map((e) => e.toJson()).toList(),
       "tournamentSkills": tournamentSkills?.map((key, value) {
         return MapEntry(key.toString(), value.toJson());
-      })
+      }),
+      "sessions": sessions?.map((s) => s.toJson()).toList(),
     };
   }
 }
@@ -112,6 +120,13 @@ Tournament loadTournament(json) {
     });
   }
 
+  List<LeagueSession>? sessions;
+  if (tournament["sessions"] != null) {
+    sessions = (tournament["sessions"] as List)
+        .map((s) => LeagueSession.fromJson(s))
+        .toList();
+  }
+
   return Tournament(
     id: tournament["id"],
     name: tournament["name"],
@@ -124,6 +139,7 @@ Tournament loadTournament(json) {
     teams: teams,
     awards: awards,
     tournamentSkills: tournamentSkills,
+    sessions: sessions,
   );
 }
 
@@ -137,6 +153,14 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
 
   try {
     final parsed = jsonDecode(response.body);
+
+    // DEBUG: Log API response structure for league session support
+    if (kDebugMode) {
+      debugPrint('=== API Response Debug (Event $tournamentID) ===');
+      debugPrint('event_type: ${parsed['event_type']}');
+      debugPrint('locations: ${parsed['locations'] != null ? jsonEncode(parsed['locations']) : 'null'}');
+      debugPrint('=== End API Debug ===');
+    }
 
     List<Division> divisions = await Future.wait(parsed["divisions"].map<Future<Division>>((division) async {
       Division returnDivision = Division(
@@ -165,6 +189,19 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
 
     List<Award> awards = await getTournamentAwards(tournamentID);
 
+    // Parse sessions from locations Map (for leagues)
+    List<LeagueSession>? sessions;
+    if (parsed['locations'] != null &&
+        parsed['locations'] is Map &&
+        (parsed['locations'] as Map).isNotEmpty) {
+      final locationsMap = parsed['locations'] as Map<String, dynamic>;
+      sessions = locationsMap.entries
+          .map((entry) => LeagueSession.fromMapEntry(entry.key, entry.value))
+          .toList();
+      // Sort sessions by date
+      sessions.sort((a, b) => a.date.compareTo(b.date));
+    }
+
     return Tournament(
       id: tournamentID,
       name: parsed["name"],
@@ -185,6 +222,7 @@ Future<Tournament> getTournamentDetails(int tournamentID) async {
       divisions: divisions,
       tournamentSkills: skills,
       awards: awards,
+      sessions: sessions,
     );
   } catch (e) {
     throw (e);

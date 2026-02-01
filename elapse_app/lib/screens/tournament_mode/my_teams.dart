@@ -32,7 +32,6 @@ class TMMyTeams extends StatefulWidget {
 }
 
 class TMMyTeamsState extends State<TMMyTeams> {
-  late String savedTeam;
   late TeamPreview savedTeamPreview;
   bool _hasSavedTeam = false;
 
@@ -45,21 +44,33 @@ class TMMyTeamsState extends State<TMMyTeams> {
   Tournament? _tournament;
   bool _isTournamentLoading = true;
 
-  int seasonID = 190;
+  String? _tournamentError;
+
   @override
   void initState() {
     super.initState();
     reload();
   }
 
+  @override
+  void didUpdateWidget(TMMyTeams oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.tournamentID != widget.tournamentID) {
+      _initializeTournament();
+    }
+  }
+
   void _initializeTournament() {
+    setState(() {
+      _isTournamentLoading = true;
+      _tournamentError = null;
+    });
+
     final cachedTournament = CacheManager.lastLoadedTournament;
 
     if (cachedTournament != null && cachedTournament.id == widget.tournamentID) {
-      // Don't call setState if called from initState - just assign directly
       _tournament = cachedTournament;
       _isTournamentLoading = false;
-      // Schedule a rebuild after initState completes
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) setState(() {});
       });
@@ -69,6 +80,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
           setState(() {
             _tournament = t;
             _isTournamentLoading = false;
+            _tournamentError = null;
           });
         }
       }).catchError((error) {
@@ -76,6 +88,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
         if (mounted) {
           setState(() {
             _isTournamentLoading = false;
+            _tournamentError = error.toString();
           });
         }
       });
@@ -125,9 +138,10 @@ class TMMyTeamsState extends State<TMMyTeams> {
       setState(() {
         selectedTeamPreview = value;
         team = fetchTeam(value.teamID);
-        teamStats = getTrueSkillDataForTeam(seasonID, value.teamNumber);
-        teamTournaments = fetchTeamTournaments(value.teamID, seasonID);
-        teamAwards = getAwards(value.teamID, seasonID);
+        teamStats = getTrueSkillDataForTeam(season.vrcId, value.teamNumber);
+        skillsStats = getWorldSkillsForTeam(season.vrcId, value.teamID);
+        teamTournaments = fetchTeamTournaments(value.teamID, season.vrcId);
+        teamAwards = getAwards(value.teamID, season.vrcId);
       });
     }
   }
@@ -138,8 +152,56 @@ class TMMyTeamsState extends State<TMMyTeams> {
   Future<WorldSkillsStats>? skillsStats;
   Future<List<Award>>? teamAwards;
 
+  Future<void> _onRefresh() async {
+    // Re-fetch all data
+    setState(() {
+      team = fetchTeam(selectedTeamPreview.teamID);
+      teamStats = getTrueSkillDataForTeam(season.vrcId, selectedTeamPreview.teamNumber);
+      skillsStats = getWorldSkillsForTeam(season.vrcId, selectedTeamPreview.teamID);
+      teamTournaments = fetchTeamTournaments(selectedTeamPreview.teamID, season.vrcId);
+      teamAwards = getAwards(selectedTeamPreview.teamID, season.vrcId);
+    });
+    _initializeTournament();
+
+    // Wait for all futures to complete
+    await Future.wait([
+      if (team != null) team!,
+      if (teamStats != null) teamStats!,
+      if (skillsStats != null) skillsStats!,
+      if (teamTournaments != null) teamTournaments!,
+      if (teamAwards != null) teamAwards!,
+    ].whereType<Future>());
+  }
+
   Widget _buildTournamentSection() {
-    if (_isTournamentLoading || _tournament == null) {
+    if (_isTournamentLoading) {
+      return Container(
+        margin: const EdgeInsets.only(top: 25),
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_tournamentError != null) {
+      return Container(
+        margin: const EdgeInsets.only(top: 25),
+        child: Column(
+          children: [
+            Text(
+              "Failed to load tournament data",
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+            const SizedBox(height: 8),
+            TextButton.icon(
+              onPressed: _initializeTournament,
+              icon: const Icon(Icons.refresh),
+              label: const Text("Retry"),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_tournament == null) {
       return Container();
     }
 
@@ -214,9 +276,19 @@ class TMMyTeamsState extends State<TMMyTeams> {
     if (!_hasSavedTeam) {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        appBar: const ElapseAppBar(title: Text("My Team")),
-        body: const Center(
-          child: Text("No saved team found. Please select a team."),
+        body: CustomScrollView(
+          slivers: [
+            const ElapseAppBar(
+              title: Text("My Team"),
+              backNavigation: true,
+            ),
+            const SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(
+                child: Text("No saved team found. Please select a team."),
+              ),
+            ),
+          ],
         ),
       );
     }
@@ -229,12 +301,14 @@ class TMMyTeamsState extends State<TMMyTeams> {
     }
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: CustomScrollView(
-        slivers: [
-          ElapseAppBar(
-            title: const Text(
-              "My Team",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+      body: RefreshIndicator(
+        onRefresh: _onRefresh,
+        child: CustomScrollView(
+          slivers: [
+            ElapseAppBar(
+              title: const Text(
+                "My Team",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
             includeSettings: true,
             background: Padding(
@@ -947,7 +1021,8 @@ class TMMyTeamsState extends State<TMMyTeams> {
                   ),
                 )
               : SliverToBoxAdapter()
-        ],
+          ],
+        ),
       ),
     );
   }

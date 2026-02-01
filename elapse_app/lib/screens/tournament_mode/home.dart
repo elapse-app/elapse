@@ -1,6 +1,7 @@
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
+import 'package:elapse_app/classes/Tournament/league_session.dart';
 import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
 import 'package:elapse_app/database/cache_manager.dart';
 import 'package:elapse_app/main.dart';
@@ -84,6 +85,58 @@ class _TMHomePageState extends State<TMHomePage> {
         orElse: () => tournament.divisions.first,
       );
     }
+  }
+
+  /// Get the current or upcoming session for leagues
+  /// Returns null if not a league or no sessions available
+  LeagueSession? _getCurrentSession() {
+    if (_tournament == null || !_tournament!.isLeague) {
+      return null;
+    }
+    
+    // Guard for null or empty sessions
+    if (_tournament!.sessions == null || _tournament!.sessions!.isEmpty) {
+      return null;
+    }
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    // Find today's session or the next upcoming session
+    for (final session in _tournament!.sessions!) {
+      final sessionDay = DateTime(session.date.year, session.date.month, session.date.day);
+      if (sessionDay.isAtSameMomentAs(today) || sessionDay.isAfter(today)) {
+        return session;
+      }
+    }
+
+    // Fall back to last session if all sessions are in the past
+    return _tournament!.sessions!.last;
+  }
+
+  /// Filter games by current session for leagues
+  /// In tournament mode, we include unscheduled games since they may be
+  /// matches pending scheduling for the current session
+  List<Game> _filterGamesForCurrentSession(List<Game> games) {
+    final session = _getCurrentSession();
+    if (session == null) {
+      return games;
+    }
+
+    return games.where((game) {
+      // Include games scheduled for the current session
+      if (game.scheduledTime != null) {
+        return _isSameDay(game.scheduledTime!, session.date);
+      }
+      // Include unscheduled games in tournament mode
+      // (they may be matches pending scheduling for this session)
+      return true;
+    }).toList();
+  }
+
+  /// Check if two dates are the same day
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
   Widget _buildSearchBar(BuildContext context) {
@@ -179,7 +232,10 @@ class _TMHomePageState extends State<TMHomePage> {
       );
     }
 
-    List<Game> upcomingGames = getTeamGames(_division!.games!, widget.teamNumber).where(
+    // Filter games by current session for leagues
+    List<Game> sessionGames = _filterGamesForCurrentSession(_division!.games!);
+
+    List<Game> upcomingGames = getTeamGames(sessionGames, widget.teamNumber).where(
       (element) {
         return element.startedTime == null &&
             element.redScore == 0 &&
@@ -212,7 +268,7 @@ class _TMHomePageState extends State<TMHomePage> {
           children: [
             NextGame(
               game: game,
-              games: _division!.games!,
+              games: sessionGames,
               rankings: _division!.teamStats!,
               skills: _tournament!.tournamentSkills ?? {},
               targetTeam: TeamPreview(
@@ -252,7 +308,10 @@ class _TMHomePageState extends State<TMHomePage> {
       );
     }
 
-    List<Game> upcomingGames = getTeamGames(_division!.games!, widget.teamNumber).where(
+    // Filter games by current session for leagues
+    List<Game> sessionGames = _filterGamesForCurrentSession(_division!.games!);
+
+    List<Game> upcomingGames = getTeamGames(sessionGames, widget.teamNumber).where(
       (element) {
         return element.startedTime == null &&
             element.redScore == 0 &&
