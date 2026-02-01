@@ -86,9 +86,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
         savedTeams.addAll(savedTeamsString
             .map((e) => TeamPreview(teamID: jsonDecode(e)["teamID"], teamNumber: jsonDecode(e)["teamNumber"]))
             .toList());
-        rankingsTeams = tournament.teams
-            .where((element) => savedTeams.any((element2) => element2.teamID == element.id))
-            .toList();
+        rankingsTeams =
+            tournament.teams.where((element) => savedTeams.any((element2) => element2.teamID == element.id)).toList();
       } else {
         rankingsTeams = tournament.teams;
       }
@@ -177,9 +176,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                 }
               }),
       SkillsPage(
-          skills: tournament.tournamentSkills!,
-          teams: tournament.teams,
-          divisions: tournament.divisions,
+        skills: tournament.tournamentSkills!,
+        teams: tournament.teams,
+        divisions: tournament.divisions,
         sort: sortIndex,
         filter: filter,
       ),
@@ -271,11 +270,10 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                                   ),
                                   Spacer(),
                                   tournament.divisions.isNotEmpty
-                                        ? DropdownButton<Division>(
+                                      ? DropdownButton<Division>(
                                           value: division,
                                           borderRadius: BorderRadius.circular(20),
-                                          items:
-                                            tournament.divisions.map<DropdownMenuItem<Division>>((division) {
+                                          items: tournament.divisions.map<DropdownMenuItem<Division>>((division) {
                                             return DropdownMenuItem(
                                                 value: division,
                                                 child: Row(
@@ -524,7 +522,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                                   setState(() {
                                     _fadeStart = scrollNotification.metrics.pixels / 10;
                                     _fadeEnd = (scrollNotification.metrics.maxScrollExtent -
-                                        scrollNotification.metrics.pixels) /
+                                            scrollNotification.metrics.pixels) /
                                         10;
 
                                     _fadeStart = _fadeStart.clamp(0.0, 1.0);
@@ -565,10 +563,10 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                                                         selectAnimation: AnimationStyle(duration: Duration.zero)),
                                                     onSelected: snapshot.connectionState == ConnectionState.done
                                                         ? (bool selected) {
-                                                      setState(() {
-                                                        sortIndex = index;
-                                                      });
-                                                    }
+                                                            setState(() {
+                                                              sortIndex = index;
+                                                            });
+                                                          }
                                                         : null,
                                                   ),
                                                 );
@@ -584,8 +582,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                                                 )),
                                             selected: sortIndex == index,
                                             shape: RoundedRectangleBorder(
-                                                side:
-                                                BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
+                                                side: BorderSide(
+                                                    color: Theme.of(context).colorScheme.primary, width: 1.5),
                                                 borderRadius: BorderRadius.circular(10)),
                                             selectedColor: Theme.of(context).colorScheme.primary,
                                             disabledColor: Theme.of(context).colorScheme.onSurfaceVariant,
@@ -645,100 +643,100 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                   : const SliverToBoxAdapter(),
               selectedIndex == 2
                   ? SliverToBoxAdapter(
-                child: Container(
-                  padding: const EdgeInsets.only(left: 23),
-                  height: 50,
-                  child: Flex(
-                    direction: Axis.horizontal,
-                    children: [
-                      Flexible(
-                        flex: 6,
-                        child: NotificationListener<ScrollNotification>(
-                          onNotification: (scrollNotification) {
-                            setState(() {
-                              _fadeStart = scrollNotification.metrics.pixels / 10;
-                              _fadeEnd = (scrollNotification.metrics.maxScrollExtent -
-                                  scrollNotification.metrics.pixels) /
-                                  10;
+                      child: Container(
+                        padding: const EdgeInsets.only(left: 23),
+                        height: 50,
+                        child: Flex(
+                          direction: Axis.horizontal,
+                          children: [
+                            Flexible(
+                              flex: 6,
+                              child: NotificationListener<ScrollNotification>(
+                                onNotification: (scrollNotification) {
+                                  setState(() {
+                                    _fadeStart = scrollNotification.metrics.pixels / 10;
+                                    _fadeEnd = (scrollNotification.metrics.maxScrollExtent -
+                                            scrollNotification.metrics.pixels) /
+                                        10;
 
-                              _fadeStart = _fadeStart.clamp(0.0, 1.0);
-                              _fadeEnd = _fadeEnd.clamp(0.0, 1.0);
-                            });
-                            return true;
-                          },
-                          child: Stack(
-                            children: [
-                              ListView(
-                                scrollDirection: Axis.horizontal,
-                                children: List<Widget>.generate(skillsSorts.length, (int index) {
-                                  return Container(
-                                    padding: const EdgeInsets.only(right: 5),
-                                    child: ChoiceChip(
-                                      padding: const EdgeInsets.symmetric(horizontal: 5),
-                                      label: Text(skillsSorts[index],
-                                          style: TextStyle(
-                                            color: Theme.of(context).colorScheme.onSurface,
-                                          )),
-                                      selected: sortIndex == index,
-                                      shape: RoundedRectangleBorder(
-                                          side:
-                                          BorderSide(color: Theme.of(context).colorScheme.primary, width: 1.5),
-                                          borderRadius: BorderRadius.circular(10)),
-                                      selectedColor: Theme.of(context).colorScheme.primary,
-                                      disabledColor: Theme.of(context).colorScheme.onSurfaceVariant,
-                                      chipAnimationStyle: ChipAnimationStyle(
-                                          enableAnimation: AnimationStyle(duration: Duration.zero),
-                                          selectAnimation: AnimationStyle(duration: Duration.zero)),
-                                      onSelected: (bool selected) {
-                                        setState(() {
-                                          sortIndex = index;
-                                        });
-                                      },
+                                    _fadeStart = _fadeStart.clamp(0.0, 1.0);
+                                    _fadeEnd = _fadeEnd.clamp(0.0, 1.0);
+                                  });
+                                  return true;
+                                },
+                                child: Stack(
+                                  children: [
+                                    ListView(
+                                      scrollDirection: Axis.horizontal,
+                                      children: List<Widget>.generate(skillsSorts.length, (int index) {
+                                        return Container(
+                                          padding: const EdgeInsets.only(right: 5),
+                                          child: ChoiceChip(
+                                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                                            label: Text(skillsSorts[index],
+                                                style: TextStyle(
+                                                  color: Theme.of(context).colorScheme.onSurface,
+                                                )),
+                                            selected: sortIndex == index,
+                                            shape: RoundedRectangleBorder(
+                                                side: BorderSide(
+                                                    color: Theme.of(context).colorScheme.primary, width: 1.5),
+                                                borderRadius: BorderRadius.circular(10)),
+                                            selectedColor: Theme.of(context).colorScheme.primary,
+                                            disabledColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                                            chipAnimationStyle: ChipAnimationStyle(
+                                                enableAnimation: AnimationStyle(duration: Duration.zero),
+                                                selectAnimation: AnimationStyle(duration: Duration.zero)),
+                                            onSelected: (bool selected) {
+                                              setState(() {
+                                                sortIndex = index;
+                                              });
+                                            },
+                                          ),
+                                        );
+                                      }).toList(),
                                     ),
-                                  );
-                                }).toList(),
-                              ),
-                              IgnorePointer(
-                                ignoring: true,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        Theme.of(context).colorScheme.surface,
-                                        Theme.of(context).colorScheme.surface.withValues(alpha: 0),
-                                        Theme.of(context).colorScheme.surface.withValues(alpha: 0),
-                                        Theme.of(context).colorScheme.surface,
-                                      ],
-                                      stops: [0, 0.05 * _fadeStart, 1 - 0.05 * _fadeEnd, 1.0],
+                                    IgnorePointer(
+                                      ignoring: true,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Theme.of(context).colorScheme.surface,
+                                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                                              Theme.of(context).colorScheme.surface,
+                                            ],
+                                            stops: [0, 0.05 * _fadeStart, 1 - 0.05 * _fadeEnd, 1.0],
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                  ),
+                                  ],
                                 ),
                               ),
-                            ],
-                          ),
+                            ),
+                            Flexible(
+                                flex: 1,
+                                child: IconButton(
+                                    icon: const Icon(
+                                      Icons.filter_list,
+                                      size: 30,
+                                    ),
+                                    onPressed: () async {
+                                      TournamentRankingsFilter updatedFilter = await worldRankingsFilter(
+                                        context,
+                                        filter,
+                                        prefs.getBool("isTournamentMode") ?? false,
+                                      );
+                                      setState(() {
+                                        filter = updatedFilter;
+                                      });
+                                    })),
+                          ],
                         ),
                       ),
-                      Flexible(
-                          flex: 1,
-                          child: IconButton(
-                              icon: const Icon(
-                                Icons.filter_list,
-                                size: 30,
-                              ),
-                              onPressed: () async {
-                                TournamentRankingsFilter updatedFilter = await worldRankingsFilter(
-                                  context,
-                                  filter,
-                                  prefs.getBool("isTournamentMode") ?? false,
-                                );
-                                setState(() {
-                                  filter = updatedFilter;
-                                });
-                              })),
-                    ],
-                  ),
-                ),
-              )
+                    )
                   : const SliverToBoxAdapter(),
               // selectedIndex == 0 &&
               //         division.games != null &&
