@@ -952,7 +952,7 @@ Widget buildTeamDropdown(
 
                                       prefs.setBool("isTournamentMode", false);
                                       clearLastLoadedTournament();
-                                      myAppKey.currentState!.reloadApp();
+                                      setupGateKey.currentState!.reloadApp();
                                       Navigator.pop(context);
                                     })
                               ],

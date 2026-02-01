@@ -595,7 +595,7 @@ class _TMHomePageState extends State<TMHomePage> {
                   onPressed: () {
                     prefs.setBool("isTournamentMode", false);
                     clearLastLoadedTournament();
-                    myAppKey.currentState!.reloadApp();
+                    setupGateKey.currentState!.reloadApp();
                   }),
               Spacer(),
             ],
