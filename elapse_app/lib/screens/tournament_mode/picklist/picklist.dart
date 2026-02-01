@@ -2,10 +2,9 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:carousel_slider/carousel_controller.dart';
-import 'package:elapse_app/classes/Tournament/tstats.dart';
+import 'package:elapse_app/database/cache_manager.dart';
 import 'package:elapse_app/screens/tournament_mode/picklist/picklist_widget.dart';
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../classes/Team/teamPreview.dart';
@@ -23,7 +22,8 @@ class PicklistPage extends StatefulWidget {
 
 class _PicklistPageState extends State<PicklistPage> {
   List<TeamPreview> teams = [];
-  late Future<Tournament> tournament;
+  Tournament? _tournament;
+  bool _isTournamentLoading = true;
 
   List<CarouselSliderController> carouselControllers = [];
 
@@ -37,11 +37,39 @@ class _PicklistPageState extends State<PicklistPage> {
     });
   }
 
+  void _initializeTournament() {
+    final cachedTournament = CacheManager.lastLoadedTournament;
+    final tournamentId = prefs.getInt("tournamentID") ?? 0;
+
+    if (cachedTournament != null && cachedTournament.id == tournamentId) {
+      setState(() {
+        _tournament = cachedTournament;
+        _isTournamentLoading = false;
+      });
+    } else {
+      TMTournamentDetails(tournamentId).then((t) {
+        if (mounted) {
+          setState(() {
+            _tournament = t;
+            _isTournamentLoading = false;
+          });
+        }
+      }).catchError((error) {
+        debugPrint('Failed to load tournament: $error');
+        if (mounted) {
+          setState(() {
+            _isTournamentLoading = false;
+          });
+        }
+      });
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     refreshTeams();
-    tournament = TMTournamentDetails(prefs.getInt("tournamentID") ?? 0);
+    _initializeTournament();
   }
 
   @override
@@ -71,7 +99,8 @@ class _PicklistPageState extends State<PicklistPage> {
                                   PicklistWidget(
                                       index: i,
                                       team: e,
-                                      tournament: tournament,
+                                      tournament: _tournament,
+                                      isTournamentLoading: _isTournamentLoading,
                                       carouselControllers: carouselControllers,
                                       refresh: refreshTeams),
                                   i != teams.length - 1

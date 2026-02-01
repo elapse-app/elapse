@@ -12,6 +12,7 @@ import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
 import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
+import 'package:elapse_app/database/cache_manager.dart';
 import 'package:elapse_app/screens/my_team/my_team.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:elapse_app/screens/tournament_mode/widgets/ranking_overview_widget.dart';
@@ -40,7 +41,8 @@ class TMMyTeamsState extends State<TMMyTeams> {
   late TeamPreview selectedTeamPreview;
   late Season season;
 
-  Future<Tournament>? tournament;
+  Tournament? _tournament;
+  bool _isTournamentLoading = true;
 
   int seasonID = 190;
   @override
@@ -49,12 +51,39 @@ class TMMyTeamsState extends State<TMMyTeams> {
     reload();
   }
 
+  void _initializeTournament() {
+    final cachedTournament = CacheManager.lastLoadedTournament;
+
+    if (cachedTournament != null && cachedTournament.id == widget.tournamentID) {
+      setState(() {
+        _tournament = cachedTournament;
+        _isTournamentLoading = false;
+      });
+    } else {
+      TMTournamentDetails(widget.tournamentID).then((t) {
+        if (mounted) {
+          setState(() {
+            _tournament = t;
+            _isTournamentLoading = false;
+          });
+        }
+      }).catchError((error) {
+        debugPrint('Failed to load tournament: $error');
+        if (mounted) {
+          setState(() {
+            _isTournamentLoading = false;
+          });
+        }
+      });
+    }
+  }
+
   void reload() {
     final String savedTeam = prefs.getString("savedTeam") ?? "";
     final parsed = jsonDecode(savedTeam);
     savedTeamPreview = TeamPreview(teamID: parsed["teamID"], teamNumber: parsed["teamNumber"]);
 
-    tournament = TMTournamentDetails(widget.tournamentID);
+    _initializeTournament();
 
     savedTeamStrings = prefs.getStringList("savedTeams") ?? [];
     savedTeamPreviews.add(savedTeamPreview);
@@ -90,6 +119,73 @@ class TMMyTeamsState extends State<TMMyTeams> {
   Future<List<TournamentPreview>>? teamTournaments;
   Future<WorldSkillsStats>? skillsStats;
   Future<List<Award>>? teamAwards;
+
+  Widget _buildTournamentSection() {
+    if (_isTournamentLoading || _tournament == null) {
+      return Container();
+    }
+
+    final tournament = _tournament!;
+
+    if (!tournament.teams.any((element) => element.teamNumber == selectedTeamPreview.teamNumber)) {
+      return Container();
+    }
+
+    // Find the division that contains this team
+    final division = tournament.divisions.firstWhere(
+      (d) => d.teamStats?.containsKey(selectedTeamPreview.teamID) ?? false,
+      orElse: () => tournament.divisions.first,
+    );
+
+    if (division.games?.isEmpty ?? true) {
+      return Container();
+    }
+
+    return Container(
+      margin: EdgeInsets.only(top: 25),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "This Tournament",
+            style: TextStyle(fontSize: 24),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          if (division.teamStats != null &&
+              division.teamStats!.containsKey(selectedTeamPreview.teamID) &&
+              tournament.tournamentSkills != null)
+            RankingOverviewWidget(
+                teamStats: division.teamStats![selectedTeamPreview.teamID]!,
+                skills: tournament.tournamentSkills!,
+                teamID: selectedTeamPreview.teamID),
+          SizedBox(
+            height: 10,
+          ),
+          Column(
+            children: getTeamGames(division.games!, selectedTeamPreview.teamNumber).map(
+              (e) {
+                return Column(
+                  children: [
+                    GameWidget(
+                      game: e,
+                      teamName: selectedTeamPreview.teamNumber,
+                      isAllianceColoured: false,
+                    ),
+                    Divider(
+                      color: Theme.of(context).colorScheme.surfaceDim,
+                    )
+                  ],
+                );
+              },
+            ).toList(),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     ColorPallete colorPallete;
@@ -311,66 +407,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 23),
             sliver: SliverToBoxAdapter(
-              child: FutureBuilder(
-                  future: tournament,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      Tournament tournament = snapshot.data as Tournament;
-                      if (!tournament.teams.any(
-                        (element) {
-                          return element.teamNumber == selectedTeamPreview.teamNumber;
-                        },
-                      )) {
-                        return Container();
-                      }
-                      if (tournament.divisions[0].games?.isEmpty ?? true) {
-                        return Container();
-                      }
-                      return Container(
-                        margin: EdgeInsets.only(top: 25),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "This Tournament",
-                              style: TextStyle(fontSize: 24),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            RankingOverviewWidget(
-                                teamStats: tournament.divisions[0].teamStats![selectedTeamPreview.teamID]!,
-                                skills: tournament.tournamentSkills!,
-                                teamID: selectedTeamPreview.teamID),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Column(
-                              children:
-                                  getTeamGames(tournament.divisions[0].games!, selectedTeamPreview.teamNumber).map(
-                                (e) {
-                                  return Column(
-                                    children: [
-                                      GameWidget(
-                                        game: e,
-                                        teamName: selectedTeamPreview.teamNumber,
-                                        isAllianceColoured: false,
-                                      ),
-                                      Divider(
-                                        color: Theme.of(context).colorScheme.surfaceDim,
-                                      )
-                                    ],
-                                  );
-                                },
-                              ).toList(),
-                            )
-                          ],
-                        ),
-                      );
-                    } else {
-                      return Container();
-                    }
-                  }),
+              child: _buildTournamentSection(),
             ),
           ),
           const SliverToBoxAdapter(

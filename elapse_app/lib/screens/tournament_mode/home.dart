@@ -2,6 +2,7 @@ import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
+import 'package:elapse_app/database/cache_manager.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/main/search_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
@@ -30,13 +31,303 @@ class TMHomePage extends StatefulWidget {
 }
 
 class _TMHomePageState extends State<TMHomePage> {
+  Tournament? _tournament;
+  bool _isLoading = true;
+  Division? _division;
+
   @override
   void initState() {
     super.initState();
-    tournament = TMTournamentDetails(widget.tournamentID);
+    _initializeTournament();
   }
 
-  Future<Tournament>? tournament;
+  void _initializeTournament({bool forceRefresh = false}) {
+    final cachedTournament = CacheManager.lastLoadedTournament;
+
+    if (!forceRefresh && cachedTournament != null && cachedTournament.id == widget.tournamentID) {
+      _setupWithTournament(cachedTournament);
+    } else {
+      setState(() => _isLoading = true);
+      TMTournamentDetails(widget.tournamentID, forceRefresh: forceRefresh).then((t) {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+            _setupWithTournament(t);
+          });
+        }
+      }).catchError((error) {
+        debugPrint('Failed to load tournament: $error');
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      });
+    }
+  }
+
+  void _setupWithTournament(Tournament tournament) {
+    _tournament = tournament;
+    _isLoading = false;
+
+    // Find the division that contains this team
+    if (tournament.divisions.isNotEmpty) {
+      _division = tournament.divisions.firstWhere(
+        (d) => d.teamStats?.containsKey(widget.teamID) ?? false,
+        orElse: () => tournament.divisions.first,
+      );
+    }
+  }
+
+  Widget _buildSearchBar(BuildContext context) {
+    return Container(
+      height: 60,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        color: Theme.of(context).colorScheme.surface,
+      ),
+      alignment: Alignment.centerLeft,
+      child: Row(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18.0),
+            child: Icon(Icons.search,
+                color: Theme.of(context).colorScheme.onSecondary),
+          ),
+          Text("Search your tournament",
+              style: TextStyle(
+                  fontSize: 16,
+                  color: Theme.of(context).colorScheme.onSecondary)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSearchBarWithNavigation(BuildContext context) {
+    if (_tournament == null || _division == null) {
+      return _buildSearchBar(context);
+    }
+
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          PageRouteBuilder(
+            transitionDuration: const Duration(milliseconds: 300),
+            reverseTransitionDuration: const Duration(milliseconds: 300),
+            pageBuilder: (context, animation, secondaryAnimation) =>
+                SearchScreen(tournament: _tournament!, division: _division!),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+          ),
+        );
+      },
+      child: _buildSearchBar(context),
+    );
+  }
+
+  Widget _buildNextGameSection() {
+    if (_isLoading) {
+      return const SliverToBoxAdapter(
+        child: SizedBox(
+            height: 50,
+            width: 50,
+            child: Center(child: CircularProgressIndicator())),
+      );
+    }
+
+    if (_tournament == null || _division == null || _division!.teamStats == null) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 23),
+          child: Container(
+              padding: EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.tertiary,
+                  borderRadius: BorderRadius.circular(18)),
+              child: Text(
+                "Tournament data is not available yet",
+                style: TextStyle(fontSize: 16),
+              )),
+        ),
+      );
+    }
+
+    if (_division!.games == null || _division!.games!.isEmpty) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 23),
+          child: Container(
+              padding: EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.tertiary,
+                  borderRadius: BorderRadius.circular(18)),
+              child: Text(
+                "No matches currently available",
+                style: TextStyle(fontSize: 16),
+              )),
+        ),
+      );
+    }
+
+    List<Game> upcomingGames = getTeamGames(_division!.games!, widget.teamNumber).where(
+      (element) {
+        return element.startedTime == null &&
+            element.redScore == 0 &&
+            element.blueScore == 0;
+      },
+    ).toList();
+
+    if (upcomingGames.isEmpty) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 23),
+          child: Container(
+              padding: EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.tertiary,
+                  borderRadius: BorderRadius.circular(18)),
+              child: Text(
+                "No matches currently available",
+                style: TextStyle(fontSize: 16),
+              )),
+        ),
+      );
+    }
+
+    Game game = upcomingGames[0];
+    return SliverPadding(
+      padding: EdgeInsets.symmetric(horizontal: 23),
+      sliver: SliverToBoxAdapter(
+        child: Column(
+          children: [
+            NextGame(
+              game: game,
+              games: _division!.games!,
+              rankings: _division!.teamStats!,
+              skills: _tournament!.tournamentSkills ?? {},
+              targetTeam: TeamPreview(
+                  teamNumber: widget.teamNumber,
+                  teamID: widget.teamID),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUpcomingGamesSection() {
+    if (_isLoading) {
+      return const SliverToBoxAdapter(
+        child: SizedBox(
+            height: 50,
+            width: 50,
+            child: Center(child: CircularProgressIndicator())),
+      );
+    }
+
+    if (_tournament == null || _division == null || _division!.teamStats == null) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 23),
+          child: Container(
+              padding: EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.tertiary,
+                  borderRadius: BorderRadius.circular(18)),
+              child: Text(
+                "No matches currently available",
+                style: TextStyle(fontSize: 16),
+              )),
+        ),
+      );
+    }
+
+    List<Game> upcomingGames = getTeamGames(_division!.games!, widget.teamNumber).where(
+      (element) {
+        return element.startedTime == null &&
+            element.redScore == 0 &&
+            element.blueScore == 0;
+      },
+    ).toList();
+
+    if (upcomingGames.length < 2) {
+      return SliverToBoxAdapter(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 23),
+          child: Container(
+              padding: EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.tertiary,
+                  borderRadius: BorderRadius.circular(18)),
+              child: Text(
+                "No upcoming matches",
+                style: TextStyle(fontSize: 16),
+              )),
+        ),
+      );
+    }
+
+    return SliverPadding(
+      padding: EdgeInsets.symmetric(horizontal: 23),
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, index) {
+            Game game = upcomingGames[index + 1];
+            return Column(
+              children: [
+                GameWidget(
+                  game: game,
+                  teamName: widget.teamNumber,
+                  isAllianceColoured: true,
+                ),
+                Divider(
+                  color: Theme.of(context).colorScheme.surfaceDim,
+                  height: 3,
+                )
+              ],
+            );
+          },
+          childCount: upcomingGames.length - 1,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildRankingOverviewSection() {
+    if (_isLoading) {
+      return const SliverToBoxAdapter(
+        child: SizedBox(
+            height: 50,
+            width: 50,
+            child: Center(child: CircularProgressIndicator())),
+      );
+    }
+
+    if (_tournament == null || _division == null || _division!.teamStats == null) {
+      return const SliverToBoxAdapter(child: SizedBox(height: 50, width: 50));
+    }
+
+    if (_division!.teamStats!.isEmpty ||
+        !_division!.teamStats!.containsKey(widget.teamID) ||
+        (_tournament!.tournamentSkills?.isEmpty ?? true)) {
+      return const SliverToBoxAdapter(child: SizedBox.shrink());
+    }
+
+    return SliverPadding(
+      padding: EdgeInsets.symmetric(horizontal: 23),
+      sliver: SliverToBoxAdapter(
+        child: RankingOverviewWidget(
+          teamStats: _division!.teamStats![widget.teamID]!,
+          skills: _tournament!.tournamentSkills!,
+          teamID: widget.teamID,
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final remoteConfig = FirebaseRemoteConfigService();
@@ -59,10 +350,7 @@ class _TMHomePageState extends State<TMHomePage> {
     return Scaffold(
         body: RefreshIndicator(
       onRefresh: () async {
-        setState(() {
-          tournament =
-              TMTournamentDetails(widget.tournamentID, forceRefresh: true);
-        });
+        _initializeTournament(forceRefresh: true);
       },
       child: CustomScrollView(
         slivers: [
@@ -181,132 +469,7 @@ class _TMHomePageState extends State<TMHomePage> {
                           ),
                           Padding(
                             padding: const EdgeInsets.only(right: 8.0),
-                            child: FutureBuilder(
-                              future: tournament,
-                              builder: (context, snapshot) {
-                                if (snapshot.hasData) {
-                                  Division division = snapshot.data!.divisions
-                                      .firstWhere(
-                                          (d) => d.teamStats?.containsKey(widget.teamID) ?? false,
-                                          orElse: () => snapshot.data!.divisions.first);
-                                  return GestureDetector(
-                                    onTap: () {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          transitionDuration:
-                                              const Duration(milliseconds: 300),
-                                          reverseTransitionDuration:
-                                              const Duration(milliseconds: 300),
-                                          pageBuilder: (context, animation,
-                                                  secondaryAnimation) =>
-                                              SearchScreen(
-                                                  tournament: snapshot.data!,
-                                                  division: division),
-                                          transitionsBuilder: (context,
-                                              animation,
-                                              secondaryAnimation,
-                                              child) {
-                                            // Create a Tween that transitions the new screen from fully transparent to fully opaque
-                                            return FadeTransition(
-                                              opacity: animation,
-                                              child: child,
-                                            );
-                                          },
-                                        ),
-                                      );
-                                    },
-                                    child: Container(
-                                      height: 60,
-                                      width: double.infinity,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(30),
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .surface,
-                                      ),
-                                      alignment: Alignment.centerLeft,
-                                      child: Row(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                                horizontal: 18.0),
-                                            child: Icon(Icons.search,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSecondary),
-                                          ),
-                                          Text("Search your tournament",
-                                              style: TextStyle(
-                                                  fontSize: 16,
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .onSecondary)),
-                                        ],
-                                      ),
-                                    ),
-                                  );
-                                } else if (snapshot.hasError) {
-                                  return Container(
-                                    height: 60,
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(30),
-                                      color:
-                                          Theme.of(context).colorScheme.surface,
-                                    ),
-                                    alignment: Alignment.centerLeft,
-                                    child: Row(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 18.0),
-                                          child: Icon(Icons.search,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSecondary),
-                                        ),
-                                        Text("Search your tournament",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSecondary)),
-                                      ],
-                                    ),
-                                  );
-                                } else {
-                                  return Container(
-                                    height: 60,
-                                    width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(30),
-                                      color:
-                                          Theme.of(context).colorScheme.surface,
-                                    ),
-                                    alignment: Alignment.centerLeft,
-                                    child: Row(
-                                      children: [
-                                        Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 18.0),
-                                          child: Icon(Icons.search,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .onSecondary),
-                                        ),
-                                        Text("Search your tournament",
-                                            style: TextStyle(
-                                                fontSize: 16,
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .onSecondary)),
-                                      ],
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
+                            child: _buildSearchBarWithNavigation(context),
                           ),
                         ],
                       ),
@@ -318,117 +481,7 @@ class _TMHomePageState extends State<TMHomePage> {
             backgroundColor: Theme.of(context).colorScheme.primary,
           ),
           const RoundedTop(),
-          FutureBuilder(
-            future: tournament,
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
-                case ConnectionState.waiting:
-                case ConnectionState.active:
-                  return const SliverToBoxAdapter(
-                    child: SizedBox(
-                        height: 50,
-                        width: 50,
-                        child: Center(child: CircularProgressIndicator())),
-                  );
-                case ConnectionState.done:
-                  if (snapshot.hasData && snapshot.data?.divisions != null) {
-                    if (snapshot.data?.divisions.first.teamStats != null) {
-                      final divisions = snapshot.data!.divisions;
-                      Division? division = divisions.firstWhere(
-                          (d) => d.teamStats?.containsKey(widget.teamID) ?? false,
-                          orElse: () => divisions.first);
-
-                      if (division.games!.isEmpty) {
-                        return SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 23),
-                            child: Container(
-                                padding: EdgeInsets.all(18),
-                                decoration: BoxDecoration(
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
-                                    borderRadius: BorderRadius.circular(18)),
-                                child: Text(
-                                  "No matches currently available",
-                                  style: TextStyle(fontSize: 16),
-                                )),
-                          ),
-                        );
-                      }
-
-                      List<Game> upcomingGames =
-                          getTeamGames(division.games!, widget.teamNumber)
-                              .where(
-                        (element) {
-                          return element.startedTime == null &&
-                              element.redScore == 0 &&
-                              element.blueScore == 0;
-                        },
-                      ).toList();
-                      if (upcomingGames.isEmpty) {
-                        return SliverToBoxAdapter(
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 23),
-                            child: Container(
-                                padding: EdgeInsets.all(18),
-                                decoration: BoxDecoration(
-                                    color:
-                                        Theme.of(context).colorScheme.tertiary,
-                                    borderRadius: BorderRadius.circular(18)),
-                                child: Text(
-                                  "No matches currently available",
-                                  style: TextStyle(fontSize: 16),
-                                )),
-                          ),
-                        );
-                      }
-
-                      Game game = upcomingGames[0];
-                      return SliverPadding(
-                        padding: EdgeInsets.symmetric(horizontal: 23),
-                        sliver: SliverToBoxAdapter(
-                          child: Column(
-                            children: [
-                              NextGame(
-                                game: game,
-                                games: division.games!,
-                                rankings: division.teamStats!,
-                                skills: snapshot.data!.tournamentSkills ?? {},
-                                targetTeam: TeamPreview(
-                                    teamNumber: widget.teamNumber,
-                                    teamID: widget.teamID),
-                              ),
-                              // SizedBox(height: 25),
-                              // RankingOverviewWidget(
-                              //   teamStats: snapshot
-                              //       .data!.divisions[0].teamStats![widget.teamID]!,
-                              //   skills: snapshot.data!.tournamentSkills!,
-                              //   teamID: widget.teamID,
-                              // ),
-                            ],
-                          ),
-                        ),
-                      );
-                    } else {}
-                  }
-              }
-              return SliverToBoxAdapter(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 23),
-                  child: Container(
-                      padding: EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.tertiary,
-                          borderRadius: BorderRadius.circular(18)),
-                      child: Text(
-                        "Tournament data is not available yet",
-                        style: TextStyle(fontSize: 16),
-                      )),
-                ),
-              );
-            },
-          ),
+          _buildNextGameSection(),
           const SliverToBoxAdapter(
             child: SizedBox(
               height: 25,
@@ -446,134 +499,14 @@ class _TMHomePageState extends State<TMHomePage> {
               height: 10,
             ),
           ),
-          FutureBuilder(
-            future: tournament,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                if (snapshot.data?.divisions.first.teamStats != null) {
-                  Division division = snapshot.data!.divisions.firstWhere(
-                      (d) => d.teamStats?.containsKey(widget.teamID) ?? false,
-                      orElse: () => snapshot.data!.divisions.first);
-                  List<Game> upcomingGames =
-                      getTeamGames(division.games!, widget.teamNumber).where(
-                    (element) {
-                      return element.startedTime == null &&
-                          element.redScore == 0 &&
-                          element.blueScore == 0;
-                    },
-                  ).toList();
-                  if (upcomingGames.length < 2) {
-                    return SliverToBoxAdapter(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 23),
-                        child: Container(
-                            padding: EdgeInsets.all(18),
-                            decoration: BoxDecoration(
-                                color: Theme.of(context).colorScheme.tertiary,
-                                borderRadius: BorderRadius.circular(18)),
-                            child: Text(
-                              "No upcoming matches",
-                              style: TextStyle(fontSize: 16),
-                            )),
-                      ),
-                    );
-                  }
-                  return SliverPadding(
-                    padding: EdgeInsets.symmetric(horizontal: 23),
-                    sliver: SliverList(
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          Game game = upcomingGames[index + 1];
-                          return Column(
-                            children: [
-                              GameWidget(
-                                game: game,
-                                teamName: widget.teamNumber,
-                                isAllianceColoured: true,
-                              ),
-                              Divider(
-                                color: Theme.of(context).colorScheme.surfaceDim,
-                                height: 3,
-                              )
-                            ],
-                          );
-                        },
-                        childCount: upcomingGames.length - 1,
-                      ),
-                    ),
-                  );
-                } else {
-                  return SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 23),
-                      child: Container(
-                          padding: EdgeInsets.all(18),
-                          decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.tertiary,
-                              borderRadius: BorderRadius.circular(18)),
-                          child: Text(
-                            "No matches currently available",
-                            style: TextStyle(fontSize: 16),
-                          )),
-                    ),
-                  );
-                }
-              } else {
-                return const SliverToBoxAdapter(
-                  child: SizedBox(
-                      height: 50,
-                      width: 50,
-                      child: Center(child: CircularProgressIndicator())),
-                );
-              }
-            },
-          ),
+          _buildUpcomingGamesSection(),
           SliverToBoxAdapter(),
           SliverToBoxAdapter(
             child: SizedBox(
               height: 25,
             ),
           ),
-          FutureBuilder(
-            future: tournament,
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                if (snapshot.data?.divisions.first.teamStats != null) {
-                  Division division = snapshot.data!.divisions.firstWhere(
-                      (d) => d.teamStats?.containsKey(widget.teamID) ?? false,
-                      orElse: () => snapshot.data!.divisions.first);
-                  return SliverPadding(
-                    padding: EdgeInsets.symmetric(horizontal: 23),
-                    sliver: SliverToBoxAdapter(
-                      child: division.teamStats != null &&
-                              division.teamStats!.isNotEmpty &&
-                              (snapshot.data!.tournamentSkills?.isNotEmpty ?? false)
-                          ? RankingOverviewWidget(
-                              teamStats: division.teamStats![widget.teamID]!,
-                              skills: snapshot.data!.tournamentSkills!,
-                              teamID: widget.teamID,
-                            )
-                          : Container(),
-                    ),
-                  );
-                } else {
-                  return const SliverToBoxAdapter(
-                    child: SizedBox(
-                      height: 50,
-                      width: 50,
-                    ),
-                  );
-                }
-              } else {
-                return const SliverToBoxAdapter(
-                  child: SizedBox(
-                      height: 50,
-                      width: 50,
-                      child: Center(child: CircularProgressIndicator())),
-                );
-              }
-            },
-          ),
+          _buildRankingOverviewSection(),
           SliverToBoxAdapter(
             child: SizedBox(
               height: 15,
