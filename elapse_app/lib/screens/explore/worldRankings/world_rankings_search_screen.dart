@@ -1,20 +1,16 @@
 import 'package:elapse_app/screens/explore/worldRankings/skills/world_skills_widget.dart';
-import 'package:elapse_app/screens/explore/worldRankings/true_skill/world_true_skill_widget.dart';
+import 'package:elapse_app/screens/widgets/custom_tab_bar.dart';
 import 'package:flutter/material.dart';
 
-import '../../../classes/Team/vdaStats.dart';
 import '../../../classes/Team/world_skills.dart';
-import '../../widgets/custom_tab_bar.dart';
 
 class WorldRankingsSearchScreen extends StatefulWidget {
   const WorldRankingsSearchScreen({
     super.key,
     required this.skills,
-    required this.vda,
   });
 
   final List<WorldSkillsStats> skills;
-  final List<VDAStats> vda;
 
   @override
   State<WorldRankingsSearchScreen> createState() => _WorldRankingsSearchScreenState();
@@ -22,7 +18,6 @@ class WorldRankingsSearchScreen extends StatefulWidget {
 
 class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
   final FocusNode _focusNode = FocusNode();
-  int selectedIndex = 0;
   String searchQuery = "";
 
   @override
@@ -46,10 +41,6 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
       return (e.teamName.toLowerCase().contains(searchQuery.toLowerCase()) ||
           e.teamNum.toLowerCase().contains(searchQuery.toLowerCase()));
     }).toList();
-    List<VDAStats> filteredVDA = widget.vda.where((e) {
-      return ((e.teamName ?? "").toLowerCase().contains(searchQuery.toLowerCase()) ||
-          e.teamNum.toLowerCase().contains(searchQuery.toLowerCase()));
-    }).toList();
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -57,79 +48,52 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
         slivers: [
           SliverAppBar.large(
             automaticallyImplyLeading: false,
-            expandedHeight: 165,
+            expandedHeight: 90,
             centerTitle: false,
             flexibleSpace: FlexibleSpaceBar(
               expandedTitleScale: 1,
               collapseMode: CollapseMode.parallax,
               title: Padding(
-                padding: const EdgeInsets.only(left: 15, right: 15),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: SafeArea(
                   child: LayoutBuilder(
                     builder: (context, constraints) {
                       num containerHeight = constraints.maxHeight;
                       return Container(
-                        alignment: Alignment.bottomCenter,
+                        alignment: Alignment.centerLeft,
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(25),
                           color: Theme.of(context).colorScheme.surface,
                         ),
                         child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              const Spacer(),
-                              Flex(
-                                  direction: Axis.horizontal,
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Flexible(
-                                      flex: 1,
-                                      child: IconButton(
-                                        icon: const Icon(Icons.arrow_back, size: 24),
-                                        onPressed: () => Navigator.pop(context),
+                          padding: const EdgeInsets.symmetric(horizontal: 10),
+                          child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Flexible(
+                                  flex: 1,
+                                  child: IconButton(
+                                    icon: const Icon(Icons.arrow_back, size: 24),
+                                    onPressed: () => Navigator.pop(context),
+                                  ),
+                                ),
+                                Flexible(
+                                    flex: 6,
+                                    child: TextField(
+                                      focusNode: _focusNode,
+                                      onChanged: (value) {
+                                        setState(() {
+                                          searchQuery = value;
+                                        });
+                                      },
+                                      cursorColor: Theme.of(context).colorScheme.secondary,
+                                      decoration: const InputDecoration(
+                                        hintText: "Search world rankings",
+                                        border: InputBorder.none,
                                       ),
-                                    ),
-                                    Flexible(
-                                        flex: 6,
-                                        child: TextField(
-                                          focusNode: _focusNode,
-                                          onChanged: (value) {
-                                            setState(() {
-                                              searchQuery = value;
-                                            });
-                                          },
-                                          cursorColor: Theme.of(context).colorScheme.secondary,
-                                          decoration: const InputDecoration(
-                                            hintText: "Search world rankings",
-                                            border: InputBorder.none,
-                                          ),
-                                        ))
-                                  ]),
-                              const Spacer(),
-                              if (constraints.maxHeight - 135 + 45 > 0)
-                                SizedBox(
-                                    height: containerHeight > 130 ? 45 : containerHeight - 130 + 45,
-                                    child: Flex(direction: Axis.horizontal, children: [
-                                      Flexible(
-                                        flex: 1,
-                                        child: _filterButton(0, constraints.maxHeight, "All"),
-                                      ),
-                                      Flexible(
-                                        flex: 1,
-                                        child: _filterButton(1, constraints.maxHeight, "Skills"),
-                                      ),
-                                      Flexible(
-                                        flex: 1,
-                                        child: _filterButton(2, constraints.maxHeight, "TrueSkill"),
-                                      ),
-                                    ]))
-                              else
-                                const Spacer(),
-                              const Spacer(),
-                            ],
-                          ),
+                                    ))
+                              ]),
                         ),
                       );
                     },
@@ -168,164 +132,49 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
               ),
             ),
           ),
-          selectedIndex == 0 || selectedIndex == 1
-              ? SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 23),
-                  sliver: SliverToBoxAdapter(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("Skills", style: TextStyle(fontSize: 16)),
-                        Divider(
-                          color: Theme.of(context).colorScheme.surfaceDim,
-                          thickness: 1.5,
-                        ),
-                      ],
-                    ),
+          SliverPadding(
+            padding: const EdgeInsets.symmetric(horizontal: 23),
+            sliver: SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text("Skills", style: TextStyle(fontSize: 16)),
+                  Divider(
+                    color: Theme.of(context).colorScheme.surfaceDim,
+                    thickness: 1.5,
                   ),
-                )
-              : const SliverToBoxAdapter(),
-          selectedIndex == 0 || selectedIndex == 1
-              ? SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final ranking = filteredSkills[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 23),
-                        child: Column(
-                          children: [
-                            WorldSkillsWidget(stats: ranking, rank: index + 1),
-                            index != filteredSkills.length - 1
-                                ? Divider(
-                                    height: 3,
-                                    color: Theme.of(context).colorScheme.surfaceDim,
-                                  )
-                                : Container(),
-                          ],
-                        ),
-                      );
-                    },
-                    childCount: filteredSkills.length,
-                  ),
-                )
-              : const SliverToBoxAdapter(),
-          SliverToBoxAdapter(
-            child: selectedIndex == 0
-                ? const SizedBox(
-                    height: 15,
-                  )
-                : null,
+                ],
+              ),
+            ),
           ),
-          selectedIndex == 0 || selectedIndex == 2
-              ? SliverPadding(
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                final ranking = filteredSkills[index];
+                return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 23),
-                  sliver: SliverToBoxAdapter(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text("TrueSkill", style: TextStyle(fontSize: 16)),
-                        Divider(
-                          color: Theme.of(context).colorScheme.surfaceDim,
-                          thickness: 1.5,
-                        ),
-                      ],
-                    ),
+                  child: Column(
+                    children: [
+                      WorldSkillsWidget(stats: ranking, rank: index + 1),
+                      index != filteredSkills.length - 1
+                          ? Divider(
+                              height: 3,
+                              color: Theme.of(context).colorScheme.surfaceDim,
+                            )
+                          : Container(),
+                    ],
                   ),
-                )
-              : const SliverToBoxAdapter(),
-          selectedIndex == 0 || selectedIndex == 2
-              ? SliverList(
-                  delegate: SliverChildBuilderDelegate(
-                    (context, index) {
-                      final stats = filteredVDA[index];
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 23),
-                        child: Column(
-                          children: [
-                            WorldTrueSkillWidget(stats: stats, rank: index + 1),
-                            index != filteredVDA.length - 1
-                                ? Divider(
-                                    height: 3,
-                                    color: Theme.of(context).colorScheme.surfaceDim,
-                                  )
-                                : Container(),
-                          ],
-                        ),
-                      );
-                    },
-                    childCount: filteredVDA.length,
-                  ),
-                )
-              : const SliverToBoxAdapter(),
+                );
+              },
+              childCount: filteredSkills.length,
+            ),
+          ),
+          const SliverToBoxAdapter(
+            child: SizedBox(
+              height: 15,
+            ),
+          ),
         ],
-      ),
-    );
-  }
-
-  Widget _filterButton(buttonIndex, maxHeight, text) {
-    Color selectedContainerColor = Theme.of(context).colorScheme.primary;
-    Color unselectedContainerColor = Theme.of(context).colorScheme.surface;
-
-    BorderRadius borderRadius;
-
-    if (buttonIndex == 0) {
-      borderRadius = const BorderRadius.only(
-        topLeft: Radius.circular(20),
-        bottomLeft: Radius.circular(20),
-      );
-    } else if (buttonIndex == 2) {
-      borderRadius = const BorderRadius.only(
-        topRight: Radius.circular(20),
-        bottomRight: Radius.circular(20),
-      );
-    } else {
-      borderRadius = BorderRadius.zero;
-    }
-
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedIndex = buttonIndex;
-        });
-      },
-      child: AnimatedContainer(
-        curve: Curves.fastOutSlowIn,
-        duration: const Duration(milliseconds: 300), // Duration of the animation
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: selectedIndex == buttonIndex
-              ? selectedContainerColor.withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40)
-              : unselectedContainerColor.withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
-          border: buttonIndex == 1
-              ? Border.symmetric(
-                  horizontal: BorderSide(
-                    width: 1.5,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .primary
-                        .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
-                  ),
-                )
-              : Border.all(
-                  width: 1.5,
-                  color: Theme.of(context)
-                      .colorScheme
-                      .primary
-                      .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
-                ),
-          borderRadius: borderRadius,
-        ),
-        child: Text(
-          text,
-          style: TextStyle(
-            color: Theme.of(context)
-                .colorScheme
-                .secondary
-                .withValues(alpha: ((maxHeight - 85) / 40) > 1 ? 1 : (maxHeight - 85) / 40),
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
       ),
     );
   }

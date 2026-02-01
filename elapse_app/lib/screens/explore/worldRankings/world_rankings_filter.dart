@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../classes/Filters/region.dart';
-import '../../../classes/Team/vdaStats.dart';
 import '../../../classes/Team/world_skills.dart';
 
 class WorldRankingsFilter {
