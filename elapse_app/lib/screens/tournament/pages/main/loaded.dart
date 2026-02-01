@@ -193,11 +193,36 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
       practice = filteredGames.where((game) => game.roundNum == 1).toList();
       qualifications = filteredGames.where((game) => game.roundNum == 2).toList();
       eliminations = filteredGames.where((game) => game.roundNum > 2).toList();
+
+      // For leagues showing all sessions, sort by scheduled time first to group by session date
+      if (tournament.isLeague && _selectedSession == null) {
+        _sortGamesByScheduledTime(practice);
+        _sortGamesByScheduledTime(qualifications);
+        _sortGamesByScheduledTime(eliminations);
+      }
     } else {
       practice = [];
       qualifications = [];
       eliminations = [];
     }
+  }
+
+  /// Sort games by scheduled time first, then by game number
+  /// This ensures games from the same session/date stay grouped together
+  void _sortGamesByScheduledTime(List<Game> games) {
+    games.sort((a, b) {
+      // First sort by scheduled date (null dates go to the end)
+      if (a.scheduledTime != null && b.scheduledTime != null) {
+        final dateCompare = a.scheduledTime!.compareTo(b.scheduledTime!);
+        if (dateCompare != 0) return dateCompare;
+      } else if (a.scheduledTime != null) {
+        return -1; // a has date, b doesn't - a comes first
+      } else if (b.scheduledTime != null) {
+        return 1; // b has date, a doesn't - b comes first
+      }
+      // Then sort by game number within the same date
+      return a.gameNum.compareTo(b.gameNum);
+    });
   }
 
   /// Filter games by selected session date (for leagues)
