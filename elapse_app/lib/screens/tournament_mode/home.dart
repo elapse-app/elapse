@@ -41,27 +41,35 @@ class _TMHomePageState extends State<TMHomePage> {
     _initializeTournament();
   }
 
-  void _initializeTournament({bool forceRefresh = false}) {
+  Future<void> _initializeTournament({bool forceRefresh = false}) async {
     final cachedTournament = CacheManager.lastLoadedTournament;
 
     if (!forceRefresh && cachedTournament != null && cachedTournament.id == widget.tournamentID) {
       _setupWithTournament(cachedTournament);
     } else {
-      // Don't call setState if called from initState - just assign directly
-      _isLoading = true;
-      TMTournamentDetails(widget.tournamentID, forceRefresh: forceRefresh).then((t) {
+      // For forceRefresh (pull-to-refresh), use setState to show loading spinner
+      // For initial load from initState, just assign directly
+      if (forceRefresh) {
+        setState(() {
+          _isLoading = true;
+        });
+      } else {
+        _isLoading = true;
+      }
+      try {
+        final t = await TMTournamentDetails(widget.tournamentID, forceRefresh: forceRefresh);
         if (mounted) {
           _setupWithTournament(t);
           setState(() {});
         }
-      }).catchError((error) {
+      } catch (error) {
         debugPrint('Failed to load tournament: $error');
         if (mounted) {
           setState(() {
             _isLoading = false;
           });
         }
-      });
+      }
     }
   }
 

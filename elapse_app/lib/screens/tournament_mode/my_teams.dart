@@ -34,6 +34,7 @@ class TMMyTeams extends StatefulWidget {
 class TMMyTeamsState extends State<TMMyTeams> {
   late String savedTeam;
   late TeamPreview savedTeamPreview;
+  bool _hasSavedTeam = false;
 
   List<TeamPreview> savedTeamPreviews = [];
   List<String> savedTeamStrings = [];
@@ -82,10 +83,24 @@ class TMMyTeamsState extends State<TMMyTeams> {
   }
 
   void reload() {
-    final String savedTeam = prefs.getString("savedTeam") ?? "";
-    final parsed = jsonDecode(savedTeam);
-    savedTeamPreview = TeamPreview(teamID: parsed["teamID"], teamNumber: parsed["teamNumber"]);
+    final String? savedTeam = prefs.getString("savedTeam");
+    if (savedTeam == null || savedTeam.isEmpty) {
+      // No saved team - can't load my teams page
+      debugPrint('TMMyTeams: No saved team found');
+      _hasSavedTeam = false;
+      return;
+    }
 
+    try {
+      final parsed = jsonDecode(savedTeam);
+      savedTeamPreview = TeamPreview(teamID: parsed["teamID"], teamNumber: parsed["teamNumber"]);
+    } catch (e) {
+      debugPrint('TMMyTeams: Failed to parse saved team: $e');
+      _hasSavedTeam = false;
+      return;
+    }
+    
+    _hasSavedTeam = true;
     _initializeTournament();
 
     savedTeamStrings = prefs.getStringList("savedTeams") ?? [];
@@ -196,6 +211,16 @@ class TMMyTeamsState extends State<TMMyTeams> {
 
   @override
   Widget build(BuildContext context) {
+    if (!_hasSavedTeam) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        appBar: const ElapseAppBar(title: Text("My Team")),
+        body: const Center(
+          child: Text("No saved team found. Please select a team."),
+        ),
+      );
+    }
+
     ColorPallete colorPallete;
     if (Theme.of(context).colorScheme.brightness == Brightness.dark) {
       colorPallete = darkPallete;

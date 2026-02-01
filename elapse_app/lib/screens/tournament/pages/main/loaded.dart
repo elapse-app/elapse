@@ -106,25 +106,34 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   }
 
   /// Initialize tournament data - try sync cache first, fall back to async DB fetch
-  void _initializeTournament() {
+  Future<void> _initializeTournament({bool forceRefresh = false}) async {
     // Try sync access first - cache should be set by entry point's TMTournamentDetails call
     final cachedTournament = getLastLoadedTournament();
 
     // Verify cached tournament ID matches to avoid race conditions when navigating between tournaments
-    if (cachedTournament != null && cachedTournament.id == widget.tournamentId) {
+    if (!forceRefresh && cachedTournament != null && cachedTournament.id == widget.tournamentId) {
       _setupWithTournament(cachedTournament);
     } else {
       // Cache not set - fetch from DB asynchronously
       // This handles edge cases like hot restart or direct navigation
-      _isLoading = true;
-      TMTournamentDetails(widget.tournamentId).then((t) {
+      if (forceRefresh) {
+        setState(() {
+          _isLoading = true;
+          _loadError = null;
+        });
+      } else {
+        _isLoading = true;
+      }
+      
+      try {
+        final t = await TMTournamentDetails(widget.tournamentId, forceRefresh: forceRefresh);
         if (mounted) {
           setState(() {
             _isLoading = false;
             _setupWithTournament(t);
           });
         }
-      }).catchError((error, stackTrace) {
+      } catch (error, stackTrace) {
         // Log error for debugging
         debugPrint('TournamentLoadedScreen: Failed to load tournament: $error');
         debugPrintStack(stackTrace: stackTrace);
@@ -134,7 +143,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             _loadError = 'Failed to load tournament';
           });
         }
-      });
+      }
     }
   }
 
@@ -203,22 +212,27 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
               child: BigErrorMessage(icon: Icons.list_outlined, message: "Rankings not available"));
         }
         // Rankings page with caching check
-        if (hasCachedWorldSkillsRankings(
-                getGradeLevel(prefs.getString("defaultGrade")) == gradeLevels["College"]
-                    ? seasons[0].vexUId!
-                    : seasons[0].vrcId,
-                getGradeLevel(prefs.getString("defaultGrade"))) &&
-            hasCachedTrueSkillData()) {
+        final gradeLevel = getGradeLevel(prefs.getString("defaultGrade"));
+        final seasonId = gradeLevel == gradeLevels["College"]
+            ? (seasons[0].vexUId ?? seasons[0].vrcId)
+            : seasons[0].vrcId;
+        final worldSkillsData = prefs.getString("worldSkillsData");
+        final vdaData = prefs.getString("vdaData");
+
+        if (hasCachedWorldSkillsRankings(seasonId, gradeLevel) &&
+            hasCachedTrueSkillData() &&
+            worldSkillsData != null &&
+            vdaData != null) {
           return RankingsPage(
             searchQuery: searchQuery,
             sort: rankingSorts[sortIndex],
             divisionIndex: division.order - 1,
             filter: filter,
             skills: tournament.tournamentSkills!,
-            worldSkills: jsonDecode(prefs.getString("worldSkillsData")!)
+            worldSkills: jsonDecode(worldSkillsData)
                 .map<WorldSkillsStats>((e) => WorldSkillsStats.fromJson(e))
                 .toList(),
-            vda: jsonDecode(prefs.getString("vdaData")!).map<VDAStats>((json) => VDAStats.fromJson(json)).toList(),
+            vda: jsonDecode(vdaData).map<VDAStats>((json) => VDAStats.fromJson(json)).toList(),
           );
         }
         return FutureBuilder(
@@ -305,6 +319,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
           onRefresh: () async {
             // Use TMTournamentDetails with forceRefresh to fetch fresh data from API
             // This fetches from API, saves to SQLite, and updates the in-memory CacheManager
+            // Note: RefreshIndicator shows its own spinner, but we could optionally set _isLoading here
             final updatedTournament = await TMTournamentDetails(widget.tournamentId, forceRefresh: true);
 
             // Preserve the user's current division selection by finding matching division in updated data

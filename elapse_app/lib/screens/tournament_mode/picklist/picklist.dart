@@ -39,7 +39,17 @@ class _PicklistPageState extends State<PicklistPage> {
 
   void _initializeTournament() {
     final cachedTournament = CacheManager.lastLoadedTournament;
-    final tournamentId = prefs.getInt("tournamentID") ?? 0;
+    final tournamentId = prefs.getInt("tournamentID");
+
+    // Validate tournament ID exists and is valid
+    if (tournamentId == null || tournamentId == 0) {
+      debugPrint('Picklist: No valid tournament ID found');
+      _isTournamentLoading = false;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() {});
+      });
+      return;
+    }
 
     if (cachedTournament != null && cachedTournament.id == tournamentId) {
       // Don't call setState if called from initState - just assign directly
