@@ -111,8 +111,10 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
             ),
           );
         } else if (snapshot.hasData) {
+          // TMTournamentDetails already set the in-memory cache
+          // TournamentLoadedScreen will use getLastLoadedTournament() for sync access
           return TournamentLoadedScreen(
-            tournament: snapshot.data as Tournament,
+            tournamentId: widget.tournamentID,
             isPreview: widget.isPreview,
           );
         } else {
