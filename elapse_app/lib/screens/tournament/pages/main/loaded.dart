@@ -202,8 +202,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
 
   /// Filter games by selected session date (for leagues)
   List<Game> _filterGamesBySession(List<Game> games) {
-    // If no session selected or not a league, show all games
-    if (_selectedSession == null || !tournament.isLeague) {
+    // If no session selected, not a league, or single-session league, show all games
+    if (_selectedSession == null || !tournament.isLeague ||
+        tournament.sessions == null || tournament.sessions!.length <= 1) {
       return games;
     }
 
@@ -419,9 +420,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                 );
               }
 
-              // Preserve session selection for leagues
-              if (currentSessionDate != null && tournament.isLeague && 
-                  tournament.sessions != null && tournament.sessions!.isNotEmpty) {
+              // Preserve session selection for leagues with multiple sessions
+              if (currentSessionDate != null && tournament.isLeague &&
+                  tournament.sessions != null && tournament.sessions!.length > 1) {
                 _selectedSession = tournament.sessions!.firstWhere(
                   (s) => _isSameDay(s.date, currentSessionDate),
                   orElse: () => tournament.sessions!.first,

@@ -88,14 +88,15 @@ class _TMHomePageState extends State<TMHomePage> {
   }
 
   /// Get the current or upcoming session for leagues
-  /// Returns null if not a league or no sessions available
+  /// Returns null if not a league, no sessions available, or single-session league
   LeagueSession? _getCurrentSession() {
     if (_tournament == null || !_tournament!.isLeague) {
       return null;
     }
-    
-    // Guard for null or empty sessions
-    if (_tournament!.sessions == null || _tournament!.sessions!.isEmpty) {
+
+    // Guard for null, empty, or single-session leagues
+    // Single-session leagues don't need filtering (all games belong to that session)
+    if (_tournament!.sessions == null || _tournament!.sessions!.length <= 1) {
       return null;
     }
 
