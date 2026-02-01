@@ -189,8 +189,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                       );
                                     });
                               } else {
-                                return Icon(Icons.search,
-                                    color: Theme.of(context).colorScheme.onSurface.withAlpha(128));
+                                return Icon(Icons.search);
                               }
                             })
                       ],
