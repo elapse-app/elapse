@@ -79,7 +79,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         onRefresh: () async {
           final userJson = prefs.getString("currentUser");
           if (userJson != null) {
-            await FirebaseAuth.instance.currentUser?.reload();
+            try {
+              await FirebaseAuth.instance.currentUser?.reload();
+            } catch (_) {}
             setState(() {
               currentUser = ElapseUser.fromJson(jsonDecode(userJson));
               final uid = currentUser?.uid;
@@ -261,20 +263,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                   builder: (context) =>
                                                       const CreateAccount(),
                                                 ));
-                                            if (prefs
-                                                    .getString("currentUser") !=
-                                                null) {
-                                              await FirebaseAuth
-                                                  .instance.currentUser!
-                                                  .reload();
+                                            final userJson = prefs.getString("currentUser");
+                                            if (userJson != null) {
+                                              try {
+                                                await FirebaseAuth.instance.currentUser?.reload();
+                                              } catch (_) {}
                                               setState(() {
-                                                currentUser = ElapseUser
-                                                    .fromJson(jsonDecode(
-                                                        prefs.getString(
-                                                            "currentUser")!));
-                                                teamGroupFuture =
-                                                    getUserTeamGroup(
-                                                        currentUser!.uid!);
+                                                currentUser = ElapseUser.fromJson(jsonDecode(userJson));
+                                                final uid = currentUser?.uid;
+                                                if (uid != null) {
+                                                  teamGroupFuture = getUserTeamGroup(uid);
+                                                }
                                               });
                                             }
                                           },
@@ -293,20 +292,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                   builder: (context) =>
                                                       const LoginPage(),
                                                 ));
-                                            if (prefs
-                                                    .getString("currentUser") !=
-                                                null) {
-                                              await FirebaseAuth
-                                                  .instance.currentUser!
-                                                  .reload();
+                                            final userJson = prefs.getString("currentUser");
+                                            if (userJson != null) {
+                                              try {
+                                                await FirebaseAuth.instance.currentUser?.reload();
+                                              } catch (_) {}
                                               setState(() {
-                                                currentUser = ElapseUser
-                                                    .fromJson(jsonDecode(
-                                                        prefs.getString(
-                                                            "currentUser")!));
-                                                teamGroupFuture =
-                                                    getUserTeamGroup(
-                                                        currentUser!.uid!);
+                                                currentUser = ElapseUser.fromJson(jsonDecode(userJson));
+                                                final uid = currentUser?.uid;
+                                                if (uid != null) {
+                                                  teamGroupFuture = getUserTeamGroup(uid);
+                                                }
                                               });
                                             }
                                           },

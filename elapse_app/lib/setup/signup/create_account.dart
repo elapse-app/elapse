@@ -67,8 +67,10 @@ class _CreateAccountState extends State<CreateAccount> {
                 onTap: () async {
                   final user = FirebaseAuth.instance.currentUser;
                   if (user != null) {
-                    await user.reload();
-                    await user.delete();
+                    try {
+                      await user.reload();
+                      await user.delete();
+                    } catch (_) {}
                   }
                   if (!mounted) return;
                   Navigator.pop(context);
@@ -333,8 +335,10 @@ class _CreateAccountState extends State<CreateAccount> {
                                             onPressed: () async {
                                               final updatedUser = FirebaseAuth.instance.currentUser;
                                               if (updatedUser != null) {
-                                                await updatedUser.reload(); // Ensure the user object is updated
-                                                await updatedUser.delete(); // Delete the user if verification fails
+                                                try {
+                                                  await updatedUser.reload();
+                                                  await updatedUser.delete();
+                                                } catch (_) {}
                                               }
                                               Navigator.pop(context);
                                             },
@@ -376,7 +380,9 @@ class _CreateAccountState extends State<CreateAccount> {
                                             Navigator.pop(context);
 
                                             bool initBuild = false;
-                                            FirebaseAuth.instance.currentUser?.sendEmailVerification();
+                                            try {
+                                              await FirebaseAuth.instance.currentUser?.sendEmailVerification();
+                                            } catch (_) {}
                                             showDialog(
                                                 context: context,
                                                 builder: (context) {
@@ -390,7 +396,9 @@ class _CreateAccountState extends State<CreateAccount> {
                                                             !user.emailVerified &&
                                                             DateTime.now().isBefore(timeout)) {
                                                           await Future.delayed(Duration(seconds: 5));
-                                                          await user.reload();
+                                                          try {
+                                                            await user.reload();
+                                                          } catch (_) {}
                                                           user = FirebaseAuth.instance.currentUser;
                                                         }
 
@@ -402,10 +410,10 @@ class _CreateAccountState extends State<CreateAccount> {
                                                           Navigator.pop(context);
                                                           final updatedUser = FirebaseAuth.instance.currentUser;
                                                           if (updatedUser != null) {
-                                                            await updatedUser
-                                                                .reload(); // Ensure the user object is updated
-                                                            await updatedUser
-                                                                .delete(); // Delete the user if verification fails
+                                                            try {
+                                                              await updatedUser.reload();
+                                                              await updatedUser.delete();
+                                                            } catch (_) {}
                                                           }
 
                                                           showDialog(
@@ -421,8 +429,10 @@ class _CreateAccountState extends State<CreateAccount> {
                                                                           final user =
                                                                               FirebaseAuth.instance.currentUser;
                                                                           if (user == null) return;
-                                                                          await user.reload();
-                                                                          await user.delete();
+                                                                          try {
+                                                                            await user.reload();
+                                                                            await user.delete();
+                                                                          } catch (_) {}
                                                                           Navigator.pop(context);
                                                                         },
                                                                         child: Text(
@@ -466,8 +476,10 @@ class _CreateAccountState extends State<CreateAccount> {
                                                             onPressed: () async {
                                                               final user = FirebaseAuth.instance.currentUser;
                                                               if (user != null) {
-                                                                await user.reload();
-                                                                await user.delete();
+                                                                try {
+                                                                  await user.reload();
+                                                                  await user.delete();
+                                                                } catch (_) {}
                                                               }
                                                               Navigator.pop(context);
                                                             },

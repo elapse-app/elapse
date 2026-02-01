@@ -298,13 +298,15 @@ class _AccountSettingsState extends State<AccountSettings> {
                           ),
                           TextButton(
                               child: Text("Sign out", style: TextStyle(color: Theme.of(context).colorScheme.error)),
-                              onPressed: () {
+                              onPressed: () async {
                                 Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(builder: (context) => const FirstSetupPage()),
                                   ((_) => false),
                                 );
-                                FirebaseAuth.instance.signOut();
+                                try {
+                                  await FirebaseAuth.instance.signOut();
+                                } catch (_) {}
                                 clearPrefs();
                               })
                         ],
@@ -471,7 +473,9 @@ class _AccountSettingsState extends State<AccountSettings> {
                                               );
                                               Database database = Database();
                                               database.deleteCurrentUser();
-                                              user.delete();
+                                              try {
+                                                await user.delete();
+                                              } catch (_) {}
                                               clearPrefs();
                                             },
                                           ),
