@@ -16,15 +16,16 @@ import '../../../explore/worldRankings/world_rankings_filter.dart';
 import '../../../widgets/app_bar.dart';
 
 class AllTeams extends StatefulWidget {
-  const AllTeams({super.key, required this.tournament});
+  const AllTeams({super.key, required this.tournamentId});
 
-  final Tournament tournament;
+  final int tournamentId;
 
   @override
   State<AllTeams> createState() => _AllTeamsState();
 }
 
 class _AllTeamsState extends State<AllTeams> {
+  Tournament? _tournament;
   int sortIndex = 0;
   List<String> sorts = [
     "Team Number",
@@ -38,47 +39,86 @@ class _AllTeamsState extends State<AllTeams> {
   ];
   double _fadeStart = 0, _fadeEnd = 1;
 
-  late Future<List<WorldSkillsStats>> skillsStats;
+  Future<List<WorldSkillsStats>>? skillsStats;
   List<WorldSkillsStats>? loadedSkills;
-  late Future<List<VDAStats>> vdaStats;
+  Future<List<VDAStats>>? vdaStats;
   List<VDAStats>? loadedVDA;
 
   WorldRankingsFilter filter = WorldRankingsFilter();
 
   late bool inTM;
-  late Tournament? tmTournament;
+  Tournament? tmTournament;
   late List<TeamPreview> savedTeams;
   late List<TeamPreview> picklistTeams;
   late List<TeamPreview> scoutedTeams;
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
+    _loadTournament();
+  }
 
-    skillsStats =
-        getWorldSkillsRankings(widget.tournament.seasonID, getGradeLevel(prefs.getString("defaultGrade"))).then((data) {
-      setState(() {
-        loadedSkills = data;
-      });
-      return data;
-    });
-    vdaStats = getTrueSkillData(widget.tournament.seasonID).then((data) {
-      setState(() {
-        loadedVDA = data;
-      });
-      return data;
-    });
+  Future<void> _loadTournament() async {
+    final tournament = await getTournamentFromCache(widget.tournamentId);
+    if (tournament != null && mounted) {
+      _tournament = tournament;
 
-    inTM = prefs.getBool("isTournamentMode") ?? false;
-    tmTournament = inTM ? getLastLoadedTournament() : null;
-    savedTeams = _getSavedTeams();
-    picklistTeams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
-    scoutedTeams = [];
+      skillsStats =
+          getWorldSkillsRankings(tournament.seasonID, getGradeLevel(prefs.getString("defaultGrade"))).then((data) {
+        if (mounted) {
+          setState(() {
+            loadedSkills = data;
+          });
+        }
+        return data;
+      });
+      vdaStats = getTrueSkillData(tournament.seasonID).then((data) {
+        if (mounted) {
+          setState(() {
+            loadedVDA = data;
+          });
+        }
+        return data;
+      });
+
+      inTM = prefs.getBool("isTournamentMode") ?? false;
+      tmTournament = inTM ? tournament : null;
+      savedTeams = _getSavedTeams();
+      picklistTeams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
+      scoutedTeams = [];
+    }
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    List<Team> teams = widget.tournament.teams;
+    if (_isLoading) {
+      return Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_tournament == null) {
+      return Scaffold(
+        body: CustomScrollView(
+          slivers: [
+            ElapseAppBar(
+              title: const Text("All Teams", style: TextStyle(fontSize: 24, height: 1, fontWeight: FontWeight.w600)),
+              backNavigation: true,
+            ),
+            const RoundedTop(),
+            const SliverFillRemaining(
+              child: Center(child: Text("Tournament not found")),
+            ),
+          ],
+        ),
+      );
+    }
+
+    List<Team> teams = _tournament!.teams;
 
     if (filter.regions!.isNotEmpty) {
       teams = teams.where((e) => filter.regions!.any((e2) => e2 == (e.location?.region ?? ""))).toList();
@@ -99,10 +139,13 @@ class _AllTeamsState extends State<AllTeams> {
     switch (sortIndex) {
       case 0:
         teams.sort((a, b) {
-          num teamNumA = num.parse(a.teamNumber!.substring(0, a.teamNumber!.length - 1));
-          num teamNumB = num.parse(b.teamNumber!.substring(0, b.teamNumber!.length - 1));
+          final numA = a.teamNumber ?? "";
+          final numB = b.teamNumber ?? "";
+          if (numA.isEmpty || numB.isEmpty) return numA.compareTo(numB);
+          final teamNumA = num.tryParse(numA.substring(0, numA.length - 1)) ?? 0;
+          final teamNumB = num.tryParse(numB.substring(0, numB.length - 1)) ?? 0;
           if (teamNumA == teamNumB) {
-            return a.teamNumber![a.teamNumber!.length - 1].compareTo(b.teamNumber![b.teamNumber!.length - 1]);
+            return numA[numA.length - 1].compareTo(numB[numB.length - 1]);
           }
           return teamNumA.compareTo(teamNumB);
         });

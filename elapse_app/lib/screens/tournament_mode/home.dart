@@ -3,7 +3,6 @@ import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/league_session.dart';
 import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
-import 'package:elapse_app/database/cache_manager.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/main/search_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
@@ -43,10 +42,12 @@ class _TMHomePageState extends State<TMHomePage> {
   }
 
   Future<void> _initializeTournament({bool forceRefresh = false}) async {
-    final cachedTournament = CacheManager.lastLoadedTournament;
+    // Try loading from SQLite cache first
+    final cachedTournament = await getTournamentFromCache(widget.tournamentID);
 
     if (!forceRefresh && cachedTournament != null && cachedTournament.id == widget.tournamentID) {
       _setupWithTournament(cachedTournament);
+      if (mounted) setState(() {});
     } else {
       // For forceRefresh (pull-to-refresh), use setState to show loading spinner
       // For initial load from initState, just assign directly
@@ -178,7 +179,7 @@ class _TMHomePageState extends State<TMHomePage> {
             transitionDuration: const Duration(milliseconds: 300),
             reverseTransitionDuration: const Duration(milliseconds: 300),
             pageBuilder: (context, animation, secondaryAnimation) =>
-                SearchScreen(tournament: _tournament!, division: _division!),
+                SearchScreen(tournamentId: _tournament!.id, divisionId: _division!.id),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },
@@ -268,8 +269,10 @@ class _TMHomePageState extends State<TMHomePage> {
         child: Column(
           children: [
             NextGame(
-              game: game,
-              games: sessionGames,
+              divisionId: game.divisionId,
+              roundNum: game.roundNum,
+              gameNum: game.gameNum,
+              instance: game.instance,
               rankings: _division!.teamStats!,
               skills: _tournament!.tournamentSkills ?? {},
               targetTeam: TeamPreview(
@@ -346,7 +349,10 @@ class _TMHomePageState extends State<TMHomePage> {
             return Column(
               children: [
                 GameWidget(
-                  game: game,
+                  divisionId: game.divisionId,
+                  roundNum: game.roundNum,
+                  gameNum: game.gameNum,
+                  instance: game.instance,
                   teamName: widget.teamNumber,
                   isAllianceColoured: true,
                 ),
@@ -592,9 +598,9 @@ class _TMHomePageState extends State<TMHomePage> {
                         fontSize: 16,
                         color: Theme.of(context).colorScheme.secondary),
                   ),
-                  onPressed: () {
+                  onPressed: () async {
                     prefs.setBool("isTournamentMode", false);
-                    clearLastLoadedTournament();
+                    await invalidateTournamentCache(widget.tournamentID);
                     setupGateKey.currentState?.reloadApp();
                   }),
               Spacer(),

@@ -108,44 +108,47 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
     _initializeTournament();
   }
 
-  /// Initialize tournament data - try sync cache first, fall back to async DB fetch
+  /// Initialize tournament data from SQLite cache or API
   Future<void> _initializeTournament({bool forceRefresh = false}) async {
-    // Try sync access first - cache should be set by entry point's TMTournamentDetails call
-    final cachedTournament = getLastLoadedTournament();
-
-    // Verify cached tournament ID matches to avoid race conditions when navigating between tournaments
-    if (!forceRefresh && cachedTournament != null && cachedTournament.id == widget.tournamentId) {
-      _setupWithTournament(cachedTournament);
-    } else {
-      // Cache not set - fetch from DB asynchronously
-      // This handles edge cases like hot restart or direct navigation
-      if (forceRefresh) {
-        setState(() {
-          _isLoading = true;
-          _loadError = null;
-        });
-      } else {
+    if (forceRefresh) {
+      setState(() {
         _isLoading = true;
+        _loadError = null;
+      });
+    } else {
+      _isLoading = true;
+    }
+
+    try {
+      // First try SQLite cache for fast loading
+      if (!forceRefresh) {
+        final cachedTournament = await getTournamentFromCache(widget.tournamentId);
+        if (cachedTournament != null && mounted) {
+          setState(() {
+            _isLoading = false;
+            _setupWithTournament(cachedTournament);
+          });
+          return;
+        }
       }
 
-      try {
-        final t = await TMTournamentDetails(widget.tournamentId, forceRefresh: forceRefresh);
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            _setupWithTournament(t);
-          });
-        }
-      } catch (error, stackTrace) {
-        // Log error for debugging
-        debugPrint('TournamentLoadedScreen: Failed to load tournament: $error');
-        debugPrintStack(stackTrace: stackTrace);
-        if (mounted) {
-          setState(() {
-            _isLoading = false;
-            _loadError = 'Failed to load tournament';
-          });
-        }
+      // Fall back to API fetch
+      final t = await TMTournamentDetails(widget.tournamentId, forceRefresh: forceRefresh);
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _setupWithTournament(t);
+        });
+      }
+    } catch (error, stackTrace) {
+      // Log error for debugging
+      debugPrint('TournamentLoadedScreen: Failed to load tournament: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _loadError = 'Failed to load tournament';
+        });
       }
     }
   }
@@ -382,8 +385,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
         );
       case 3:
         return InfoPage(
-          tournament: tournament,
-          awards: tournament.awards,
+          tournamentId: tournament.id,
         );
       default:
         return const SliverToBoxAdapter();
@@ -425,7 +427,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
         body: RefreshIndicator(
           onRefresh: () async {
             // Use TMTournamentDetails with forceRefresh to fetch fresh data from API
-            // This fetches from API, saves to SQLite, and updates the in-memory CacheManager
+            // This fetches from API and saves to SQLite via CacheManager
             // Note: RefreshIndicator shows its own spinner, but we could optionally set _isLoading here
             final updatedTournament = await TMTournamentDetails(widget.tournamentId, forceRefresh: true);
 
@@ -493,8 +495,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                             transitionDuration: Duration(milliseconds: 300),
                             reverseTransitionDuration: Duration(milliseconds: 300),
                             pageBuilder: (context, animation, secondaryAnimation) => SearchScreen(
-                              tournament: tournament,
-                              division: division,
+                              tournamentId: tournament.id,
+                              divisionId: division.id,
                             ),
                             transitionsBuilder: (context, animation, secondaryAnimation, child) {
                               // Create a Tween that transitions the new screen from fully transparent to fully opaque

@@ -548,7 +548,7 @@ class _TeamScreenState extends State<TeamScreen> {
                     const Icon(Icons.event_note),
                     const SizedBox(width: 4),
                     Text(
-                      season.name.substring(10),
+                      season.name.length > 10 ? season.name.substring(10) : season.name,
                       style: const TextStyle(fontSize: 16),
                     ),
                     const Icon(Icons.arrow_right)

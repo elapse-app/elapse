@@ -12,7 +12,6 @@ import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
 import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
-import 'package:elapse_app/database/cache_manager.dart';
 import 'package:elapse_app/screens/my_team/my_team.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:elapse_app/screens/tournament_mode/widgets/ranking_overview_widget.dart';
@@ -60,22 +59,22 @@ class TMMyTeamsState extends State<TMMyTeams> {
     }
   }
 
-  void _initializeTournament() {
+  Future<void> _initializeTournament() async {
     setState(() {
       _isTournamentLoading = true;
       _tournamentError = null;
     });
 
-    final cachedTournament = CacheManager.lastLoadedTournament;
+    // Try loading from SQLite cache first
+    final cachedTournament = await getTournamentFromCache(widget.tournamentID);
 
     if (cachedTournament != null && cachedTournament.id == widget.tournamentID) {
       _tournament = cachedTournament;
       _isTournamentLoading = false;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) setState(() {});
-      });
+      if (mounted) setState(() {});
     } else {
-      TMTournamentDetails(widget.tournamentID).then((t) {
+      try {
+        final t = await TMTournamentDetails(widget.tournamentID);
         if (mounted) {
           setState(() {
             _tournament = t;
@@ -83,7 +82,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
             _tournamentError = null;
           });
         }
-      }).catchError((error) {
+      } catch (error) {
         debugPrint('Failed to load tournament: $error');
         if (mounted) {
           setState(() {
@@ -91,7 +90,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
             _tournamentError = error.toString();
           });
         }
-      });
+      }
     }
   }
 
@@ -254,7 +253,10 @@ class TMMyTeamsState extends State<TMMyTeams> {
                 return Column(
                   children: [
                     GameWidget(
-                      game: e,
+                      divisionId: e.divisionId,
+                      roundNum: e.roundNum,
+                      gameNum: e.gameNum,
+                      instance: e.instance,
                       teamName: selectedTeamPreview.teamNumber,
                       isAllianceColoured: false,
                     ),
@@ -336,7 +338,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                         const Icon(Icons.event_note),
                         const SizedBox(width: 4),
                         Text(
-                          season.name.substring(10),
+                          season.name.length > 10 ? season.name.substring(10) : season.name,
                           style: const TextStyle(fontSize: 16),
                         ),
                         const Icon(Icons.arrow_right)

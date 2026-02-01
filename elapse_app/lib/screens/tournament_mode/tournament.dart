@@ -111,8 +111,8 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
             ),
           );
         } else if (snapshot.hasData) {
-          // TMTournamentDetails already set the in-memory cache
-          // TournamentLoadedScreen will use getLastLoadedTournament() for sync access
+          // Tournament data is cached in SQLite by TMTournamentDetails
+          // TournamentLoadedScreen will read from SQLite via getTournamentFromCache()
           return TournamentLoadedScreen(
             tournamentId: widget.tournamentID,
             isPreview: widget.isPreview,

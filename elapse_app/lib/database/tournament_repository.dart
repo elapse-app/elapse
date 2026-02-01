@@ -423,7 +423,7 @@ class TournamentRepository {
       final gameRows = gamesByDivision[divisionId] ?? [];
       final statsRows = statsByDivision[divisionId] ?? [];
 
-      final games = _buildGames(gameRows, alliancesByGame);
+      final games = _buildGames(gameRows, alliancesByGame, divisionId);
       final teamStats = _loadTeamStatsMap(statsRows);
 
       return Division(
@@ -440,6 +440,7 @@ class TournamentRepository {
   List<Game> _buildGames(
     List<Map<String, dynamic>> gameRows,
     Map<int, List<Map<String, dynamic>>> alliancesByGame,
+    int divisionId,
   ) {
     return gameRows.map((row) {
       final gameId = row['id'] as int;
@@ -465,6 +466,7 @@ class TournamentRepository {
         blueAlliancePreview: blueAlliance,
         redScore: row['red_score'] as int?,
         blueScore: row['blue_score'] as int?,
+        divisionId: divisionId,
         roundNum: row['round_num'] as num? ?? 0,
         gameNum: row['game_num'] as int? ?? 0,
         instance: row['instance'] as int? ?? 1,

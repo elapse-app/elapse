@@ -911,7 +911,7 @@ Widget buildTeamDropdown(
                       .map((e) => DropdownMenuItem(
                           value: e.teamID, child: Text("Team ${e.teamNumber}")))
                       .toList(),
-                  onChanged: (int? value) {
+                  onChanged: (int? value) async {
                     final String savedTeam = prefs.getString("savedTeam") ?? "";
                     final List<String> savedTeams =
                         prefs.getStringList("savedTeams") ?? [];
@@ -920,8 +920,9 @@ Widget buildTeamDropdown(
                     if (selected == null) return;
 
                     Tournament? tournament;
-                    if (prefs.getBool("isTournamentMode") ?? false) {
-                      tournament = getLastLoadedTournament();
+                    final tournamentId = prefs.getInt("tournamentID");
+                    if ((prefs.getBool("isTournamentMode") ?? false) && tournamentId != null) {
+                      tournament = await getTournamentFromCache(tournamentId);
                     }
 
                     if (tournament != null &&
@@ -952,7 +953,7 @@ Widget buildTeamDropdown(
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .secondary)),
-                                    onPressed: () {
+                                    onPressed: () async {
                                       savedTeams.removeWhere((e) =>
                                           jsonDecode(e)["teamID"] == value);
                                       savedTeams.add(savedTeam);
@@ -963,7 +964,9 @@ Widget buildTeamDropdown(
                                       update(value!);
 
                                       prefs.setBool("isTournamentMode", false);
-                                      clearLastLoadedTournament();
+                                      if (tournamentId != null) {
+                                        await invalidateTournamentCache(tournamentId);
+                                      }
                                       setupGateKey.currentState!.reloadApp();
                                       Navigator.pop(context);
                                     })

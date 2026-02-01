@@ -39,6 +39,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
   List<WorldSkillsStats>? loadedSkills;
   late bool isVDALoaded;
   List<VDAStats>? loadedVDA;
+  Tournament? _tournament;
 
   int selectedIndex = 0;
   List<String> pageTitles = ["Skills", "TrueSkill"];
@@ -81,6 +82,21 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
     savedTeams = _getSavedTeams();
     picklistTeams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
     inTM = prefs.getBool("isTournamentMode") ?? false;
+    _loadTournament();
+  }
+
+  Future<void> _loadTournament() async {
+    if (inTM) {
+      final tournamentId = prefs.getInt("tournamentID");
+      if (tournamentId != null && tournamentId != 0) {
+        final tournament = await getTournamentFromCache(tournamentId);
+        if (mounted) {
+          setState(() {
+            _tournament = tournament;
+          });
+        }
+      }
+    }
   }
 
   @override
@@ -213,7 +229,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                         const Icon(Icons.event_note),
                         const SizedBox(width: 4),
                         Text(
-                          season.name.substring(10),
+                          season.name.length > 10 ? season.name.substring(10) : season.name,
                           style: const TextStyle(fontSize: 16),
                         ),
                         const Icon(Icons.arrow_right)
@@ -483,7 +499,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                 filter: filter,
                 savedTeams: savedTeams,
                 picklistTeams: picklistTeams,
-                tournament: inTM ? getLastLoadedTournament() : null,
+                tournament: inTM ? _tournament : null,
                 scoutedTeams: const [],
               );
             }
@@ -494,7 +510,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                 filter: filter,
                 savedTeams: savedTeams,
                 picklistTeams: picklistTeams,
-                tournament: inTM ? getLastLoadedTournament() : null,
+                tournament: inTM ? _tournament : null,
               );
             }
 

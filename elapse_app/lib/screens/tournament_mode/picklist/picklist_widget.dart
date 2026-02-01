@@ -5,44 +5,66 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:collection/collection.dart';
 
 import '../../../classes/Team/teamPreview.dart';
+import '../../../classes/Tournament/division.dart';
 import '../../../classes/Tournament/tournament.dart';
 import '../../../main.dart';
 
-class PicklistWidget extends StatelessWidget {
+class PicklistWidget extends StatefulWidget {
   const PicklistWidget({
     super.key,
     required this.index,
     required this.team,
-    required this.tournament,
-    required this.isTournamentLoading,
     required this.carouselControllers,
     required this.refresh,
   });
 
   final int index;
   final TeamPreview team;
-  final Tournament? tournament;
-  final bool isTournamentLoading;
   final List<CarouselSliderController> carouselControllers;
   final Function refresh;
 
-  Widget _buildTournamentStats(BuildContext context) {
-    if (isTournamentLoading) {
-      return const Center(child: CircularProgressIndicator());
-    }
+  @override
+  State<PicklistWidget> createState() => _PicklistWidgetState();
+}
 
-    if (tournament == null) {
+class _PicklistWidgetState extends State<PicklistWidget> {
+  Tournament? _tournament;
+  Division? _division;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTournament();
+  }
+
+  Future<void> _loadTournament() async {
+    final tournamentId = prefs.getInt("tournamentID");
+    if (tournamentId != null && tournamentId != 0) {
+      final tournament = await getTournamentFromCache(tournamentId);
+      if (tournament != null && mounted) {
+        _tournament = tournament;
+        _division = tournament.divisions
+            .firstWhereOrNull((e) => e.teamStats?.containsKey(widget.team.teamID) ?? false);
+      }
+    }
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  Widget _buildTournamentStats(BuildContext context) {
+    if (_isLoading || _tournament == null) {
       return const SizedBox.shrink();
     }
 
-    final division = tournament!.divisions
-        .firstWhereOrNull((e) => e.teamStats?.containsKey(team.teamID) ?? false);
+    final division = _division;
 
     if (division == null || division.teamStats == null) {
       return const SizedBox.shrink();
     }
 
-    final stats = division.teamStats![team.teamID]!;
+    final stats = division.teamStats![widget.team.teamID]!;
 
     List<Widget> pages = [
       Padding(
@@ -161,13 +183,13 @@ class PicklistWidget extends StatelessWidget {
         enlargeFactor: 0,
         padEnds: true,
         onPageChanged: (index, reason) {
-          for (final c in carouselControllers) {
+          for (final c in widget.carouselControllers) {
             c.animateToPage(index,
                 duration: const Duration(milliseconds: 100), curve: Curves.fastOutSlowIn);
           }
         },
       ),
-      carouselController: carouselControllers[index],
+      carouselController: widget.carouselControllers[widget.index],
     );
   }
 
@@ -182,14 +204,14 @@ class PicklistWidget extends StatelessWidget {
             child: Container(color: Theme.of(context).colorScheme.error),
           )),
           Dismissible(
-            key: Key("$index"),
+            key: Key("${widget.index}"),
             direction: DismissDirection.endToStart,
             onDismissed: (direction) {
               final picklist = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
-              picklist.remove(team);
+              picklist.remove(widget.team);
               prefs.setStringList("picklist", picklist.map((e) => jsonEncode(e.toJson())).toList());
               print(picklist);
-              refresh();
+              widget.refresh();
             },
             background: Container(
               padding: const EdgeInsets.only(right: 20),
@@ -209,19 +231,19 @@ class PicklistWidget extends StatelessWidget {
                   Flexible(
                     flex: 15,
                     fit: FlexFit.tight,
-                    child: ReorderableDragStartListener(index: index, child: const Icon(Icons.drag_indicator)),
+                    child: ReorderableDragStartListener(index: widget.index, child: const Icon(Icons.drag_indicator)),
                   ),
                   Flexible(
                     flex: 20,
                     fit: FlexFit.tight,
-                    child: Text("${index + 1}.",
+                    child: Text("${widget.index + 1}.",
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface, fontSize: 24, fontWeight: FontWeight.w600)),
                   ),
                   Flexible(
                     flex: 100,
                     fit: FlexFit.tight,
-                    child: Text(team.teamNumber,
+                    child: Text(widget.team.teamNumber,
                         style: TextStyle(
                             color: Theme.of(context).colorScheme.onSurface, fontSize: 36, fontWeight: FontWeight.w400)),
                   ),

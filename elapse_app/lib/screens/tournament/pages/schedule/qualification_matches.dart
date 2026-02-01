@@ -24,7 +24,10 @@ class MatchesView extends StatelessWidget {
             child: Column(
               children: [
                 GameWidget(
-                  game: game,
+                  divisionId: game.divisionId,
+                  roundNum: game.roundNum,
+                  gameNum: game.gameNum,
+                  instance: game.instance,
                   useLiveTiming: useLiveTiming,
                 ),
                 index != games.length - 1

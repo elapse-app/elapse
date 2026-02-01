@@ -9,13 +9,42 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
-class InfoPage extends StatelessWidget {
-  const InfoPage({super.key, required this.tournament, required this.awards});
-  final Tournament tournament;
-  final List<Award> awards;
+class InfoPage extends StatefulWidget {
+  const InfoPage({super.key, required this.tournamentId});
+  final int tournamentId;
+
+  @override
+  State<InfoPage> createState() => _InfoPageState();
+}
+
+class _InfoPageState extends State<InfoPage> {
+  Tournament? _tournament;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTournament();
+  }
+
+  Future<void> _loadTournament() async {
+    final tournament = await getTournamentFromCache(widget.tournamentId);
+    if (mounted) {
+      setState(() {
+        _tournament = tournament;
+        _isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading || _tournament == null) {
+      return const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator()));
+    }
+    final tournament = _tournament!;
+    final awards = tournament.awards;
+
     Future<bool> livestream = hasLivestream(tournament.sku);
 
     final String tournamentName = tournament.name;
@@ -189,7 +218,7 @@ class InfoPage extends StatelessWidget {
                     context,
                     MaterialPageRoute(
                         builder: (context) => AllTeams(
-                              tournament: tournament,
+                              tournamentId: tournament.id,
                             )));
               },
               child: Container(
@@ -230,7 +259,7 @@ class InfoPage extends StatelessWidget {
                     height: 15,
                   ),
                   Column(
-                    children: awards.map((award) => AwardWidget(award: award)).toList(),
+                    children: List.generate(awards.length, (index) => AwardWidget(awardIndex: index)),
                   )
                 ],
               ),

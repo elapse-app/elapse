@@ -10,6 +10,7 @@ import 'dart:convert';
 
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/database/cache_manager.dart';
+import 'package:elapse_app/database/tournament_repository.dart';
 import 'package:elapse_app/extras/token.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
@@ -256,9 +257,6 @@ Future<Tournament> TMTournamentDetails(int tournamentID, {bool forceRefresh = fa
       }
     }
 
-    // Store in memory for sync access by other screens
-    CacheManager.setLastLoadedTournament(tournament);
-
     return tournament;
   }
 
@@ -266,15 +264,17 @@ Future<Tournament> TMTournamentDetails(int tournamentID, {bool forceRefresh = fa
   throw Exception("Failed to load tournament: ${result.errors.map((e) => e.message).join(', ')}");
 }
 
-/// Gets the last loaded tournament from memory (sync access).
-/// Returns null if no tournament has been loaded yet.
-/// Use this instead of loadTournament(prefs.getString("recently-opened-tournament")).
-Tournament? getLastLoadedTournament() {
-  return CacheManager.lastLoadedTournament;
+/// Gets a tournament from SQLite cache by ID.
+/// Returns null if not found or on any error.
+/// This is the primary way to access tournament data - always reads from SQLite.
+Future<Tournament?> getTournamentFromCache(int tournamentId) async {
+  final repo = TournamentRepository();
+  return await repo.getCachedTournament(tournamentId);
 }
 
-/// Clears the in-memory tournament cache.
+/// Clears the tournament cache for a specific tournament.
 /// Call this when exiting tournament mode.
-void clearLastLoadedTournament() {
-  CacheManager.clearLastLoadedTournament();
+Future<void> invalidateTournamentCache(int tournamentId) async {
+  final repo = TournamentRepository();
+  await repo.invalidateCache(tournamentId);
 }

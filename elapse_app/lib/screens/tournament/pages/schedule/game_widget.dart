@@ -10,29 +10,78 @@ import 'package:elapse_app/screens/tournament/pages/schedule/game_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class GameWidget extends StatelessWidget {
+class GameWidget extends StatefulWidget {
   const GameWidget({
     super.key,
-    required this.game,
+    required this.divisionId,
+    required this.roundNum,
+    required this.gameNum,
+    required this.instance,
     this.teamName,
     this.isAllianceColoured,
     this.useLiveTiming,
   });
-  final Game game;
 
+  final int divisionId;
+  final num roundNum;
+  final int gameNum;
+  final int instance;
   final String? teamName;
   final bool? isAllianceColoured;
   final bool? useLiveTiming;
 
   @override
+  State<GameWidget> createState() => _GameWidgetState();
+}
+
+class _GameWidgetState extends State<GameWidget> {
+  Game? _game;
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadGame();
+  }
+
+  Future<void> _loadGame() async {
+    final tournamentId = prefs.getInt("tournamentID");
+    if (tournamentId != null && tournamentId != 0) {
+      final tournament = await getTournamentFromCache(tournamentId);
+      if (tournament != null && mounted) {
+        for (final division in tournament.divisions) {
+          if (division.id == widget.divisionId && division.games != null) {
+            for (final game in division.games!) {
+              if (game.roundNum == widget.roundNum &&
+                  game.gameNum == widget.gameNum &&
+                  game.instance == widget.instance) {
+                _game = game;
+                break;
+              }
+            }
+            break;
+          }
+        }
+      }
+    }
+    if (mounted) {
+      setState(() => _isLoading = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    if (_isLoading || _game == null) {
+      return const SizedBox.shrink();
+    }
+    final game = _game!;
     String time = "No Time";
     if (game.startedTime != null) {
       time = DateFormat.Hm().format(game.startedTime!.toLocal());
     }
     if (game.scheduledTime != null && game.startedTime == null) {
       DateTime start;
-      if (useLiveTiming == true) {
+      if (widget.useLiveTiming == true) {
         start = (game.adjustedTime ?? game.scheduledTime!).toLocal();
         time = DateFormat.Hm().format(start);
       } else {
@@ -63,27 +112,28 @@ class GameWidget extends StatelessWidget {
       }
     }
 
-    if (isAllianceColoured == false) {
+    if (widget.isAllianceColoured == false) {
       gameColor = Theme.of(context).colorScheme.onSurface;
     } else {
-      if (game.redAlliancePreview!.any((element) => element.teamNumber == teamName)) {
+      if (game.redAlliancePreview?.any((element) => element.teamNumber == widget.teamName) ?? false) {
         gameColor = colorPallete.redAllianceText;
-      } else if (game.blueAlliancePreview!.any((element) => element.teamNumber == teamName)) {
+      } else if (game.blueAlliancePreview?.any((element) => element.teamNumber == widget.teamName) ?? false) {
         gameColor = colorPallete.blueAllianceText;
       }
     }
 
-    if (winningAlliance == "red" && game.redAlliancePreview!.any((element) => element.teamNumber == teamName)) {
+    if (winningAlliance == "red" && (game.redAlliancePreview?.any((element) => element.teamNumber == widget.teamName) ?? false)) {
       gameColor = colorPallete.greenText;
     } else if (winningAlliance == "blue" &&
-        game.blueAlliancePreview!.any((element) => element.teamNumber == teamName)) {
+        (game.blueAlliancePreview?.any((element) => element.teamNumber == widget.teamName) ?? false)) {
       gameColor = colorPallete.greenText;
-    } else if (winningAlliance != "none" && teamName != null) {
+    } else if (winningAlliance != "none" && widget.teamName != null) {
       gameColor = colorPallete.redAllianceText;
     }
 
     Widget gameText;
-    if (game.gameName.substring(0, 1) == "R") {
+    final gameName = game.gameName;
+    if (gameName.startsWith("R") && gameName.length >= 4) {
       gameText = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
         Text("R",
             style: TextStyle(
@@ -100,7 +150,7 @@ class GameWidget extends StatelessWidget {
               fontWeight: FontWeight.w400,
               color: gameColor,
             )),
-        Text(game.gameName.substring(3, 4),
+        Text(gameName.substring(3, 4),
             style: TextStyle(
               color: gameColor,
               fontSize: 40,
@@ -109,7 +159,7 @@ class GameWidget extends StatelessWidget {
             ))
       ]);
     } else {
-      gameText = Text(game.gameName,
+      gameText = Text(gameName,
           style: TextStyle(
             letterSpacing: -1.75,
             fontSize: 40,
@@ -130,7 +180,10 @@ class GameWidget extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => GameScreen(
-              game: game,
+              divisionId: game.divisionId,
+              roundNum: game.roundNum,
+              gameNum: game.gameNum,
+              instance: game.instance,
             ),
           ),
         );
@@ -220,7 +273,7 @@ class GameWidget extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: game.redAlliancePreview!.map(
+                      children: (game.redAlliancePreview ?? []).map(
                         (e) {
                           return Text(
                             e.teamNumber,
@@ -240,7 +293,7 @@ class GameWidget extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.end,
-                      children: game.blueAlliancePreview!.map(
+                      children: (game.blueAlliancePreview ?? []).map(
                         (e) {
                           return Text(
                             e.teamNumber,

@@ -1,6 +1,5 @@
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
-import 'package:elapse_app/database/cache_manager.dart';
 import 'package:elapse_app/screens/tournament/pages/main/loaded.dart';
 import 'package:elapse_app/screens/tournament/pages/main/loading.dart';
 import 'package:flutter/material.dart';
@@ -34,12 +33,8 @@ class _TournamentScreenState extends State<TournamentScreen> {
     super.initState();
 
     if (widget.tournamentFuture != null) {
-      // Wrap the provided future to ensure it sets the in-memory cache
-      // This is critical for TournamentLoadedScreen which uses getLastLoadedTournament()
-      tournament = widget.tournamentFuture!.then((t) {
-        CacheManager.setLastLoadedTournament(t);
-        return t;
-      });
+      // Use provided future - TMTournamentDetails caches to SQLite automatically
+      tournament = widget.tournamentFuture;
     } else {
       // Use TMTournamentDetails to leverage SQLite caching
       // This ensures previewed tournaments are cached for offline access
@@ -55,8 +50,8 @@ class _TournamentScreenState extends State<TournamentScreen> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const TournamentLoadingScreen();
         } else if (snapshot.hasData) {
-          // TMTournamentDetails already set the in-memory cache
-          // TournamentLoadedScreen will use getLastLoadedTournament() for sync access
+          // Tournament data is cached in SQLite by TMTournamentDetails
+          // TournamentLoadedScreen will read from SQLite via getTournamentFromCache()
           return TournamentLoadedScreen(
             tournamentId: widget.tournamentID,
             isPreview: widget.isPreview,

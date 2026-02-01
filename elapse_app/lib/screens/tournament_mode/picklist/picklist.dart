@@ -2,13 +2,11 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:carousel_slider/carousel_controller.dart';
-import 'package:elapse_app/database/cache_manager.dart';
 import 'package:elapse_app/screens/tournament_mode/picklist/picklist_widget.dart';
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:flutter/material.dart';
 
 import '../../../classes/Team/teamPreview.dart';
-import '../../../classes/Tournament/tournament.dart';
 import '../../../main.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/rounded_top.dart';
@@ -22,8 +20,6 @@ class PicklistPage extends StatefulWidget {
 
 class _PicklistPageState extends State<PicklistPage> {
   List<TeamPreview> teams = [];
-  Tournament? _tournament;
-  bool _isTournamentLoading = true;
 
   List<CarouselSliderController> carouselControllers = [];
 
@@ -37,52 +33,10 @@ class _PicklistPageState extends State<PicklistPage> {
     });
   }
 
-  void _initializeTournament() {
-    final cachedTournament = CacheManager.lastLoadedTournament;
-    final tournamentId = prefs.getInt("tournamentID");
-
-    // Validate tournament ID exists and is valid
-    if (tournamentId == null || tournamentId == 0) {
-      debugPrint('Picklist: No valid tournament ID found');
-      _isTournamentLoading = false;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) setState(() {});
-      });
-      return;
-    }
-
-    if (cachedTournament != null && cachedTournament.id == tournamentId) {
-      // Don't call setState if called from initState - just assign directly
-      _tournament = cachedTournament;
-      _isTournamentLoading = false;
-      // Schedule a rebuild after initState completes
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (mounted) setState(() {});
-      });
-    } else {
-      TMTournamentDetails(tournamentId).then((t) {
-        if (mounted) {
-          setState(() {
-            _tournament = t;
-            _isTournamentLoading = false;
-          });
-        }
-      }).catchError((error) {
-        debugPrint('Failed to load tournament: $error');
-        if (mounted) {
-          setState(() {
-            _isTournamentLoading = false;
-          });
-        }
-      });
-    }
-  }
-
   @override
   void initState() {
     super.initState();
     refreshTeams();
-    _initializeTournament();
   }
 
   @override
@@ -112,8 +66,6 @@ class _PicklistPageState extends State<PicklistPage> {
                                   PicklistWidget(
                                       index: i,
                                       team: e,
-                                      tournament: _tournament,
-                                      isTournamentLoading: _isTournamentLoading,
                                       carouselControllers: carouselControllers,
                                       refresh: refreshTeams),
                                   i != teams.length - 1

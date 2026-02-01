@@ -13,6 +13,7 @@ class Game {
   int? redScore;
   int? blueScore;
 
+  int divisionId;
   num roundNum;
   int gameNum;
   int instance;
@@ -27,6 +28,7 @@ class Game {
   Game({
     this.redAlliancePreview,
     this.blueAlliancePreview,
+    required this.divisionId,
     required this.gameNum,
     required this.roundNum,
     required this.gameName,
@@ -39,7 +41,7 @@ class Game {
     this.blueScore,
   });
 
-  factory Game.fromJson(Map<String, dynamic> json) {
+  factory Game.fromJson(Map<String, dynamic> json, int divisionId) {
     List<TeamPreview> redAlliancePreview = [];
     List<TeamPreview> blueAlliancePreview = [];
     int redScore = 0;
@@ -98,6 +100,7 @@ class Game {
       blueAlliancePreview: blueAlliancePreview,
       redScore: redScore,
       blueScore: blueScore,
+      divisionId: divisionId,
       roundNum: roundNum,
       gameNum: json["matchnum"],
       instance: json["instance"],
@@ -121,6 +124,7 @@ class Game {
       "blueAlliancePreview": blueAlliancePreviewStrings,
       "redScore": redScore,
       "blueScore": blueScore,
+      "divisionId": divisionId,
       "roundNum": roundNum,
       "gameNum": gameNum,
       "instance": instance,
@@ -165,7 +169,7 @@ Future<List<Game>> _fetchDivisionMatches(int eventId, divisionID) async {
 
   if (response.statusCode == 200) {
     final parsed = jsonDecode(response.body)["data"] as List;
-    divisionMatches = parsed.map<Game>((json) => Game.fromJson(json)).toList();
+    divisionMatches = parsed.map<Game>((json) => Game.fromJson(json, divisionID)).toList();
   } else {
     throw Exception("Failed to load schedule");
   }
@@ -197,7 +201,7 @@ Future<void> _fetchAdditionalPage(
   if (response.statusCode == 200) {
     final parsed = jsonDecode(response.body)["data"] as List;
     divisionMatches
-        .addAll(parsed.map<Game>((json) => Game.fromJson(json)).toList());
+        .addAll(parsed.map<Game>((json) => Game.fromJson(json, divisionId)).toList());
   } else {
     throw Exception("Failed to load schedule");
   }
@@ -218,6 +222,7 @@ Game loadGame(game) {
     blueAlliancePreview: blueAlliancePreview,
     redScore: game["redScore"],
     blueScore: game["blueScore"],
+    divisionId: game["divisionId"],
     roundNum: game["roundNum"],
     gameNum: game["gameNum"],
     instance: game["instance"],

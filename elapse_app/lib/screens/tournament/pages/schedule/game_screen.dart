@@ -4,6 +4,7 @@ import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/extras/twelve_hour.dart';
+import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
@@ -13,27 +14,95 @@ import 'package:intl/intl.dart';
 class GameScreen extends StatefulWidget {
   const GameScreen({
     super.key,
-    required this.game,
+    required this.divisionId,
+    required this.roundNum,
+    required this.gameNum,
+    required this.instance,
   });
 
-  final Game game;
+  final int divisionId;
+  final num roundNum;
+  final int gameNum;
+  final int instance;
 
   @override
   State<GameScreen> createState() => _GameScreenState();
 }
 
 class _GameScreenState extends State<GameScreen> {
+  Game? _game;
   List<Team> teams = [];
+  bool _isLoading = true;
+
+  @override
   void initState() {
     super.initState();
-    final tournament = getLastLoadedTournament();
-    if (tournament != null) {
-      teams = tournament.teams;
+    _loadGame();
+  }
+
+  Future<void> _loadGame() async {
+    final tournamentId = prefs.getInt("tournamentID");
+    if (tournamentId != null && tournamentId != 0) {
+      final tournament = await getTournamentFromCache(tournamentId);
+      if (tournament != null && mounted) {
+        teams = tournament.teams;
+        // Find the game using composite key
+        for (final division in tournament.divisions) {
+          if (division.id == widget.divisionId && division.games != null) {
+            for (final game in division.games!) {
+              if (game.roundNum == widget.roundNum &&
+                  game.gameNum == widget.gameNum &&
+                  game.instance == widget.instance) {
+                _game = game;
+                break;
+              }
+            }
+            break;
+          }
+        }
+      }
+    }
+    if (mounted) {
+      setState(() => _isLoading = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        body: CustomScrollView(
+          slivers: [
+            ElapseAppBar(
+              title: Text("Game Info", style: const TextStyle(fontSize: 24, height: 1, fontWeight: FontWeight.w600)),
+              backNavigation: true,
+            ),
+            const RoundedTop(),
+            SliverFillRemaining(
+              child: Center(child: CircularProgressIndicator()),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_game == null) {
+      return Scaffold(
+        body: CustomScrollView(
+          slivers: [
+            ElapseAppBar(
+              title: Text("Game Info", style: const TextStyle(fontSize: 24, height: 1, fontWeight: FontWeight.w600)),
+              backNavigation: true,
+            ),
+            const RoundedTop(),
+            SliverFillRemaining(
+              child: Center(child: Text("Game not found")),
+            ),
+          ],
+        ),
+      );
+    }
+
     ColorPallete colorPallete;
     if (Theme.of(context).colorScheme.brightness == Brightness.dark) {
       colorPallete = darkPallete;
@@ -41,20 +110,21 @@ class _GameScreenState extends State<GameScreen> {
       colorPallete = lightPallete;
     }
     String time = "No Time";
-    if (widget.game.startedTime != null) {
-      time = DateFormat.Hm().format(widget.game.startedTime!.toLocal());
+    if (_game!.startedTime != null) {
+      time = DateFormat.Hm().format(_game!.startedTime!.toLocal());
     }
-    if (widget.game.scheduledTime != null) {
-      time = DateFormat.Hm().format(widget.game.scheduledTime!.toLocal());
+    if (_game!.scheduledTime != null) {
+      time = DateFormat.Hm().format(_game!.scheduledTime!.toLocal());
     }
 
     String status = "Not played";
-    if ((widget.game.redScore != 0 && widget.game.blueScore != 0) || widget.game.startedTime != null) {
+    if ((_game!.redScore != 0 && _game!.blueScore != 0) || _game!.startedTime != null) {
       status = "Played";
     }
 
     Widget gameText;
-    if (widget.game.gameName.substring(0, 1) == "R") {
+    final gameName = _game!.gameName;
+    if (gameName.startsWith("R") && gameName.length >= 4) {
       gameText = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
         const Text("R",
             style: TextStyle(
@@ -69,7 +139,7 @@ class _GameScreenState extends State<GameScreen> {
               letterSpacing: -1,
               fontWeight: FontWeight.w500,
             )),
-        Text(widget.game.gameName.substring(3, 4),
+        Text(gameName.substring(3, 4),
             style: const TextStyle(
               fontSize: 64,
               height: 1,
@@ -77,7 +147,7 @@ class _GameScreenState extends State<GameScreen> {
             ))
       ]);
     } else {
-      gameText = Text(widget.game.gameName,
+      gameText = Text(gameName,
           style: const TextStyle(
             fontSize: 64,
             height: 1,
@@ -87,9 +157,9 @@ class _GameScreenState extends State<GameScreen> {
 
     Color gameColor = Theme.of(context).colorScheme.tertiary;
 
-    if ((widget.game.redScore ?? 0) > (widget.game.blueScore ?? 0)) {
+    if ((_game!.redScore ?? 0) > (_game!.blueScore ?? 0)) {
       gameColor = colorPallete.redAllianceBackground;
-    } else if ((widget.game.redScore ?? 0) < (widget.game.blueScore ?? 0)) {
+    } else if ((_game!.redScore ?? 0) < (_game!.blueScore ?? 0)) {
       gameColor = colorPallete.blueAllianceBackground;
     }
     return Scaffold(
@@ -144,7 +214,7 @@ class _GameScreenState extends State<GameScreen> {
                             ),
                             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                               const Text("Field", style: TextStyle(fontSize: 24, height: 1)),
-                              Text(widget.game.fieldName ?? "",
+                              Text(_game!.fieldName ?? "",
                                   style: const TextStyle(fontSize: 24, height: 1, fontWeight: FontWeight.w500))
                             ])
                           ],
@@ -170,7 +240,7 @@ class _GameScreenState extends State<GameScreen> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          Text(widget.game.redScore?.toString() ?? "",
+                          Text(_game!.redScore?.toString() ?? "",
                               style: TextStyle(
                                   fontSize: 32,
                                   height: 1,
@@ -181,16 +251,11 @@ class _GameScreenState extends State<GameScreen> {
                       const SizedBox(
                         height: 8,
                       ),
-                      Column(
-                        children: widget.game.redAlliancePreview!.map(
-                          (e) {
-                            {
-                              String teamName = "";
-                              for (Team team in teams) {
-                                if (team.id == e.teamID) {
-                                  teamName = team.teamName ?? "";
-                                }
-                              }
+                      if (_game!.redAlliancePreview != null)
+                        Column(
+                          children: _game!.redAlliancePreview!.map(
+                            (e) {
+                              final teamName = teams.where((t) => t.id == e.teamID).firstOrNull?.teamName ?? "";
                               return Column(
                                 children: [
                                   RankingsWidget(
@@ -204,10 +269,9 @@ class _GameScreenState extends State<GameScreen> {
                                   )
                                 ],
                               );
-                            }
-                          },
-                        ).toList(),
-                      ),
+                            },
+                          ).toList(),
+                        ),
                     ],
                   ),
                 ),
@@ -228,7 +292,7 @@ class _GameScreenState extends State<GameScreen> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          Text(widget.game.blueScore?.toString() ?? "",
+                          Text(_game!.blueScore?.toString() ?? "",
                               style: TextStyle(
                                   fontSize: 32,
                                   height: 1,
@@ -239,16 +303,11 @@ class _GameScreenState extends State<GameScreen> {
                       SizedBox(
                         height: 20,
                       ),
-                      Column(
-                        children: widget.game.blueAlliancePreview!.map(
-                          (e) {
-                            {
-                              String teamName = "";
-                              for (Team team in teams) {
-                                if (team.id == e.teamID) {
-                                  teamName = team.teamName ?? "";
-                                }
-                              }
+                      if (_game!.blueAlliancePreview != null)
+                        Column(
+                          children: _game!.blueAlliancePreview!.map(
+                            (e) {
+                              final teamName = teams.where((t) => t.id == e.teamID).firstOrNull?.teamName ?? "";
                               return Column(
                                 children: [
                                   RankingsWidget(
@@ -262,13 +321,9 @@ class _GameScreenState extends State<GameScreen> {
                                   )
                                 ],
                               );
-                            }
-                          },
-                        ).toList(),
-                      ),
-                      Row(
-                        children: [Text("")],
-                      )
+                            },
+                          ).toList(),
+                        ),
                     ],
                   ),
                 )

@@ -56,28 +56,9 @@ class CacheManager {
 
   static final CacheManager _instance = CacheManager._internal(TournamentRepository());
 
-  /// In-memory cache of the last loaded tournament for sync access.
-  /// This replaces the old SharedPreferences "recently-opened-tournament" pattern.
-  static Tournament? _lastLoadedTournament;
-
   factory CacheManager() => _instance;
 
   CacheManager._internal(this._repo);
-
-  /// Returns the last loaded tournament synchronously.
-  /// Returns null if no tournament has been loaded yet.
-  /// Use this for screens that need sync access (replaces SharedPreferences reads).
-  static Tournament? get lastLoadedTournament => _lastLoadedTournament;
-
-  /// Sets the last loaded tournament (called by TMTournamentDetails).
-  static void setLastLoadedTournament(Tournament tournament) {
-    _lastLoadedTournament = tournament;
-  }
-
-  /// Clears the in-memory cache (call when exiting tournament mode).
-  static void clearLastLoadedTournament() {
-    _lastLoadedTournament = null;
-  }
 
   /// Gets tournament with caching logic.
   ///
