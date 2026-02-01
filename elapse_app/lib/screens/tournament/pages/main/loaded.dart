@@ -69,7 +69,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   List<Game> qualifications = [];
   List<Game> eliminations = [];
 
-  LeagueSession? _selectedSession;  // null = show all sessions (for leagues)
+  LeagueSession? _selectedSession; // null = show all sessions (for leagues)
 
   List<Widget> widgets = [SliverToBoxAdapter(), SliverToBoxAdapter()];
 
@@ -88,9 +88,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
         savedTeams.addAll(savedTeamsString
             .map((e) => TeamPreview(teamID: jsonDecode(e)["teamID"], teamNumber: jsonDecode(e)["teamNumber"]))
             .toList());
-        rankingsTeams = tournament.teams
-            .where((element) => savedTeams.any((element2) => element2.teamID == element.id))
-            .toList();
+        rankingsTeams =
+            tournament.teams.where((element) => savedTeams.any((element2) => element2.teamID == element.id)).toList();
       } else {
         rankingsTeams = tournament.teams;
       }
@@ -128,7 +127,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
       } else {
         _isLoading = true;
       }
-      
+
       try {
         final t = await TMTournamentDetails(widget.tournamentId, forceRefresh: forceRefresh);
         if (mounted) {
@@ -228,8 +227,10 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   /// Filter games by selected session date (for leagues)
   List<Game> _filterGamesBySession(List<Game> games) {
     // If no session selected, not a league, or single-session league, show all games
-    if (_selectedSession == null || !tournament.isLeague ||
-        tournament.sessions == null || tournament.sessions!.length <= 1) {
+    if (_selectedSession == null ||
+        !tournament.isLeague ||
+        tournament.sessions == null ||
+        tournament.sessions!.length <= 1) {
       return games;
     }
 
@@ -264,7 +265,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
         children: [
           const Icon(Icons.calendar_today, size: 24),
           const SizedBox(width: 10),
-          Text("All Sessions"),
+          Text("All"),
         ],
       ),
       items: [
@@ -274,7 +275,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             children: [
               const Icon(Icons.calendar_today, size: 24),
               const SizedBox(width: 10),
-              Text("All Sessions"),
+              Text("All"),
             ],
           ),
         ),
@@ -321,9 +322,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
         }
         // Rankings page with caching check
         final gradeLevel = getGradeLevel(prefs.getString("defaultGrade"));
-        final seasonId = gradeLevel == gradeLevels["College"]
-            ? (seasons[0].vexUId ?? seasons[0].vrcId)
-            : seasons[0].vrcId;
+        final seasonId =
+            gradeLevel == gradeLevels["College"] ? (seasons[0].vexUId ?? seasons[0].vrcId) : seasons[0].vrcId;
         final worldSkillsData = prefs.getString("worldSkillsData");
         final vdaData = prefs.getString("vdaData");
 
@@ -337,9 +337,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             divisionIndex: division.order - 1,
             filter: filter,
             skills: tournament.tournamentSkills!,
-            worldSkills: jsonDecode(worldSkillsData)
-                .map<WorldSkillsStats>((e) => WorldSkillsStats.fromJson(e))
-                .toList(),
+            worldSkills:
+                jsonDecode(worldSkillsData).map<WorldSkillsStats>((e) => WorldSkillsStats.fromJson(e)).toList(),
             vda: jsonDecode(vdaData).map<VDAStats>((json) => VDAStats.fromJson(json)).toList(),
           );
         }
@@ -446,8 +445,10 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
               }
 
               // Preserve session selection for leagues with multiple sessions
-              if (currentSessionDate != null && tournament.isLeague &&
-                  tournament.sessions != null && tournament.sessions!.length > 1) {
+              if (currentSessionDate != null &&
+                  tournament.isLeague &&
+                  tournament.sessions != null &&
+                  tournament.sessions!.length > 1) {
                 _selectedSession = tournament.sessions!.firstWhere(
                   (s) => _isSameDay(s.date, currentSessionDate),
                   orElse: () => tournament.sessions!.first,
@@ -529,12 +530,11 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                                   ),
                                   Spacer(),
                                   _buildSessionDropdown(),
-                                  tournament.divisions.isNotEmpty
-                                        ? DropdownButton<Division>(
+                                  tournament.divisions.length > 1
+                                      ? DropdownButton<Division>(
                                           value: division,
                                           borderRadius: BorderRadius.circular(20),
-                                          items:
-                                            tournament.divisions.map<DropdownMenuItem<Division>>((division) {
+                                          items: tournament.divisions.map<DropdownMenuItem<Division>>((division) {
                                             return DropdownMenuItem(
                                                 value: division,
                                                 child: Row(
@@ -1077,10 +1077,8 @@ class _ChipListWithFadeState extends State<_ChipListWithFade> {
       onNotification: (scrollNotification) {
         setState(() {
           _fadeStart = (scrollNotification.metrics.pixels / 10).clamp(0.0, 1.0);
-          _fadeEnd = ((scrollNotification.metrics.maxScrollExtent -
-                      scrollNotification.metrics.pixels) /
-                  10)
-              .clamp(0.0, 1.0);
+          _fadeEnd =
+              ((scrollNotification.metrics.maxScrollExtent - scrollNotification.metrics.pixels) / 10).clamp(0.0, 1.0);
         });
         return true;
       },
@@ -1168,10 +1166,8 @@ class _RankingsChipListWithFadeState extends State<_RankingsChipListWithFade> {
       onNotification: (scrollNotification) {
         setState(() {
           _fadeStart = (scrollNotification.metrics.pixels / 10).clamp(0.0, 1.0);
-          _fadeEnd = ((scrollNotification.metrics.maxScrollExtent -
-                      scrollNotification.metrics.pixels) /
-                  10)
-              .clamp(0.0, 1.0);
+          _fadeEnd =
+              ((scrollNotification.metrics.maxScrollExtent - scrollNotification.metrics.pixels) / 10).clamp(0.0, 1.0);
         });
         return true;
       },
@@ -1213,9 +1209,7 @@ class _RankingsChipListWithFadeState extends State<_RankingsChipListWithFade> {
                           enableAnimation: AnimationStyle(duration: Duration.zero),
                           selectAnimation: AnimationStyle(duration: Duration.zero),
                         ),
-                        onSelected: isLoaded
-                            ? (bool selected) => widget.onSelected(index)
-                            : null,
+                        onSelected: isLoaded ? (bool selected) => widget.onSelected(index) : null,
                       ),
                     );
                   },
