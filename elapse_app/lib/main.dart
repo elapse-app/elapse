@@ -196,6 +196,9 @@ class SetupGateState extends State<SetupGate> {
   late int teamID;
   late String teamNumber;
   bool _hasTeamInfo = false;
+  final PageStorageBucket _bucket = PageStorageBucket();
+  List<Widget> _screens = [];
+  bool _lastTournamentMode = false;
 
   @override
   void initState() {
@@ -203,6 +206,45 @@ class SetupGateState extends State<SetupGate> {
     if (prefs.getBool("isSetUp") ?? false) {
       _loadTeamInfo();
       initializeTournamentMode();
+      _lastTournamentMode = isTournamentMode;
+      _rebuildScreens();
+    }
+  }
+
+  void _rebuildScreens() {
+    if (isTournamentMode) {
+      _screens = [
+        TMHomePage(
+          tournamentID: prefs.getInt("tournamentID") ?? 0,
+          teamID: teamID,
+          teamNumber: teamNumber,
+        ),
+        TMTournamentScreen(
+          tournamentID: prefs.getInt("tournamentID") ?? 0,
+          isPreview: false,
+        ),
+        CloudScoutScreen(),
+        TMMyTeams(
+          tournamentID: prefs.getInt("tournamentID") ?? 0,
+        ),
+        ExploreScreen()
+      ];
+    } else {
+      _screens = [
+        HomeScreen(
+          key: PageStorageKey<String>("home"),
+        ),
+        CloudScoutScreen(),
+        MyTeams(
+          key: PageStorageKey<String>("my-teams"),
+        ),
+        ExploreScreen(
+          key: PageStorageKey<String>("explore"),
+        ),
+      ];
+    }
+    if (selectedIndex >= _screens.length) {
+      selectedIndex = 0;
     }
   }
 
@@ -237,6 +279,8 @@ class SetupGateState extends State<SetupGate> {
       if (prefs.getBool("isSetUp") ?? false) {
         _loadTeamInfo();
         initializeTournamentMode();
+        _lastTournamentMode = isTournamentMode;
+        _rebuildScreens();
       }
     });
   }
@@ -252,37 +296,10 @@ class SetupGateState extends State<SetupGate> {
 
     _loadTeamInfo();
     final chosenTheme = Theme.of(context).colorScheme;
-    List<Widget> screens;
-
-    isTournamentMode
-        ? screens = [
-            TMHomePage(
-              tournamentID: prefs.getInt("tournamentID") ?? 0,
-              teamID: teamID,
-              teamNumber: teamNumber,
-            ),
-            TMTournamentScreen(
-              tournamentID: prefs.getInt("tournamentID") ?? 0,
-              isPreview: false,
-            ),
-            CloudScoutScreen(),
-            TMMyTeams(
-              tournamentID: prefs.getInt("tournamentID") ?? 0,
-            ),
-            ExploreScreen()
-          ]
-        : screens = [
-            HomeScreen(
-              key: PageStorageKey<String>("home"),
-            ),
-            CloudScoutScreen(),
-            MyTeams(
-              key: PageStorageKey<String>("my-teams"),
-            ),
-            ExploreScreen(
-              key: PageStorageKey<String>("explore"),
-            ),
-          ];
+    if (_screens.isEmpty || _lastTournamentMode != isTournamentMode) {
+      _lastTournamentMode = isTournamentMode;
+      _rebuildScreens();
+    }
 
     List<NavigationDestination> destinations = [
       NavigationDestination(
@@ -305,8 +322,6 @@ class SetupGateState extends State<SetupGate> {
       ),
     ];
 
-    final PageStorageBucket _bucket = PageStorageBucket();
-
     if (isTournamentMode) {
       destinations.insert(
         1,
@@ -321,7 +336,10 @@ class SetupGateState extends State<SetupGate> {
     return Scaffold(
       body: PageStorage(
         bucket: _bucket,
-        child: screens[selectedIndex],
+        child: IndexedStack(
+          index: selectedIndex,
+          children: _screens,
+        ),
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: selectedIndex,
