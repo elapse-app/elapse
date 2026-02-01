@@ -157,26 +157,26 @@ class _AllTeamsState extends State<AllTeams> {
         break;
       case 2:
         teams.sort((a, b) {
-          return (loadedVDA!.singleWhere((e) => e.id == b.id).opr ?? -1e5)
-              .compareTo(loadedVDA!.singleWhere((e) => e.id == a.id).opr ?? -1e5);
+          return (loadedVDA!.singleWhereOrNull((e) => e.id == b.id)?.opr ?? -1e5)
+              .compareTo(loadedVDA!.singleWhereOrNull((e) => e.id == a.id)?.opr ?? -1e5);
         });
         break;
       case 3:
         teams.sort((a, b) {
-          return (loadedVDA!.singleWhere((e) => e.id == a.id).dpr ?? 1e5)
-              .compareTo(loadedVDA!.singleWhere((e) => e.id == b.id).dpr ?? 1e5);
+          return (loadedVDA!.singleWhereOrNull((e) => e.id == a.id)?.dpr ?? 1e5)
+              .compareTo(loadedVDA!.singleWhereOrNull((e) => e.id == b.id)?.dpr ?? 1e5);
         });
         break;
       case 4:
         teams.sort((a, b) {
-          return (loadedVDA!.singleWhere((e) => e.id == b.id).ccwm ?? -1e5)
-              .compareTo(loadedVDA!.singleWhere((e) => e.id == a.id).ccwm ?? -1e5);
+          return (loadedVDA!.singleWhereOrNull((e) => e.id == b.id)?.ccwm ?? -1e5)
+              .compareTo(loadedVDA!.singleWhereOrNull((e) => e.id == a.id)?.ccwm ?? -1e5);
         });
         break;
       case 5:
         teams.sort((a, b) {
-          return (loadedVDA!.singleWhere((e) => e.id == b.id).winPercent ?? -1e5)
-              .compareTo(loadedVDA!.singleWhere((e) => e.id == a.id).winPercent ?? -1e5);
+          return (loadedVDA!.singleWhereOrNull((e) => e.id == b.id)?.winPercent ?? -1e5)
+              .compareTo(loadedVDA!.singleWhereOrNull((e) => e.id == a.id)?.winPercent ?? -1e5);
         });
         break;
       case 6:
@@ -187,8 +187,8 @@ class _AllTeamsState extends State<AllTeams> {
         break;
       case 7:
         teams.sort((a, b) {
-          return (loadedVDA!.singleWhere((e) => e.id == b.id).trueSkill ?? 0)
-              .compareTo(loadedVDA!.singleWhere((e) => e.id == a.id).trueSkill ?? 0);
+          return (loadedVDA!.singleWhereOrNull((e) => e.id == b.id)?.trueSkill ?? 0)
+              .compareTo(loadedVDA!.singleWhereOrNull((e) => e.id == a.id)?.trueSkill ?? 0);
         });
         break;
     }

@@ -103,9 +103,42 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
             const SizedBox(height: 18),
             LongButton(
               onPressed: () async {
+                final joinCode = joinCodeController.text;
+                if (joinCode.length < 8) {
+                  showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                            title: const Text("Invalid Join Code"),
+                            content: const Text("Please enter a complete 8-character join code."),
+                            actions: [
+                              TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text("Close",
+                                      style: TextStyle(color: Theme.of(context).colorScheme.secondary)))
+                            ],
+                          ));
+                  return;
+                }
                 Database database = Database();
                 final currentUser = FirebaseAuth.instance.currentUser;
-                TeamGroup group = TeamGroup.fromJson((await database.getGroupInfo("${joinCodeController.text.substring(0, 4)}-${joinCodeController.text.substring(4)}"))!);
+                final formattedCode = "${joinCode.substring(0, 4)}-${joinCode.substring(4)}";
+                final groupInfo = await database.getGroupInfo(formattedCode);
+                if (groupInfo == null) {
+                  showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                            title: const Text("Invalid Join Code"),
+                            content: const Text("Unable to find a team group with this join code."),
+                            actions: [
+                              TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text("Close",
+                                      style: TextStyle(color: Theme.of(context).colorScheme.secondary)))
+                            ],
+                          ));
+                  return;
+                }
+                TeamGroup group = TeamGroup.fromJson(groupInfo);
                 if (!group.allowJoin) {
                   showDialog(
                       barrierDismissible: false,
@@ -130,8 +163,7 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
                 }
 
                 await database
-                    .joinTeamGroup("${joinCodeController.text.substring(0, 4)}-${joinCodeController.text.substring(4)}",
-                        currentUser!.uid)
+                    .joinTeamGroup(formattedCode, currentUser!.uid)
                     .then((value) async {
                       if (value == null) {
                         await showDialog(

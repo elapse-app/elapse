@@ -319,10 +319,7 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                         (game) => Column(
                           children: [
                             GameWidget(
-                              divisionId: game.divisionId,
-                              roundNum: game.roundNum,
-                              gameNum: game.gameNum,
-                              instance: game.instance,
+                              game: game,
                               teamName: teamNumber,
                               isAllianceColoured: false,
                             ),

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/main.dart';
 import 'package:http/http.dart' as http;
@@ -110,21 +111,21 @@ class VDAStats {
       ccwm: json["ccwm"],
       wins: (json["total_wins"] + json["elimination_wins"])?.truncate(),
       losses: (json["total_losses"] + json["elimination_losses"])?.truncate(),
-      ties: (json["total_ties"] + json["elimination_losses"])?.truncate(),
+      ties: (json["total_ties"] + json["elimination_ties"])?.truncate(),
       matches: (((json["total_wins"] + json["elimination_wins"]) ?? 0) +
                   ((json["total_losses"] + json["elimination_losses"]) ?? 0) +
-                  ((json["total_ties"] + json["elimination_losses"]) ?? 0))
+                  ((json["total_ties"] + json["elimination_ties"]) ?? 0))
               ?.truncate() ??
           0,
       winPercent: double.parse((((json["total_wins"] + json["elimination_wins"]) ?? 0) /
               ((((json["total_wins"] + json["elimination_wins"]) ?? 0) +
                           ((json["total_losses"] + json["elimination_losses"]) ?? 0) +
-                          ((json["total_ties"] + json["elimination_losses"]) ?? 0)) ==
+                          ((json["total_ties"] + json["elimination_ties"]) ?? 0)) ==
                       0
                   ? 1
                   : (((json["total_wins"] + json["elimination_wins"]) ?? 0) +
                       ((json["total_losses"] + json["elimination_losses"]) ?? 0) +
-                      ((json["total_ties"] + json["elimination_losses"]) ?? 0))) *
+                      ((json["total_ties"] + json["elimination_ties"]) ?? 0))) *
               100)
           .toStringAsFixed(1)),
       trueSkill: json["trueskill"],
@@ -174,7 +175,7 @@ Future<List<VDAStats>> getTrueSkillData(int seasonId) async {
 Future<VDAStats?> getTrueSkillDataForTeam(int seasonId, String teamNum) async {
   final response = await getTrueSkillData(seasonId);
   if (response.isEmpty) return null;
-  return response.firstWhere((element) => element.teamName == teamNum || element.teamNum == teamNum);
+  return response.firstWhereOrNull((element) => element.teamName == teamNum || element.teamNum == teamNum);
 }
 
 bool hasCachedTrueSkillData() {

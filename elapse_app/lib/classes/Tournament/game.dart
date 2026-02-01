@@ -52,44 +52,48 @@ class Game {
 
     List<dynamic> alliances = json["alliances"];
 
-    if (alliances[0]["color"] == "red") {
-      for (int i = 0; i < alliances[0]["teams"].length; i++) {
-        redAlliancePreview.add(TeamPreview(
-            teamID: alliances[0]["teams"][i]["team"]["id"],
-            teamNumber: alliances[0]["teams"][i]["team"]["name"]));
+    if (alliances.length >= 2) {
+      if (alliances[0]["color"] == "red") {
+        for (int i = 0; i < alliances[0]["teams"].length; i++) {
+          redAlliancePreview.add(TeamPreview(
+              teamID: alliances[0]["teams"][i]["team"]["id"],
+              teamNumber: alliances[0]["teams"][i]["team"]["name"]));
+        }
+        redScore = alliances[0]["score"];
+        for (int i = 0; i < alliances[1]["teams"].length; i++) {
+          blueAlliancePreview.add(TeamPreview(
+              teamID: alliances[1]["teams"][i]["team"]["id"],
+              teamNumber: alliances[1]["teams"][i]["team"]["name"]));
+        }
+        blueScore = alliances[1]["score"];
+      } else {
+        for (int i = 0; i < alliances[1]["teams"].length; i++) {
+          redAlliancePreview.add(TeamPreview(
+              teamID: alliances[1]["teams"][i]["team"]["id"],
+              teamNumber: alliances[1]["teams"][i]["team"]["name"]));
+        }
+        redScore = alliances[1]["score"];
+        for (int i = 0; i < alliances[0]["teams"].length; i++) {
+          blueAlliancePreview.add(TeamPreview(
+              teamID: alliances[0]["teams"][i]["team"]["id"],
+              teamNumber: alliances[0]["teams"][i]["team"]["name"]));
+        }
+        blueScore = alliances[0]["score"];
       }
-      redScore = alliances[0]["score"];
-      for (int i = 0; i < alliances[1]["teams"].length; i++) {
-        blueAlliancePreview.add(TeamPreview(
-            teamID: alliances[1]["teams"][i]["team"]["id"],
-            teamNumber: alliances[1]["teams"][i]["team"]["name"]));
-      }
-      blueScore = alliances[1]["score"];
-    } else {
-      for (int i = 0; i < alliances[1]["teams"].length; i++) {
-        redAlliancePreview.add(TeamPreview(
-            teamID: alliances[1]["teams"][i]["team"]["id"],
-            teamNumber: alliances[1]["teams"][i]["team"]["name"]));
-      }
-      redScore = alliances[1]["score"];
-      for (int i = 0; i < alliances[0]["teams"].length; i++) {
-        blueAlliancePreview.add(TeamPreview(
-            teamID: alliances[0]["teams"][i]["team"]["id"],
-            teamNumber: alliances[0]["teams"][i]["team"]["name"]));
-      }
-      blueScore = alliances[0]["score"];
     }
 
     String gameName = "";
-    String firstPart = json["name"].split(" ")[0];
+    List<String> nameParts = (json["name"] ?? "").split(" ");
+    String firstPart = nameParts.isNotEmpty ? nameParts[0] : "";
     firstPart = firstPart == "Qualifier" ? "Q" : firstPart;
     firstPart = firstPart == "Practice " ? "P" : firstPart;
     firstPart = firstPart == "Practice" ? "P" : firstPart;
     firstPart = firstPart == "Final" ? "F" : firstPart;
-    String secondPart = json["name"].split(" ")[1];
+    String secondPart = nameParts.length > 1 ? nameParts[1] : "";
 
     secondPart = secondPart.split("-")[0];
-    secondPart = secondPart.split("#")[1];
+    List<String> hashParts = secondPart.split("#");
+    secondPart = hashParts.length > 1 ? hashParts[1] : secondPart;
     if (firstPart == "F") {
       secondPart = json["matchnum"].toString();
     }

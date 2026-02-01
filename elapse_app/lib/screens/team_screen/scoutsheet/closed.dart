@@ -54,7 +54,9 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
-                              value: progress.cumulativeBytesLoaded / progress.expectedTotalBytes!,
+                              value: progress.expectedTotalBytes != null
+                                ? progress.cumulativeBytesLoaded / progress.expectedTotalBytes!
+                                : null,
                             ),
                           ));
                         })))),
@@ -77,7 +79,9 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
                                   width: 20,
                                   height: 20,
                                   child: CircularProgressIndicator(
-                                    value: progress.cumulativeBytesLoaded / progress.expectedTotalBytes!,
+                                    value: progress.expectedTotalBytes != null
+                                ? progress.cumulativeBytesLoaded / progress.expectedTotalBytes!
+                                : null,
                                   ),
                                 ));
                               })))))
@@ -102,7 +106,9 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
                                           width: 20,
                                           height: 20,
                                           child: CircularProgressIndicator(
-                                            value: progress.cumulativeBytesLoaded / progress.expectedTotalBytes!,
+                                            value: progress.expectedTotalBytes != null
+                                ? progress.cumulativeBytesLoaded / progress.expectedTotalBytes!
+                                : null,
                                           ),
                                         ));
                                       }),
@@ -127,7 +133,9 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
                                         width: 20,
                                         height: 20,
                                         child: CircularProgressIndicator(
-                                          value: progress.cumulativeBytesLoaded / progress.expectedTotalBytes!,
+                                          value: progress.expectedTotalBytes != null
+                                ? progress.cumulativeBytesLoaded / progress.expectedTotalBytes!
+                                : null,
                                         ),
                                       ));
                                     })))))
@@ -321,7 +329,9 @@ void _openPhotoViewer(BuildContext context, List<dynamic> photos, int initIndex)
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(
-                    value: event != null ? event.cumulativeBytesLoaded / event.expectedTotalBytes! : null,
+                    value: event != null && event.expectedTotalBytes != null
+                      ? event.cumulativeBytesLoaded / event.expectedTotalBytes!
+                      : null,
                   ),
                 )),
                 pageController: PageController(initialPage: initIndex),

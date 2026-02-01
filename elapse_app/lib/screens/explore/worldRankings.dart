@@ -64,18 +64,22 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
     isVDALoaded = false;
     futureSkillsStats =
         getWorldSkillsRankings((grade == gradeLevels["College"] ? season.vexUId! : season.vrcId), grade).then((data) {
-      setState(() {
-        isSkillsLoaded = true;
-        loadedSkills = data;
-      });
+      if (mounted) {
+        setState(() {
+          isSkillsLoaded = true;
+          loadedSkills = data;
+        });
+      }
       return data;
     });
     futures.add(futureSkillsStats);
     futureVDAStats = getTrueSkillData(season.vrcId).then((data) {
-      setState(() {
-        isVDALoaded = true;
-        loadedVDA = data;
-      });
+      if (mounted) {
+        setState(() {
+          isVDALoaded = true;
+          loadedVDA = data;
+        });
+      }
       return data;
     });
     futures.add(futureVDAStats);
@@ -179,10 +183,12 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                           futureSkillsStats = getWorldSkillsRankings(
                                   grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade)
                               .then((data) {
-                            setState(() {
-                              isSkillsLoaded = true;
-                              loadedSkills = data;
-                            });
+                            if (mounted) {
+                              setState(() {
+                                isSkillsLoaded = true;
+                                loadedSkills = data;
+                              });
+                            }
                             return data;
                           });
                           futures[0] = futureSkillsStats;
@@ -201,24 +207,29 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                 seasonsList: seasons.sublist(0, seasons.indexWhere((e) => e.vrcId == 115) + 1)),
                           ),
                         );
+                        if (!mounted) return;
                         setState(() {
                           season = updated;
                           isSkillsLoaded = false;
                           futureSkillsStats = getWorldSkillsRankings(
                                   grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade)
                               .then((data) {
-                            setState(() {
-                              isSkillsLoaded = true;
-                              loadedSkills = data;
-                            });
+                            if (mounted) {
+                              setState(() {
+                                isSkillsLoaded = true;
+                                loadedSkills = data;
+                              });
+                            }
                             return data;
                           });
                           isVDALoaded = false;
                           futureVDAStats = getTrueSkillData(season.vrcId).then((data) {
-                            setState(() {
-                              isVDALoaded = true;
-                              loadedVDA = data;
-                            });
+                            if (mounted) {
+                              setState(() {
+                                isVDALoaded = true;
+                                loadedVDA = data;
+                              });
+                            }
                             return data;
                           });
                           futures[0] = futureSkillsStats;

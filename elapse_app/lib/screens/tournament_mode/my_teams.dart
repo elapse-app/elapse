@@ -148,7 +148,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
   Future<Team>? team;
   Future<VDAStats?>? teamStats;
   Future<List<TournamentPreview>>? teamTournaments;
-  Future<WorldSkillsStats>? skillsStats;
+  Future<WorldSkillsStats?>? skillsStats;
   Future<List<Award>>? teamAwards;
 
   Future<void> _onRefresh() async {
@@ -253,10 +253,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                 return Column(
                   children: [
                     GameWidget(
-                      divisionId: e.divisionId,
-                      roundNum: e.roundNum,
-                      gameNum: e.gameNum,
-                      instance: e.instance,
+                      game: e,
                       teamName: selectedTeamPreview.teamNumber,
                       isAllianceColoured: false,
                     ),

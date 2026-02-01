@@ -66,7 +66,7 @@ class _MyTeamsState extends State<MyTeams> {
 
   Future<Team>? team;
   Future<VDAStats?>? teamStats;
-  Future<WorldSkillsStats>? skillsStats;
+  Future<WorldSkillsStats?>? skillsStats;
   Future<List<TournamentPreview>>? teamTournaments;
   Future<List<Award>>? teamAwards;
 
@@ -318,7 +318,7 @@ class _MyTeamsState extends State<MyTeams> {
                   ),
                   child: Padding(
                     padding: const EdgeInsets.all(18.0),
-                    child: FutureBuilder<Object>(
+                    child: FutureBuilder<WorldSkillsStats?>(
                       future: skillsStats,
                       builder: (context, snapshot) {
                         switch (snapshot.connectionState) {

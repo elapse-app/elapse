@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:collection/collection.dart';
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -109,11 +110,11 @@ Future<List<WorldSkillsStats>> getWorldSkillsRankings(
   return ranking;
 }
 
-Future<WorldSkillsStats> getWorldSkillsForTeam(int seasonID, int teamID) async {
+Future<WorldSkillsStats?> getWorldSkillsForTeam(int seasonID, int teamID) async {
   GradeLevel grade = (await fetchTeam(teamID)).grade!;
   List<WorldSkillsStats> rankings =
       await getWorldSkillsRankings(seasonID, grade);
-  return rankings.singleWhere((e) => e.teamId == teamID);
+  return rankings.singleWhereOrNull((e) => e.teamId == teamID);
 }
 
 bool hasCachedWorldSkillsRankings(int seasonID, GradeLevel grade) {

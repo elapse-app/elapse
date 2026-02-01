@@ -62,7 +62,7 @@ class _TeamScreenState extends State<TeamScreen> {
   Future<Tournament>? tournament;
   Future<Team>? team;
   Future<VDAStats?>? teamStats;
-  Future<WorldSkillsStats>? skillsStats;
+  Future<WorldSkillsStats?>? skillsStats;
   Future<List<TournamentPreview>>? teamTournaments;
   Future<List<Award>>? teamAwards;
   Future<DocumentSnapshot<Object?>?>? scoutSheet;
@@ -79,11 +79,13 @@ class _TeamScreenState extends State<TeamScreen> {
     displaySave = true;
     team = fetchTeam(widget.teamID).then(
       (value) {
-        setState(() {
-          teamSave.location = value.location;
-          teamSave.teamName = value.teamName;
-          locationLoaded = true;
-        });
+        if (mounted) {
+          setState(() {
+            teamSave.location = value.location;
+            teamSave.teamName = value.teamName;
+            locationLoaded = true;
+          });
+        }
         return value;
       },
     );
@@ -95,9 +97,11 @@ class _TeamScreenState extends State<TeamScreen> {
     teamTournaments = fetchTeamTournaments(widget.teamID, season.vrcId).then(
       (value) {
         if (value.isNotEmpty && teamGroupID.isNotEmpty) {
-          setState(() {
-            selectedTournament = value[0];
-          });
+          if (mounted) {
+            setState(() {
+              selectedTournament = value[0];
+            });
+          }
           scoutSheet =
               database.getTeamScoutSheetInfo(teamGroupID, widget.teamID.toString(), value[0].id.toString()).then(
             (value) {
@@ -105,22 +109,26 @@ class _TeamScreenState extends State<TeamScreen> {
                 print(value.data());
                 Map<String, dynamic> sheet = value.data() as Map<String, dynamic>;
                 Map<String, dynamic> specs = sheet["properties"]["Specs"];
-                setState(() {
-                  scoutsheetID = value.id;
-                  scoutSheetStateIndex = 1;
-                  activeScoutSheet = ScoutSheetUI(
-                      intakeType: specs["intakeType"] ?? "",
-                      numMotors: specs["numMotors"] ?? "",
-                      RPM: specs["RPM"] ?? "",
-                      otherNotes: specs["otherNotes"] ?? "",
-                      photos: specs["photos"] ?? [],
-                      autonNotes: specs["numMotors"] ?? "");
-                });
+                if (mounted) {
+                  setState(() {
+                    scoutsheetID = value.id;
+                    scoutSheetStateIndex = 1;
+                    activeScoutSheet = ScoutSheetUI(
+                        intakeType: specs["intakeType"] ?? "",
+                        numMotors: specs["numMotors"] ?? "",
+                        RPM: specs["RPM"] ?? "",
+                        otherNotes: specs["otherNotes"] ?? "",
+                        photos: specs["photos"] ?? [],
+                        autonNotes: specs["numMotors"] ?? "");
+                  });
+                }
                 return value;
               } else {
-                setState(() {
-                  scoutSheetStateIndex = 0;
-                });
+                if (mounted) {
+                  setState(() {
+                    scoutSheetStateIndex = 0;
+                  });
+                }
               }
               return null;
             },

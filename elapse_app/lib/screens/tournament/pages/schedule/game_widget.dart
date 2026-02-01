@@ -1,87 +1,34 @@
 import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
-import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
-import 'package:elapse_app/classes/Tournament/tournament.dart';
-import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
 import 'package:elapse_app/extras/twelve_hour.dart';
-import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class GameWidget extends StatefulWidget {
+class GameWidget extends StatelessWidget {
   const GameWidget({
     super.key,
-    required this.divisionId,
-    required this.roundNum,
-    required this.gameNum,
-    required this.instance,
+    required this.game,
     this.teamName,
     this.isAllianceColoured,
     this.useLiveTiming,
   });
 
-  final int divisionId;
-  final num roundNum;
-  final int gameNum;
-  final int instance;
+  final Game game;
   final String? teamName;
   final bool? isAllianceColoured;
   final bool? useLiveTiming;
 
   @override
-  State<GameWidget> createState() => _GameWidgetState();
-}
-
-class _GameWidgetState extends State<GameWidget> {
-  Game? _game;
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadGame();
-  }
-
-  Future<void> _loadGame() async {
-    final tournamentId = prefs.getInt("tournamentID");
-    if (tournamentId != null && tournamentId != 0) {
-      final tournament = await getTournamentFromCache(tournamentId);
-      if (tournament != null && mounted) {
-        for (final division in tournament.divisions) {
-          if (division.id == widget.divisionId && division.games != null) {
-            for (final game in division.games!) {
-              if (game.roundNum == widget.roundNum &&
-                  game.gameNum == widget.gameNum &&
-                  game.instance == widget.instance) {
-                _game = game;
-                break;
-              }
-            }
-            break;
-          }
-        }
-      }
-    }
-    if (mounted) {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (_isLoading || _game == null) {
-      return const SizedBox.shrink();
-    }
-    final game = _game!;
     String time = "No Time";
     if (game.startedTime != null) {
       time = DateFormat.Hm().format(game.startedTime!.toLocal());
     }
     if (game.scheduledTime != null && game.startedTime == null) {
       DateTime start;
-      if (widget.useLiveTiming == true) {
+      if (useLiveTiming == true) {
         start = (game.adjustedTime ?? game.scheduledTime!).toLocal();
         time = DateFormat.Hm().format(start);
       } else {
@@ -112,22 +59,22 @@ class _GameWidgetState extends State<GameWidget> {
       }
     }
 
-    if (widget.isAllianceColoured == false) {
+    if (isAllianceColoured == false) {
       gameColor = Theme.of(context).colorScheme.onSurface;
     } else {
-      if (game.redAlliancePreview?.any((element) => element.teamNumber == widget.teamName) ?? false) {
+      if (game.redAlliancePreview?.any((element) => element.teamNumber == teamName) ?? false) {
         gameColor = colorPallete.redAllianceText;
-      } else if (game.blueAlliancePreview?.any((element) => element.teamNumber == widget.teamName) ?? false) {
+      } else if (game.blueAlliancePreview?.any((element) => element.teamNumber == teamName) ?? false) {
         gameColor = colorPallete.blueAllianceText;
       }
     }
 
-    if (winningAlliance == "red" && (game.redAlliancePreview?.any((element) => element.teamNumber == widget.teamName) ?? false)) {
+    if (winningAlliance == "red" && (game.redAlliancePreview?.any((element) => element.teamNumber == teamName) ?? false)) {
       gameColor = colorPallete.greenText;
     } else if (winningAlliance == "blue" &&
-        (game.blueAlliancePreview?.any((element) => element.teamNumber == widget.teamName) ?? false)) {
+        (game.blueAlliancePreview?.any((element) => element.teamNumber == teamName) ?? false)) {
       gameColor = colorPallete.greenText;
-    } else if (winningAlliance != "none" && widget.teamName != null) {
+    } else if (winningAlliance != "none" && teamName != null) {
       gameColor = colorPallete.redAllianceText;
     }
 

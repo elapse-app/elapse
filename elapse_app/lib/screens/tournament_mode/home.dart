@@ -349,10 +349,7 @@ class _TMHomePageState extends State<TMHomePage> {
             return Column(
               children: [
                 GameWidget(
-                  divisionId: game.divisionId,
-                  roundNum: game.roundNum,
-                  gameNum: game.gameNum,
-                  instance: game.instance,
+                  game: game,
                   teamName: widget.teamNumber,
                   isAllianceColoured: true,
                 ),

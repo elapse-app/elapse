@@ -313,10 +313,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             child: Column(
                               children: [
                                 GameWidget(
-                                  divisionId: game.divisionId,
-                                  roundNum: game.roundNum,
-                                  gameNum: game.gameNum,
-                                  instance: game.instance,
+                                  game: game,
                                 ),
                                 index != _division!.games!.length - 1
                                     ? Divider(

@@ -154,11 +154,9 @@ class _RankingsPageState extends State<RankingsPage> {
     } else if (widget.sort == "TrueSkill") {
       if (widget.vda != null) {
         divisionTeams.sort((a, b) {
-          return widget.vda!
-                  .singleWhere((e) => e.id == b.id)
-                  .trueSkill
-                  ?.compareTo(widget.vda!.singleWhere((e) => e.id == a.id).trueSkill ?? 0) ??
-              0;
+          final vdaB = widget.vda!.singleWhereOrNull((e) => e.id == b.id);
+          final vdaA = widget.vda!.singleWhereOrNull((e) => e.id == a.id);
+          return (vdaB?.trueSkill ?? 0).compareTo(vdaA?.trueSkill ?? 0);
         });
       } else {
         divisionTeams.sort((a, b) {
