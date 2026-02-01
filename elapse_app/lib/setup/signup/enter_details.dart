@@ -31,6 +31,7 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
 
   @override
   void initState() {
+    super.initState();
     currentUser = ElapseUser(
       uid: firebaseUser!.uid,
       email: firebaseUser!.email,
@@ -42,6 +43,7 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         // backgroundColor: Color.fromARGB(255, 191, 231, 237),
