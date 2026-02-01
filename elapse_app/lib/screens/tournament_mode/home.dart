@@ -47,13 +47,12 @@ class _TMHomePageState extends State<TMHomePage> {
     if (!forceRefresh && cachedTournament != null && cachedTournament.id == widget.tournamentID) {
       _setupWithTournament(cachedTournament);
     } else {
-      setState(() => _isLoading = true);
+      // Don't call setState if called from initState - just assign directly
+      _isLoading = true;
       TMTournamentDetails(widget.tournamentID, forceRefresh: forceRefresh).then((t) {
         if (mounted) {
-          setState(() {
-            _isLoading = false;
-            _setupWithTournament(t);
-          });
+          _setupWithTournament(t);
+          setState(() {});
         }
       }).catchError((error) {
         debugPrint('Failed to load tournament: $error');
@@ -528,7 +527,7 @@ class _TMHomePageState extends State<TMHomePage> {
                   onPressed: () {
                     prefs.setBool("isTournamentMode", false);
                     clearLastLoadedTournament();
-                    setupGateKey.currentState!.reloadApp();
+                    setupGateKey.currentState?.reloadApp();
                   }),
               Spacer(),
             ],

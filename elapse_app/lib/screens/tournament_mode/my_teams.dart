@@ -55,9 +55,12 @@ class TMMyTeamsState extends State<TMMyTeams> {
     final cachedTournament = CacheManager.lastLoadedTournament;
 
     if (cachedTournament != null && cachedTournament.id == widget.tournamentID) {
-      setState(() {
-        _tournament = cachedTournament;
-        _isTournamentLoading = false;
+      // Don't call setState if called from initState - just assign directly
+      _tournament = cachedTournament;
+      _isTournamentLoading = false;
+      // Schedule a rebuild after initState completes
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() {});
       });
     } else {
       TMTournamentDetails(widget.tournamentID).then((t) {
@@ -128,6 +131,11 @@ class TMMyTeamsState extends State<TMMyTeams> {
     final tournament = _tournament!;
 
     if (!tournament.teams.any((element) => element.teamNumber == selectedTeamPreview.teamNumber)) {
+      return Container();
+    }
+
+    // Check if there are any divisions
+    if (tournament.divisions.isEmpty) {
       return Container();
     }
 

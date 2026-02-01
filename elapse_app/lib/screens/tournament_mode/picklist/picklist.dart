@@ -42,9 +42,12 @@ class _PicklistPageState extends State<PicklistPage> {
     final tournamentId = prefs.getInt("tournamentID") ?? 0;
 
     if (cachedTournament != null && cachedTournament.id == tournamentId) {
-      setState(() {
-        _tournament = cachedTournament;
-        _isTournamentLoading = false;
+      // Don't call setState if called from initState - just assign directly
+      _tournament = cachedTournament;
+      _isTournamentLoading = false;
+      // Schedule a rebuild after initState completes
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) setState(() {});
       });
     } else {
       TMTournamentDetails(tournamentId).then((t) {

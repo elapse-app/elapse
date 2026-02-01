@@ -91,7 +91,7 @@ class PicklistWidget extends StatelessWidget {
                   children: [
                     Text("${stats.wins}-${stats.losses}-${stats.ties}",
                         style: const TextStyle(fontSize: 16)),
-                    Text("${(stats.wins / stats.totalMatches * 100).toStringAsFixed(1)}%",
+                    Text("${stats.totalMatches > 0 ? (stats.wins / stats.totalMatches * 100).toStringAsFixed(1) : '0.0'}%",
                         style: const TextStyle(fontSize: 16)),
                   ])),
           Flexible(
