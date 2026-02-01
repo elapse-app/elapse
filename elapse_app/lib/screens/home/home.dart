@@ -226,7 +226,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                           prefs.setBool("isTournamentMode", true);
                                                           print(upcoming.id);
                                                           prefs.setInt("tournamentID", upcoming.id);
-                                                          myAppKey.currentState!.reloadApp();
+                                                          setupGateKey.currentState!.reloadApp();
 
                                                           Provider.of<TournamentModeProvider>(context, listen: false)
                                                               .setTournamentMode(true);

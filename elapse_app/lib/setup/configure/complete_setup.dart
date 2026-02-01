@@ -143,14 +143,26 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
                       LongButton(
                           icon: Icons.send_rounded,
                           gradient: true,
-                          onPressed: () {
-                            prefs.setBool("isSetUp", true);
-                            Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MyApp(), // Navigate to main app
-                                ),
-                                ModalRoute.withName("/Home"));
+                          onPressed: () async {
+                            await prefs.setBool("isSetUp", true);
+                            Navigator.of(context).pushAndRemoveUntil(
+                              PageRouteBuilder(
+                                pageBuilder: (context, animation, secondaryAnimation) =>
+                                    const SetupGate(),
+                                transitionsBuilder:
+                                    (context, animation, secondaryAnimation, child) {
+                                  final curved = CurvedAnimation(
+                                    parent: animation,
+                                    curve: Curves.easeInOut,
+                                  );
+                                  return FadeTransition(
+                                    opacity: curved,
+                                    child: child,
+                                  );
+                                },
+                              ),
+                              (route) => false,
+                            );
                           },
                           text: "Take me to the app"),
                       SizedBox(
