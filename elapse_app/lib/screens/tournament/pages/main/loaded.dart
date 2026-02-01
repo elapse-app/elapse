@@ -225,8 +225,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
 
   /// Builds the session dropdown for leagues (returns empty widget for tournaments)
   Widget _buildSessionDropdown() {
-    // Only show for leagues with sessions
-    if (!tournament.isLeague || tournament.sessions == null || tournament.sessions!.isEmpty) {
+    // Only show for leagues with multiple sessions
+    // Single-session leagues display like standard tournaments (no dropdown)
+    if (!tournament.isLeague || tournament.sessions == null || tournament.sessions!.length <= 1) {
       return const SizedBox.shrink();
     }
 
