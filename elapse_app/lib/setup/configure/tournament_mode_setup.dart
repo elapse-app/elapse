@@ -24,7 +24,6 @@ class _TournamentModeSetupPageState extends State<TournamentModeSetupPage> {
   void initState() {
     super.initState();
     prefs.setBool("useLiveTiming", useLiveTiming);
-    super.initState();
     prefs.setBool("useMatchNotifs", useMatchNotifs);
   }
 
