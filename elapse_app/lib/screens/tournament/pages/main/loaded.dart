@@ -337,7 +337,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
           return RankingsPage(
             searchQuery: searchQuery,
             sort: rankingSorts[sortIndex],
-            divisionIndex: division.order - 1,
+            teams: tournament.teams,
+            rankings: division.teamStats ?? {},
             filter: filter,
             skills: tournament.tournamentSkills!,
             worldSkills:
@@ -361,7 +362,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                 return RankingsPage(
                   searchQuery: searchQuery,
                   sort: rankingSorts[sortIndex],
-                  divisionIndex: division.order - 1,
+                  teams: tournament.teams,
+                  rankings: division.teamStats ?? {},
                   filter: filter,
                   skills: tournament.tournamentSkills!,
                   worldSkills: snapshot.data?[0] as List<WorldSkillsStats>,

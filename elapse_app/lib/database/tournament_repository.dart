@@ -324,8 +324,8 @@ class TournamentRepository {
       final awardRows = topLevelResults[3];
 
       // Get IDs for batch loading
-      final divisionIds = divisionRows.map((r) => r['id'] as int).toList();
-      final awardIds = awardRows.map((r) => r['id'] as int).toList();
+      final divisionIds = divisionRows.map((r) => (r['id'] as num).toInt()).toList();
+      final awardIds = awardRows.map((r) => (r['id'] as num).toInt()).toList();
 
       // Batch load division children (games, stats) and award children (3 + 3 = 6 queries)
       final childResults = await Future.wait([
@@ -350,7 +350,7 @@ class TournamentRepository {
       final allIndividualWinnerRows = childResults[4];
 
       // Get game IDs for alliance batch load (1 query)
-      final gameIds = allGameRows.map((r) => r['id'] as int).toList();
+      final gameIds = allGameRows.map((r) => (r['id'] as num).toInt()).toList();
       final allAllianceRows = gameIds.isEmpty ? <Map<String, dynamic>>[] :
         await db.query('game_alliances', where: 'game_id IN (${gameIds.join(",")})', orderBy: 'game_id, position');
 
@@ -375,10 +375,10 @@ class TournamentRepository {
       final awards = _buildAwards(awardRows, qualsByAward, teamWinnersByAward, individualWinnersByAward);
 
       return Tournament(
-        id: row['id'] as int,
+        id: (row['id'] as num).toInt(),
         name: row['name'] as String? ?? '',
         sku: row['sku'] as String? ?? '',
-        seasonID: row['season_id'] as int? ?? 0,
+        seasonID: (row['season_id'] as num?)?.toInt() ?? 0,
         location: Location(
           venue: row['venue'] as String?,
           city: row['city'] as String?,
@@ -405,7 +405,7 @@ class TournamentRepository {
   Map<int, List<Map<String, dynamic>>> _groupBy(List<Map<String, dynamic>> rows, String keyField) {
     final map = <int, List<Map<String, dynamic>>>{};
     for (final row in rows) {
-      final key = row[keyField] as int;
+      final key = (row[keyField] as num).toInt();
       map.putIfAbsent(key, () => []).add(row);
     }
     return map;
@@ -419,7 +419,7 @@ class TournamentRepository {
     Map<int, List<Map<String, dynamic>>> alliancesByGame,
   ) {
     return divisionRows.map((row) {
-      final divisionId = row['id'] as int;
+      final divisionId = (row['id'] as num).toInt();
       final gameRows = gamesByDivision[divisionId] ?? [];
       final statsRows = statsByDivision[divisionId] ?? [];
 
@@ -429,7 +429,7 @@ class TournamentRepository {
       return Division(
         id: divisionId,
         name: row['name'] as String? ?? '',
-        order: row['order_num'] as int? ?? 0,
+        order: (row['order_num'] as num?)?.toInt() ?? 0,
         games: games.isNotEmpty ? games : null,
         teamStats: teamStats.isNotEmpty ? teamStats : null,
       );
@@ -443,7 +443,7 @@ class TournamentRepository {
     int divisionId,
   ) {
     return gameRows.map((row) {
-      final gameId = row['id'] as int;
+      final gameId = (row['id'] as num).toInt();
       final allianceRows = alliancesByGame[gameId] ?? [];
 
       final redAlliance = <TeamPreview>[];
@@ -451,7 +451,7 @@ class TournamentRepository {
 
       for (final a in allianceRows) {
         final preview = TeamPreview(
-          teamID: a['team_id'] as int? ?? 0,
+          teamID: (a['team_id'] as num?)?.toInt() ?? 0,
           teamNumber: a['team_number'] as String? ?? '',
         );
         if (a['alliance'] == 'red') {
@@ -464,12 +464,12 @@ class TournamentRepository {
       return Game(
         redAlliancePreview: redAlliance,
         blueAlliancePreview: blueAlliance,
-        redScore: row['red_score'] as int?,
-        blueScore: row['blue_score'] as int?,
+        redScore: (row['red_score'] as num?)?.toInt(),
+        blueScore: (row['blue_score'] as num?)?.toInt(),
         divisionId: divisionId,
         roundNum: row['round_num'] as num? ?? 0,
-        gameNum: row['game_num'] as int? ?? 0,
-        instance: row['instance'] as int? ?? 1,
+        gameNum: (row['game_num'] as num?)?.toInt() ?? 0,
+        instance: (row['instance'] as num?)?.toInt() ?? 1,
         gameName: row['game_name'] as String? ?? '',
         fieldName: row['field_name'] as String?,
         scheduledTime: row['scheduled_time'] != null ? DateTime.tryParse(row['scheduled_time'] as String) : null,
@@ -481,7 +481,7 @@ class TournamentRepository {
 
   List<Team> _loadTeams(List<Map<String, dynamic>> teamRows) {
     return teamRows.map((row) => Team(
-      id: row['id'] as int,
+      id: (row['id'] as num).toInt(),
       teamName: row['team_name'] as String?,
       teamNumber: row['team_number'] as String?,
       organization: row['organization'] as String?,
@@ -497,24 +497,24 @@ class TournamentRepository {
   Map<int, TeamStats> _loadTeamStatsMap(List<Map<String, dynamic>> statsRows) {
     final map = <int, TeamStats>{};
     for (final row in statsRows) {
-      final teamId = row['team_id'] as int;
+      final teamId = (row['team_id'] as num).toInt();
       map[teamId] = TeamStats()
-        ..rank = row['rank'] as int? ?? 0
-        ..wins = row['wins'] as int? ?? 0
-        ..losses = row['losses'] as int? ?? 0
-        ..ties = row['ties'] as int? ?? 0
-        ..totalMatches = row['total_matches'] as int? ?? 0
-        ..wp = row['wp'] as int? ?? 0
-        ..ap = row['ap'] as int? ?? 0
-        ..sp = row['sp'] as int? ?? 0
-        ..awp = row['awp'] as int? ?? 0
+        ..rank = (row['rank'] as num?)?.toInt() ?? 0
+        ..wins = (row['wins'] as num?)?.toInt() ?? 0
+        ..losses = (row['losses'] as num?)?.toInt() ?? 0
+        ..ties = (row['ties'] as num?)?.toInt() ?? 0
+        ..totalMatches = (row['total_matches'] as num?)?.toInt() ?? 0
+        ..wp = (row['wp'] as num?)?.toInt() ?? 0
+        ..ap = (row['ap'] as num?)?.toInt() ?? 0
+        ..sp = (row['sp'] as num?)?.toInt() ?? 0
+        ..awp = (row['awp'] as num?)?.toInt() ?? 0
         ..awpRate = (row['awp_rate'] as num?)?.toDouble() ?? 0.0
         ..opr = (row['opr'] as num?)?.toDouble() ?? 0.0
         ..dpr = (row['dpr'] as num?)?.toDouble() ?? 0.0
         ..ccwm = (row['ccwm'] as num?)?.toDouble() ?? 0.0
-        ..highScore = row['high_score'] as int? ?? 0
+        ..highScore = (row['high_score'] as num?)?.toInt() ?? 0
         ..avgScore = (row['avg_score'] as num?)?.toDouble() ?? 0.0
-        ..totalScore = row['total_score'] as int? ?? 0;
+        ..totalScore = (row['total_score'] as num?)?.toInt() ?? 0;
     }
     return map;
   }
@@ -522,14 +522,14 @@ class TournamentRepository {
   Map<int, TournamentSkills> _loadSkillsMap(List<Map<String, dynamic>> skillsRows) {
     final map = <int, TournamentSkills>{};
     for (final row in skillsRows) {
-      final teamId = row['team_id'] as int;
+      final teamId = (row['team_id'] as num).toInt();
       map[teamId] = TournamentSkills()
-        ..rank = row['rank'] as int? ?? 0
-        ..score = row['score'] as int? ?? 0
-        ..autonScore = row['auton_score'] as int? ?? 0
-        ..autonAttempts = row['auton_attempts'] as int? ?? 0
-        ..driverScore = row['driver_score'] as int? ?? 0
-        ..driverAttempts = row['driver_attempts'] as int? ?? 0;
+        ..rank = (row['rank'] as num?)?.toInt() ?? 0
+        ..score = (row['score'] as num?)?.toInt() ?? 0
+        ..autonScore = (row['auton_score'] as num?)?.toInt() ?? 0
+        ..autonAttempts = (row['auton_attempts'] as num?)?.toInt() ?? 0
+        ..driverScore = (row['driver_score'] as num?)?.toInt() ?? 0
+        ..driverAttempts = (row['driver_attempts'] as num?)?.toInt() ?? 0;
     }
     return map;
   }
@@ -542,14 +542,14 @@ class TournamentRepository {
     Map<int, List<Map<String, dynamic>>> individualWinnersByAward,
   ) {
     return awardRows.map((row) {
-      final awardId = row['id'] as int;
+      final awardId = (row['id'] as num).toInt();
 
       final qualifications = (qualsByAward[awardId] ?? [])
           .map((r) => r['qualification'] as String)
           .toList();
       final teamWinners = (teamWinnersByAward[awardId] ?? [])
           .map((r) => TeamPreview(
-                teamID: r['team_id'] as int? ?? 0,
+                teamID: (r['team_id'] as num?)?.toInt() ?? 0,
                 teamNumber: r['team_number'] as String? ?? '',
               ))
           .toList();

@@ -260,6 +260,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                         teamNumber: team.teamNumber!,
                                         teamName: team.teamName!,
                                         teamID: team.id,
+                                        stats: _division!.teamStats![team.id]!,
                                         allianceColor: Theme.of(context).colorScheme.onSurface,
                                       ),
                                 index != filteredTeams.length - 1

@@ -1,7 +1,4 @@
-import 'package:elapse_app/classes/Tournament/division.dart';
-import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
-import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/tournament_stats_page.dart';
 import 'package:flutter/material.dart';
@@ -10,13 +7,14 @@ import '../../../../classes/Team/vdaStats.dart';
 import '../../../../classes/Team/world_skills.dart';
 import '../../../../classes/Tournament/tskills.dart';
 
-class RankingsWidget extends StatefulWidget {
+class RankingsWidget extends StatelessWidget {
   const RankingsWidget({
     super.key,
     required this.teamID,
     required this.teamNumber,
     required this.teamName,
     required this.allianceColor,
+    required this.stats,
     this.rank,
     this.sort = "Rank",
     this.skills,
@@ -29,54 +27,20 @@ class RankingsWidget extends StatefulWidget {
   final String teamName;
   final int? rank;
   final Color allianceColor;
+  final TeamStats stats;
   final String sort;
   final TournamentSkills? skills;
   final WorldSkillsStats? worldSkills;
   final VDAStats? vda;
 
   @override
-  State<RankingsWidget> createState() => _RankingsWidgetState();
-}
-
-class _RankingsWidgetState extends State<RankingsWidget> {
-  Tournament? _tournament;
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadTournament();
-  }
-
-  Future<void> _loadTournament() async {
-    final tournamentId = prefs.getInt("tournamentID");
-    if (tournamentId != null && tournamentId != 0) {
-      final tournament = await getTournamentFromCache(tournamentId);
-      if (mounted) {
-        setState(() {
-          _tournament = tournament;
-          _isLoading = false;
-        });
-      }
-    } else {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (_isLoading || _tournament == null) return const SizedBox.shrink();
-
-    int divisionIndex = getTeamDivisionIndex(_tournament!.divisions, widget.teamID);
-
-    Map<int, TeamStats> rankings = _tournament!.divisions[divisionIndex].teamStats!;
-    TeamStats stats = rankings[widget.teamID]!;
 
     String val1 = "${stats.wins}-${stats.losses}-${stats.ties}",
         val2 = "${stats.wp} WP",
         val3 = "${stats.ap} AP",
         val4 = "${stats.sp} SP";
-    switch (widget.sort) {
+    switch (sort) {
       case "Rank":
       case "AP":
       case "SP":
@@ -102,26 +66,26 @@ class _RankingsWidgetState extends State<RankingsWidget> {
       case "Skills":
         val1 = "${stats.wins}-${stats.losses}-${stats.ties}";
         val2 = "${stats.wp} WP";
-        val3 = widget.skills != null ? "Rank ${widget.skills?.rank}" : "N/A";
-        val4 = widget.skills != null ? "${widget.skills?.score} pts" : "N/A";
+        val3 = skills != null ? "Rank ${skills?.rank}" : "N/A";
+        val4 = skills != null ? "${skills?.score} pts" : "N/A";
         break;
       case "World Skills":
         val1 = "${stats.wins}-${stats.losses}-${stats.ties}";
         val2 = "${stats.wp} WP";
-        val3 = widget.worldSkills != null ? "Rank ${widget.worldSkills?.rank}" : "N/A";
-        val4 = widget.worldSkills != null ? "${widget.worldSkills?.score} pts" : "N/A";
+        val3 = worldSkills != null ? "Rank ${worldSkills?.rank}" : "N/A";
+        val4 = worldSkills != null ? "${worldSkills?.score} pts" : "N/A";
         break;
       case "TrueSkill":
         val1 = "${stats.wins}-${stats.losses}-${stats.ties}";
         val2 = "${stats.wp} WP";
-        val3 = widget.vda != null ? "Rank ${widget.vda?.trueSkillGlobalRank}" : "N/A";
-        val4 = widget.vda != null ? "${widget.vda?.trueSkill}" : "N/A";
+        val3 = vda != null ? "Rank ${vda?.trueSkillGlobalRank}" : "N/A";
+        val4 = vda != null ? "${vda?.trueSkill}" : "N/A";
         break;
     }
 
     return GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () => tournamentStatsPage(context, widget.teamID, widget.teamNumber, widget.teamName),
+        onTap: () => tournamentStatsPage(context, teamID, teamNumber, teamName),
         child: SizedBox(
             height: 72,
             child: Flex(
@@ -133,9 +97,9 @@ class _RankingsWidgetState extends State<RankingsWidget> {
                     flex: 37,
                     fit: FlexFit.tight,
                     child: Text(
-                      "${widget.rank ?? stats.rank}",
+                      "${rank ?? stats.rank}",
                       maxLines: 1,
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, height: 1, color: widget.allianceColor),
+                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, height: 1, color: allianceColor),
                       textAlign: TextAlign.start,
                     ),
                   ),
@@ -146,19 +110,19 @@ class _RankingsWidgetState extends State<RankingsWidget> {
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(widget.teamNumber,
+                          Text(teamNumber,
                               style: TextStyle(
                                   fontSize: 32,
                                   height: 1,
                                   letterSpacing: -1.5,
                                   fontWeight: FontWeight.w400,
-                                  color: widget.allianceColor)),
-                          Text(widget.teamName,
+                                  color: allianceColor)),
+                          Text(teamName,
                               softWrap: false,
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w300,
-                                color: widget.allianceColor.withAlpha(200),
+                                color: allianceColor.withAlpha(200),
                                 overflow: TextOverflow.fade,
                               ))
                         ]),

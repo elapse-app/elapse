@@ -3,6 +3,7 @@ import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
+import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/extras/twelve_hour.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dart';
@@ -32,6 +33,7 @@ class GameScreen extends StatefulWidget {
 class _GameScreenState extends State<GameScreen> {
   Game? _game;
   List<Team> teams = [];
+  Map<int, TeamStats>? _teamStats;
   bool _isLoading = true;
 
   @override
@@ -49,6 +51,7 @@ class _GameScreenState extends State<GameScreen> {
         // Find the game using composite key
         for (final division in tournament.divisions) {
           if (division.id == widget.divisionId && division.games != null) {
+            _teamStats = division.teamStats;
             for (final game in division.games!) {
               if (game.roundNum == widget.roundNum &&
                   game.gameNum == widget.gameNum &&
@@ -256,12 +259,21 @@ class _GameScreenState extends State<GameScreen> {
                           children: _game!.redAlliancePreview!.map(
                             (e) {
                               final teamName = teams.where((t) => t.id == e.teamID).firstOrNull?.teamName ?? "";
+                              final stats = _teamStats?[e.teamID];
+                              if (stats == null) {
+                                return EmptyRanking(
+                                  teamName: e.teamNumber,
+                                  teamID: e.teamID,
+                                  allianceColor: colorPallete.redAllianceText,
+                                );
+                              }
                               return Column(
                                 children: [
                                   RankingsWidget(
                                       teamID: e.teamID,
                                       teamNumber: e.teamNumber,
                                       teamName: teamName,
+                                      stats: stats,
                                       allianceColor: colorPallete.redAllianceText),
                                   Divider(
                                     color: Theme.of(context).colorScheme.surfaceDim,
@@ -308,12 +320,21 @@ class _GameScreenState extends State<GameScreen> {
                           children: _game!.blueAlliancePreview!.map(
                             (e) {
                               final teamName = teams.where((t) => t.id == e.teamID).firstOrNull?.teamName ?? "";
+                              final stats = _teamStats?[e.teamID];
+                              if (stats == null) {
+                                return EmptyRanking(
+                                  teamName: e.teamNumber,
+                                  teamID: e.teamID,
+                                  allianceColor: colorPallete.blueAllianceText,
+                                );
+                              }
                               return Column(
                                 children: [
                                   RankingsWidget(
                                       teamID: e.teamID,
                                       teamNumber: e.teamNumber,
                                       teamName: teamName,
+                                      stats: stats,
                                       allianceColor: colorPallete.blueAllianceText),
                                   Divider(
                                     color: Theme.of(context).colorScheme.surfaceDim,
