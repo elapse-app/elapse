@@ -9,6 +9,7 @@ import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tskills.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
+import 'package:elapse_app/classes/Tournament/league_session.dart';
 import 'package:elapse_app/classes/Filters/gradeLevel.dart';
 
 import 'database_helper.dart';
@@ -101,6 +102,21 @@ class TournamentRepository {
               message: e.toString(),
               rawValue: award.name,
             ));
+          }
+        }
+
+        // 7. Save league sessions (for multi-day leagues)
+        if (tournament.sessions != null) {
+          for (final session in tournament.sessions!) {
+            try {
+              await _saveSession(txn, tournament.id, session);
+            } catch (e) {
+              errors.add(IngestionError(
+                field: 'session',
+                message: e.toString(),
+                rawValue: session.date.toIso8601String(),
+              ));
+            }
           }
         }
       });
@@ -290,6 +306,20 @@ class TournamentRepository {
     }
   }
 
+  Future<void> _saveSession(Transaction txn, int tournamentId, LeagueSession session) async {
+    await txn.insert('league_sessions', {
+      'tournament_id': tournamentId,
+      'session_date': session.date.toIso8601String(),
+      'venue': session.location.venue,
+      'city': session.location.city,
+      'region': session.location.region,
+      'country': session.location.country,
+      'address1': session.location.address1,
+      'address2': session.location.address2,
+      'postal_code': session.location.postalCode,
+    });
+  }
+
   /// Loads a complete tournament from SQLite.
   /// Returns null if not found. Never throws - returns null on any error.
   ///
@@ -310,18 +340,20 @@ class TournamentRepository {
 
       final row = tournamentRows.first;
 
-      // Load all top-level related data in parallel (4 queries)
+      // Load all top-level related data in parallel (5 queries)
       final topLevelResults = await Future.wait([
         db.query('divisions', where: 'tournament_id = ?', whereArgs: [tournamentId], orderBy: 'order_num'),
         db.query('teams', where: 'tournament_id = ?', whereArgs: [tournamentId]),
         db.query('tournament_skills', where: 'tournament_id = ?', whereArgs: [tournamentId]),
         db.query('awards', where: 'tournament_id = ?', whereArgs: [tournamentId]),
+        db.query('league_sessions', where: 'tournament_id = ?', whereArgs: [tournamentId], orderBy: 'session_date'),
       ]);
 
       final divisionRows = topLevelResults[0];
       final teamRows = topLevelResults[1];
       final skillsRows = topLevelResults[2];
       final awardRows = topLevelResults[3];
+      final sessionRows = topLevelResults[4];
 
       // Get IDs for batch loading
       final divisionIds = divisionRows.map((r) => (r['id'] as num).toInt()).toList();
@@ -374,6 +406,9 @@ class TournamentRepository {
       // Build awards
       final awards = _buildAwards(awardRows, qualsByAward, teamWinnersByAward, individualWinnersByAward);
 
+      // Build sessions (for leagues)
+      final sessions = _loadSessions(sessionRows);
+
       return Tournament(
         id: (row['id'] as num).toInt(),
         name: row['name'] as String? ?? '',
@@ -394,6 +429,7 @@ class TournamentRepository {
         teams: teams,
         tournamentSkills: tournamentSkills.isNotEmpty ? tournamentSkills : null,
         awards: awards,
+        sessions: sessions.isNotEmpty ? sessions : null,
       );
     } catch (e) {
       print('Failed to load cached tournament $tournamentId: $e');
@@ -532,6 +568,21 @@ class TournamentRepository {
         ..driverAttempts = (row['driver_attempts'] as num?)?.toInt() ?? 0;
     }
     return map;
+  }
+
+  List<LeagueSession> _loadSessions(List<Map<String, dynamic>> sessionRows) {
+    return sessionRows.map((row) => LeagueSession(
+      date: DateTime.tryParse(row['session_date'] as String? ?? '') ?? DateTime.now(),
+      location: Location(
+        venue: row['venue'] as String?,
+        city: row['city'] as String?,
+        region: row['region'] as String?,
+        country: row['country'] as String?,
+        address1: row['address1'] as String?,
+        address2: row['address2'] as String?,
+        postalCode: row['postal_code'] as String?,
+      ),
+    )).toList();
   }
 
   /// Builds awards from pre-loaded data (no additional queries).

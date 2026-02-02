@@ -238,9 +238,11 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
     }
 
     return games.where((game) {
-      // Include games scheduled for the selected session
-      if (game.scheduledTime != null) {
-        return _isSameDay(game.scheduledTime!, _selectedSession!.date);
+      // Check scheduledTime first, then startedTime as fallback
+      final gameDate = game.scheduledTime ?? game.startedTime;
+      if (gameDate != null) {
+        // Convert to local time for comparison since session dates are local
+        return _isSameDay(gameDate.toLocal(), _selectedSession!.date);
       }
       // Include unscheduled games in session view as well
       // (they may be matches pending scheduling for this session)
@@ -248,7 +250,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
     }).toList();
   }
 
-  /// Check if two dates are the same day
+  /// Check if two dates are the same day (both should be in local time)
   bool _isSameDay(DateTime a, DateTime b) {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }

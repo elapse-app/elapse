@@ -21,14 +21,37 @@ class DatabaseHelper {
 
     return await openDatabase(
       path,
-      version: 1,
+      version: 3,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
       onConfigure: _onConfigure,
     );
   }
 
   Future<void> _onConfigure(Database db) async {
     await db.execute('PRAGMA foreign_keys = ON');
+  }
+
+  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    // For cache database, simplest approach is to drop and recreate
+    // This ensures schema is always up to date without complex migrations
+    if (oldVersion < newVersion) {
+      // Drop all tables (order matters due to foreign keys)
+      await db.execute('DROP TABLE IF EXISTS award_individual_winners');
+      await db.execute('DROP TABLE IF EXISTS award_team_winners');
+      await db.execute('DROP TABLE IF EXISTS award_qualifications');
+      await db.execute('DROP TABLE IF EXISTS awards');
+      await db.execute('DROP TABLE IF EXISTS tournament_skills');
+      await db.execute('DROP TABLE IF EXISTS team_stats');
+      await db.execute('DROP TABLE IF EXISTS game_alliances');
+      await db.execute('DROP TABLE IF EXISTS games');
+      await db.execute('DROP TABLE IF EXISTS league_sessions');
+      await db.execute('DROP TABLE IF EXISTS teams');
+      await db.execute('DROP TABLE IF EXISTS divisions');
+      await db.execute('DROP TABLE IF EXISTS tournaments');
+      // Recreate with new schema
+      await _onCreate(db, newVersion);
+    }
   }
 
   Future<void> _onCreate(Database db, int version) async {
@@ -84,6 +107,8 @@ class DatabaseHelper {
     await db.execute('CREATE INDEX idx_teams_number ON teams(team_number)');
 
     // Games table
+    // Note: For leagues, games from different sessions can have the same game_num,
+    // so we include scheduled_time in the unique constraint to allow this.
     await db.execute('''
       CREATE TABLE games (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -99,7 +124,7 @@ class DatabaseHelper {
         red_score INTEGER,
         blue_score INTEGER,
         FOREIGN KEY (division_id) REFERENCES divisions(id) ON DELETE CASCADE,
-        UNIQUE(division_id, round_num, game_num, instance)
+        UNIQUE(division_id, round_num, game_num, instance, scheduled_time)
       )
     ''');
     await db.execute('CREATE INDEX idx_games_division ON games(division_id)');
@@ -212,6 +237,24 @@ class DatabaseHelper {
       )
     ''');
     await db.execute('CREATE INDEX idx_award_individual_winners_award ON award_individual_winners(award_id)');
+
+    // League sessions table (for multi-day leagues)
+    await db.execute('''
+      CREATE TABLE league_sessions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        tournament_id INTEGER NOT NULL,
+        session_date TEXT NOT NULL,
+        venue TEXT,
+        city TEXT,
+        region TEXT,
+        country TEXT,
+        address1 TEXT,
+        address2 TEXT,
+        postal_code TEXT,
+        FOREIGN KEY (tournament_id) REFERENCES tournaments(id) ON DELETE CASCADE
+      )
+    ''');
+    await db.execute('CREATE INDEX idx_league_sessions_tournament ON league_sessions(tournament_id)');
   }
 
   /// Delete all data for a specific tournament (cascade handles related tables)
