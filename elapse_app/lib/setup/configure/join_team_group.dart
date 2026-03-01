@@ -182,8 +182,31 @@ class _JoinTeamGroupState extends State<JoinTeamGroup> {
                         onPressed: () async {
                           Database database = Database();
                           final currentUser = FirebaseAuth.instance.currentUser;
+                          if (currentUser == null) {
+                            if (!mounted) return;
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text("Not Signed In"),
+                                    content: Text("Please sign in before joining a team group"),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text(
+                                            "OK",
+                                            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                          ))
+                                    ],
+                                  );
+                                });
+                            return;
+                          }
                           try {
-                            final value = await database.joinTeamGroup(joinCode, currentUser!.uid);
+                            final value = await database.joinTeamGroup(joinCode, currentUser.uid);
                             if (!mounted) return;
                             prefs.setString("teamGroup", jsonEncode(value?.toJson()));
                             Navigator.push(
