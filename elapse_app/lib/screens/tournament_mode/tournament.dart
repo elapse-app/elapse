@@ -1,4 +1,5 @@
-import 'package:elapse_app/classes/Tournament/division.dart';
+import 'dart:async';
+
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/screens/tournament/pages/main/loaded.dart';
 import 'package:elapse_app/screens/widgets/elapse_loading_indicator.dart';
@@ -19,28 +20,61 @@ class TMTournamentScreen extends StatefulWidget {
 }
 
 class _TMTournamentScreenState extends State<TMTournamentScreen> {
-  Future<Tournament>? tournament;
-  int selectedIndex = 0;
-
-  Division? division;
-
-  List<String> titles = ["Schedule", "Rankings", "Skills", "Info"];
+  StreamSubscription<Tournament>? _subscription;
+  Tournament? _tournament;
+  Object? _error;
+  bool _done = false;
 
   @override
   void initState() {
     super.initState();
-    // Use cache when valid (30s expiry) for offline resilience
-    // forceRefresh only used on explicit pull-to-refresh
-    tournament = TMTournamentDetails(widget.tournamentID);
+    final stream = streamTMTournamentDetails(widget.tournamentID);
+
+    _subscription = stream.listen(
+      (tournament) {
+        if (mounted) setState(() => _tournament = tournament);
+      },
+      onError: (error) {
+        if (mounted) setState(() => _error = error);
+      },
+      onDone: () {
+        if (mounted) setState(() => _done = true);
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _subscription?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: tournament,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Scaffold(
+    if (_tournament != null) {
+      return TournamentLoadedScreen(
+        tournamentId: widget.tournamentID,
+        tournament: _tournament!,
+        isFullyLoaded: _done,
+        isPreview: widget.isPreview,
+      );
+    } else if (_error != null) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.error),
+              const SizedBox(height: 16),
+              Text("Failed to load tournament details",
+                  style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            ],
+          ),
+        ),
+      );
+    } else {
+      return Scaffold(
             backgroundColor: Theme.of(context).colorScheme.surface,
             body: CustomScrollView(
               slivers: [
@@ -49,7 +83,6 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
                   expandedHeight: 125,
                   centerTitle: false,
                   backgroundColor: Theme.of(context).colorScheme.primary,
-                  
                 ),
                 SliverPersistentHeader(
                     pinned: true,
@@ -104,34 +137,7 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
               ],
             ),
           );
-        } else if (snapshot.hasData) {
-          // Tournament data is cached in SQLite by TMTournamentDetails
-          // TournamentLoadedScreen will read from SQLite via getTournamentFromCache()
-          return TournamentLoadedScreen(
-            tournamentId: widget.tournamentID,
-            isPreview: widget.isPreview,
-          );
-        } else {
-          print(snapshot.error.toString());
-          print(snapshot.error.toString());
-          debugPrintStack(stackTrace: snapshot.stackTrace);
-          return Scaffold(
-            backgroundColor: Theme.of(context).colorScheme.surface,
-            body: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.error),
-                  const SizedBox(height: 16),
-                  Text("Failed to load tournament details",
-                      style: TextStyle(color: Theme.of(context).colorScheme.error)),
-                ],
-              ),
-            ),
-          );
-        }
-      },
-    );
+    }
   }
 
   Widget _buildIconButton(BuildContext context, IconData icon, int index) {

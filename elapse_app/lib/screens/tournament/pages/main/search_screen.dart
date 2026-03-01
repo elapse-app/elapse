@@ -2,18 +2,17 @@ import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
-import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
-import 'package:elapse_app/screens/widgets/elapse_loading_indicator.dart';
+import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key, required this.tournamentId, required this.divisionId});
+  const SearchScreen({super.key, required this.tournament, required this.division});
 
-  final int tournamentId;
-  final int divisionId;
+  final Tournament tournament;
+  final Division division;
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -23,33 +22,13 @@ class _SearchScreenState extends State<SearchScreen> {
   final FocusNode _focusNode = FocusNode();
   int selectedIndex = 0;
   String searchQuery = "";
-  Tournament? _tournament;
-  Division? _division;
-  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadTournament();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _focusNode.requestFocus();
     });
-  }
-
-  Future<void> _loadTournament() async {
-    final tournament = await getTournamentFromCache(widget.tournamentId);
-    if (tournament != null && mounted) {
-      _tournament = tournament;
-      for (final division in tournament.divisions) {
-        if (division.id == widget.divisionId) {
-          _division = division;
-          break;
-        }
-      }
-    }
-    if (mounted) {
-      setState(() => _isLoading = false);
-    }
   }
 
   @override
@@ -60,21 +39,34 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading || _tournament == null || _division == null) {
+    final division = widget.division;
+    final tournament = widget.tournament;
+
+    if (division.games == null || division.games!.isEmpty) {
       return Scaffold(
-        body: ElapseLoadingIndicator(
-          message: "Searching",
-          size: LoadingSize.fullScreen,
-          icon: Icons.search,
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: CustomScrollView(
+          slivers: [
+            SliverAppBar.large(
+              automaticallyImplyLeading: true,
+              expandedHeight: 125,
+              centerTitle: false,
+              backgroundColor: Theme.of(context).colorScheme.primary,
+            ),
+            const RoundedTop(),
+            const SliverToBoxAdapter(
+              child: BigErrorMessage(icon: Icons.schedule, message: "Schedule not loaded yet"),
+            ),
+          ],
         ),
       );
     }
 
-    List<Team> filteredTeams = _tournament!.teams.where((e) {
+    List<Team> filteredTeams = tournament.teams.where((e) {
       return (e.teamName!.toLowerCase().contains(searchQuery.toLowerCase()) ||
               e.teamNumber!.toLowerCase().contains(searchQuery.toLowerCase())) &&
-          ((_division!.teamStats != null && _division!.teamStats![e.id] != null) ||
-              _division!.teamStats?.isEmpty == true);
+          ((division.teamStats != null && division.teamStats![e.id] != null) ||
+              division.teamStats?.isEmpty == true);
     }).toList();
     List<Game> filteredGames;
 
@@ -83,7 +75,7 @@ class _SearchScreenState extends State<SearchScreen> {
     } else {
       Set<String> teamNumbers = filteredTeams.map((e) => e.teamNumber!).toSet();
 
-      filteredGames = _division!.games!.where((e) {
+      filteredGames = division.games!.where((e) {
         if (searchQuery.isEmpty) {
           return true;
         }
@@ -160,7 +152,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                       },
                                       cursorColor: Theme.of(context).colorScheme.secondary,
                                       decoration: InputDecoration(
-                                          hintText: "Search ${_division!.name}", border: InputBorder.none),
+                                          hintText: "Search ${division.name}", border: InputBorder.none),
                                     ),
                                   ),
                                 ],
@@ -256,7 +248,7 @@ class _SearchScreenState extends State<SearchScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 23.0),
                             child: Column(
                               children: [
-                                _division!.teamStats![team.id] == null
+                                division.teamStats![team.id] == null
                                     ? EmptyRanking(
                                         teamName: team.teamNumber ?? "",
                                         teamID: team.id,
@@ -265,7 +257,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                         teamNumber: team.teamNumber!,
                                         teamName: team.teamName!,
                                         teamID: team.id,
-                                        stats: _division!.teamStats![team.id]!,
+                                        stats: division.teamStats![team.id]!,
                                         allianceColor: Theme.of(context).colorScheme.onSurface,
                                       ),
                                 index != filteredTeams.length - 1
@@ -321,7 +313,7 @@ class _SearchScreenState extends State<SearchScreen> {
                                 GameWidget(
                                   game: game,
                                 ),
-                                index != _division!.games!.length - 1
+                                index != filteredGames.length - 1
                                     ? Divider(
                                         height: 3,
                                         color: Theme.of(context).colorScheme.surfaceDim,

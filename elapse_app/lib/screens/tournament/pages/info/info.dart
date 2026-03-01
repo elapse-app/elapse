@@ -1,8 +1,8 @@
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
-import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/screens/tournament/pages/info/all_teams.dart';
 import 'package:elapse_app/screens/tournament/pages/info/award_widget.dart';
+import 'package:elapse_app/screens/widgets/elapse_loading_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:maps_launcher/maps_launcher.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -10,42 +10,35 @@ import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 
 class InfoPage extends StatefulWidget {
-  const InfoPage({super.key, required this.tournamentId});
-  final int tournamentId;
+  const InfoPage({super.key, required this.tournament, this.isFullyLoaded = false});
+  final Tournament tournament;
+  final bool isFullyLoaded;
 
   @override
   State<InfoPage> createState() => _InfoPageState();
 }
 
 class _InfoPageState extends State<InfoPage> {
-  Tournament? _tournament;
-  bool _isLoading = true;
+  late Future<bool> _livestream;
 
   @override
   void initState() {
     super.initState();
-    _loadTournament();
+    _livestream = hasLivestream(widget.tournament.sku);
   }
 
-  Future<void> _loadTournament() async {
-    final tournament = await getTournamentFromCache(widget.tournamentId);
-    if (mounted) {
-      setState(() {
-        _tournament = tournament;
-        _isLoading = false;
-      });
+  @override
+  void didUpdateWidget(covariant InfoPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.tournament.sku != widget.tournament.sku) {
+      _livestream = hasLivestream(widget.tournament.sku);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading || _tournament == null) {
-      return const SliverToBoxAdapter(child: Center(child: CircularProgressIndicator()));
-    }
-    final tournament = _tournament!;
+    final tournament = widget.tournament;
     final awards = tournament.awards;
-
-    Future<bool> livestream = hasLivestream(tournament.sku);
 
     final String tournamentName = tournament.name;
     final Location location = tournament.location;
@@ -160,7 +153,7 @@ class _InfoPageState extends State<InfoPage> {
                     ],
                   ),
                   FutureBuilder(
-                      future: livestream,
+                      future: _livestream,
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
                           return Container();
@@ -169,15 +162,7 @@ class _InfoPageState extends State<InfoPage> {
                           case ConnectionState.none:
                           case ConnectionState.waiting:
                           case ConnectionState.active:
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                const SizedBox(
-                                  height: 45,
-                                ),
-                                const CircularProgressIndicator(),
-                              ],
-                            );
+                            return const SizedBox.shrink();
                           case ConnectionState.done:
                             if (snapshot.data as bool) {
                               return Column(
@@ -218,7 +203,8 @@ class _InfoPageState extends State<InfoPage> {
                     context,
                     MaterialPageRoute(
                         builder: (context) => AllTeams(
-                              tournamentId: tournament.id,
+                              tournament: tournament,
+                              isFullyLoaded: widget.isFullyLoaded,
                             )));
               },
               child: Container(
@@ -241,29 +227,34 @@ class _InfoPageState extends State<InfoPage> {
             const SizedBox(
               height: 25,
             ),
-            Container(
-              width: double.infinity,
-              decoration:
-                  BoxDecoration(color: Theme.of(context).colorScheme.tertiary, borderRadius: BorderRadius.circular(18)),
-              padding: EdgeInsets.all(18),
-              child: Column(
-                children: [
-                  const Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text("Awards", style: TextStyle(fontSize: 24)),
-                      // Icon(Icons.arrow_forward)
-                    ],
-                  ),
-                  SizedBox(
-                    height: 15,
-                  ),
-                  Column(
-                    children: List.generate(awards.length, (index) => AwardWidget(awardIndex: index)),
-                  )
-                ],
+            if (awards.isNotEmpty)
+              Container(
+                width: double.infinity,
+                decoration:
+                    BoxDecoration(color: Theme.of(context).colorScheme.tertiary, borderRadius: BorderRadius.circular(18)),
+                padding: EdgeInsets.all(18),
+                child: Column(
+                  children: [
+                    const Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text("Awards", style: TextStyle(fontSize: 24)),
+                      ],
+                    ),
+                    SizedBox(
+                      height: 15,
+                    ),
+                    Column(
+                      children: List.generate(awards.length, (index) => AwardWidget(award: awards[index])),
+                    )
+                  ],
+                ),
+              )
+            else if (!widget.isFullyLoaded)
+              const ElapseLoadingIndicator(
+                message: "Loading awards",
+                size: LoadingSize.section,
               ),
-            ),
             SizedBox(
               height: 50,
             ),

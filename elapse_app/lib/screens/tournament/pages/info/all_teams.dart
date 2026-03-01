@@ -17,16 +17,16 @@ import '../../../explore/worldRankings/world_rankings_filter.dart';
 import '../../../widgets/app_bar.dart';
 
 class AllTeams extends StatefulWidget {
-  const AllTeams({super.key, required this.tournamentId});
+  const AllTeams({super.key, required this.tournament, this.isFullyLoaded = false});
 
-  final int tournamentId;
+  final Tournament tournament;
+  final bool isFullyLoaded;
 
   @override
   State<AllTeams> createState() => _AllTeamsState();
 }
 
 class _AllTeamsState extends State<AllTeams> {
-  Tournament? _tournament;
   int sortIndex = 0;
   List<String> sorts = [
     "Team Number",
@@ -52,78 +52,67 @@ class _AllTeamsState extends State<AllTeams> {
   late List<TeamPreview> savedTeams;
   late List<TeamPreview> picklistTeams;
   late List<TeamPreview> scoutedTeams;
-  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadTournament();
-  }
+    final tournament = widget.tournament;
 
-  Future<void> _loadTournament() async {
-    final tournament = await getTournamentFromCache(widget.tournamentId);
-    if (tournament != null && mounted) {
-      _tournament = tournament;
+    skillsStats =
+        getWorldSkillsRankings(tournament.seasonID, getGradeLevel(prefs.getString("defaultGrade"))).then((data) {
+      if (mounted) {
+        setState(() {
+          loadedSkills = data;
+        });
+      }
+      return data;
+    });
+    vdaStats = getTrueSkillData(tournament.seasonID).then((data) {
+      if (mounted) {
+        setState(() {
+          loadedVDA = data;
+        });
+      }
+      return data;
+    });
 
-      skillsStats =
-          getWorldSkillsRankings(tournament.seasonID, getGradeLevel(prefs.getString("defaultGrade"))).then((data) {
-        if (mounted) {
-          setState(() {
-            loadedSkills = data;
-          });
-        }
-        return data;
-      });
-      vdaStats = getTrueSkillData(tournament.seasonID).then((data) {
-        if (mounted) {
-          setState(() {
-            loadedVDA = data;
-          });
-        }
-        return data;
-      });
-
-      inTM = prefs.getBool("isTournamentMode") ?? false;
-      tmTournament = inTM ? tournament : null;
-      savedTeams = _getSavedTeams();
-      picklistTeams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
-      scoutedTeams = [];
-    }
-    if (mounted) {
-      setState(() => _isLoading = false);
-    }
+    inTM = prefs.getBool("isTournamentMode") ?? false;
+    tmTournament = inTM ? tournament : null;
+    savedTeams = _getSavedTeams();
+    picklistTeams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
+    scoutedTeams = [];
   }
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
+    if (widget.tournament.teams.isEmpty) {
       return Scaffold(
-        body: ElapseLoadingIndicator(
-          message: "Loading team list",
-          size: LoadingSize.fullScreen,
-          icon: Icons.people_alt_outlined,
-        ),
-      );
-    }
-
-    if (_tournament == null) {
-      return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: CustomScrollView(
           slivers: [
             ElapseAppBar(
-              title: const Text("All Teams", style: TextStyle(fontSize: 24, height: 1, fontWeight: FontWeight.w600)),
+              title: const Text("All Teams", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
               backNavigation: true,
             ),
             const RoundedTop(),
-            const SliverFillRemaining(
-              child: Center(child: Text("Tournament not found")),
-            ),
+            if (!widget.isFullyLoaded)
+              const SliverToBoxAdapter(
+                child: ElapseLoadingIndicator(
+                  message: "Loading team list",
+                  size: LoadingSize.section,
+                  icon: Icons.people_alt_outlined,
+                ),
+              )
+            else
+              const SliverFillRemaining(
+                child: Center(child: Text("No teams registered")),
+              ),
           ],
         ),
       );
     }
 
-    List<Team> teams = _tournament!.teams;
+    List<Team> teams = widget.tournament.teams;
 
     if (filter.regions!.isNotEmpty) {
       teams = teams.where((e) => filter.regions!.any((e2) => e2 == (e.location?.region ?? ""))).toList();

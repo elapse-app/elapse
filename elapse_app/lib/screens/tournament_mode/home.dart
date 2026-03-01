@@ -180,7 +180,7 @@ class _TMHomePageState extends State<TMHomePage> {
             transitionDuration: const Duration(milliseconds: 300),
             reverseTransitionDuration: const Duration(milliseconds: 300),
             pageBuilder: (context, animation, secondaryAnimation) =>
-                SearchScreen(tournamentId: _tournament!.id, divisionId: _division!.id),
+                SearchScreen(tournament: _tournament!, division: _division!),
             transitionsBuilder: (context, animation, secondaryAnimation, child) {
               return FadeTransition(opacity: animation, child: child);
             },

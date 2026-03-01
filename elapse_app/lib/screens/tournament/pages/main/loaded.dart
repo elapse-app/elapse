@@ -19,6 +19,7 @@ import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:elapse_app/screens/widgets/elapse_loading_indicator.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
@@ -29,10 +30,14 @@ import '../../../../classes/Team/world_skills.dart';
 
 class TournamentLoadedScreen extends StatefulWidget {
   final int tournamentId;
+  final Tournament tournament;
+  final bool isFullyLoaded;
   final bool isPreview;
   const TournamentLoadedScreen({
     super.key,
     required this.tournamentId,
+    required this.tournament,
+    this.isFullyLoaded = false,
     this.isPreview = false,
   });
 
@@ -65,6 +70,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   List<TeamPreview> savedTeams = [];
   bool useSavedTeams = false;
 
+  bool _userSelectedTab = false; // true once the user explicitly taps a tab
+
   List<Game> practice = [];
   List<Game> qualifications = [];
   List<Game> eliminations = [];
@@ -95,61 +102,72 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
     });
   }
 
-  bool _isLoading = false;
-  String? _loadError;
+  bool _isFullyLoaded = false;
 
   @override
   void initState() {
     super.initState();
-    // Initialize scroll controller early to prevent LateInitializationError in dispose()
-    // if user navigates away during async loading
     _scrollController = ScrollController();
-    _initializeTournament();
+    _isFullyLoaded = widget.isFullyLoaded;
+    _setupWithTournament(widget.tournament);
   }
 
-  /// Initialize tournament data from SQLite cache or API
-  Future<void> _initializeTournament({bool forceRefresh = false}) async {
-    if (forceRefresh) {
-      setState(() {
-        _isLoading = true;
-        _loadError = null;
-      });
+  @override
+  void didUpdateWidget(covariant TournamentLoadedScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _isFullyLoaded = widget.isFullyLoaded;
+    // Update derived state without calling setState — the parent's setState
+    // already scheduled a rebuild that brought us here, so an extra setState
+    // would cause a redundant second build.
+    _syncDerivedState(widget.tournament);
+  }
+
+  /// Core logic to sync derived state (division, teams, games) from a
+  /// tournament update. Does NOT call setState — caller decides whether to
+  /// wrap in setState or rely on an already-scheduled build.
+  void _syncDerivedState(Tournament t) {
+    tournament = t;
+
+    // Preserve division selection — find same division in updated data
+    if (tournament.divisions.isNotEmpty) {
+      final matchingDivision = tournament.divisions
+          .where((d) => d.id == division.id)
+          .firstOrNull;
+      if (matchingDivision != null) {
+        division = matchingDivision;
+      } else {
+        division = tournament.divisions[0];
+      }
+    }
+
+    // Update teams list (preserving saved-teams filter if active)
+    if (useSavedTeams) {
+      rankingsTeams = tournament.teams
+          .where((element) => savedTeams.any((e2) => e2.teamID == element.id))
+          .toList();
     } else {
-      _isLoading = true;
+      rankingsTeams = tournament.teams;
     }
 
-    try {
-      // First try SQLite cache for fast loading
-      if (!forceRefresh) {
-        final cachedTournament = await getTournamentFromCache(widget.tournamentId);
-        if (cachedTournament != null && mounted) {
-          setState(() {
-            _isLoading = false;
-            _setupWithTournament(cachedTournament);
-          });
-          return;
-        }
-      }
+    // Recompute game lists for current division
+    _processGames();
 
-      // Fall back to API fetch
-      final t = await TMTournamentDetails(widget.tournamentId, forceRefresh: forceRefresh);
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _setupWithTournament(t);
-        });
-      }
-    } catch (error, stackTrace) {
-      // Log error for debugging
-      debugPrint('TournamentLoadedScreen: Failed to load tournament: $error');
-      debugPrintStack(stackTrace: stackTrace);
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-          _loadError = 'Failed to load tournament';
-        });
-      }
+    // Auto-switch to Schedule tab once games arrive, if the user hasn't
+    // explicitly selected a tab (otherwise they'd be stuck on Info)
+    if (!_userSelectedTab &&
+        selectedIndex == 3 &&
+        division.games != null &&
+        division.games!.isNotEmpty) {
+      selectedIndex = 0;
     }
+  }
+
+  /// Updates tournament data while preserving UI state. Calls setState to
+  /// trigger a rebuild (use for imperative updates like pull-to-refresh).
+  void _updateWithTournament(Tournament t) {
+    setState(() {
+      _syncDerivedState(t);
+    });
   }
 
   /// Set up all state from the tournament object
@@ -318,7 +336,15 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
         // Schedule content is handled separately via SliverStickyHeader widgets
         return const SliverToBoxAdapter();
       case 1:
-        // Handle null skills data
+        // Show loading indicator while skills data is still being fetched
+        if (tournament.tournamentSkills == null && !_isFullyLoaded) {
+          return const SliverToBoxAdapter(
+              child: ElapseLoadingIndicator(
+                message: "Loading rankings data",
+                size: LoadingSize.section,
+              ));
+        }
+        // Show unavailable only after stream is complete
         if (tournament.tournamentSkills == null) {
           return const SliverToBoxAdapter(
               child: BigErrorMessage(icon: Icons.list_outlined, message: "Rankings not available"));
@@ -373,7 +399,15 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
           },
         );
       case 2:
-        // Handle null skills data
+        // Show loading indicator while skills data is still being fetched
+        if (tournament.tournamentSkills == null && !_isFullyLoaded) {
+          return const SliverToBoxAdapter(
+              child: ElapseLoadingIndicator(
+                message: "Loading skills data",
+                size: LoadingSize.section,
+              ));
+        }
+        // Show unavailable only after stream is complete
         if (tournament.tournamentSkills == null) {
           return const SliverToBoxAdapter(
               child: BigErrorMessage(icon: Icons.sports_esports_outlined, message: "Skills not available"));
@@ -387,7 +421,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
         );
       case 3:
         return InfoPage(
-          tournamentId: tournament.id,
+          tournament: tournament,
+          isFullyLoaded: _isFullyLoaded,
         );
       default:
         return const SliverToBoxAdapter();
@@ -396,86 +431,31 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Handle loading state (async fallback when cache was empty)
-    if (_isLoading) {
-      return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        body: const ElapseLoadingIndicator(
-          message: "Loading tournament data",
-          size: LoadingSize.fullScreen,
-          icon: Icons.emoji_events_outlined,
-        ),
-      );
-    }
-
-    // Handle error state
-    if (_loadError != null) {
-      return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.error),
-              const SizedBox(height: 16),
-              Text(_loadError!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
-            ],
-          ),
-        ),
-      );
-    }
-
-    // Game lists are now computed once in _processGames() called from initState
-    // and when division changes, not on every build
-
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: RefreshIndicator(
           onRefresh: () async {
-            // Use TMTournamentDetails with forceRefresh to fetch fresh data from API
-            // This fetches from API and saves to SQLite via CacheManager
-            // Note: RefreshIndicator shows its own spinner, but we could optionally set _isLoading here
-            final updatedTournament = await TMTournamentDetails(widget.tournamentId, forceRefresh: true);
-
-            // Preserve the user's current division and session selection
-            final currentDivisionId = division.id;
-            final currentSessionDate = _selectedSession?.date;
-
-            setState(() {
-              tournament = updatedTournament;
-
-              // Find the same division in the updated tournament, or fall back to first division
-              if (tournament.divisions.isNotEmpty) {
-                division = tournament.divisions.firstWhere(
-                  (d) => d.id == currentDivisionId,
-                  orElse: () => tournament.divisions[0],
+            // Stream refresh results, updating UI progressively
+            // The refresh indicator stays visible until the stream closes
+            try {
+              await for (final updatedTournament in streamTMTournamentDetails(
+                widget.tournamentId,
+                forceRefresh: true,
+              )) {
+                if (mounted) {
+                  _updateWithTournament(updatedTournament);
+                }
+              }
+              // Re-fetch world skills once after refresh completes
+              if (mounted) {
+                worldSkillsStats = getWorldSkillsRankings(
+                  tournament.seasonID,
+                  getGradeLevel(prefs.getString("defaultGrade")),
                 );
               }
-
-              // Preserve session selection for leagues with multiple sessions
-              if (currentSessionDate != null &&
-                  tournament.isLeague &&
-                  tournament.sessions != null &&
-                  tournament.sessions!.length > 1) {
-                _selectedSession = tournament.sessions!.firstWhere(
-                  (s) => _isSameDay(s.date, currentSessionDate),
-                  orElse: () => tournament.sessions!.first,
-                );
-              } else {
-                _selectedSession = null;
-              }
-
-              rankingsTeams = tournament.teams;
-              inSearch = false;
-              searchQuery = "";
-              savedQuery = "";
-
-              worldSkillsStats =
-                  getWorldSkillsRankings(tournament.seasonID, getGradeLevel(prefs.getString("defaultGrade")));
-
-              // Recompute game lists after refresh
-              _processGames();
-            });
+            } catch (e) {
+              if (kDebugMode) debugPrint('Refresh failed: $e');
+            }
           },
           child: CustomScrollView(
             controller: _scrollController,
@@ -500,8 +480,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                             transitionDuration: Duration(milliseconds: 300),
                             reverseTransitionDuration: Duration(milliseconds: 300),
                             pageBuilder: (context, animation, secondaryAnimation) => SearchScreen(
-                              tournamentId: tournament.id,
-                              divisionId: division.id,
+                              tournament: tournament,
+                              division: division,
                             ),
                             transitionsBuilder: (context, animation, secondaryAnimation, child) {
                               // Create a Tween that transitions the new screen from fully transparent to fully opaque
@@ -981,11 +961,18 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                     )
                   : SliverToBoxAdapter(),
 
-              selectedIndex == 0 && (division.games == null || division.games!.isEmpty)
-                  ? SliverToBoxAdapter(
-                      child: BigErrorMessage(icon: Icons.schedule, message: "Schedule Not Available"),
+              selectedIndex == 0 && (division.games == null || division.games!.isEmpty) && !_isFullyLoaded
+                  ? const SliverToBoxAdapter(
+                      child: ElapseLoadingIndicator(
+                        message: "Loading schedule",
+                        size: LoadingSize.section,
+                      ),
                     )
-                  : SliverToBoxAdapter(),
+                  : selectedIndex == 0 && (division.games == null || division.games!.isEmpty) && _isFullyLoaded
+                      ? SliverToBoxAdapter(
+                          child: BigErrorMessage(icon: Icons.schedule, message: "Schedule Not Available"),
+                        )
+                      : SliverToBoxAdapter(),
 
               _buildCurrentPage(),
               const SliverToBoxAdapter(
@@ -1041,6 +1028,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
           ),
           onPressed: () {
             setState(() {
+              _userSelectedTab = true;
               selectedIndex = index;
               sortIndex = 0;
               _scrollController.animateTo(
