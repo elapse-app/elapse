@@ -261,7 +261,11 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                           if (prefs.getBool("isSetUp") ?? false) {
                             Database database = Database();
                             try {
-                              await database.createUser(currentUser, loadTeamPreview(prefs.getString("savedTeam")));
+                              final savedTeamJson = prefs.getString("savedTeam");
+                              if (savedTeamJson == null || savedTeamJson.isEmpty) {
+                                throw Exception("No saved team found");
+                              }
+                              await database.createUser(currentUser, loadTeamPreview(savedTeamJson));
                               if (!mounted) return;
                               Navigator.of(context)
                                 ..pop()

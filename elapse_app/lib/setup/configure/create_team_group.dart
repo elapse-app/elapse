@@ -182,10 +182,33 @@ class _CreateTeamGroupState extends State<CreateTeamGroup> {
                         onPressed: () async {
                           Database database = Database();
                           final currentUser = FirebaseAuth.instance.currentUser;
+                          if (currentUser == null) {
+                            if (!mounted) return;
+                            showDialog(
+                                barrierDismissible: false,
+                                context: context,
+                                builder: (context) {
+                                  return AlertDialog(
+                                    title: Text("Not Signed In"),
+                                    content: Text("Please sign in before creating a team group"),
+                                    actions: [
+                                      TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          },
+                                          child: Text(
+                                            "OK",
+                                            style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                          ))
+                                    ],
+                                  );
+                                });
+                            return;
+                          }
                           ElapseUser currentElapseUser =
                               ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
                           try {
-                            final value = await database.createTeamGroup(currentUser!.uid, groupName,
+                            final value = await database.createTeamGroup(currentUser.uid, groupName,
                                 currentElapseUser.fname ?? "", currentElapseUser.lname ?? "");
                             if (!mounted) return;
                             prefs.setString("teamGroup", jsonEncode(value?.toJson()));
