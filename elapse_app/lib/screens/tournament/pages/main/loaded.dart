@@ -24,7 +24,6 @@ import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 
 import '../../../../classes/Filters/gradeLevel.dart';
 import '../../../../classes/Filters/season.dart';
-import '../../../../classes/Team/vdaStats.dart';
 import '../../../../classes/Team/world_skills.dart';
 
 class TournamentLoadedScreen extends StatefulWidget {
@@ -45,7 +44,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   late int selectedIndex;
   int sortIndex = 0;
   List<String> titles = ["Schedule", "Rankings", "Skills", "Info"];
-  List<String> rankingSorts = ["Rank", "AP", "SP", "AWP", "OPR", "DPR", "CCWM", "Skills", "World Skills", "TrueSkill"];
+  List<String> rankingSorts = ["Rank", "AP", "SP", "AWP", "OPR", "DPR", "CCWM", "Skills", "World Skills"];
   List<String> skillsSorts = ["Rank", "Driver", "Auton", "Driver Attempts", "Auton Attempts"];
   TournamentRankingsFilter filter = TournamentRankingsFilter();
 
@@ -74,7 +73,6 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   List<Widget> widgets = [SliverToBoxAdapter(), SliverToBoxAdapter()];
 
   late Future<List<WorldSkillsStats>> worldSkillsStats;
-  late Future<List<VDAStats>> vdaStats;
 
   void savedPress() {
     setState(() {
@@ -171,7 +169,6 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
     savedQuery = "";
 
     worldSkillsStats = getWorldSkillsRankings(tournament.seasonID, getGradeLevel(prefs.getString("defaultGrade")));
-    vdaStats = getTrueSkillData(tournament.seasonID);
 
     // Process games once on init, not every build
     _processGames();
@@ -330,12 +327,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
         final seasonId =
             gradeLevel == gradeLevels["College"] ? (seasons[0].vexUId ?? seasons[0].vrcId) : seasons[0].vrcId;
         final worldSkillsData = prefs.getString("worldSkillsData");
-        final vdaData = prefs.getString("vdaData");
 
-        if (hasCachedWorldSkillsRankings(seasonId, gradeLevel) &&
-            hasCachedTrueSkillData() &&
-            worldSkillsData != null &&
-            vdaData != null) {
+        if (hasCachedWorldSkillsRankings(seasonId, gradeLevel) && worldSkillsData != null) {
           return RankingsPage(
             searchQuery: searchQuery,
             sort: rankingSorts[sortIndex],
@@ -345,11 +338,11 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             skills: tournament.tournamentSkills!,
             worldSkills:
                 jsonDecode(worldSkillsData).map<WorldSkillsStats>((e) => WorldSkillsStats.fromJson(e)).toList(),
-            vda: jsonDecode(vdaData).map<VDAStats>((json) => VDAStats.fromJson(json)).toList(),
+            vda: null,
           );
         }
         return FutureBuilder(
-          future: Future.wait(sortIndex == 9 ? [worldSkillsStats, vdaStats] : [worldSkillsStats]),
+          future: worldSkillsStats,
           builder: (context, snapshot) {
             switch (snapshot.connectionState) {
               case ConnectionState.none:
@@ -368,8 +361,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                   rankings: division.teamStats ?? {},
                   filter: filter,
                   skills: tournament.tournamentSkills!,
-                  worldSkills: snapshot.data?[0] as List<WorldSkillsStats>,
-                  vda: sortIndex == 9 ? (snapshot.data?[1] as List<VDAStats>) : null,
+                  worldSkills: snapshot.data as List<WorldSkillsStats>,
+                  vda: null,
                 );
             }
           },
@@ -470,7 +463,6 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
 
               worldSkillsStats =
                   getWorldSkillsRankings(tournament.seasonID, getGradeLevel(prefs.getString("defaultGrade")));
-              vdaStats = getTrueSkillData(tournament.seasonID);
 
               // Recompute game lists after refresh
               _processGames();
@@ -792,7 +784,6 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                               child: _RankingsChipListWithFade(
                                 labels: rankingSorts,
                                 selectedIndex: sortIndex,
-                                vdaStats: vdaStats,
                                 onSelected: (index) {
                                   setState(() {
                                     sortIndex = index;
@@ -1144,18 +1135,16 @@ class _ChipListWithFadeState extends State<_ChipListWithFade> {
   }
 }
 
-/// Rankings chip list with special handling for TrueSkill (index 9) loading state.
+/// Rankings chip list with edge fade behavior.
 class _RankingsChipListWithFade extends StatefulWidget {
   final List<String> labels;
   final int selectedIndex;
   final ValueChanged<int> onSelected;
-  final Future<List<VDAStats>> vdaStats;
 
   const _RankingsChipListWithFade({
     required this.labels,
     required this.selectedIndex,
     required this.onSelected,
-    required this.vdaStats,
   });
 
   @override
@@ -1182,45 +1171,6 @@ class _RankingsChipListWithFadeState extends State<_RankingsChipListWithFade> {
           ListView(
             scrollDirection: Axis.horizontal,
             children: List<Widget>.generate(widget.labels.length, (int index) {
-              // Index 9 (TrueSkill) has special loading state handling
-              if (index == 9) {
-                return FutureBuilder(
-                  future: widget.vdaStats,
-                  builder: (context, snapshot) {
-                    final isLoaded = snapshot.connectionState == ConnectionState.done;
-                    return Container(
-                      padding: const EdgeInsets.only(right: 5),
-                      child: ChoiceChip(
-                        padding: const EdgeInsets.symmetric(horizontal: 5),
-                        label: Text(
-                          widget.labels[index],
-                          style: TextStyle(
-                            color: isLoaded
-                                ? Theme.of(context).colorScheme.onSurface
-                                : Theme.of(context).colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        selected: widget.selectedIndex == index,
-                        shape: RoundedRectangleBorder(
-                          side: BorderSide(
-                            color: isLoaded
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.tertiary,
-                            width: 1.5,
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        selectedColor: Theme.of(context).colorScheme.primary,
-                        chipAnimationStyle: ChipAnimationStyle(
-                          enableAnimation: AnimationStyle(duration: Duration.zero),
-                          selectAnimation: AnimationStyle(duration: Duration.zero),
-                        ),
-                        onSelected: isLoaded ? (bool selected) => widget.onSelected(index) : null,
-                      ),
-                    );
-                  },
-                );
-              }
               return Container(
                 padding: const EdgeInsets.only(right: 5),
                 child: ChoiceChip(
