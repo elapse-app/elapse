@@ -1,6 +1,7 @@
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/screens/tournament/pages/main/loaded.dart';
+import 'package:elapse_app/screens/widgets/elapse_loading_indicator.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 
@@ -94,17 +95,10 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
                       ),
                     )),
                 SliverToBoxAdapter(
-                  child: Container(
-                    child: Column(
-                      children: const [
-                        SizedBox(
-                          height: 50,
-                        ),
-                        Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ],
-                    ),
+                  child: ElapseLoadingIndicator(
+                    message: "Loading tournament",
+                    size: LoadingSize.section,
+                    icon: Icons.emoji_events_outlined,
                   ),
                 ),
               ],

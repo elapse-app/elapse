@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:elapse_app/classes/Team/team.dart';
+import 'package:elapse_app/screens/widgets/elapse_loading_indicator.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/team_widget.dart';
 import 'package:flutter/material.dart';
@@ -97,7 +98,11 @@ class _AllTeamsState extends State<AllTeams> {
   Widget build(BuildContext context) {
     if (_isLoading) {
       return Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: ElapseLoadingIndicator(
+          message: "Loading team list",
+          size: LoadingSize.fullScreen,
+          icon: Icons.people_alt_outlined,
+        ),
       );
     }
 

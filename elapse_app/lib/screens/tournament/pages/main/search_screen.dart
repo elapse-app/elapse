@@ -5,6 +5,7 @@ import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
+import 'package:elapse_app/screens/widgets/elapse_loading_indicator.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 
@@ -61,7 +62,11 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     if (_isLoading || _tournament == null || _division == null) {
       return Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: ElapseLoadingIndicator(
+          message: "Searching",
+          size: LoadingSize.fullScreen,
+          icon: Icons.search,
+        ),
       );
     }
 

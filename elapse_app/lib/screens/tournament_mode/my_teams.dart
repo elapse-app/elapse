@@ -16,6 +16,7 @@ import 'package:elapse_app/screens/my_team/my_team.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:elapse_app/screens/tournament_mode/widgets/ranking_overview_widget.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
+import 'package:elapse_app/screens/widgets/elapse_loading_indicator.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
@@ -176,7 +177,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
     if (_isTournamentLoading) {
       return Container(
         margin: const EdgeInsets.only(top: 25),
-        child: const Center(child: CircularProgressIndicator()),
+        child: const ElapseLoadingIndicator(message: "Loading tournament data"),
       );
     }
 

@@ -8,6 +8,7 @@ import 'package:elapse_app/extras/twelve_hour.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
+import 'package:elapse_app/screens/widgets/elapse_loading_indicator.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -82,7 +83,11 @@ class _GameScreenState extends State<GameScreen> {
             ),
             const RoundedTop(),
             SliverFillRemaining(
-              child: Center(child: CircularProgressIndicator()),
+              child: ElapseLoadingIndicator(
+                message: "Loading match details",
+                size: LoadingSize.fullScreen,
+                icon: Icons.sports_esports_outlined,
+              ),
             ),
           ],
         ),

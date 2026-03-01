@@ -16,6 +16,7 @@ import 'package:elapse_app/screens/tournament/pages/schedule/qualification_match
 import 'package:elapse_app/screens/tournament/pages/skills/skills.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
+import 'package:elapse_app/screens/widgets/elapse_loading_indicator.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
@@ -348,7 +349,11 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
               case ConnectionState.none:
               case ConnectionState.waiting:
               case ConnectionState.active:
-                return const SliverToBoxAdapter(child: LinearProgressIndicator());
+                return const SliverToBoxAdapter(
+                  child: ElapseLoadingIndicator(
+                    message: "Loading rankings data",
+                  ),
+                );
               case ConnectionState.done:
                 if (snapshot.hasError) {
                   return const SliverToBoxAdapter(
@@ -395,7 +400,11 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
     if (_isLoading) {
       return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        body: const Center(child: CircularProgressIndicator()),
+        body: const ElapseLoadingIndicator(
+          message: "Loading tournament data",
+          size: LoadingSize.fullScreen,
+          icon: Icons.emoji_events_outlined,
+        ),
       );
     }
 

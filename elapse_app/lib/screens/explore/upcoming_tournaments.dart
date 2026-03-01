@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import '../../classes/Tournament/tournament_preview.dart';
 import '../tournament/tournament.dart';
 import '../widgets/big_error_message.dart';
+import '../widgets/elapse_loading_indicator.dart';
 import 'filters.dart';
 
 class UpcomingTournaments extends StatefulWidget {
@@ -34,10 +35,9 @@ class _UpcomingTournamentsState extends State<UpcomingTournaments> {
         future: upcomingTournaments,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SizedBox(
-                height: 100,
-                width: 100,
-                child: Center(child: CircularProgressIndicator()));
+            return const ElapseLoadingIndicator(
+              message: "Loading upcoming events",
+            );
           } else if (snapshot.hasData) {
             return _LoadedUpcomingTournaments(
                 tournaments: (snapshot.data as TournamentList).tournaments);

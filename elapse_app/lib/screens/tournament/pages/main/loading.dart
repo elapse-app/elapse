@@ -1,10 +1,10 @@
+import 'package:elapse_app/screens/widgets/elapse_loading_indicator.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 
 class TournamentLoadingScreen extends StatelessWidget {
   const TournamentLoadingScreen({super.key});
 
-  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -63,7 +63,7 @@ class TournamentLoadingScreen extends StatelessWidget {
                 ),
               )),
           const SliverToBoxAdapter(
-            child: LinearProgressIndicator(),
+            child: ElapseLoadingIndicator(message: "Loading tournament data"),
           )
         ],
       ),

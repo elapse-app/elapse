@@ -7,6 +7,7 @@ import '../../../classes/Team/world_skills.dart';
 import '../../../main.dart';
 import '../../team_screen/team_screen.dart';
 import '../../widgets/big_error_message.dart';
+import '../../widgets/elapse_loading_indicator.dart';
 
 class TopWorldSkills extends StatefulWidget {
   const TopWorldSkills({
@@ -33,10 +34,9 @@ class _TopWorldSkillsState extends State<TopWorldSkills> {
         future: rankings,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return const SizedBox(
-                height: 100,
-                width: 100,
-                child: Center(child: CircularProgressIndicator()));
+            return const ElapseLoadingIndicator(
+              message: "Loading world skills rankings",
+            );
           } else if (snapshot.hasData) {
             return _LoadedTopWorldSkills(
                 rankings: snapshot.data as List<WorldSkillsStats>);

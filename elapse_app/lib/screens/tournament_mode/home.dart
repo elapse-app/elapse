@@ -8,6 +8,7 @@ import 'package:elapse_app/screens/tournament/pages/main/search_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:elapse_app/screens/tournament_mode/widgets/next_game.dart';
 import 'package:elapse_app/screens/tournament_mode/widgets/ranking_overview_widget.dart';
+import 'package:elapse_app/screens/widgets/elapse_loading_indicator.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
@@ -193,10 +194,7 @@ class _TMHomePageState extends State<TMHomePage> {
   Widget _buildNextGameSection() {
     if (_isLoading) {
       return const SliverToBoxAdapter(
-        child: SizedBox(
-            height: 50,
-            width: 50,
-            child: Center(child: CircularProgressIndicator())),
+        child: ElapseLoadingIndicator(message: "Loading schedule"),
       );
     }
 
@@ -288,10 +286,7 @@ class _TMHomePageState extends State<TMHomePage> {
   Widget _buildUpcomingGamesSection() {
     if (_isLoading) {
       return const SliverToBoxAdapter(
-        child: SizedBox(
-            height: 50,
-            width: 50,
-            child: Center(child: CircularProgressIndicator())),
+        child: ElapseLoadingIndicator(message: "Loading upcoming matches"),
       );
     }
 
@@ -369,10 +364,7 @@ class _TMHomePageState extends State<TMHomePage> {
   Widget _buildRankingOverviewSection() {
     if (_isLoading) {
       return const SliverToBoxAdapter(
-        child: SizedBox(
-            height: 50,
-            width: 50,
-            child: Center(child: CircularProgressIndicator())),
+        child: ElapseLoadingIndicator(message: "Loading rankings"),
       );
     }
 
