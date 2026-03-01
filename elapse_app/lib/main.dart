@@ -177,8 +177,8 @@ class SetupGate extends StatefulWidget {
 class SetupGateState extends State<SetupGate> {
   int selectedIndex = 0;
   bool isTournamentMode = false;
-  late int teamID;
-  late String teamNumber;
+  int teamID = 0;
+  String teamNumber = "";
   bool _hasTeamInfo = false;
   final PageStorageBucket _bucket = PageStorageBucket();
   List<Widget> _screens = [];
