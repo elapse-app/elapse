@@ -235,13 +235,15 @@ class SetupGateState extends State<SetupGate> {
   void _loadTeamInfo() {
     if (_hasTeamInfo) return;
     final savedTeam = prefs.getString("savedTeam");
-    if (savedTeam == null) {
-      return;
+    if (savedTeam == null || savedTeam.isEmpty) return;
+    try {
+      final decoded = jsonDecode(savedTeam);
+      teamID = decoded["teamID"];
+      teamNumber = decoded["teamNumber"];
+      _hasTeamInfo = true;
+    } catch (_) {
+      // Corrupted prefs — silently ignore so the app can still start
     }
-    final decoded = jsonDecode(savedTeam);
-    teamID = decoded["teamID"];
-    teamNumber = decoded["teamNumber"];
-    _hasTeamInfo = true;
   }
 
   void initializeTournamentMode() {

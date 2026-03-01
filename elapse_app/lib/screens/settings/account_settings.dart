@@ -162,7 +162,15 @@ class _AccountSettingsState extends State<AccountSettings> {
                             onPressed: () async {
                               final user = FirebaseAuth.instance.currentUser;
                               if (user == null) return;
-                              await user.reload();
+                              try {
+                                await user.reload();
+                              } catch (e) {
+                                if (!mounted) return;
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Could not check verification status. Please check your connection.")),
+                                );
+                                return;
+                              }
                               if (!mounted) return;
                               if (user.emailVerified) {
                                 Database database = Database();
