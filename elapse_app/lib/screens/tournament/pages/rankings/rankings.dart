@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
-import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_filter.dart';
@@ -20,7 +19,8 @@ class RankingsPage extends StatelessWidget {
     super.key,
     required this.searchQuery,
     required this.sort,
-    required this.divisionIndex,
+    required this.teams,
+    required this.rankings,
     required this.filter,
     required this.skills,
     required this.worldSkills,
@@ -28,7 +28,8 @@ class RankingsPage extends StatelessWidget {
   });
 
   final String searchQuery;
-  final int divisionIndex;
+  final List<Team> teams;
+  final Map<int, TeamStats> rankings;
   final String sort;
   final TournamentRankingsFilter filter;
   final Map<int, TournamentSkills> skills;
@@ -37,44 +38,39 @@ class RankingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tournament = getLastLoadedTournament();
-    if (tournament == null) return const SizedBox.shrink();
-
-    List<Team> teams = tournament.teams;
+    List<Team> filteredTeams = List.from(teams);
     List<TeamPreview> savedTeams = [];
     if (filter.saved) {
       final String savedTeam = prefs.getString("savedTeam") ?? "";
-      TeamPreview savedTeamPreview =
-          TeamPreview(teamID: jsonDecode(savedTeam)["teamID"], teamNumber: jsonDecode(savedTeam)["teamNumber"]);
+      if (savedTeam.isNotEmpty) {
+        TeamPreview savedTeamPreview =
+            TeamPreview(teamID: jsonDecode(savedTeam)["teamID"], teamNumber: jsonDecode(savedTeam)["teamNumber"]);
+        savedTeams.add(savedTeamPreview);
+      }
       List<String> savedTeamsString = prefs.getStringList("savedTeams") ?? [];
-      savedTeams.add(savedTeamPreview);
       savedTeams.addAll(savedTeamsString
           .map((e) => TeamPreview(teamID: jsonDecode(e)["teamID"], teamNumber: jsonDecode(e)["teamNumber"]))
           .toList());
-      teams = tournament.teams.where((element) => savedTeams.any((element2) => element2.teamID == element.id)).toList();
-    } else {
-      teams = tournament.teams;
+      filteredTeams = teams.where((element) => savedTeams.any((element2) => element2.teamID == element.id)).toList();
     }
 
     List<TeamPreview> scoutedTeams = [];
     if (filter.scouted) {
-      teams = tournament.teams.where((e) => scoutedTeams.any((e2) => e2.teamID == e.id)).toList();
+      filteredTeams = teams.where((e) => scoutedTeams.any((e2) => e2.teamID == e.id)).toList();
     }
 
     List<TeamPreview> pickListTeams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
     if (filter.onPicklist) {
-      teams = tournament.teams.where((e) => pickListTeams.any((e2) => e2.teamID == e.id)).toList();
+      filteredTeams = teams.where((e) => pickListTeams.any((e2) => e2.teamID == e.id)).toList();
     }
 
-    Map<int, TeamStats>? rankings = tournament.divisions[divisionIndex].teamStats;
-
-    if (rankings == null || rankings.isEmpty) {
+    if (rankings.isEmpty) {
       return SliverToBoxAdapter(
         child: BigErrorMessage(icon: Icons.format_list_numbered_outlined, message: "Rankings not available"),
       );
     }
 
-    List<Team> divisionTeams = teams.where((e) => rankings[e.id] != null).toList();
+    List<Team> divisionTeams = filteredTeams.where((e) => rankings[e.id] != null).toList();
     if (sort == "Rank") {
       divisionTeams.sort((a, b) {
         return rankings[a.id]!.rank.compareTo(rankings[b.id]!.rank);
@@ -121,11 +117,9 @@ class RankingsPage extends StatelessWidget {
     } else if (sort == "TrueSkill") {
       if (vda != null) {
         divisionTeams.sort((a, b) {
-          return vda!
-                  .singleWhere((e) => e.id == b.id)
-                  .trueSkill
-                  ?.compareTo(vda!.singleWhere((e) => e.id == a.id).trueSkill ?? 0) ??
-              0;
+          final vdaB = vda!.singleWhereOrNull((e) => e.id == b.id);
+          final vdaA = vda!.singleWhereOrNull((e) => e.id == a.id);
+          return (vdaB?.trueSkill ?? 0).compareTo(vdaA?.trueSkill ?? 0);
         });
       } else {
         divisionTeams.sort((a, b) {
@@ -160,6 +154,7 @@ class RankingsPage extends StatelessWidget {
                 teamID: team.id,
                 teamNumber: team.teamNumber!,
                 teamName: team.teamName!,
+                stats: teamStats,
                 rank: index + 1,
                 sort: sort,
                 allianceColor: Theme.of(context).colorScheme.onSurface,

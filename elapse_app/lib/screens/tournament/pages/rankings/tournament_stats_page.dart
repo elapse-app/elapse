@@ -1,13 +1,17 @@
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
+import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:flutter/material.dart';
 
-Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNumber, String teamName) {
-  final tournament = getLastLoadedTournament();
-  if (tournament == null) return Future.value();
+Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNumber, String teamName) async {
+  final tournamentId = prefs.getInt("tournamentID");
+  if (tournamentId == null || tournamentId == 0) return;
+
+  final tournament = await getTournamentFromCache(tournamentId);
+  if (tournament == null) return;
 
   int divisionIndex = getTeamDivisionIndex(tournament.divisions, teamID);
 

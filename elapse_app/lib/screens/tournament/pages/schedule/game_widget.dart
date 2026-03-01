@@ -1,11 +1,7 @@
 import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
-import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
-import 'package:elapse_app/classes/Tournament/tournament.dart';
-import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
 import 'package:elapse_app/extras/twelve_hour.dart';
-import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -18,8 +14,8 @@ class GameWidget extends StatelessWidget {
     this.isAllianceColoured,
     this.useLiveTiming,
   });
-  final Game game;
 
+  final Game game;
   final String? teamName;
   final bool? isAllianceColoured;
   final bool? useLiveTiming;
@@ -66,24 +62,25 @@ class GameWidget extends StatelessWidget {
     if (isAllianceColoured == false) {
       gameColor = Theme.of(context).colorScheme.onSurface;
     } else {
-      if (game.redAlliancePreview!.any((element) => element.teamNumber == teamName)) {
+      if (game.redAlliancePreview?.any((element) => element.teamNumber == teamName) ?? false) {
         gameColor = colorPallete.redAllianceText;
-      } else if (game.blueAlliancePreview!.any((element) => element.teamNumber == teamName)) {
+      } else if (game.blueAlliancePreview?.any((element) => element.teamNumber == teamName) ?? false) {
         gameColor = colorPallete.blueAllianceText;
       }
     }
 
-    if (winningAlliance == "red" && game.redAlliancePreview!.any((element) => element.teamNumber == teamName)) {
+    if (winningAlliance == "red" && (game.redAlliancePreview?.any((element) => element.teamNumber == teamName) ?? false)) {
       gameColor = colorPallete.greenText;
     } else if (winningAlliance == "blue" &&
-        game.blueAlliancePreview!.any((element) => element.teamNumber == teamName)) {
+        (game.blueAlliancePreview?.any((element) => element.teamNumber == teamName) ?? false)) {
       gameColor = colorPallete.greenText;
     } else if (winningAlliance != "none" && teamName != null) {
       gameColor = colorPallete.redAllianceText;
     }
 
     Widget gameText;
-    if (game.gameName.substring(0, 1) == "R") {
+    final gameName = game.gameName;
+    if (gameName.startsWith("R") && gameName.length >= 4) {
       gameText = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
         Text("R",
             style: TextStyle(
@@ -100,7 +97,7 @@ class GameWidget extends StatelessWidget {
               fontWeight: FontWeight.w400,
               color: gameColor,
             )),
-        Text(game.gameName.substring(3, 4),
+        Text(gameName.substring(3, 4),
             style: TextStyle(
               color: gameColor,
               fontSize: 40,
@@ -109,7 +106,7 @@ class GameWidget extends StatelessWidget {
             ))
       ]);
     } else {
-      gameText = Text(game.gameName,
+      gameText = Text(gameName,
           style: TextStyle(
             letterSpacing: -1.75,
             fontSize: 40,
@@ -130,7 +127,10 @@ class GameWidget extends StatelessWidget {
           context,
           MaterialPageRoute(
             builder: (context) => GameScreen(
-              game: game,
+              divisionId: game.divisionId,
+              roundNum: game.roundNum,
+              gameNum: game.gameNum,
+              instance: game.instance,
             ),
           ),
         );
@@ -220,7 +220,7 @@ class GameWidget extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: game.redAlliancePreview!.map(
+                      children: (game.redAlliancePreview ?? []).map(
                         (e) {
                           return Text(
                             e.teamNumber,
@@ -240,7 +240,7 @@ class GameWidget extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.end,
-                      children: game.blueAlliancePreview!.map(
+                      children: (game.blueAlliancePreview ?? []).map(
                         (e) {
                           return Text(
                             e.teamNumber,

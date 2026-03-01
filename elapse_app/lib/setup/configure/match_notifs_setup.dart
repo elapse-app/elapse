@@ -140,8 +140,10 @@ class _NotifsSetupState extends State<NotifsSetup> {
                                   useForwardArrow: false,
                                   onPressed: () {
                                     askForNotifPerms();
-                                    subToTeamPushNotifs(
-                                        getSavedTeams()[0].teamNumber);
+                                    final teams = getSavedTeams();
+                                    if (teams.isNotEmpty) {
+                                      subToTeamPushNotifs(teams[0].teamNumber);
+                                    }
                                     setState(() {
                                       useMatchNotifs = true;
                                     });

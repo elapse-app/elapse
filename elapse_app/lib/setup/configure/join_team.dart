@@ -216,14 +216,17 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                               currentUser.teamNumber = selectedTeam!.teamNumber;
                               prefs.setString("currentUser", jsonEncode(currentUser.toJson()));
                               Database database = Database();
-                              await database.createUser(currentUser, selectedTeam!).then((value) {
+                              try {
+                                await database.createUser(currentUser, selectedTeam!);
+                                if (!mounted) return;
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) => ThemeSetup(),
                                   ),
                                 );
-                              }).catchError((onError) {
+                              } catch (e) {
+                                if (!mounted) return;
                                 showDialog(
                                     barrierDismissible: false,
                                     context: context,
@@ -243,7 +246,7 @@ class _JoinTeamPageState extends State<JoinTeamPage> {
                                         ],
                                       );
                                     });
-                              });
+                              }
                             }
                           },
                           text: buttonLabel,

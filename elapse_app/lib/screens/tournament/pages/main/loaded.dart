@@ -5,7 +5,9 @@ import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
+import 'package:elapse_app/classes/Tournament/league_session.dart';
 import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
+import 'package:intl/intl.dart';
 import 'package:elapse_app/screens/tournament/pages/info/info.dart';
 import 'package:elapse_app/screens/tournament/pages/main/search_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings.dart';
@@ -22,15 +24,14 @@ import 'package:flutter_sticky_header/flutter_sticky_header.dart';
 
 import '../../../../classes/Filters/gradeLevel.dart';
 import '../../../../classes/Filters/season.dart';
-import '../../../../classes/Team/vdaStats.dart';
 import '../../../../classes/Team/world_skills.dart';
 
 class TournamentLoadedScreen extends StatefulWidget {
-  final Tournament tournament;
+  final int tournamentId;
   final bool isPreview;
   const TournamentLoadedScreen({
     super.key,
-    required this.tournament,
+    required this.tournamentId,
     this.isPreview = false,
   });
 
@@ -38,16 +39,14 @@ class TournamentLoadedScreen extends StatefulWidget {
   State<TournamentLoadedScreen> createState() => _TournamentLoadedScreenState();
 }
 
-class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with TickerProviderStateMixin {
+class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   late Tournament tournament; // mutable tournament so refreshes propagate across the screen
   late int selectedIndex;
   int sortIndex = 0;
   List<String> titles = ["Schedule", "Rankings", "Skills", "Info"];
-  List<String> rankingSorts = ["Rank", "AP", "SP", "AWP", "OPR", "DPR", "CCWM", "Skills", "World Skills", "TrueSkill"];
+  List<String> rankingSorts = ["Rank", "AP", "SP", "AWP", "OPR", "DPR", "CCWM", "Skills", "World Skills"];
   List<String> skillsSorts = ["Rank", "Driver", "Auton", "Driver Attempts", "Auton Attempts"];
   TournamentRankingsFilter filter = TournamentRankingsFilter();
-
-  double _fadeStart = 0, _fadeEnd = 1;
 
   bool showPractice = true;
   bool showQualification = true;
@@ -69,10 +68,11 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
   List<Game> qualifications = [];
   List<Game> eliminations = [];
 
+  LeagueSession? _selectedSession; // null = show all sessions (for leagues)
+
   List<Widget> widgets = [SliverToBoxAdapter(), SliverToBoxAdapter()];
 
   late Future<List<WorldSkillsStats>> worldSkillsStats;
-  late Future<List<VDAStats>> vdaStats;
 
   void savedPress() {
     setState(() {
@@ -94,25 +94,213 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
     });
   }
 
+  bool _isLoading = false;
+  String? _loadError;
+
   @override
   void initState() {
     super.initState();
-    tournament = widget.tournament;
+    // Initialize scroll controller early to prevent LateInitializationError in dispose()
+    // if user navigates away during async loading
+    _scrollController = ScrollController();
+    _initializeTournament();
+  }
+
+  /// Initialize tournament data from SQLite cache or API
+  Future<void> _initializeTournament({bool forceRefresh = false}) async {
+    if (forceRefresh) {
+      setState(() {
+        _isLoading = true;
+        _loadError = null;
+      });
+    } else {
+      _isLoading = true;
+    }
+
+    try {
+      // First try SQLite cache for fast loading
+      if (!forceRefresh) {
+        final cachedTournament = await getTournamentFromCache(widget.tournamentId);
+        if (cachedTournament != null && mounted) {
+          setState(() {
+            _isLoading = false;
+            _setupWithTournament(cachedTournament);
+          });
+          return;
+        }
+      }
+
+      // Fall back to API fetch
+      final t = await TMTournamentDetails(widget.tournamentId, forceRefresh: forceRefresh);
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _setupWithTournament(t);
+        });
+      }
+    } catch (error, stackTrace) {
+      // Log error for debugging
+      debugPrint('TournamentLoadedScreen: Failed to load tournament: $error');
+      debugPrintStack(stackTrace: stackTrace);
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+          _loadError = 'Failed to load tournament';
+        });
+      }
+    }
+  }
+
+  /// Set up all state from the tournament object
+  void _setupWithTournament(Tournament t) {
+    tournament = t;
     rankingsTeams = tournament.teams;
-    division = tournament.divisions[0];
+
+    // Safely access first division with bounds check
+    if (tournament.divisions.isNotEmpty) {
+      division = tournament.divisions[0];
+    } else {
+      // This shouldn't happen in practice, but handle gracefully
+      division = Division(id: 0, name: 'Unknown', order: 1);
+    }
+
     inSearch = false;
     searchQuery = "";
     savedQuery = "";
-    _scrollController = ScrollController();
 
     worldSkillsStats = getWorldSkillsRankings(tournament.seasonID, getGradeLevel(prefs.getString("defaultGrade")));
-    vdaStats = getTrueSkillData(tournament.seasonID);
 
-    if (tournament.divisions[0].games == null || tournament.divisions[0].games!.isEmpty) {
-      selectedIndex = 3;
+    // Process games once on init, not every build
+    _processGames();
+
+    // Determine initial tab based on whether games exist
+    if (division.games == null || division.games!.isEmpty) {
+      selectedIndex = 3; // Info tab
     } else {
-      selectedIndex = 0;
+      selectedIndex = 0; // Schedule tab
     }
+  }
+
+  /// Process game lists once when data loads or division changes, not on every build
+  void _processGames() {
+    if (division.games != null && division.games!.isNotEmpty) {
+      adjustMatchTiming(division.games!);
+
+      // Filter games by selected session (for leagues)
+      List<Game> filteredGames = _filterGamesBySession(division.games!);
+
+      practice = filteredGames.where((game) => game.roundNum == 1).toList();
+      qualifications = filteredGames.where((game) => game.roundNum == 2).toList();
+      eliminations = filteredGames.where((game) => game.roundNum > 2).toList();
+
+      // For leagues showing all sessions, sort by scheduled time first to group by session date
+      if (tournament.isLeague && _selectedSession == null) {
+        _sortGamesByScheduledTime(practice);
+        _sortGamesByScheduledTime(qualifications);
+        _sortGamesByScheduledTime(eliminations);
+      }
+    } else {
+      practice = [];
+      qualifications = [];
+      eliminations = [];
+    }
+  }
+
+  /// Sort games by scheduled time first, then by game number
+  /// This ensures games from the same session/date stay grouped together
+  void _sortGamesByScheduledTime(List<Game> games) {
+    games.sort((a, b) {
+      // First sort by scheduled date (null dates go to the end)
+      if (a.scheduledTime != null && b.scheduledTime != null) {
+        final dateCompare = a.scheduledTime!.compareTo(b.scheduledTime!);
+        if (dateCompare != 0) return dateCompare;
+      } else if (a.scheduledTime != null) {
+        return -1; // a has date, b doesn't - a comes first
+      } else if (b.scheduledTime != null) {
+        return 1; // b has date, a doesn't - b comes first
+      }
+      // Then sort by game number within the same date
+      return a.gameNum.compareTo(b.gameNum);
+    });
+  }
+
+  /// Filter games by selected session date (for leagues)
+  List<Game> _filterGamesBySession(List<Game> games) {
+    // If no session selected, not a league, or single-session league, show all games
+    if (_selectedSession == null ||
+        !tournament.isLeague ||
+        tournament.sessions == null ||
+        tournament.sessions!.length <= 1) {
+      return games;
+    }
+
+    return games.where((game) {
+      // Check scheduledTime first, then startedTime as fallback
+      final gameDate = game.scheduledTime ?? game.startedTime;
+      if (gameDate != null) {
+        // Convert to local time for comparison since session dates are local
+        return _isSameDay(gameDate.toLocal(), _selectedSession!.date);
+      }
+      // Include unscheduled games in session view as well
+      // (they may be matches pending scheduling for this session)
+      return true;
+    }).toList();
+  }
+
+  /// Check if two dates are the same day (both should be in local time)
+  bool _isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  /// Builds the session dropdown for leagues (returns empty widget for tournaments)
+  Widget _buildSessionDropdown() {
+    // Only show for leagues with multiple sessions
+    // Single-session leagues display like standard tournaments (no dropdown)
+    if (!tournament.isLeague || tournament.sessions == null || tournament.sessions!.length <= 1) {
+      return const SizedBox.shrink();
+    }
+
+    return DropdownButton<LeagueSession?>(
+      value: _selectedSession,
+      borderRadius: BorderRadius.circular(20),
+      hint: Row(
+        children: [
+          const Icon(Icons.calendar_today, size: 24),
+          const SizedBox(width: 10),
+          Text("All"),
+        ],
+      ),
+      items: [
+        DropdownMenuItem<LeagueSession?>(
+          value: null,
+          child: Row(
+            children: [
+              const Icon(Icons.calendar_today, size: 24),
+              const SizedBox(width: 10),
+              Text("All"),
+            ],
+          ),
+        ),
+        ...tournament.sessions!.map<DropdownMenuItem<LeagueSession?>>((session) {
+          return DropdownMenuItem(
+            value: session,
+            child: Row(
+              children: [
+                const Icon(Icons.event, size: 24),
+                const SizedBox(width: 10),
+                Text(DateFormat('MMM d').format(session.date)),
+              ],
+            ),
+          );
+        }),
+      ],
+      onChanged: (LeagueSession? value) {
+        setState(() {
+          _selectedSession = value;
+          _processGames();
+        });
+      },
+    );
   }
 
   @override
@@ -122,84 +310,152 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
     super.dispose();
   }
 
+  /// Lazily builds only the currently selected page - avoids instantiating all 4 pages every build
+  Widget _buildCurrentPage() {
+    switch (selectedIndex) {
+      case 0:
+        // Schedule content is handled separately via SliverStickyHeader widgets
+        return const SliverToBoxAdapter();
+      case 1:
+        // Handle null skills data
+        if (tournament.tournamentSkills == null) {
+          return const SliverToBoxAdapter(
+              child: BigErrorMessage(icon: Icons.list_outlined, message: "Rankings not available"));
+        }
+        // Rankings page with caching check
+        final gradeLevel = getGradeLevel(prefs.getString("defaultGrade"));
+        final seasonId =
+            gradeLevel == gradeLevels["College"] ? (seasons[0].vexUId ?? seasons[0].vrcId) : seasons[0].vrcId;
+        final worldSkillsData = prefs.getString("worldSkillsData");
+
+        if (hasCachedWorldSkillsRankings(seasonId, gradeLevel) && worldSkillsData != null) {
+          return RankingsPage(
+            searchQuery: searchQuery,
+            sort: rankingSorts[sortIndex],
+            teams: tournament.teams,
+            rankings: division.teamStats ?? {},
+            filter: filter,
+            skills: tournament.tournamentSkills!,
+            worldSkills:
+                jsonDecode(worldSkillsData).map<WorldSkillsStats>((e) => WorldSkillsStats.fromJson(e)).toList(),
+            vda: null,
+          );
+        }
+        return FutureBuilder(
+          future: worldSkillsStats,
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+              case ConnectionState.waiting:
+              case ConnectionState.active:
+                return const SliverToBoxAdapter(child: LinearProgressIndicator());
+              case ConnectionState.done:
+                if (snapshot.hasError) {
+                  return const SliverToBoxAdapter(
+                      child: BigErrorMessage(icon: Icons.list_outlined, message: "Unable to load rankings"));
+                }
+                return RankingsPage(
+                  searchQuery: searchQuery,
+                  sort: rankingSorts[sortIndex],
+                  teams: tournament.teams,
+                  rankings: division.teamStats ?? {},
+                  filter: filter,
+                  skills: tournament.tournamentSkills!,
+                  worldSkills: snapshot.data as List<WorldSkillsStats>,
+                  vda: null,
+                );
+            }
+          },
+        );
+      case 2:
+        // Handle null skills data
+        if (tournament.tournamentSkills == null) {
+          return const SliverToBoxAdapter(
+              child: BigErrorMessage(icon: Icons.sports_esports_outlined, message: "Skills not available"));
+        }
+        return SkillsPage(
+          skills: tournament.tournamentSkills!,
+          teams: tournament.teams,
+          divisions: tournament.divisions,
+          sort: sortIndex,
+          filter: filter,
+        );
+      case 3:
+        return InfoPage(
+          tournamentId: tournament.id,
+        );
+      default:
+        return const SliverToBoxAdapter();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (division.games != null && division.games!.isNotEmpty) {
-      adjustMatchTiming(division.games!);
-      practice = division.games!.where((game) => game.roundNum == 1).toList();
-      qualifications = division.games!.where((game) => game.roundNum == 2).toList();
-      eliminations = division.games!.where((game) => game.roundNum > 2).toList();
+    // Handle loading state (async fallback when cache was empty)
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: const Center(child: CircularProgressIndicator()),
+      );
     }
 
-    List<Widget> pages = [
-      SliverToBoxAdapter(),
-      hasCachedWorldSkillsRankings(
-                  getGradeLevel(prefs.getString("defaultGrade")) == gradeLevels["College"]
-                      ? seasons[0].vexUId!
-                      : seasons[0].vrcId,
-                  getGradeLevel(prefs.getString("defaultGrade"))) &&
-              hasCachedTrueSkillData()
-          ? RankingsPage(
-              searchQuery: searchQuery,
-              sort: rankingSorts[sortIndex],
-              divisionIndex: division.order - 1,
-              filter: filter,
-              skills: tournament.tournamentSkills!,
-              worldSkills: jsonDecode(prefs.getString("worldSkillsData")!)
-                  .map<WorldSkillsStats>((e) => WorldSkillsStats.fromJson(e))
-                  .toList(),
-              vda: jsonDecode(prefs.getString("vdaData")!).map<VDAStats>((json) => VDAStats.fromJson(json)).toList(),
-            )
-          : FutureBuilder(
-              future: Future.wait(sortIndex == 9 ? [worldSkillsStats, vdaStats] : [worldSkillsStats]),
-              builder: (context, snapshot) {
-                switch (snapshot.connectionState) {
-                  case ConnectionState.none:
-                  case ConnectionState.waiting:
-                  case ConnectionState.active:
-                    return const SliverToBoxAdapter(child: LinearProgressIndicator());
-                  case ConnectionState.done:
-                    if (snapshot.hasError) {
-                      return const SliverToBoxAdapter(
-                          child: BigErrorMessage(icon: Icons.list_outlined, message: "Unable to load rankings"));
-                    }
+    // Handle error state
+    if (_loadError != null) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.error),
+              const SizedBox(height: 16),
+              Text(_loadError!, style: TextStyle(color: Theme.of(context).colorScheme.error)),
+            ],
+          ),
+        ),
+      );
+    }
 
-                    return RankingsPage(
-                      searchQuery: searchQuery,
-                      sort: rankingSorts[sortIndex],
-                      divisionIndex: division.order - 1,
-                      filter: filter,
-                      skills: tournament.tournamentSkills!,
-                      worldSkills: snapshot.data?[0] as List<WorldSkillsStats>,
-                      vda: sortIndex == 9 ? (snapshot.data?[1] as List<VDAStats>) : null,
-                    );
-                }
-              }),
-      SkillsPage(
-        skills: tournament.tournamentSkills!,
-        teams: tournament.teams,
-        divisions: tournament.divisions,
-        sort: sortIndex,
-        filter: filter,
-      ),
-      InfoPage(
-        // InfoPage is a StatelessWidget
-        tournament: tournament,
-        awards: tournament.awards,
-      ),
-    ];
+    // Game lists are now computed once in _processGames() called from initState
+    // and when division changes, not on every build
 
     return Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: RefreshIndicator(
           onRefresh: () async {
-            // Use TMTournamentDetails with forceRefresh checks to ensure correct caching behavior
-            // This fetches from API, saves to SQLite, and updates the in-memory CacheManager
-            final updatedTournament = await TMTournamentDetails(tournament.id, forceRefresh: true);
+            // Use TMTournamentDetails with forceRefresh to fetch fresh data from API
+            // This fetches from API and saves to SQLite via CacheManager
+            // Note: RefreshIndicator shows its own spinner, but we could optionally set _isLoading here
+            final updatedTournament = await TMTournamentDetails(widget.tournamentId, forceRefresh: true);
+
+            // Preserve the user's current division and session selection
+            final currentDivisionId = division.id;
+            final currentSessionDate = _selectedSession?.date;
 
             setState(() {
               tournament = updatedTournament;
-              division = tournament.divisions.isNotEmpty ? tournament.divisions[0] : division;
+
+              // Find the same division in the updated tournament, or fall back to first division
+              if (tournament.divisions.isNotEmpty) {
+                division = tournament.divisions.firstWhere(
+                  (d) => d.id == currentDivisionId,
+                  orElse: () => tournament.divisions[0],
+                );
+              }
+
+              // Preserve session selection for leagues with multiple sessions
+              if (currentSessionDate != null &&
+                  tournament.isLeague &&
+                  tournament.sessions != null &&
+                  tournament.sessions!.length > 1) {
+                _selectedSession = tournament.sessions!.firstWhere(
+                  (s) => _isSameDay(s.date, currentSessionDate),
+                  orElse: () => tournament.sessions!.first,
+                );
+              } else {
+                _selectedSession = null;
+              }
+
               rankingsTeams = tournament.teams;
               inSearch = false;
               searchQuery = "";
@@ -207,7 +463,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
 
               worldSkillsStats =
                   getWorldSkillsRankings(tournament.seasonID, getGradeLevel(prefs.getString("defaultGrade")));
-              vdaStats = getTrueSkillData(tournament.seasonID);
+
+              // Recompute game lists after refresh
+              _processGames();
             });
           },
           child: CustomScrollView(
@@ -233,8 +491,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                             transitionDuration: Duration(milliseconds: 300),
                             reverseTransitionDuration: Duration(milliseconds: 300),
                             pageBuilder: (context, animation, secondaryAnimation) => SearchScreen(
-                              tournament: tournament,
-                              division: division,
+                              tournamentId: tournament.id,
+                              divisionId: division.id,
                             ),
                             transitionsBuilder: (context, animation, secondaryAnimation, child) {
                               // Create a Tween that transitions the new screen from fully transparent to fully opaque
@@ -269,7 +527,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                                     child: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
                                   ),
                                   Spacer(),
-                                  tournament.divisions.isNotEmpty
+                                  _buildSessionDropdown(),
+                                  tournament.divisions.length > 1
                                       ? DropdownButton<Division>(
                                           value: division,
                                           borderRadius: BorderRadius.circular(20),
@@ -287,11 +546,13 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                                                   ],
                                                 ));
                                           }).toList(),
-                                          onChanged: (Division? value) => {
-                                            setState(() {
-                                              division = value!;
-                                              selectedIndex = selectedIndex;
-                                            })
+                                          onChanged: (Division? value) {
+                                            if (value != null && value != division) {
+                                              setState(() {
+                                                division = value;
+                                                _processGames();
+                                              });
+                                            }
                                           },
                                         )
                                       : const SizedBox.shrink(),
@@ -317,13 +578,16 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                                             ],
                                           ));
                                     }).toList(),
-                                    onChanged: (Division? value) => {
-                                      setState(() {
-                                        division = value!;
-                                        selectedIndex = selectedIndex;
-                                      })
+                                    onChanged: (Division? value) {
+                                      if (value != null && value != division) {
+                                        setState(() {
+                                          division = value;
+                                          _processGames();
+                                        });
+                                      }
                                     },
                                   ),
+                                  _buildSessionDropdown(),
                                   Spacer(),
                                   SettingsButton()
                                 ],
@@ -517,106 +781,14 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                           children: [
                             Flexible(
                               flex: 6,
-                              child: NotificationListener<ScrollNotification>(
-                                onNotification: (scrollNotification) {
+                              child: _RankingsChipListWithFade(
+                                labels: rankingSorts,
+                                selectedIndex: sortIndex,
+                                onSelected: (index) {
                                   setState(() {
-                                    _fadeStart = scrollNotification.metrics.pixels / 10;
-                                    _fadeEnd = (scrollNotification.metrics.maxScrollExtent -
-                                            scrollNotification.metrics.pixels) /
-                                        10;
-
-                                    _fadeStart = _fadeStart.clamp(0.0, 1.0);
-                                    _fadeEnd = _fadeEnd.clamp(0.0, 1.0);
+                                    sortIndex = index;
                                   });
-                                  return true;
                                 },
-                                child: Stack(
-                                  children: [
-                                    ListView(
-                                      scrollDirection: Axis.horizontal,
-                                      children: List<Widget>.generate(rankingSorts.length, (int index) {
-                                        if (index == 9) {
-                                          return FutureBuilder(
-                                              future: vdaStats,
-                                              builder: (context, snapshot) {
-                                                return Container(
-                                                  padding: const EdgeInsets.only(right: 5),
-                                                  child: ChoiceChip(
-                                                    padding: const EdgeInsets.symmetric(horizontal: 5),
-                                                    label: Text(rankingSorts[index],
-                                                        style: TextStyle(
-                                                          color: snapshot.connectionState == ConnectionState.done
-                                                              ? Theme.of(context).colorScheme.onSurface
-                                                              : Theme.of(context).colorScheme.onSurfaceVariant,
-                                                        )),
-                                                    selected: sortIndex == index,
-                                                    shape: RoundedRectangleBorder(
-                                                        side: BorderSide(
-                                                            color: snapshot.connectionState == ConnectionState.done
-                                                                ? Theme.of(context).colorScheme.primary
-                                                                : Theme.of(context).colorScheme.tertiary,
-                                                            width: 1.5),
-                                                        borderRadius: BorderRadius.circular(10)),
-                                                    selectedColor: Theme.of(context).colorScheme.primary,
-                                                    chipAnimationStyle: ChipAnimationStyle(
-                                                        enableAnimation: AnimationStyle(duration: Duration.zero),
-                                                        selectAnimation: AnimationStyle(duration: Duration.zero)),
-                                                    onSelected: snapshot.connectionState == ConnectionState.done
-                                                        ? (bool selected) {
-                                                            setState(() {
-                                                              sortIndex = index;
-                                                            });
-                                                          }
-                                                        : null,
-                                                  ),
-                                                );
-                                              });
-                                        }
-                                        return Container(
-                                          padding: const EdgeInsets.only(right: 5),
-                                          child: ChoiceChip(
-                                            padding: const EdgeInsets.symmetric(horizontal: 5),
-                                            label: Text(rankingSorts[index],
-                                                style: TextStyle(
-                                                  color: Theme.of(context).colorScheme.onSurface,
-                                                )),
-                                            selected: sortIndex == index,
-                                            shape: RoundedRectangleBorder(
-                                                side: BorderSide(
-                                                    color: Theme.of(context).colorScheme.primary, width: 1.5),
-                                                borderRadius: BorderRadius.circular(10)),
-                                            selectedColor: Theme.of(context).colorScheme.primary,
-                                            disabledColor: Theme.of(context).colorScheme.onSurfaceVariant,
-                                            chipAnimationStyle: ChipAnimationStyle(
-                                                enableAnimation: AnimationStyle(duration: Duration.zero),
-                                                selectAnimation: AnimationStyle(duration: Duration.zero)),
-                                            onSelected: (bool selected) {
-                                              setState(() {
-                                                sortIndex = index;
-                                              });
-                                            },
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ),
-                                    IgnorePointer(
-                                      ignoring: true,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              Theme.of(context).colorScheme.surface,
-                                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
-                                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
-                                              Theme.of(context).colorScheme.surface,
-                                            ],
-                                            stops: [0.0, 0.05 * _fadeStart, 1 - 0.05 * _fadeEnd, 1.0],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
                               ),
                             ),
                             Flexible(
@@ -651,69 +823,14 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                           children: [
                             Flexible(
                               flex: 6,
-                              child: NotificationListener<ScrollNotification>(
-                                onNotification: (scrollNotification) {
+                              child: _ChipListWithFade(
+                                labels: skillsSorts,
+                                selectedIndex: sortIndex,
+                                onSelected: (index) {
                                   setState(() {
-                                    _fadeStart = scrollNotification.metrics.pixels / 10;
-                                    _fadeEnd = (scrollNotification.metrics.maxScrollExtent -
-                                            scrollNotification.metrics.pixels) /
-                                        10;
-
-                                    _fadeStart = _fadeStart.clamp(0.0, 1.0);
-                                    _fadeEnd = _fadeEnd.clamp(0.0, 1.0);
+                                    sortIndex = index;
                                   });
-                                  return true;
                                 },
-                                child: Stack(
-                                  children: [
-                                    ListView(
-                                      scrollDirection: Axis.horizontal,
-                                      children: List<Widget>.generate(skillsSorts.length, (int index) {
-                                        return Container(
-                                          padding: const EdgeInsets.only(right: 5),
-                                          child: ChoiceChip(
-                                            padding: const EdgeInsets.symmetric(horizontal: 5),
-                                            label: Text(skillsSorts[index],
-                                                style: TextStyle(
-                                                  color: Theme.of(context).colorScheme.onSurface,
-                                                )),
-                                            selected: sortIndex == index,
-                                            shape: RoundedRectangleBorder(
-                                                side: BorderSide(
-                                                    color: Theme.of(context).colorScheme.primary, width: 1.5),
-                                                borderRadius: BorderRadius.circular(10)),
-                                            selectedColor: Theme.of(context).colorScheme.primary,
-                                            disabledColor: Theme.of(context).colorScheme.onSurfaceVariant,
-                                            chipAnimationStyle: ChipAnimationStyle(
-                                                enableAnimation: AnimationStyle(duration: Duration.zero),
-                                                selectAnimation: AnimationStyle(duration: Duration.zero)),
-                                            onSelected: (bool selected) {
-                                              setState(() {
-                                                sortIndex = index;
-                                              });
-                                            },
-                                          ),
-                                        );
-                                      }).toList(),
-                                    ),
-                                    IgnorePointer(
-                                      ignoring: true,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              Theme.of(context).colorScheme.surface,
-                                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
-                                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
-                                              Theme.of(context).colorScheme.surface,
-                                            ],
-                                            stops: [0, 0.05 * _fadeStart, 1 - 0.05 * _fadeEnd, 1.0],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
                               ),
                             ),
                             Flexible(
@@ -861,7 +978,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                     )
                   : SliverToBoxAdapter(),
 
-              pages[selectedIndex],
+              _buildCurrentPage(),
               const SliverToBoxAdapter(
                 child: SizedBox(
                   height: 50,
@@ -917,8 +1034,6 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
             setState(() {
               selectedIndex = index;
               sortIndex = 0;
-              _fadeStart = 0;
-              _fadeEnd = 1;
               _scrollController.animateTo(
                 0.0,
                 duration: const Duration(milliseconds: 500),
@@ -928,6 +1043,181 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
           },
         ),
       ],
+    );
+  }
+}
+
+/// A horizontal scrolling chip list with fade gradient on edges.
+/// Manages its own fade state so scroll updates don't rebuild parent.
+class _ChipListWithFade extends StatefulWidget {
+  final List<String> labels;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  const _ChipListWithFade({
+    required this.labels,
+    required this.selectedIndex,
+    required this.onSelected,
+  });
+
+  @override
+  State<_ChipListWithFade> createState() => _ChipListWithFadeState();
+}
+
+class _ChipListWithFadeState extends State<_ChipListWithFade> {
+  double _fadeStart = 0;
+  double _fadeEnd = 1;
+
+  @override
+  Widget build(BuildContext context) {
+    return NotificationListener<ScrollNotification>(
+      onNotification: (scrollNotification) {
+        setState(() {
+          _fadeStart = (scrollNotification.metrics.pixels / 10).clamp(0.0, 1.0);
+          _fadeEnd =
+              ((scrollNotification.metrics.maxScrollExtent - scrollNotification.metrics.pixels) / 10).clamp(0.0, 1.0);
+        });
+        return true;
+      },
+      child: Stack(
+        children: [
+          ListView(
+            scrollDirection: Axis.horizontal,
+            children: List<Widget>.generate(widget.labels.length, (int index) {
+              return Container(
+                padding: const EdgeInsets.only(right: 5),
+                child: ChoiceChip(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  label: Text(
+                    widget.labels[index],
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  selected: widget.selectedIndex == index,
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  selectedColor: Theme.of(context).colorScheme.primary,
+                  disabledColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                  chipAnimationStyle: ChipAnimationStyle(
+                    enableAnimation: AnimationStyle(duration: Duration.zero),
+                    selectAnimation: AnimationStyle(duration: Duration.zero),
+                  ),
+                  onSelected: (bool selected) => widget.onSelected(index),
+                ),
+              );
+            }).toList(),
+          ),
+          IgnorePointer(
+            ignoring: true,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.surface,
+                    Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                    Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                    Theme.of(context).colorScheme.surface,
+                  ],
+                  stops: [0.0, 0.05 * _fadeStart, 1 - 0.05 * _fadeEnd, 1.0],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Rankings chip list with edge fade behavior.
+class _RankingsChipListWithFade extends StatefulWidget {
+  final List<String> labels;
+  final int selectedIndex;
+  final ValueChanged<int> onSelected;
+
+  const _RankingsChipListWithFade({
+    required this.labels,
+    required this.selectedIndex,
+    required this.onSelected,
+  });
+
+  @override
+  State<_RankingsChipListWithFade> createState() => _RankingsChipListWithFadeState();
+}
+
+class _RankingsChipListWithFadeState extends State<_RankingsChipListWithFade> {
+  double _fadeStart = 0;
+  double _fadeEnd = 1;
+
+  @override
+  Widget build(BuildContext context) {
+    return NotificationListener<ScrollNotification>(
+      onNotification: (scrollNotification) {
+        setState(() {
+          _fadeStart = (scrollNotification.metrics.pixels / 10).clamp(0.0, 1.0);
+          _fadeEnd =
+              ((scrollNotification.metrics.maxScrollExtent - scrollNotification.metrics.pixels) / 10).clamp(0.0, 1.0);
+        });
+        return true;
+      },
+      child: Stack(
+        children: [
+          ListView(
+            scrollDirection: Axis.horizontal,
+            children: List<Widget>.generate(widget.labels.length, (int index) {
+              return Container(
+                padding: const EdgeInsets.only(right: 5),
+                child: ChoiceChip(
+                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                  label: Text(
+                    widget.labels[index],
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                  selected: widget.selectedIndex == index,
+                  shape: RoundedRectangleBorder(
+                    side: BorderSide(
+                      color: Theme.of(context).colorScheme.primary,
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  selectedColor: Theme.of(context).colorScheme.primary,
+                  disabledColor: Theme.of(context).colorScheme.onSurfaceVariant,
+                  chipAnimationStyle: ChipAnimationStyle(
+                    enableAnimation: AnimationStyle(duration: Duration.zero),
+                    selectAnimation: AnimationStyle(duration: Duration.zero),
+                  ),
+                  onSelected: (bool selected) => widget.onSelected(index),
+                ),
+              );
+            }).toList(),
+          ),
+          IgnorePointer(
+            ignoring: true,
+            child: Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: [
+                    Theme.of(context).colorScheme.surface,
+                    Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                    Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                    Theme.of(context).colorScheme.surface,
+                  ],
+                  stops: [0.0, 0.05 * _fadeStart, 1 - 0.05 * _fadeEnd, 1.0],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

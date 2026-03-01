@@ -182,7 +182,9 @@ class _JoinTeamGroupState extends State<JoinTeamGroup> {
                         onPressed: () async {
                           Database database = Database();
                           final currentUser = FirebaseAuth.instance.currentUser;
-                          await database.joinTeamGroup(joinCode, currentUser!.uid).then((value) {
+                          try {
+                            final value = await database.joinTeamGroup(joinCode, currentUser!.uid);
+                            if (!mounted) return;
                             prefs.setString("teamGroup", jsonEncode(value?.toJson()));
                             Navigator.push(
                               context,
@@ -190,7 +192,8 @@ class _JoinTeamGroupState extends State<JoinTeamGroup> {
                                 builder: (context) => CompleteSetupPage(),
                               ),
                             );
-                          }).catchError((onError) {
+                          } catch (e) {
+                            if (!mounted) return;
                             showDialog(
                                 barrierDismissible: false,
                                 context: context,
@@ -210,7 +213,7 @@ class _JoinTeamGroupState extends State<JoinTeamGroup> {
                                     ],
                                   );
                                 });
-                          });
+                          }
                         },
                       ),
                       SizedBox(height: 38),

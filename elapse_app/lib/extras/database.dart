@@ -70,7 +70,10 @@ class Database {
   }
 
   Future<void> deleteCurrentUser() async {
-    deleteUser(FirebaseAuth.instance.currentUser!.uid);
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      deleteUser(user.uid);
+    }
   }
 
   Future<void> verifyUser(String uid) async {
@@ -133,7 +136,8 @@ class Database {
 
       // Get the Team Group Document from joinCode and add user to list of members
       var teamDoc = await _firestore.collection('teamGroups').where('joinCode', isEqualTo: joinCode).limit(1).get();
-      DocumentSnapshot? userDoc = teamDoc.docs.first;
+      if (teamDoc.docs.isEmpty) return null;
+      DocumentSnapshot userDoc = teamDoc.docs.first;
       userDoc.reference.update({
         'members.$uid': "$firstName $lastName",
       });
@@ -183,9 +187,12 @@ class Database {
       if (info.get("members").isEmpty) {
         await deleteTeamGroup(groupid);
       } else if (info.get("adminId") == memberid) {
-        await _firestore.collection('teamGroups').doc(groupid).update({
-          'adminId': info.get("members").keys.toList()[0],
-        });
+        final memberKeys = info.get("members").keys.toList();
+        if (memberKeys.isNotEmpty) {
+          await _firestore.collection('teamGroups').doc(groupid).update({
+            'adminId': memberKeys[0],
+          });
+        }
       }
 
       await _firestore.collection('users').doc(memberid).update({
@@ -258,7 +265,9 @@ class Database {
   Future<void> clearScoutsheets(String groupID) async {
     try {
       var scoutsheets = await _firestore.collection('teamGroups').doc(groupID).collection('scoutsheets').get();
-      scoutsheets.docs.first.reference.delete();
+      for (var doc in scoutsheets.docs) {
+        await doc.reference.delete();
+      }
     } catch(e) {
       print(e);
     }
@@ -267,7 +276,9 @@ class Database {
   Future<void> clearMatchNotes(String groupID) async {
     try {
       var matchNotes = await _firestore.collection('teamGroups').doc(groupID).collection('matchNotes').get();
-      matchNotes.docs.first.reference.delete();
+      for (var doc in matchNotes.docs) {
+        await doc.reference.delete();
+      }
     } catch(e) {
       print(e);
     }
@@ -340,7 +351,8 @@ class Database {
           .where('tournamentID', isEqualTo: tournamentID)
           .limit(1)
           .get();
-      DocumentSnapshot? collection = scoutSheetCollection.docs.first;
+      if (scoutSheetCollection.docs.isEmpty) return;
+      DocumentSnapshot collection = scoutSheetCollection.docs.first;
       collection.reference.delete();
     } catch (e) {
       print(e);
@@ -357,7 +369,8 @@ class Database {
           .where('tournamentID', isEqualTo: tournamentID)
           .limit(1)
           .get();
-      DocumentSnapshot? collection = scoutSheetCollection.docs.first;
+      if (scoutSheetCollection.docs.isEmpty) return;
+      DocumentSnapshot collection = scoutSheetCollection.docs.first;
       collection.reference.update({
         'isEditing': Val,
       });
@@ -401,6 +414,7 @@ class Database {
           .where('tournamentID', isEqualTo: tournamentID)
           .limit(1)
           .get();
+      if (collection.docs.isEmpty) return null;
       return collection.docs.first;
     } catch (e) {
       print(e);
@@ -420,7 +434,8 @@ class Database {
           .where('tournamentID', isEqualTo: tournamentID)
           .limit(1)
           .get();
-      DocumentSnapshot? collection = scoutSheetCollection.docs.first;
+      if (scoutSheetCollection.docs.isEmpty) return null;
+      DocumentSnapshot collection = scoutSheetCollection.docs.first;
       collection.reference.update({
         'properties.$property': val,
       });
@@ -442,7 +457,8 @@ class Database {
           .where('tournamentID', isEqualTo: tournamentID)
           .limit(1)
           .get();
-      DocumentSnapshot? collection = scoutSheetCollection.docs.first;
+      if (scoutSheetCollection.docs.isEmpty) return null;
+      DocumentSnapshot collection = scoutSheetCollection.docs.first;
       collection.reference.update({
         'teamNotes': notes,
       });
@@ -463,7 +479,8 @@ class Database {
           .where('tournamentID', isEqualTo: tournamentID)
           .limit(1)
           .get();
-      DocumentSnapshot? collection = scoutSheetCollection.docs.first;
+      if (scoutSheetCollection.docs.isEmpty) return null;
+      DocumentSnapshot collection = scoutSheetCollection.docs.first;
       collection.reference.update({
         'properties.Specs.photos': FieldValue.arrayUnion([url]),
       });
@@ -484,7 +501,8 @@ class Database {
           .where('tournamentID', isEqualTo: tournamentID)
           .limit(1)
           .get();
-      DocumentSnapshot? collection = scoutSheetCollection.docs.first;
+      if (scoutSheetCollection.docs.isEmpty) return null;
+      DocumentSnapshot collection = scoutSheetCollection.docs.first;
       collection.reference.update({
         'properties.Specs.photos': FieldValue.arrayRemove([URL]),
       });
@@ -556,6 +574,7 @@ class Database {
           .where('tournamentID', isEqualTo: tournamentID)
           .limit(1)
           .get();
+      if (collection.docs.isEmpty) return null;
       return collection.docs.first.data();
     } catch (e) {
       print(e);

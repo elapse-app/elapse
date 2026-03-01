@@ -33,6 +33,7 @@ class _TournamentScreenState extends State<TournamentScreen> {
     super.initState();
 
     if (widget.tournamentFuture != null) {
+      // Use provided future - TMTournamentDetails caches to SQLite automatically
       tournament = widget.tournamentFuture;
     } else {
       // Use TMTournamentDetails to leverage SQLite caching
@@ -49,10 +50,10 @@ class _TournamentScreenState extends State<TournamentScreen> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const TournamentLoadingScreen();
         } else if (snapshot.hasData) {
-          // Note: TMTournamentDetails already sets the in-memory cache via CacheManager
-          // No need to call setLastLoadedTournament here
+          // Tournament data is cached in SQLite by TMTournamentDetails
+          // TournamentLoadedScreen will read from SQLite via getTournamentFromCache()
           return TournamentLoadedScreen(
-            tournament: snapshot.data!,
+            tournamentId: widget.tournamentID,
             isPreview: widget.isPreview,
           );
         } else if (snapshot.hasError) {

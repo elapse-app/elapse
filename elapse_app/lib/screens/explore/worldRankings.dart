@@ -33,6 +33,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
 
   late bool isSkillsLoaded;
   List<WorldSkillsStats>? loadedSkills;
+  Tournament? _tournament;
 
   int selectedIndex = 0;
   List<String> pageTitles = ["Skills"];
@@ -55,16 +56,33 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
     isSkillsLoaded = false;
     futureSkillsStats =
         getWorldSkillsRankings((grade == gradeLevels["College"] ? season.vexUId! : season.vrcId), grade).then((data) {
-      setState(() {
-        isSkillsLoaded = true;
-        loadedSkills = data;
-      });
+      if (mounted) {
+        setState(() {
+          isSkillsLoaded = true;
+          loadedSkills = data;
+        });
+      }
       return data;
     });
     futures.add(futureSkillsStats);
     savedTeams = _getSavedTeams();
     picklistTeams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
     inTM = prefs.getBool("isTournamentMode") ?? false;
+    _loadTournament();
+  }
+
+  Future<void> _loadTournament() async {
+    if (inTM) {
+      final tournamentId = prefs.getInt("tournamentID");
+      if (tournamentId != null && tournamentId != 0) {
+        final tournament = await getTournamentFromCache(tournamentId);
+        if (mounted) {
+          setState(() {
+            _tournament = tournament;
+          });
+        }
+      }
+    }
   }
 
   @override
@@ -115,10 +133,12 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                 futureSkillsStats = getWorldSkillsRankings(
                                         grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade)
                                     .then((data) {
-                                  setState(() {
-                                    isSkillsLoaded = true;
-                                    loadedSkills = data;
-                                  });
+                                  if (mounted) {
+                                    setState(() {
+                                      isSkillsLoaded = true;
+                                      loadedSkills = data;
+                                    });
+                                  }
                                   return data;
                                 });
                                 futures[0] = futureSkillsStats;
@@ -137,16 +157,19 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                       seasonsList: seasons.sublist(0, seasons.indexWhere((e) => e.vrcId == 115) + 1)),
                                 ),
                               );
+                              if (!mounted) return;
                               setState(() {
                                 season = updated;
                                 isSkillsLoaded = false;
                                 futureSkillsStats = getWorldSkillsRankings(
                                         grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade)
                                     .then((data) {
-                                  setState(() {
-                                    isSkillsLoaded = true;
-                                    loadedSkills = data;
-                                  });
+                                  if (mounted) {
+                                    setState(() {
+                                      isSkillsLoaded = true;
+                                      loadedSkills = data;
+                                    });
+                                  }
                                   return data;
                                 });
                                 futures[0] = futureSkillsStats;
@@ -156,7 +179,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                               const Icon(Icons.event_note),
                               const SizedBox(width: 4),
                               Text(
-                                season.name.substring(10),
+                                season.name.length > 10 ? season.name.substring(10) : season.name,
                                 style: const TextStyle(fontSize: 16),
                               ),
                               const Icon(Icons.arrow_right)
@@ -336,7 +359,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                 filter: filter,
                 savedTeams: savedTeams,
                 picklistTeams: picklistTeams,
-                tournament: inTM ? getLastLoadedTournament() : null,
+                tournament: inTM ? _tournament : null,
                 scoutedTeams: const [],
               );
             }

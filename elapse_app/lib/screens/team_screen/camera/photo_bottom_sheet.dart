@@ -190,8 +190,10 @@ Future<String?> uploadFile(XFile? pic) async {
   final file = File(pic.path);
 
   final ref = FirebaseStorage.instance.ref().child(path);
+  final ext = p.extension(path);
+  final contentType = ext.length > 1 ? 'image/${ext.substring(1)}' : 'image/jpeg';
   final snapshot = await ref.putData(
-      file.readAsBytesSync(), SettableMetadata(contentType: 'image/${p.extension(path).substring(1)}'));
+      file.readAsBytesSync(), SettableMetadata(contentType: contentType));
 
   return await snapshot.ref.getDownloadURL();
 

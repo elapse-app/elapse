@@ -31,17 +31,22 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
 
   @override
   void initState() {
-    currentUser = ElapseUser(
-      uid: firebaseUser!.uid,
-      email: firebaseUser!.email,
-      verified: firebaseUser!.emailVerified,
-    );
-    if (prefs.getString("savedTeam") != null) {
-      TeamPreview team = loadTeamPreview(prefs.getString("savedTeam"));
+    super.initState();
+    if (firebaseUser != null) {
+      currentUser = ElapseUser(
+        uid: firebaseUser!.uid,
+        email: firebaseUser!.email,
+        verified: firebaseUser!.emailVerified,
+      );
+    }
+    final savedTeam = prefs.getString("savedTeam");
+    if (savedTeam != null) {
+      TeamPreview team = loadTeamPreview(savedTeam);
       currentUser.teamNumber = team.teamNumber;
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         // backgroundColor: Color.fromARGB(255, 191, 231, 237),
@@ -255,12 +260,14 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
 
                           if (prefs.getBool("isSetUp") ?? false) {
                             Database database = Database();
-                            await database
-                                .createUser(currentUser, loadTeamPreview(prefs.getString("savedTeam")))
-                                .then((_) => Navigator.of(context)
-                                  ..pop()
-                                  ..pop())
-                                .catchError((onError) {
+                            try {
+                              await database.createUser(currentUser, loadTeamPreview(prefs.getString("savedTeam")));
+                              if (!mounted) return;
+                              Navigator.of(context)
+                                ..pop()
+                                ..pop();
+                            } catch (e) {
+                              if (!mounted) return;
                               showDialog(
                                   barrierDismissible: false,
                                   context: context,
@@ -280,7 +287,7 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
                                       ],
                                     );
                                   });
-                            });
+                            }
                           } else {
                             Navigator.push(
                                 context,

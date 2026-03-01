@@ -31,8 +31,8 @@ class TMMyTeams extends StatefulWidget {
 }
 
 class TMMyTeamsState extends State<TMMyTeams> {
-  late String savedTeam;
   late TeamPreview savedTeamPreview;
+  bool _hasSavedTeam = false;
 
   List<TeamPreview> savedTeamPreviews = [];
   List<String> savedTeamStrings = [];
@@ -40,21 +40,80 @@ class TMMyTeamsState extends State<TMMyTeams> {
   late TeamPreview selectedTeamPreview;
   late Season season;
 
-  Future<Tournament>? tournament;
+  Tournament? _tournament;
+  bool _isTournamentLoading = true;
 
-  int seasonID = 190;
+  String? _tournamentError;
+
   @override
   void initState() {
     super.initState();
     reload();
   }
 
-  void reload() {
-    final String savedTeam = prefs.getString("savedTeam") ?? "";
-    final parsed = jsonDecode(savedTeam);
-    savedTeamPreview = TeamPreview(teamID: parsed["teamID"], teamNumber: parsed["teamNumber"]);
+  @override
+  void didUpdateWidget(TMMyTeams oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.tournamentID != widget.tournamentID) {
+      _initializeTournament();
+    }
+  }
 
-    tournament = TMTournamentDetails(widget.tournamentID);
+  Future<void> _initializeTournament() async {
+    setState(() {
+      _isTournamentLoading = true;
+      _tournamentError = null;
+    });
+
+    // Try loading from SQLite cache first
+    final cachedTournament = await getTournamentFromCache(widget.tournamentID);
+
+    if (cachedTournament != null && cachedTournament.id == widget.tournamentID) {
+      _tournament = cachedTournament;
+      _isTournamentLoading = false;
+      if (mounted) setState(() {});
+    } else {
+      try {
+        final t = await TMTournamentDetails(widget.tournamentID);
+        if (mounted) {
+          setState(() {
+            _tournament = t;
+            _isTournamentLoading = false;
+            _tournamentError = null;
+          });
+        }
+      } catch (error) {
+        debugPrint('Failed to load tournament: $error');
+        if (mounted) {
+          setState(() {
+            _isTournamentLoading = false;
+            _tournamentError = error.toString();
+          });
+        }
+      }
+    }
+  }
+
+  void reload() {
+    final String? savedTeam = prefs.getString("savedTeam");
+    if (savedTeam == null || savedTeam.isEmpty) {
+      // No saved team - can't load my teams page
+      debugPrint('TMMyTeams: No saved team found');
+      _hasSavedTeam = false;
+      return;
+    }
+
+    try {
+      final parsed = jsonDecode(savedTeam);
+      savedTeamPreview = TeamPreview(teamID: parsed["teamID"], teamNumber: parsed["teamNumber"]);
+    } catch (e) {
+      debugPrint('TMMyTeams: Failed to parse saved team: $e');
+      _hasSavedTeam = false;
+      return;
+    }
+    
+    _hasSavedTeam = true;
+    _initializeTournament();
 
     savedTeamStrings = prefs.getStringList("savedTeams") ?? [];
     savedTeamPreviews.add(savedTeamPreview);
@@ -78,9 +137,10 @@ class TMMyTeamsState extends State<TMMyTeams> {
       setState(() {
         selectedTeamPreview = value;
         team = fetchTeam(value.teamID);
-        teamStats = getTrueSkillDataForTeam(seasonID, value.teamNumber);
-        teamTournaments = fetchTeamTournaments(value.teamID, seasonID);
-        teamAwards = getAwards(value.teamID, seasonID);
+        teamStats = getTrueSkillDataForTeam(season.vrcId, value.teamNumber);
+        skillsStats = getWorldSkillsForTeam(season.vrcId, value.teamID);
+        teamTournaments = fetchTeamTournaments(value.teamID, season.vrcId);
+        teamAwards = getAwards(value.teamID, season.vrcId);
       });
     }
   }
@@ -88,10 +148,150 @@ class TMMyTeamsState extends State<TMMyTeams> {
   Future<Team>? team;
   Future<VDAStats?>? teamStats;
   Future<List<TournamentPreview>>? teamTournaments;
-  Future<WorldSkillsStats>? skillsStats;
+  Future<WorldSkillsStats?>? skillsStats;
   Future<List<Award>>? teamAwards;
+
+  Future<void> _onRefresh() async {
+    // Re-fetch all data
+    setState(() {
+      team = fetchTeam(selectedTeamPreview.teamID);
+      teamStats = getTrueSkillDataForTeam(season.vrcId, selectedTeamPreview.teamNumber);
+      skillsStats = getWorldSkillsForTeam(season.vrcId, selectedTeamPreview.teamID);
+      teamTournaments = fetchTeamTournaments(selectedTeamPreview.teamID, season.vrcId);
+      teamAwards = getAwards(selectedTeamPreview.teamID, season.vrcId);
+    });
+    _initializeTournament();
+
+    // Wait for all futures to complete
+    await Future.wait([
+      if (team != null) team!,
+      if (teamStats != null) teamStats!,
+      if (skillsStats != null) skillsStats!,
+      if (teamTournaments != null) teamTournaments!,
+      if (teamAwards != null) teamAwards!,
+    ].whereType<Future>());
+  }
+
+  Widget _buildTournamentSection() {
+    if (_isTournamentLoading) {
+      return Container(
+        margin: const EdgeInsets.only(top: 25),
+        child: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_tournamentError != null) {
+      return Container(
+        margin: const EdgeInsets.only(top: 25),
+        child: Column(
+          children: [
+            Text(
+              "Failed to load tournament data",
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
+            ),
+            const SizedBox(height: 8),
+            TextButton.icon(
+              onPressed: _initializeTournament,
+              icon: const Icon(Icons.refresh),
+              label: const Text("Retry"),
+            ),
+          ],
+        ),
+      );
+    }
+
+    if (_tournament == null) {
+      return Container();
+    }
+
+    final tournament = _tournament!;
+
+    if (!tournament.teams.any((element) => element.teamNumber == selectedTeamPreview.teamNumber)) {
+      return Container();
+    }
+
+    // Check if there are any divisions
+    if (tournament.divisions.isEmpty) {
+      return Container();
+    }
+
+    // Find the division that contains this team
+    final division = tournament.divisions.firstWhere(
+      (d) => d.teamStats?.containsKey(selectedTeamPreview.teamID) ?? false,
+      orElse: () => tournament.divisions.first,
+    );
+
+    if (division.games?.isEmpty ?? true) {
+      return Container();
+    }
+
+    return Container(
+      margin: EdgeInsets.only(top: 25),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "This Tournament",
+            style: TextStyle(fontSize: 24),
+          ),
+          SizedBox(
+            height: 10,
+          ),
+          if (division.teamStats != null &&
+              division.teamStats!.containsKey(selectedTeamPreview.teamID) &&
+              tournament.tournamentSkills != null)
+            RankingOverviewWidget(
+                teamStats: division.teamStats![selectedTeamPreview.teamID]!,
+                skills: tournament.tournamentSkills!,
+                teamID: selectedTeamPreview.teamID),
+          SizedBox(
+            height: 10,
+          ),
+          Column(
+            children: getTeamGames(division.games!, selectedTeamPreview.teamNumber).map(
+              (e) {
+                return Column(
+                  children: [
+                    GameWidget(
+                      game: e,
+                      teamName: selectedTeamPreview.teamNumber,
+                      isAllianceColoured: false,
+                    ),
+                    Divider(
+                      color: Theme.of(context).colorScheme.surfaceDim,
+                    )
+                  ],
+                );
+              },
+            ).toList(),
+          )
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
+    if (!_hasSavedTeam) {
+      return Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: CustomScrollView(
+          slivers: [
+            const ElapseAppBar(
+              title: Text("My Team"),
+              backNavigation: true,
+            ),
+            const SliverFillRemaining(
+              hasScrollBody: false,
+              child: Center(
+                child: Text("No saved team found. Please select a team."),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     ColorPallete colorPallete;
     if (Theme.of(context).colorScheme.brightness == Brightness.dark) {
       colorPallete = darkPallete;
@@ -100,12 +300,14 @@ class TMMyTeamsState extends State<TMMyTeams> {
     }
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
-      body: CustomScrollView(
-        slivers: [
-          ElapseAppBar(
-            title: const Text(
-              "My Team",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+      body: RefreshIndicator(
+        onRefresh: _onRefresh,
+        child: CustomScrollView(
+          slivers: [
+            ElapseAppBar(
+              title: const Text(
+                "My Team",
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
             ),
             includeSettings: true,
             background: Padding(
@@ -133,7 +335,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                         const Icon(Icons.event_note),
                         const SizedBox(width: 4),
                         Text(
-                          season.name.substring(10),
+                          season.name.length > 10 ? season.name.substring(10) : season.name,
                           style: const TextStyle(fontSize: 16),
                         ),
                         const Icon(Icons.arrow_right)
@@ -311,66 +513,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
           SliverPadding(
             padding: const EdgeInsets.symmetric(horizontal: 23),
             sliver: SliverToBoxAdapter(
-              child: FutureBuilder(
-                  future: tournament,
-                  builder: (context, snapshot) {
-                    if (snapshot.hasData) {
-                      Tournament tournament = snapshot.data as Tournament;
-                      if (!tournament.teams.any(
-                        (element) {
-                          return element.teamNumber == selectedTeamPreview.teamNumber;
-                        },
-                      )) {
-                        return Container();
-                      }
-                      if (tournament.divisions[0].games?.isEmpty ?? true) {
-                        return Container();
-                      }
-                      return Container(
-                        margin: EdgeInsets.only(top: 25),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "This Tournament",
-                              style: TextStyle(fontSize: 24),
-                            ),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            RankingOverviewWidget(
-                                teamStats: tournament.divisions[0].teamStats![selectedTeamPreview.teamID]!,
-                                skills: tournament.tournamentSkills!,
-                                teamID: selectedTeamPreview.teamID),
-                            SizedBox(
-                              height: 10,
-                            ),
-                            Column(
-                              children:
-                                  getTeamGames(tournament.divisions[0].games!, selectedTeamPreview.teamNumber).map(
-                                (e) {
-                                  return Column(
-                                    children: [
-                                      GameWidget(
-                                        game: e,
-                                        teamName: selectedTeamPreview.teamNumber,
-                                        isAllianceColoured: false,
-                                      ),
-                                      Divider(
-                                        color: Theme.of(context).colorScheme.surfaceDim,
-                                      )
-                                    ],
-                                  );
-                                },
-                              ).toList(),
-                            )
-                          ],
-                        ),
-                      );
-                    } else {
-                      return Container();
-                    }
-                  }),
+              child: _buildTournamentSection(),
             ),
           ),
           const SliverToBoxAdapter(
@@ -877,7 +1020,8 @@ class TMMyTeamsState extends State<TMMyTeams> {
                   ),
                 )
               : SliverToBoxAdapter()
-        ],
+          ],
+        ),
       ),
     );
   }

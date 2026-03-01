@@ -1,5 +1,3 @@
-import 'package:elapse_app/classes/Tournament/division.dart';
-import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/tournament_stats_page.dart';
@@ -16,6 +14,7 @@ class RankingsWidget extends StatelessWidget {
     required this.teamNumber,
     required this.teamName,
     required this.allianceColor,
+    required this.stats,
     this.rank,
     this.sort = "Rank",
     this.skills,
@@ -28,6 +27,7 @@ class RankingsWidget extends StatelessWidget {
   final String teamName;
   final int? rank;
   final Color allianceColor;
+  final TeamStats stats;
   final String sort;
   final TournamentSkills? skills;
   final WorldSkillsStats? worldSkills;
@@ -35,13 +35,6 @@ class RankingsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tournament = getLastLoadedTournament();
-    if (tournament == null) return const SizedBox.shrink();
-
-    int divisionIndex = getTeamDivisionIndex(tournament.divisions, teamID);
-
-    Map<int, TeamStats> rankings = tournament.divisions[divisionIndex].teamStats!;
-    TeamStats stats = rankings[teamID]!;
 
     String val1 = "${stats.wins}-${stats.losses}-${stats.ties}",
         val2 = "${stats.wp} WP",

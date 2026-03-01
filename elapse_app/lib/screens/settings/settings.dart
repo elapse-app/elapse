@@ -36,7 +36,17 @@ String theme = "system";
 class _SettingsScreenState extends State<SettingsScreen> {
   _SettingsScreenState();
 
-  int mainTeamId = jsonDecode(prefs.getString("savedTeam") ?? "")["teamID"];
+  int mainTeamId = _getSavedTeamId();
+
+  static int _getSavedTeamId() {
+    final saved = prefs.getString("savedTeam");
+    if (saved == null || saved.isEmpty) return 0;
+    try {
+      return jsonDecode(saved)["teamID"] ?? 0;
+    } catch (_) {
+      return 0;
+    }
+  }
   bool useLiveTiming = prefs.getBool("useLiveTiming") ?? true;
   bool useMatchNotifs = prefs.getBool("useMatchNotifs") ?? true;
   bool autoRefresh = prefs.getBool("autoRefresh") ?? true;
@@ -51,10 +61,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    if (prefs.getString("currentUser") != null) {
-      currentUser =
-          ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
-      teamGroupFuture = getUserTeamGroup(currentUser!.uid!);
+    final userJson = prefs.getString("currentUser");
+    if (userJson != null) {
+      currentUser = ElapseUser.fromJson(jsonDecode(userJson));
+      final uid = currentUser?.uid;
+      if (uid != null) {
+        teamGroupFuture = getUserTeamGroup(uid);
+      }
     }
   }
 
@@ -64,12 +77,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: RefreshIndicator(
         onRefresh: () async {
-          if (prefs.getString("currentUser") != null) {
-            await FirebaseAuth.instance.currentUser!.reload();
+          final userJson = prefs.getString("currentUser");
+          if (userJson != null) {
+            try {
+              await FirebaseAuth.instance.currentUser?.reload();
+            } catch (_) {}
             setState(() {
-              currentUser = ElapseUser.fromJson(
-                  jsonDecode(prefs.getString("currentUser")!));
-              teamGroupFuture = getUserTeamGroup(currentUser!.uid!);
+              currentUser = ElapseUser.fromJson(jsonDecode(userJson));
+              final uid = currentUser?.uid;
+              if (uid != null) {
+                teamGroupFuture = getUserTeamGroup(uid);
+              }
             });
           }
         },
@@ -245,20 +263,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                   builder: (context) =>
                                                       const CreateAccount(),
                                                 ));
-                                            if (prefs
-                                                    .getString("currentUser") !=
-                                                null) {
-                                              await FirebaseAuth
-                                                  .instance.currentUser!
-                                                  .reload();
+                                            final userJson = prefs.getString("currentUser");
+                                            if (userJson != null) {
+                                              try {
+                                                await FirebaseAuth.instance.currentUser?.reload();
+                                              } catch (_) {}
                                               setState(() {
-                                                currentUser = ElapseUser
-                                                    .fromJson(jsonDecode(
-                                                        prefs.getString(
-                                                            "currentUser")!));
-                                                teamGroupFuture =
-                                                    getUserTeamGroup(
-                                                        currentUser!.uid!);
+                                                currentUser = ElapseUser.fromJson(jsonDecode(userJson));
+                                                final uid = currentUser?.uid;
+                                                if (uid != null) {
+                                                  teamGroupFuture = getUserTeamGroup(uid);
+                                                }
                                               });
                                             }
                                           },
@@ -277,20 +292,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                                   builder: (context) =>
                                                       const LoginPage(),
                                                 ));
-                                            if (prefs
-                                                    .getString("currentUser") !=
-                                                null) {
-                                              await FirebaseAuth
-                                                  .instance.currentUser!
-                                                  .reload();
+                                            final userJson = prefs.getString("currentUser");
+                                            if (userJson != null) {
+                                              try {
+                                                await FirebaseAuth.instance.currentUser?.reload();
+                                              } catch (_) {}
                                               setState(() {
-                                                currentUser = ElapseUser
-                                                    .fromJson(jsonDecode(
-                                                        prefs.getString(
-                                                            "currentUser")!));
-                                                teamGroupFuture =
-                                                    getUserTeamGroup(
-                                                        currentUser!.uid!);
+                                                currentUser = ElapseUser.fromJson(jsonDecode(userJson));
+                                                final uid = currentUser?.uid;
+                                                if (uid != null) {
+                                                  teamGroupFuture = getUserTeamGroup(uid);
+                                                }
                                               });
                                             }
                                           },
@@ -899,7 +911,7 @@ Widget buildTeamDropdown(
                       .map((e) => DropdownMenuItem(
                           value: e.teamID, child: Text("Team ${e.teamNumber}")))
                       .toList(),
-                  onChanged: (int? value) {
+                  onChanged: (int? value) async {
                     final String savedTeam = prefs.getString("savedTeam") ?? "";
                     final List<String> savedTeams =
                         prefs.getStringList("savedTeams") ?? [];
@@ -908,8 +920,9 @@ Widget buildTeamDropdown(
                     if (selected == null) return;
 
                     Tournament? tournament;
-                    if (prefs.getBool("isTournamentMode") ?? false) {
-                      tournament = getLastLoadedTournament();
+                    final tournamentId = prefs.getInt("tournamentID");
+                    if ((prefs.getBool("isTournamentMode") ?? false) && tournamentId != null) {
+                      tournament = await getTournamentFromCache(tournamentId);
                     }
 
                     if (tournament != null &&
@@ -940,7 +953,7 @@ Widget buildTeamDropdown(
                                             color: Theme.of(context)
                                                 .colorScheme
                                                 .secondary)),
-                                    onPressed: () {
+                                    onPressed: () async {
                                       savedTeams.removeWhere((e) =>
                                           jsonDecode(e)["teamID"] == value);
                                       savedTeams.add(savedTeam);
@@ -951,7 +964,9 @@ Widget buildTeamDropdown(
                                       update(value!);
 
                                       prefs.setBool("isTournamentMode", false);
-                                      clearLastLoadedTournament();
+                                      if (tournamentId != null) {
+                                        await invalidateTournamentCache(tournamentId);
+                                      }
                                       setupGateKey.currentState!.reloadApp();
                                       Navigator.pop(context);
                                     })

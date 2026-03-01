@@ -288,6 +288,7 @@ class _LoginPageState extends State<LoginPage> {
                                           return;
                                         }
 
+                                        if (!context.mounted) return;
                                         Navigator.pop(context);
                                         showDialog(
                                             context: context,
@@ -333,7 +334,9 @@ class _LoginPageState extends State<LoginPage> {
                         text: "Login",
                         icon: Icons.mail_outline,
                         onPressed: () async {
-                          await signIN(_emailController.text, _passwordController.text).then((a) {
+                          try {
+                            await signIN(_emailController.text, _passwordController.text);
+                            if (!mounted) return;
                             if (prefs.getBool("isSetUp") ?? false) {
                               Navigator.pop(context);
                             } else {
@@ -343,9 +346,8 @@ class _LoginPageState extends State<LoginPage> {
                                     builder: (context) => const CompleteSetupPage(),
                                   ));
                             }
-                          }).catchError((onError, stackTrace) {
-                            print(onError);
-                            print(stackTrace);
+                          } catch (e) {
+                            if (!mounted) return;
                             showDialog(
                                 barrierDismissible: false,
                                 context: context,
@@ -365,7 +367,7 @@ class _LoginPageState extends State<LoginPage> {
                                     ],
                                   );
                                 });
-                          });
+                          }
                         },
                       ),
                     ),

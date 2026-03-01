@@ -2,14 +2,11 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:carousel_slider/carousel_controller.dart';
-import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/screens/tournament_mode/picklist/picklist_widget.dart';
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../../classes/Team/teamPreview.dart';
-import '../../../classes/Tournament/tournament.dart';
 import '../../../main.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/rounded_top.dart';
@@ -23,7 +20,6 @@ class PicklistPage extends StatefulWidget {
 
 class _PicklistPageState extends State<PicklistPage> {
   List<TeamPreview> teams = [];
-  late Future<Tournament> tournament;
 
   List<CarouselSliderController> carouselControllers = [];
 
@@ -41,7 +37,6 @@ class _PicklistPageState extends State<PicklistPage> {
   void initState() {
     super.initState();
     refreshTeams();
-    tournament = TMTournamentDetails(prefs.getInt("tournamentID") ?? 0);
   }
 
   @override
@@ -71,7 +66,6 @@ class _PicklistPageState extends State<PicklistPage> {
                                   PicklistWidget(
                                       index: i,
                                       team: e,
-                                      tournament: tournament,
                                       carouselControllers: carouselControllers,
                                       refresh: refreshTeams),
                                   i != teams.length - 1
