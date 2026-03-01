@@ -58,13 +58,35 @@ class _TournamentScreenState extends State<TournamentScreen> {
           );
         } else if (snapshot.hasError) {
           print(snapshot.error);
-          return const Center(
-            child: Text("Failed to load tournament details"),
+          return Scaffold(
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.error),
+                  const SizedBox(height: 16),
+                  Text("Failed to load tournament details",
+                      style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                ],
+              ),
+            ),
           );
         } else {
           print(snapshot.connectionState);
-          return const Center(
-            child: Text("Failed to load tournament details"),
+          return Scaffold(
+            backgroundColor: Theme.of(context).colorScheme.surface,
+            body: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.error_outline, size: 48, color: Theme.of(context).colorScheme.error),
+                  const SizedBox(height: 16),
+                  Text("Failed to load tournament details",
+                      style: TextStyle(color: Theme.of(context).colorScheme.error)),
+                ],
+              ),
+            ),
           );
         }
       },
