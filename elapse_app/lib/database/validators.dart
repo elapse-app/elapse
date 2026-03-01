@@ -1,4 +1,5 @@
 // Validation utilities for sanitizing data before SQLite storage.
+import 'package:flutter/foundation.dart';
 
 class IngestionError {
   final String field;
@@ -62,8 +63,8 @@ class TournamentValidator {
       location = json['location'] as Map<String, dynamic>;
     }
 
-    if (warnings.isNotEmpty) {
-      print('Tournament validation warnings for ID $id: $warnings');
+    if (warnings.isNotEmpty && kDebugMode) {
+      debugPrint('Tournament validation warnings for ID $id: $warnings');
     }
 
     return {
