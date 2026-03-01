@@ -267,12 +267,11 @@ class _TMHomePageState extends State<TMHomePage> {
         child: Column(
           children: [
             NextGame(
-              divisionId: game.divisionId,
-              roundNum: game.roundNum,
-              gameNum: game.gameNum,
-              instance: game.instance,
+              game: game,
+              games: sessionGames,
+              teams: _tournament!.teams,
               rankings: _division!.teamStats!,
-              skills: _tournament!.tournamentSkills ?? {},
+              skills: _tournament!.tournamentSkills,
               targetTeam: TeamPreview(
                   teamNumber: widget.teamNumber,
                   teamID: widget.teamID),
@@ -347,6 +346,10 @@ class _TMHomePageState extends State<TMHomePage> {
                   game: game,
                   teamName: widget.teamNumber,
                   isAllianceColoured: true,
+                  teams: _tournament!.teams,
+                  teamStats: _division!.teamStats,
+                  allGames: _division!.games,
+                  tournamentSkills: _tournament!.tournamentSkills,
                 ),
                 Divider(
                   color: Theme.of(context).colorScheme.surfaceDim,

@@ -2,7 +2,9 @@ import 'dart:convert';
 
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/division.dart';
+import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tskills.dart';
+import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_filter.dart';
 import 'package:elapse_app/screens/tournament/pages/skills/skills_widget.dart';
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
@@ -18,13 +20,17 @@ class SkillsPage extends StatelessWidget {
       required this.teams,
       required this.divisions,
       this.sort = 0,
-      required this.filter});
+      required this.filter,
+      this.games,
+      this.rankings});
 
   final Map<int, TournamentSkills> skills;
   final List<Team> teams;
   final List<Division> divisions;
   final int sort;
   final TournamentRankingsFilter filter;
+  final List<Game>? games;
+  final Map<int, TeamStats>? rankings;
 
   @override
   Widget build(BuildContext context) {
@@ -107,6 +113,10 @@ class SkillsPage extends StatelessWidget {
                 SkillsWidget(
                   team: filteredTeams[index],
                   stats: skills[filteredTeams[index].id]!,
+                  games: games,
+                  rankings: rankings,
+                  tournamentSkills: skills,
+                  teams: teams,
                 ),
                 Divider(
                   color: Theme.of(context).colorScheme.surfaceDim,

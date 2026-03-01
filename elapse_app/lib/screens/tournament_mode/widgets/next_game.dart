@@ -1,24 +1,22 @@
 import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
+import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
-import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tskills.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/extras/twelve_hour.dart';
-import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:collection/collection.dart';
 
-class NextGame extends StatefulWidget {
+class NextGame extends StatelessWidget {
   const NextGame({
     super.key,
-    required this.divisionId,
-    required this.roundNum,
-    required this.gameNum,
-    required this.instance,
+    required this.game,
+    required this.games,
+    required this.teams,
     required this.skills,
     required this.rankings,
     this.targetTeam,
@@ -26,64 +24,17 @@ class NextGame extends StatefulWidget {
     this.numGames,
   });
 
-  final int divisionId;
-  final num roundNum;
-  final int gameNum;
-  final int instance;
+  final Game game;
+  final List<Game> games;
+  final List<Team> teams;
   final TeamPreview? targetTeam;
-  final Map<int, TournamentSkills> skills;
+  final Map<int, TournamentSkills>? skills;
   final Map<int, TeamStats> rankings;
   final int? delay;
   final int? numGames;
 
   @override
-  State<NextGame> createState() => _NextGameState();
-}
-
-class _NextGameState extends State<NextGame> {
-  Game? _game;
-  List<Game> _games = [];
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadGame();
-  }
-
-  Future<void> _loadGame() async {
-    final tournamentId = prefs.getInt("tournamentID");
-    if (tournamentId != null && tournamentId != 0) {
-      final tournament = await getTournamentFromCache(tournamentId);
-      if (tournament != null && mounted) {
-        for (final division in tournament.divisions) {
-          if (division.id == widget.divisionId && division.games != null) {
-            _games = division.games!;
-            for (final game in division.games!) {
-              if (game.roundNum == widget.roundNum &&
-                  game.gameNum == widget.gameNum &&
-                  game.instance == widget.instance) {
-                _game = game;
-                break;
-              }
-            }
-            break;
-          }
-        }
-      }
-    }
-    if (mounted) {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (_isLoading || _game == null) {
-      return const SizedBox.shrink();
-    }
-    final game = _game!;
-    final games = _games;
     String timeString;
     if (game.startedTime != null) {
       timeString = twelveHour(DateFormat.Hm().format(game.startedTime!.toLocal()));
@@ -109,10 +60,10 @@ class _NextGameState extends State<NextGame> {
       return game.redAlliancePreview?.any((element) => element.teamNumber == teamNumber) ?? false;
     }
 
-    if (widget.targetTeam != null) {
-      if (isBlue(widget.targetTeam!.teamNumber)) {
+    if (targetTeam != null) {
+      if (isBlue(targetTeam!.teamNumber)) {
         backgroundColor = colorPallete.blueAllianceBackground;
-      } else if (isRed(widget.targetTeam!.teamNumber)) {
+      } else if (isRed(targetTeam!.teamNumber)) {
         backgroundColor = colorPallete.redAllianceBackground;
       }
     }
@@ -161,10 +112,11 @@ class _NextGameState extends State<NextGame> {
       onTap: () {
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return GameScreen(
-            divisionId: game.divisionId,
-            roundNum: game.roundNum,
-            gameNum: game.gameNum,
-            instance: game.instance,
+            game: game,
+            teams: teams,
+            teamStats: rankings,
+            allGames: games,
+            tournamentSkills: skills,
           );
         }));
       },
@@ -202,7 +154,7 @@ class _NextGameState extends State<NextGame> {
                       e.teamNumber,
                       style: TextStyle(
                           fontSize: 24,
-                          fontWeight: e.teamNumber == widget.targetTeam?.teamNumber ? FontWeight.w500 : FontWeight.normal),
+                          fontWeight: e.teamNumber == targetTeam?.teamNumber ? FontWeight.w500 : FontWeight.normal),
                     );
                   }).toList(),
                 ),
@@ -213,7 +165,7 @@ class _NextGameState extends State<NextGame> {
                       e.teamNumber,
                       style: TextStyle(
                           fontSize: 24,
-                          fontWeight: e.teamNumber == widget.targetTeam?.teamNumber ? FontWeight.w600 : FontWeight.normal),
+                          fontWeight: e.teamNumber == targetTeam?.teamNumber ? FontWeight.w600 : FontWeight.normal),
                     );
                   }).toList(),
                 )
@@ -246,7 +198,7 @@ class _NextGameState extends State<NextGame> {
                     Align(
                     alignment: Alignment.centerRight,
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end, 
+                      crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
                           "$gamesLeft",
@@ -259,7 +211,7 @@ class _NextGameState extends State<NextGame> {
                           "Matches Remaining",
                           style: TextStyle(fontSize: 16),
                           textAlign: TextAlign.right,
-                        ),  
+                        ),
                       ])
                     ),
                   ],
