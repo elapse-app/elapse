@@ -116,10 +116,12 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
     } else {
       selectedIndex = 0;
     }
+  }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<TournamentProvider>().setTournament(widget.tournament, division);
-    });
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    context.read<TournamentProvider>().setTournament(widget.tournament, division);
   }
 
   @override
