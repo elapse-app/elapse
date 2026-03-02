@@ -6,7 +6,9 @@ import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dar
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
+import 'package:elapse_app/providers/tournament_scope.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class SearchScreen extends StatefulWidget {
   const SearchScreen({super.key, required this.tournament, required this.division});
@@ -41,23 +43,27 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     final division = widget.division;
     final tournament = widget.tournament;
+    final scope = TournamentScope(tournament: tournament, division: division);
 
     if (division.games == null || division.games!.isEmpty) {
-      return Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        body: CustomScrollView(
-          slivers: [
-            SliverAppBar.large(
-              automaticallyImplyLeading: true,
-              expandedHeight: 125,
-              centerTitle: false,
-              backgroundColor: Theme.of(context).colorScheme.primary,
-            ),
-            const RoundedTop(),
-            const SliverToBoxAdapter(
-              child: BigErrorMessage(icon: Icons.schedule, message: "Schedule not loaded yet"),
-            ),
-          ],
+      return Provider<TournamentScope>.value(
+        value: scope,
+        child: Scaffold(
+          backgroundColor: Theme.of(context).colorScheme.surface,
+          body: CustomScrollView(
+            slivers: [
+              SliverAppBar.large(
+                automaticallyImplyLeading: true,
+                expandedHeight: 125,
+                centerTitle: false,
+                backgroundColor: Theme.of(context).colorScheme.primary,
+              ),
+              const RoundedTop(),
+              const SliverToBoxAdapter(
+                child: BigErrorMessage(icon: Icons.schedule, message: "Schedule not loaded yet"),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -97,7 +103,9 @@ class _SearchScreenState extends State<SearchScreen> {
         return gameContainsSearchQuery || gameContainsFilteredTeam;
       }).toList();
     }
-    return Scaffold(
+    return Provider<TournamentScope>.value(
+      value: scope,
+      child: Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
       body: CustomScrollView(
         slivers: [
@@ -259,10 +267,6 @@ class _SearchScreenState extends State<SearchScreen> {
                                         teamID: team.id,
                                         stats: division.teamStats![team.id]!,
                                         allianceColor: Theme.of(context).colorScheme.onSurface,
-                                        games: division.games,
-                                        allRankings: division.teamStats,
-                                        tournamentSkills: tournament.tournamentSkills,
-                                        teams: tournament.teams,
                                       ),
                                 index != filteredTeams.length - 1
                                     ? Divider(
@@ -316,10 +320,6 @@ class _SearchScreenState extends State<SearchScreen> {
                               children: [
                                 GameWidget(
                                   game: game,
-                                  teams: tournament.teams,
-                                  teamStats: division.teamStats,
-                                  allGames: division.games,
-                                  tournamentSkills: tournament.tournamentSkills,
                                 ),
                                 index != filteredGames.length - 1
                                     ? Divider(
@@ -339,6 +339,7 @@ class _SearchScreenState extends State<SearchScreen> {
               : const SliverToBoxAdapter(),
           const SliverToBoxAdapter(child: SizedBox(height: 40)),
         ],
+      ),
       ),
     );
   }

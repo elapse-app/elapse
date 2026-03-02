@@ -20,7 +20,9 @@ import 'package:elapse_app/screens/widgets/elapse_loading_indicator.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
+import 'package:elapse_app/providers/tournament_scope.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:elapse_app/main.dart';
 
 class TMMyTeams extends StatefulWidget {
@@ -226,51 +228,50 @@ class TMMyTeamsState extends State<TMMyTeams> {
       return Container();
     }
 
-    return Container(
-      margin: EdgeInsets.only(top: 25),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "This Tournament",
-            style: TextStyle(fontSize: 24),
-          ),
-          SizedBox(
-            height: 10,
-          ),
-          if (division.teamStats != null &&
-              division.teamStats!.containsKey(selectedTeamPreview.teamID) &&
-              tournament.tournamentSkills != null)
-            RankingOverviewWidget(
-                teamStats: division.teamStats![selectedTeamPreview.teamID]!,
-                skills: tournament.tournamentSkills!,
-                teamID: selectedTeamPreview.teamID),
-          SizedBox(
-            height: 10,
-          ),
-          Column(
-            children: getTeamGames(division.games!, selectedTeamPreview.teamNumber).map(
-              (e) {
-                return Column(
-                  children: [
-                    GameWidget(
-                      game: e,
-                      teamName: selectedTeamPreview.teamNumber,
-                      isAllianceColoured: false,
-                      teams: tournament.teams,
-                      teamStats: division.teamStats,
-                      allGames: division.games,
-                      tournamentSkills: tournament.tournamentSkills,
-                    ),
-                    Divider(
-                      color: Theme.of(context).colorScheme.surfaceDim,
-                    )
-                  ],
-                );
-              },
-            ).toList(),
-          )
-        ],
+    return Provider<TournamentScope>.value(
+      value: TournamentScope(tournament: tournament, division: division),
+      child: Container(
+        margin: EdgeInsets.only(top: 25),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              "This Tournament",
+              style: TextStyle(fontSize: 24),
+            ),
+            SizedBox(
+              height: 10,
+            ),
+            if (division.teamStats != null &&
+                division.teamStats!.containsKey(selectedTeamPreview.teamID) &&
+                tournament.tournamentSkills != null)
+              RankingOverviewWidget(
+                  teamStats: division.teamStats![selectedTeamPreview.teamID]!,
+                  skills: tournament.tournamentSkills!,
+                  teamID: selectedTeamPreview.teamID),
+            SizedBox(
+              height: 10,
+            ),
+            Column(
+              children: getTeamGames(division.games!, selectedTeamPreview.teamNumber).map(
+                (e) {
+                  return Column(
+                    children: [
+                      GameWidget(
+                        game: e,
+                        teamName: selectedTeamPreview.teamNumber,
+                        isAllianceColoured: false,
+                      ),
+                      Divider(
+                        color: Theme.of(context).colorScheme.surfaceDim,
+                      )
+                    ],
+                  );
+                },
+              ).toList(),
+            )
+          ],
+        ),
       ),
     );
   }

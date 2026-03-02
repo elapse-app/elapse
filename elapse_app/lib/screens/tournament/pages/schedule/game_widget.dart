@@ -1,12 +1,11 @@
 import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
-import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
-import 'package:elapse_app/classes/Tournament/tskills.dart';
-import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/extras/twelve_hour.dart';
+import 'package:elapse_app/providers/tournament_scope.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 
 class GameWidget extends StatelessWidget {
@@ -16,20 +15,12 @@ class GameWidget extends StatelessWidget {
     this.teamName,
     this.isAllianceColoured,
     this.useLiveTiming,
-    this.teams,
-    this.teamStats,
-    this.allGames,
-    this.tournamentSkills,
   });
 
   final Game game;
   final String? teamName;
   final bool? isAllianceColoured;
   final bool? useLiveTiming;
-  final List<Team>? teams;
-  final Map<int, TeamStats>? teamStats;
-  final List<Game>? allGames;
-  final Map<int, TournamentSkills>? tournamentSkills;
 
   @override
   Widget build(BuildContext context) {
@@ -134,15 +125,14 @@ class GameWidget extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
+        final scope = context.read<TournamentScope>();
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => GameScreen(
               game: game,
-              teams: teams ?? [],
-              teamStats: teamStats,
-              allGames: allGames,
-              tournamentSkills: tournamentSkills,
+              tournament: scope.tournament,
+              division: scope.division,
             ),
           ),
         );

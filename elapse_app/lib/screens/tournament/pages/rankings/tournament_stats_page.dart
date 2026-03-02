@@ -1,21 +1,25 @@
-import 'package:elapse_app/classes/Team/team.dart';
+import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
-import 'package:elapse_app/classes/Tournament/tskills.dart';
+import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
+import 'package:elapse_app/providers/tournament_scope.dart';
 import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 Future<void> tournamentStatsPage(
   BuildContext context, {
   required int teamID,
   required String teamNumber,
   required String teamName,
-  required List<Game> games,
-  required Map<int, TeamStats> rankings,
-  Map<int, TournamentSkills>? tournamentSkills,
-  List<Team>? teams,
+  required Tournament tournament,
+  required Division division,
 }) async {
+  final games = division.games ?? [];
+  final rankings = division.teamStats ?? {};
+  final tournamentSkills = tournament.tournamentSkills;
+
   final stats = rankings[teamID];
   if (stats == null) return;
   int rank = stats.rank;
@@ -42,7 +46,9 @@ Future<void> tournamentStatsPage(
     isScrollControlled: true,
     useSafeArea: true,
     builder: (BuildContext context) {
-      return DraggableScrollableSheet(
+      return Provider<TournamentScope>.value(
+        value: TournamentScope(tournament: tournament, division: division),
+        child: DraggableScrollableSheet(
         initialChildSize: 0.8,
         maxChildSize: 0.8,
         minChildSize: 0.5,
@@ -317,10 +323,6 @@ Future<void> tournamentStatsPage(
                               game: game,
                               teamName: teamNumber,
                               isAllianceColoured: false,
-                              teams: teams,
-                              teamStats: rankings,
-                              allGames: games,
-                              tournamentSkills: tournamentSkills,
                             ),
                             Divider(
                               height: 3,
@@ -336,6 +338,7 @@ Future<void> tournamentStatsPage(
             ),
           );
         },
+      ),
       );
     },
   );

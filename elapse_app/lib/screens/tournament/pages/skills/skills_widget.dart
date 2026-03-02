@@ -1,8 +1,8 @@
 import 'package:elapse_app/classes/Team/team.dart';
-import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tskills.dart';
-import 'package:elapse_app/classes/Tournament/tstats.dart';
+import 'package:elapse_app/providers/tournament_scope.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../rankings/tournament_stats_page.dart';
 
@@ -11,31 +11,26 @@ class SkillsWidget extends StatelessWidget {
     Key? key,
     required this.team,
     required this.stats,
-    this.games,
-    this.rankings,
-    this.tournamentSkills,
-    this.teams,
   }) : super(key: key);
 
   final Team team;
   final TournamentSkills stats;
-  final List<Game>? games;
-  final Map<int, TeamStats>? rankings;
-  final Map<int, TournamentSkills>? tournamentSkills;
-  final List<Team>? teams;
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => tournamentStatsPage(
-        context,
-        teamID: team.id,
-        teamNumber: team.teamNumber!,
-        teamName: team.teamName!,
-        games: games ?? [],
-        rankings: rankings ?? {},
-        tournamentSkills: tournamentSkills,
-        teams: teams,
-      ),
+      onTap: () {
+        final scope = context.read<TournamentScope>();
+        tournamentStatsPage(
+          context,
+          teamID: team.id,
+          teamNumber: team.teamNumber!,
+          teamName: team.teamName!,
+          tournament: scope.tournament,
+          division: scope.division,
+        );
+      },
       child: Container(
           height: 72,
           alignment: Alignment.center,

@@ -6,8 +6,10 @@ import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tskills.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/extras/twelve_hour.dart';
+import 'package:elapse_app/providers/tournament_scope.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:collection/collection.dart';
 
@@ -110,13 +112,12 @@ class NextGame extends StatelessWidget {
 
     return GestureDetector(
       onTap: () {
+        final scope = context.read<TournamentScope>();
         Navigator.push(context, MaterialPageRoute(builder: (context) {
           return GameScreen(
             game: game,
-            teams: teams,
-            teamStats: rankings,
-            allGames: games,
-            tournamentSkills: skills,
+            tournament: scope.tournament,
+            division: scope.division,
           );
         }));
       },

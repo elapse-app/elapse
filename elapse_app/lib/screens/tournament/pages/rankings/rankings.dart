@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
-import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_filter.dart';
@@ -26,7 +25,6 @@ class RankingsPage extends StatelessWidget {
     required this.skills,
     required this.worldSkills,
     required this.vda,
-    this.games,
   });
 
   final String searchQuery;
@@ -37,7 +35,6 @@ class RankingsPage extends StatelessWidget {
   final Map<int, TournamentSkills> skills;
   final List<WorldSkillsStats> worldSkills;
   final List<VDAStats>? vda;
-  final List<Game>? games;
 
   @override
   Widget build(BuildContext context) {
@@ -164,10 +161,6 @@ class RankingsPage extends StatelessWidget {
                 skills: skills[team.id],
                 worldSkills: worldSkills.firstWhereOrNull((e) => e.teamId == team.id),
                 vda: vda?.firstWhereOrNull((e) => e.id == team.id),
-                games: games,
-                allRankings: rankings,
-                tournamentSkills: skills,
-                teams: teams,
               ),
               Divider(
                 color: Theme.of(context).colorScheme.surfaceDim,

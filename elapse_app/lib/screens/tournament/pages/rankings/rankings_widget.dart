@@ -1,9 +1,9 @@
-import 'package:elapse_app/classes/Team/team.dart';
-import 'package:elapse_app/classes/Tournament/game.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
+import 'package:elapse_app/providers/tournament_scope.dart';
 import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/tournament_stats_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../classes/Team/vdaStats.dart';
 import '../../../../classes/Team/world_skills.dart';
@@ -22,10 +22,6 @@ class RankingsWidget extends StatelessWidget {
     this.skills,
     this.worldSkills,
     this.vda,
-    this.games,
-    this.allRankings,
-    this.tournamentSkills,
-    this.teams,
   });
 
   final int teamID;
@@ -38,10 +34,6 @@ class RankingsWidget extends StatelessWidget {
   final TournamentSkills? skills;
   final WorldSkillsStats? worldSkills;
   final VDAStats? vda;
-  final List<Game>? games;
-  final Map<int, TeamStats>? allRankings;
-  final Map<int, TournamentSkills>? tournamentSkills;
-  final List<Team>? teams;
 
   @override
   Widget build(BuildContext context) {
@@ -95,16 +87,17 @@ class RankingsWidget extends StatelessWidget {
 
     return GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () => tournamentStatsPage(
-          context,
-          teamID: teamID,
-          teamNumber: teamNumber,
-          teamName: teamName,
-          games: games ?? [],
-          rankings: allRankings ?? {},
-          tournamentSkills: tournamentSkills,
-          teams: teams,
-        ),
+        onTap: () {
+          final scope = context.read<TournamentScope>();
+          tournamentStatsPage(
+            context,
+            teamID: teamID,
+            teamNumber: teamNumber,
+            teamName: teamName,
+            tournament: scope.tournament,
+            division: scope.division,
+          );
+        },
         child: SizedBox(
             height: 72,
             child: Flex(

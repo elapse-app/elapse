@@ -11,7 +11,9 @@ import 'package:elapse_app/screens/tournament_mode/widgets/ranking_overview_widg
 import 'package:elapse_app/screens/widgets/elapse_loading_indicator.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
+import 'package:elapse_app/providers/tournament_scope.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../classes/Tournament/division.dart';
 
@@ -87,6 +89,7 @@ class _TMHomePageState extends State<TMHomePage> {
         orElse: () => tournament.divisions.first,
       );
     }
+
   }
 
   /// Get the current or upcoming session for leagues
@@ -346,10 +349,6 @@ class _TMHomePageState extends State<TMHomePage> {
                   game: game,
                   teamName: widget.teamNumber,
                   isAllianceColoured: true,
-                  teams: _tournament!.teams,
-                  teamStats: _division!.teamStats,
-                  allGames: _division!.games,
-                  tournamentSkills: _tournament!.tournamentSkills,
                 ),
                 Divider(
                   color: Theme.of(context).colorScheme.surfaceDim,
@@ -412,7 +411,7 @@ class _TMHomePageState extends State<TMHomePage> {
             ? "assets/dg4x.png"
             : "assets/lg4x.png";
 
-    return Scaffold(
+    Widget scaffold = Scaffold(
         body: RefreshIndicator(
       onRefresh: () async {
         _initializeTournament(forceRefresh: true);
@@ -601,5 +600,13 @@ class _TMHomePageState extends State<TMHomePage> {
         ],
       ),
     ));
+
+    if (_tournament != null && _division != null) {
+      return Provider<TournamentScope>.value(
+        value: TournamentScope(tournament: _tournament!, division: _division!),
+        child: scaffold,
+      );
+    }
+    return scaffold;
   }
 }

@@ -1,34 +1,33 @@
 import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
-import 'package:elapse_app/classes/Team/team.dart';
+import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
-import 'package:elapse_app/classes/Tournament/tskills.dart';
-import 'package:elapse_app/classes/Tournament/tstats.dart';
+import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/extras/twelve_hour.dart';
+import 'package:elapse_app/providers/tournament_scope.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
 
 class GameScreen extends StatelessWidget {
   const GameScreen({
     super.key,
     required this.game,
-    required this.teams,
-    this.teamStats,
-    this.allGames,
-    this.tournamentSkills,
+    required this.tournament,
+    required this.division,
   });
 
   final Game game;
-  final List<Team> teams;
-  final Map<int, TeamStats>? teamStats;
-  final List<Game>? allGames;
-  final Map<int, TournamentSkills>? tournamentSkills;
+  final Tournament tournament;
+  final Division division;
 
   @override
   Widget build(BuildContext context) {
+    final teams = tournament.teams;
+    final teamStats = division.teamStats;
     ColorPallete colorPallete;
     if (Theme.of(context).colorScheme.brightness == Brightness.dark) {
       colorPallete = darkPallete;
@@ -88,7 +87,9 @@ class GameScreen extends StatelessWidget {
     } else if ((game.redScore ?? 0) < (game.blueScore ?? 0)) {
       gameColor = colorPallete.blueAllianceBackground;
     }
-    return Scaffold(
+    return Provider<TournamentScope>.value(
+      value: TournamentScope(tournament: tournament, division: division),
+      child: Scaffold(
       body: CustomScrollView(
         slivers: [
           ElapseAppBar(
@@ -197,11 +198,7 @@ class GameScreen extends StatelessWidget {
                                       teamNumber: e.teamNumber,
                                       teamName: teamName,
                                       stats: stats,
-                                      allianceColor: colorPallete.redAllianceText,
-                                      games: allGames,
-                                      allRankings: teamStats,
-                                      tournamentSkills: tournamentSkills,
-                                      teams: teams),
+                                      allianceColor: colorPallete.redAllianceText),
                                   Divider(
                                     color: Theme.of(context).colorScheme.surfaceDim,
                                     thickness: 1,
@@ -262,11 +259,7 @@ class GameScreen extends StatelessWidget {
                                       teamNumber: e.teamNumber,
                                       teamName: teamName,
                                       stats: stats,
-                                      allianceColor: colorPallete.blueAllianceText,
-                                      games: allGames,
-                                      allRankings: teamStats,
-                                      tournamentSkills: tournamentSkills,
-                                      teams: teams),
+                                      allianceColor: colorPallete.blueAllianceText),
                                   Divider(
                                     color: Theme.of(context).colorScheme.surfaceDim,
                                     thickness: 1,
@@ -284,6 +277,7 @@ class GameScreen extends StatelessWidget {
           ),
         ],
       ),
+    ),
     );
   }
 }

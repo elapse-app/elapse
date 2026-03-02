@@ -19,10 +19,12 @@ import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:elapse_app/screens/widgets/elapse_loading_indicator.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
+import 'package:elapse_app/providers/tournament_scope.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../classes/Filters/gradeLevel.dart';
 import '../../../../classes/Filters/season.dart';
@@ -160,6 +162,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
         division.games!.isNotEmpty) {
       selectedIndex = 0;
     }
+
   }
 
   /// Updates tournament data while preserving UI state. Calls setState to
@@ -198,6 +201,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
     } else {
       selectedIndex = 0; // Schedule tab
     }
+
   }
 
   /// Process game lists once when data loads or division changes, not on every build
@@ -366,7 +370,6 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             worldSkills:
                 jsonDecode(worldSkillsData).map<WorldSkillsStats>((e) => WorldSkillsStats.fromJson(e)).toList(),
             vda: null,
-            games: division.games,
           );
         }
         return FutureBuilder(
@@ -395,7 +398,6 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                   skills: tournament.tournamentSkills!,
                   worldSkills: snapshot.data as List<WorldSkillsStats>,
                   vda: null,
-                  games: division.games,
                 );
             }
           },
@@ -420,8 +422,6 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
           divisions: tournament.divisions,
           sort: sortIndex,
           filter: filter,
-          games: division.games,
-          rankings: division.teamStats,
         );
       case 3:
         return InfoPage(
@@ -435,7 +435,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return Provider<TournamentScope>.value(
+      value: TournamentScope(tournament: tournament, division: division),
+      child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: RefreshIndicator(
           onRefresh: () async {
@@ -938,7 +940,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                           showPractice = !showPractice;
                         });
                       }, showPractice),
-                      sliver: showPractice ? MatchesView(games: practice, teams: tournament.teams, teamStats: division.teamStats, allGames: division.games, tournamentSkills: tournament.tournamentSkills) : SliverToBoxAdapter(),
+                      sliver: showPractice ? MatchesView(games: practice) : SliverToBoxAdapter(),
                     )
                   : SliverToBoxAdapter(),
 
@@ -950,7 +952,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                           showQualification = !showQualification;
                         });
                       }, showQualification),
-                      sliver: showQualification ? MatchesView(games: qualifications, teams: tournament.teams, teamStats: division.teamStats, allGames: division.games, tournamentSkills: tournament.tournamentSkills) : SliverToBoxAdapter(),
+                      sliver: showQualification ? MatchesView(games: qualifications) : SliverToBoxAdapter(),
                     )
                   : SliverToBoxAdapter(),
 
@@ -961,7 +963,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                           showElimination = !showElimination;
                         });
                       }, showElimination),
-                      sliver: showElimination ? MatchesView(games: eliminations, teams: tournament.teams, teamStats: division.teamStats, allGames: division.games, tournamentSkills: tournament.tournamentSkills) : SliverToBoxAdapter(),
+                      sliver: showElimination ? MatchesView(games: eliminations) : SliverToBoxAdapter(),
                     )
                   : SliverToBoxAdapter(),
 
@@ -986,7 +988,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
               )
             ],
           ),
-        ));
+        )),
+    );
   }
 
   Widget ScheduleTab(Color backgroundColor, String title, void Function() onTap, bool variable) {
