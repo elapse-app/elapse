@@ -121,6 +121,21 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
                 }
                 Database database = Database();
                 final currentUser = FirebaseAuth.instance.currentUser;
+                if (currentUser == null) {
+                  showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                            title: const Text("Not Signed In"),
+                            content: const Text("You must be signed in to join a group."),
+                            actions: [
+                              TextButton(
+                                  onPressed: () => Navigator.pop(context),
+                                  child: Text("Close",
+                                      style: TextStyle(color: Theme.of(context).colorScheme.secondary)))
+                            ],
+                          ));
+                  return;
+                }
                 final formattedCode = "${joinCode.substring(0, 4)}-${joinCode.substring(4)}";
                 final groupInfo = await database.getGroupInfo(formattedCode);
                 if (groupInfo == null) {
@@ -163,7 +178,7 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
                 }
 
                 await database
-                    .joinTeamGroup(formattedCode, currentUser!.uid)
+                    .joinTeamGroup(formattedCode, currentUser.uid)
                     .then((value) async {
                       if (value == null) {
                         await showDialog(

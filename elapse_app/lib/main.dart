@@ -13,7 +13,6 @@ import 'package:elapse_app/screens/tournament_mode/home.dart';
 import 'package:elapse_app/screens/tournament_mode/my_teams.dart';
 import 'package:elapse_app/screens/tournament_mode/tournament.dart';
 import 'package:elapse_app/setup/welcome/first_page.dart';
-import 'package:elapse_app/setup/configure/complete_setup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -32,7 +31,6 @@ final GlobalKey<SetupGateState> setupGateKey = GlobalKey<SetupGateState>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 late SharedPreferences prefs;
 late PackageInfo appInfo;
-const bool debugShowCompleteSetup = true;
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
