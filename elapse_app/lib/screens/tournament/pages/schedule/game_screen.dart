@@ -44,7 +44,7 @@ class GameScreen extends StatelessWidget {
     }
 
     String status = "Not played";
-    if ((game.redScore != 0 && game.blueScore != 0) || game.startedTime != null) {
+    if (((game.redScore ?? 0) != 0 && (game.blueScore ?? 0) != 0) || game.startedTime != null) {
       status = "Played";
     }
 

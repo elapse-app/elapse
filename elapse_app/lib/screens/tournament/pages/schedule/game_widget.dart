@@ -177,7 +177,7 @@ class GameWidget extends StatelessWidget {
                           style: TextStyle(fontSize: 16, height: 1, color: timeColor),
                           maxLines: 1,
                         ),
-                        (game.redScore != 0 && game.blueScore != 0) || game.startedTime != null
+                        ((game.redScore ?? 0) != 0 && (game.blueScore ?? 0) != 0) || game.startedTime != null
                             ? Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
