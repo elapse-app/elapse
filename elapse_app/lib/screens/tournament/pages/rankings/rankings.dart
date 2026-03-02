@@ -5,11 +5,13 @@ import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/main.dart';
+import 'package:elapse_app/providers/tournament_provider.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_filter.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dart';
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../classes/Team/vdaStats.dart';
 import '../../../../classes/Team/world_skills.dart';
@@ -37,7 +39,13 @@ class RankingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Tournament tournament = loadTournament(prefs.getString("recently-opened-tournament"));
+    final tournamentProvider = context.read<TournamentProvider>();
+    final tournament = tournamentProvider.tournament;
+    if (tournament == null) {
+      return SliverToBoxAdapter(
+        child: BigErrorMessage(icon: Icons.format_list_numbered_outlined, message: "Tournament not available"),
+      );
+    }
 
     List<Team> teams = tournament.teams;
     List<TeamPreview> savedTeams = [];

@@ -5,6 +5,7 @@ import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/extras/auth.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/providers/tournament_mode_provider.dart';
+import 'package:elapse_app/providers/tournament_provider.dart';
 import 'package:elapse_app/screens/error/error_page.dart';
 import 'package:elapse_app/screens/explore/explore.dart';
 import 'package:elapse_app/screens/home/home.dart';
@@ -104,6 +105,7 @@ void main() async {
         create: (context) => ColorProvider(),
       ),
       ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
+      ChangeNotifierProvider(create: (context) => TournamentProvider()),
     ],
     child: MyApp(key: myAppKey),
   ));

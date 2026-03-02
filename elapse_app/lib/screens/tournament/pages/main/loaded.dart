@@ -16,9 +16,11 @@ import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:elapse_app/screens/widgets/settings_button.dart';
+import 'package:elapse_app/providers/tournament_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
 import 'package:flutter_sticky_header/flutter_sticky_header.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../classes/Filters/gradeLevel.dart';
 import '../../../../classes/Filters/season.dart';
@@ -114,6 +116,10 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
     } else {
       selectedIndex = 0;
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<TournamentProvider>().setTournament(widget.tournament, division);
+    });
   }
 
   @override
@@ -288,6 +294,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                                             setState(() {
                                               division = value!;
                                               selectedIndex = selectedIndex;
+                                              context.read<TournamentProvider>().setDivision(value);
                                             })
                                           },
                                         )
@@ -318,6 +325,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> with Ti
                                       setState(() {
                                         division = value!;
                                         selectedIndex = selectedIndex;
+                                        context.read<TournamentProvider>().setDivision(value);
                                       })
                                     },
                                   ),

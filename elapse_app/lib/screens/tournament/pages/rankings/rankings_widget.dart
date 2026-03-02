@@ -1,10 +1,11 @@
 import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
-import 'package:elapse_app/main.dart';
+import 'package:elapse_app/providers/tournament_provider.dart';
 import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/tournament_stats_page.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../../../../classes/Team/vdaStats.dart';
 import '../../../../classes/Team/world_skills.dart';
@@ -36,7 +37,9 @@ class RankingsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Tournament tournament = loadTournament(prefs.getString("recently-opened-tournament"));
+    final tournamentProvider = context.read<TournamentProvider>();
+    final tournament = tournamentProvider.tournament;
+    if (tournament == null) return const SizedBox.shrink();
 
     int divisionIndex = getTeamDivisionIndex(tournament.divisions, teamID);
 
