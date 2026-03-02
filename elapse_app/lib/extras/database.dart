@@ -265,11 +265,7 @@ class Database {
   Future<void> clearScoutsheets(String groupID) async {
     try {
       var scoutsheets = await _firestore.collection('teamGroups').doc(groupID).collection('scoutsheets').get();
-      final batch = _firestore.batch();
-      for (var doc in scoutsheets.docs) {
-        batch.delete(doc.reference);
-      }
-      await batch.commit();
+      await _batchDeleteDocs(scoutsheets.docs);
     } catch(e) {
       print(e);
     }
@@ -278,13 +274,20 @@ class Database {
   Future<void> clearMatchNotes(String groupID) async {
     try {
       var matchNotes = await _firestore.collection('teamGroups').doc(groupID).collection('matchNotes').get();
+      await _batchDeleteDocs(matchNotes.docs);
+    } catch(e) {
+      print(e);
+    }
+  }
+
+  Future<void> _batchDeleteDocs(List<QueryDocumentSnapshot> docs) async {
+    for (var i = 0; i < docs.length; i += 500) {
       final batch = _firestore.batch();
-      for (var doc in matchNotes.docs) {
+      final chunk = docs.skip(i).take(500);
+      for (var doc in chunk) {
         batch.delete(doc.reference);
       }
       await batch.commit();
-    } catch(e) {
-      print(e);
     }
   }
 
