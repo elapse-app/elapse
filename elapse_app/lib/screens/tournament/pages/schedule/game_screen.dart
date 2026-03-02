@@ -36,11 +36,11 @@ class GameScreen extends StatelessWidget {
       colorPallete = lightPallete;
     }
     String time = "No Time";
-    if (game.startedTime != null) {
-      time = DateFormat.Hm().format(game.startedTime!.toLocal());
-    }
     if (game.scheduledTime != null) {
       time = DateFormat.Hm().format(game.scheduledTime!.toLocal());
+    }
+    if (game.startedTime != null) {
+      time = DateFormat.Hm().format(game.startedTime!.toLocal());
     }
 
     String status = "Not played";
