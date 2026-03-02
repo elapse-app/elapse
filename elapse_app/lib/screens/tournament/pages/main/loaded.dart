@@ -366,6 +366,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             worldSkills:
                 jsonDecode(worldSkillsData).map<WorldSkillsStats>((e) => WorldSkillsStats.fromJson(e)).toList(),
             vda: null,
+            games: division.games,
           );
         }
         return FutureBuilder(
@@ -394,6 +395,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                   skills: tournament.tournamentSkills!,
                   worldSkills: snapshot.data as List<WorldSkillsStats>,
                   vda: null,
+                  games: division.games,
                 );
             }
           },
@@ -418,6 +420,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
           divisions: tournament.divisions,
           sort: sortIndex,
           filter: filter,
+          games: division.games,
+          rankings: division.teamStats,
         );
       case 3:
         return InfoPage(
@@ -934,7 +938,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                           showPractice = !showPractice;
                         });
                       }, showPractice),
-                      sliver: showPractice ? MatchesView(games: practice) : SliverToBoxAdapter(),
+                      sliver: showPractice ? MatchesView(games: practice, teams: tournament.teams, teamStats: division.teamStats, allGames: division.games, tournamentSkills: tournament.tournamentSkills) : SliverToBoxAdapter(),
                     )
                   : SliverToBoxAdapter(),
 
@@ -946,7 +950,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                           showQualification = !showQualification;
                         });
                       }, showQualification),
-                      sliver: showQualification ? MatchesView(games: qualifications) : SliverToBoxAdapter(),
+                      sliver: showQualification ? MatchesView(games: qualifications, teams: tournament.teams, teamStats: division.teamStats, allGames: division.games, tournamentSkills: tournament.tournamentSkills) : SliverToBoxAdapter(),
                     )
                   : SliverToBoxAdapter(),
 
@@ -957,7 +961,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                           showElimination = !showElimination;
                         });
                       }, showElimination),
-                      sliver: showElimination ? MatchesView(games: eliminations) : SliverToBoxAdapter(),
+                      sliver: showElimination ? MatchesView(games: eliminations, teams: tournament.teams, teamStats: division.teamStats, allGames: division.games, tournamentSkills: tournament.tournamentSkills) : SliverToBoxAdapter(),
                     )
                   : SliverToBoxAdapter(),
 

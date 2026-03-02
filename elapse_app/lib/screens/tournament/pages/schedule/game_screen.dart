@@ -2,115 +2,33 @@ import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
-import 'package:elapse_app/classes/Tournament/tournament.dart';
+import 'package:elapse_app/classes/Tournament/tskills.dart';
 import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/extras/twelve_hour.dart';
-import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/rankings/rankings_widget.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
-import 'package:elapse_app/screens/widgets/elapse_loading_indicator.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class GameScreen extends StatefulWidget {
+class GameScreen extends StatelessWidget {
   const GameScreen({
     super.key,
-    required this.divisionId,
-    required this.roundNum,
-    required this.gameNum,
-    required this.instance,
+    required this.game,
+    required this.teams,
+    this.teamStats,
+    this.allGames,
+    this.tournamentSkills,
   });
 
-  final int divisionId;
-  final num roundNum;
-  final int gameNum;
-  final int instance;
-
-  @override
-  State<GameScreen> createState() => _GameScreenState();
-}
-
-class _GameScreenState extends State<GameScreen> {
-  Game? _game;
-  List<Team> teams = [];
-  Map<int, TeamStats>? _teamStats;
-  bool _isLoading = true;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadGame();
-  }
-
-  Future<void> _loadGame() async {
-    final tournamentId = prefs.getInt("tournamentID");
-    if (tournamentId != null && tournamentId != 0) {
-      final tournament = await getTournamentFromCache(tournamentId);
-      if (tournament != null && mounted) {
-        teams = tournament.teams;
-        // Find the game using composite key
-        for (final division in tournament.divisions) {
-          if (division.id == widget.divisionId && division.games != null) {
-            _teamStats = division.teamStats;
-            for (final game in division.games!) {
-              if (game.roundNum == widget.roundNum &&
-                  game.gameNum == widget.gameNum &&
-                  game.instance == widget.instance) {
-                _game = game;
-                break;
-              }
-            }
-            break;
-          }
-        }
-      }
-    }
-    if (mounted) {
-      setState(() => _isLoading = false);
-    }
-  }
+  final Game game;
+  final List<Team> teams;
+  final Map<int, TeamStats>? teamStats;
+  final List<Game>? allGames;
+  final Map<int, TournamentSkills>? tournamentSkills;
 
   @override
   Widget build(BuildContext context) {
-    if (_isLoading) {
-      return Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            ElapseAppBar(
-              title: Text("Game Info", style: const TextStyle(fontSize: 24, height: 1, fontWeight: FontWeight.w600)),
-              backNavigation: true,
-            ),
-            const RoundedTop(),
-            SliverFillRemaining(
-              child: ElapseLoadingIndicator(
-                message: "Loading match details",
-                size: LoadingSize.fullScreen,
-                icon: Icons.sports_esports_outlined,
-              ),
-            ),
-          ],
-        ),
-      );
-    }
-
-    if (_game == null) {
-      return Scaffold(
-        body: CustomScrollView(
-          slivers: [
-            ElapseAppBar(
-              title: Text("Game Info", style: const TextStyle(fontSize: 24, height: 1, fontWeight: FontWeight.w600)),
-              backNavigation: true,
-            ),
-            const RoundedTop(),
-            SliverFillRemaining(
-              child: Center(child: Text("Game not found")),
-            ),
-          ],
-        ),
-      );
-    }
-
     ColorPallete colorPallete;
     if (Theme.of(context).colorScheme.brightness == Brightness.dark) {
       colorPallete = darkPallete;
@@ -118,20 +36,20 @@ class _GameScreenState extends State<GameScreen> {
       colorPallete = lightPallete;
     }
     String time = "No Time";
-    if (_game!.startedTime != null) {
-      time = DateFormat.Hm().format(_game!.startedTime!.toLocal());
+    if (game.scheduledTime != null) {
+      time = DateFormat.Hm().format(game.scheduledTime!.toLocal());
     }
-    if (_game!.scheduledTime != null) {
-      time = DateFormat.Hm().format(_game!.scheduledTime!.toLocal());
+    if (game.startedTime != null) {
+      time = DateFormat.Hm().format(game.startedTime!.toLocal());
     }
 
     String status = "Not played";
-    if ((_game!.redScore != 0 && _game!.blueScore != 0) || _game!.startedTime != null) {
+    if (((game.redScore ?? 0) != 0 && (game.blueScore ?? 0) != 0) || game.startedTime != null) {
       status = "Played";
     }
 
     Widget gameText;
-    final gameName = _game!.gameName;
+    final gameName = game.gameName;
     if (gameName.startsWith("R") && gameName.length >= 4) {
       gameText = Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
         const Text("R",
@@ -165,9 +83,9 @@ class _GameScreenState extends State<GameScreen> {
 
     Color gameColor = Theme.of(context).colorScheme.tertiary;
 
-    if ((_game!.redScore ?? 0) > (_game!.blueScore ?? 0)) {
+    if ((game.redScore ?? 0) > (game.blueScore ?? 0)) {
       gameColor = colorPallete.redAllianceBackground;
-    } else if ((_game!.redScore ?? 0) < (_game!.blueScore ?? 0)) {
+    } else if ((game.redScore ?? 0) < (game.blueScore ?? 0)) {
       gameColor = colorPallete.blueAllianceBackground;
     }
     return Scaffold(
@@ -222,7 +140,7 @@ class _GameScreenState extends State<GameScreen> {
                             ),
                             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
                               const Text("Field", style: TextStyle(fontSize: 24, height: 1)),
-                              Text(_game!.fieldName ?? "",
+                              Text(game.fieldName ?? "",
                                   style: const TextStyle(fontSize: 24, height: 1, fontWeight: FontWeight.w500))
                             ])
                           ],
@@ -248,7 +166,7 @@ class _GameScreenState extends State<GameScreen> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          Text(_game!.redScore?.toString() ?? "",
+                          Text(game.redScore?.toString() ?? "",
                               style: TextStyle(
                                   fontSize: 32,
                                   height: 1,
@@ -259,12 +177,12 @@ class _GameScreenState extends State<GameScreen> {
                       const SizedBox(
                         height: 8,
                       ),
-                      if (_game!.redAlliancePreview != null)
+                      if (game.redAlliancePreview != null)
                         Column(
-                          children: _game!.redAlliancePreview!.map(
+                          children: game.redAlliancePreview!.map(
                             (e) {
                               final teamName = teams.where((t) => t.id == e.teamID).firstOrNull?.teamName ?? "";
-                              final stats = _teamStats?[e.teamID];
+                              final stats = teamStats?[e.teamID];
                               if (stats == null) {
                                 return EmptyRanking(
                                   teamName: e.teamNumber,
@@ -279,7 +197,11 @@ class _GameScreenState extends State<GameScreen> {
                                       teamNumber: e.teamNumber,
                                       teamName: teamName,
                                       stats: stats,
-                                      allianceColor: colorPallete.redAllianceText),
+                                      allianceColor: colorPallete.redAllianceText,
+                                      games: allGames,
+                                      allRankings: teamStats,
+                                      tournamentSkills: tournamentSkills,
+                                      teams: teams),
                                   Divider(
                                     color: Theme.of(context).colorScheme.surfaceDim,
                                     thickness: 1,
@@ -309,7 +231,7 @@ class _GameScreenState extends State<GameScreen> {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          Text(_game!.blueScore?.toString() ?? "",
+                          Text(game.blueScore?.toString() ?? "",
                               style: TextStyle(
                                   fontSize: 32,
                                   height: 1,
@@ -320,12 +242,12 @@ class _GameScreenState extends State<GameScreen> {
                       SizedBox(
                         height: 20,
                       ),
-                      if (_game!.blueAlliancePreview != null)
+                      if (game.blueAlliancePreview != null)
                         Column(
-                          children: _game!.blueAlliancePreview!.map(
+                          children: game.blueAlliancePreview!.map(
                             (e) {
                               final teamName = teams.where((t) => t.id == e.teamID).firstOrNull?.teamName ?? "";
-                              final stats = _teamStats?[e.teamID];
+                              final stats = teamStats?[e.teamID];
                               if (stats == null) {
                                 return EmptyRanking(
                                   teamName: e.teamNumber,
@@ -340,7 +262,11 @@ class _GameScreenState extends State<GameScreen> {
                                       teamNumber: e.teamNumber,
                                       teamName: teamName,
                                       stats: stats,
-                                      allianceColor: colorPallete.blueAllianceText),
+                                      allianceColor: colorPallete.blueAllianceText,
+                                      games: allGames,
+                                      allRankings: teamStats,
+                                      tournamentSkills: tournamentSkills,
+                                      teams: teams),
                                   Divider(
                                     color: Theme.of(context).colorScheme.surfaceDim,
                                     thickness: 1,

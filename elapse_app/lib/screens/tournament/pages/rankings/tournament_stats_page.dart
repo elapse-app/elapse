@@ -1,37 +1,32 @@
-import 'package:elapse_app/classes/Tournament/division.dart';
+import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
-import 'package:elapse_app/classes/Tournament/tournament.dart';
-import 'package:elapse_app/main.dart';
+import 'package:elapse_app/classes/Tournament/tskills.dart';
+import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:flutter/material.dart';
 
-Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNumber, String teamName) async {
-  final tournamentId = prefs.getInt("tournamentID");
-  if (tournamentId == null || tournamentId == 0) return;
-
-  final tournament = await getTournamentFromCache(tournamentId);
-  if (tournament == null) return;
-
-  int divisionIndex = getTeamDivisionIndex(tournament.divisions, teamID);
-
-  // Safely access division data - return early if missing
-  final division = tournament.divisions[divisionIndex];
-  final games = division.games;
-  final rankings = division.teamStats;
-  if (games == null || rankings == null) return Future.value();
-
-  final teamStats = rankings[teamID];
-  if (teamStats == null) return Future.value();
-  int rank = teamStats.rank;
-  int wins = teamStats.wins;
-  int losses = teamStats.losses;
-  int ties = teamStats.ties;
-  int awp = teamStats.awp;
-  double awpRate = teamStats.awpRate;
-  double opr = teamStats.opr;
-  double dpr = teamStats.dpr;
-  double ccwm = teamStats.ccwm;
+Future<void> tournamentStatsPage(
+  BuildContext context, {
+  required int teamID,
+  required String teamNumber,
+  required String teamName,
+  required List<Game> games,
+  required Map<int, TeamStats> rankings,
+  Map<int, TournamentSkills>? tournamentSkills,
+  List<Team>? teams,
+}) async {
+  final stats = rankings[teamID];
+  if (stats == null) return;
+  int rank = stats.rank;
+  int wins = stats.wins;
+  int losses = stats.losses;
+  int ties = stats.ties;
+  int awp = stats.awp;
+  double awpRate = stats.awpRate;
+  double opr = stats.opr;
+  double dpr = stats.dpr;
+  double ccwm = stats.ccwm;
 
   List<Game> teamGames = games.where(
     (element) {
@@ -139,7 +134,7 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "${teamStats.wp}",
+                                    "${stats.wp}",
                                     style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500, height: 1),
                                   ),
                                   const SizedBox(height: 4),
@@ -153,7 +148,7 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "${teamStats.ap}",
+                                    "${stats.ap}",
                                     style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500, height: 1),
                                   ),
                                   const SizedBox(height: 4),
@@ -167,7 +162,7 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    "${teamStats.sp}",
+                                    "${stats.sp}",
                                     style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500, height: 1),
                                   ),
                                   const SizedBox(height: 4),
@@ -204,7 +199,7 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                           "Skills Rank",
                           style: TextStyle(fontSize: 24),
                         ),
-                        Text("${tournament.tournamentSkills?[teamID]?.rank ?? "N/A"}",
+                        Text("${tournamentSkills?[teamID]?.rank ?? "N/A"}",
                             style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500))
                       ],
                     ),
@@ -322,6 +317,10 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                               game: game,
                               teamName: teamNumber,
                               isAllianceColoured: false,
+                              teams: teams,
+                              teamStats: rankings,
+                              allGames: games,
+                              tournamentSkills: tournamentSkills,
                             ),
                             Divider(
                               height: 3,

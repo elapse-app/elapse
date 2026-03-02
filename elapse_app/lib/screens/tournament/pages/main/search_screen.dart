@@ -259,6 +259,10 @@ class _SearchScreenState extends State<SearchScreen> {
                                         teamID: team.id,
                                         stats: division.teamStats![team.id]!,
                                         allianceColor: Theme.of(context).colorScheme.onSurface,
+                                        games: division.games,
+                                        allRankings: division.teamStats,
+                                        tournamentSkills: tournament.tournamentSkills,
+                                        teams: tournament.teams,
                                       ),
                                 index != filteredTeams.length - 1
                                     ? Divider(
@@ -312,6 +316,10 @@ class _SearchScreenState extends State<SearchScreen> {
                               children: [
                                 GameWidget(
                                   game: game,
+                                  teams: tournament.teams,
+                                  teamStats: division.teamStats,
+                                  allGames: division.games,
+                                  tournamentSkills: tournament.tournamentSkills,
                                 ),
                                 index != filteredGames.length - 1
                                     ? Divider(

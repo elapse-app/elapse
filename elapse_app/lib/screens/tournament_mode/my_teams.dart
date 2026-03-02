@@ -257,6 +257,10 @@ class TMMyTeamsState extends State<TMMyTeams> {
                       game: e,
                       teamName: selectedTeamPreview.teamNumber,
                       isAllianceColoured: false,
+                      teams: tournament.teams,
+                      teamStats: division.teamStats,
+                      allGames: division.games,
+                      tournamentSkills: tournament.tournamentSkills,
                     ),
                     Divider(
                       color: Theme.of(context).colorScheme.surfaceDim,
