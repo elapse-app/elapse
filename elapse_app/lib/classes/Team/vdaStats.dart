@@ -80,13 +80,16 @@ class VDAStats {
       losses: json["total_losses"]?.truncate(),
       ties: json["total_ties"]?.truncate(),
       matches: json["total_matches"]?.truncate(),
-      winPercent: double.tryParse(json["total_winning_percent"]?.toStringAsFixed(1) ?? ""),
+      winPercent: double.tryParse(
+          json["total_winning_percent"]?.toStringAsFixed(1) ?? ""),
       trueSkill: json["trueskill"],
       trueSkillGlobalRank: json["ts_ranking"],
       trueSkillRegionRank: json["ts_ranking_region"],
       regionalQual: json["qualified_for_regionals"],
       worldsQual: json["qualified_for_worlds"],
-      eventRegion: json["event_region"] == "British Columbia" ? "British Columbia (BC)" : json["event_region"],
+      eventRegion: json["event_region"] == "British Columbia"
+          ? "British Columbia (BC)"
+          : json["event_region"],
       location: Location(
         region: json["loc_region"],
         country: json["loc_country"],
@@ -116,15 +119,22 @@ class VDAStats {
                   ((json["total_ties"] + json["elimination_losses"]) ?? 0))
               ?.truncate() ??
           0,
-      winPercent: double.parse((((json["total_wins"] + json["elimination_wins"]) ?? 0) /
+      winPercent: double.parse((((json["total_wins"] +
+                      json["elimination_wins"]) ??
+                  0) /
               ((((json["total_wins"] + json["elimination_wins"]) ?? 0) +
-                          ((json["total_losses"] + json["elimination_losses"]) ?? 0) +
-                          ((json["total_ties"] + json["elimination_losses"]) ?? 0)) ==
+                          ((json["total_losses"] +
+                                  json["elimination_losses"]) ??
+                              0) +
+                          ((json["total_ties"] + json["elimination_losses"]) ??
+                              0)) ==
                       0
                   ? 1
                   : (((json["total_wins"] + json["elimination_wins"]) ?? 0) +
-                      ((json["total_losses"] + json["elimination_losses"]) ?? 0) +
-                      ((json["total_ties"] + json["elimination_losses"]) ?? 0))) *
+                      ((json["total_losses"] + json["elimination_losses"]) ??
+                          0) +
+                      ((json["total_ties"] + json["elimination_losses"]) ??
+                          0))) *
               100)
           .toStringAsFixed(1)),
       trueSkill: json["trueskill"],
@@ -140,46 +150,82 @@ class VDAStats {
 Future<List<VDAStats>> getTrueSkillData(int seasonId) async {
   final String? vdaData = prefs.getString("vdaData");
 
-  List<dynamic> parsed = [];
-
   if (seasonId < 154) {
     // TiP season ID (earliest season that had VDA stats)
     return List<VDAStats>.empty();
   }
 
-  if (seasonId != seasons[0].vrcId) {
-    final response = await http.get(
-      Uri.parse("https://vrc-data-analysis.com/v1/historical_allteams/$seasonId"),
-    );
-    parsed = jsonDecode(response.body) as List;
+  try {
+    if (seasonId != seasons[0].vrcId) {
+      final response = await http
+          .get(
+            Uri.parse(
+                "https://vrc-data-analysis.com/v1/historical_allteams/$seasonId"),
+          )
+          .timeout(const Duration(seconds: 12));
+      if (response.statusCode != 200) {
+        return const [];
+      }
+      final parsed = jsonDecode(response.body);
+      if (parsed is! List) {
+        return const [];
+      }
+      return parsed
+          .cast<Map<String, dynamic>>()
+          .map(VDAStats.fromHistorical)
+          .toList();
+    }
 
-    List<VDAStats> vdaStats = parsed.map<VDAStats>((json) => VDAStats.fromHistorical(json)).toList();
-    return vdaStats;
-  } else if (!hasCachedTrueSkillData()) {
-    final response = await http.get(
-      Uri.parse("https://vrc-data-analysis.com/v1/allteams"),
-    );
+    late final List<dynamic> parsed;
+    if (!hasCachedTrueSkillData()) {
+      final response = await http
+          .get(Uri.parse("https://vrc-data-analysis.com/v1/allteams"))
+          .timeout(const Duration(seconds: 12));
+      if (response.statusCode != 200) {
+        return const [];
+      }
+      final decoded = jsonDecode(response.body);
+      if (decoded is! List) {
+        return const [];
+      }
+      parsed = decoded;
+      await prefs.setString("vdaData", response.body);
+      await prefs.setString(
+        "vdaExpiry",
+        DateTime.now().add(const Duration(hours: 2)).toIso8601String(),
+      );
+    } else {
+      final decoded = jsonDecode(vdaData!);
+      if (decoded is! List) {
+        return const [];
+      }
+      parsed = decoded;
+    }
 
-    parsed = jsonDecode(response.body) as List;
-    prefs.setString("vdaData", response.body);
-    prefs.setString("vdaExpiry", DateTime.now().add(const Duration(hours: 2)).toString());
-  } else {
-    parsed = jsonDecode(vdaData!) as List;
+    return parsed.cast<Map<String, dynamic>>().map(VDAStats.fromJson).toList();
+  } catch (_) {
+    // VDA is an optional source. Callers can render their existing limited-data
+    // states while it is unreachable instead of receiving an unhandled Future.
+    return const [];
   }
-
-  List<VDAStats> vdaStats = parsed.map<VDAStats>((json) => VDAStats.fromJson(json)).toList();
-  return vdaStats;
 }
 
 Future<VDAStats?> getTrueSkillDataForTeam(int seasonId, String teamNum) async {
   final response = await getTrueSkillData(seasonId);
-  if (response.isEmpty) return null;
-  return response.firstWhere((element) => element.teamName == teamNum || element.teamNum == teamNum);
+  for (final team in response) {
+    if (team.teamName == teamNum || team.teamNum == teamNum) {
+      return team;
+    }
+  }
+  return null;
 }
 
 bool hasCachedTrueSkillData() {
   final String? vdaData = prefs.getString("vdaData");
   final String? expiryDate = prefs.getString("vdaExpiry");
 
-  return vdaData != null && expiryDate != null && DateTime.parse(expiryDate).isAfter(DateTime.now());
+  if (vdaData == null || expiryDate == null) {
+    return false;
+  }
+  return DateTime.tryParse(expiryDate)?.isAfter(DateTime.now()) ?? false;
 }

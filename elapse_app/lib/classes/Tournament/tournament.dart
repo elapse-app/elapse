@@ -128,7 +128,7 @@ Tournament loadTournament(json) {
 
 Future<Tournament> getTournamentDetails(int tournamentID) async {
   final response = await http.get(
-    Uri.parse("https://www.robotevents.com/api/v2/events/$tournamentID"),
+    Uri.parse("https://events.vex.com/api/v2/events/$tournamentID"),
     headers: {
       HttpHeaders.authorizationHeader: getToken(),
     },
