@@ -7,7 +7,7 @@ class ErrorPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Theme.of(context).canvasColor,
+        color: Theme.of(context).colorScheme.surface,
         child: Padding(
           padding: const EdgeInsets.all(23.0),
           child: Center(
@@ -22,7 +22,8 @@ class ErrorPage extends StatelessWidget {
                       color: Theme.of(context).colorScheme.secondary,
                     )),
                 SizedBox(height: 36),
-                Text("Something went wrong when trying to load this. We apologize for the inconvenience.",
+                Text(
+                    "Something went wrong when trying to load this. We apologize for the inconvenience.",
                     style: TextStyle(fontSize: 18)),
                 Spacer(),
               ],

@@ -85,14 +85,14 @@ Future<List<WorldSkillsStats>> getWorldSkillsRankings(
       grade != getGradeLevel(prefs.getString("defaultGrade"))) {
     final response = await http.get(
       Uri.parse(
-          "https://www.robotevents.com/api/seasons/$seasonID/skills?grade_level=${grade.name.replaceAll(" ", "%20")}"),
+          "https://events.vex.com/api/seasons/$seasonID/skills?grade_level=${grade.name.replaceAll(" ", "%20")}"),
     );
 
     parsed = jsonDecode(response.body) as List;
   } else if (!hasCachedWorldSkillsRankings(seasonID, grade)) {
     final response = await http.get(
       Uri.parse(
-          "https://www.robotevents.com/api/seasons/$seasonID/skills?grade_level=${grade.name.replaceAll(" ", "%20")}"),
+          "https://events.vex.com/api/seasons/$seasonID/skills?grade_level=${grade.name.replaceAll(" ", "%20")}"),
     );
 
     parsed = jsonDecode(response.body) as List;

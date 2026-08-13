@@ -43,24 +43,8 @@ class firebaseTokens {
 }
 ```  
   
-You will also need to add a `token.dart` file to `/elapse_app/lib/extras` which contains your tokens from the [RobotEvents.com api](https://www.robotevents.com/api/v2). Elapse utilizes several tokens to prevent getting ratelimited by RobotEvents, but only 1 token should be required.
-```dart
-import 'dart:math';
+Elapse uses the [VEX Events API v2](https://events.vex.com/api/v2). Its access
+token is configured directly in `elapse_app/lib/extras/token.dart`, so a fresh
+clone can run without any extra token setup.
 
-String getToken() {
-  List<String> tokens = [
-    "Bearer ",
-    "Bearer ",
-    "Bearer ",
-    "Bearer ",
-    "Bearer ",
-    "Bearer ",
-    "Bearer ",
-    "Bearer ",
-  ];
-
-  int randomIndex = Random().nextInt(tokens.length);
-  return tokens[randomIndex];
-}
-```  
 In addition, Elapse pulls data from [https://vrc-data-analysis.com/](https://vrc-data-analysis.com/), which provides TrueSkill information, some skills data, and more.

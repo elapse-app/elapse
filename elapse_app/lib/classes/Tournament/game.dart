@@ -157,7 +157,7 @@ Future<List<Game>> _fetchDivisionMatches(int eventId, divisionID) async {
   List<Game> divisionMatches = [];
   final response = await http.get(
     Uri.parse(
-        "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionID/matches?per_page=250"),
+        "https://events.vex.com/api/v2/events/$eventId/divisions/$divisionID/matches?per_page=250"),
     headers: {
       HttpHeaders.authorizationHeader: getToken(),
     },
@@ -188,7 +188,7 @@ Future<void> _fetchAdditionalPage(
     int eventId, int divisionId, int page, List<Game> divisionMatches) async {
   final response = await http.get(
     Uri.parse(
-        "https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/matches?page=$page&per_page=250"),
+        "https://events.vex.com/api/v2/events/$eventId/divisions/$divisionId/matches?page=$page&per_page=250"),
     headers: {
       HttpHeaders.authorizationHeader: getToken(),
     },
