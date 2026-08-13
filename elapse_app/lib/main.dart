@@ -24,7 +24,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
-import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:elapse_app/classes/Miscellaneous/remote_config.dart';
 
 final GlobalKey<MyAppState> myAppKey = GlobalKey<MyAppState>();
@@ -34,25 +33,33 @@ late PackageInfo appInfo;
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // If you're going  use other Firebase services in the background, such as Firestore,
-  // make sure you call `initializeApp` before using other Firebase services.
-
-  print("Handling a background message: ${message.messageId}");
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+  }
 }
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([
+  await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-
-  await FirebaseRemoteConfigService().initialize();
-
   prefs = await SharedPreferences.getInstance();
+
+  var firebaseReady = false;
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    firebaseReady = true;
+    await FirebaseRemoteConfigService().initialize();
+  } catch (error, stackTrace) {
+    // Firebase-backed features can recover when connectivity returns. Do not
+    // prevent the locally cached app from starting in the meantime.
+    debugPrint('Firebase startup failed: $error\n$stackTrace');
+  }
 
   // Set android system navbar colour
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
@@ -61,32 +68,44 @@ void main() async {
 
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-  if ((prefs.getBool("isSetUp") ?? false) &&
+  if (firebaseReady &&
+      (prefs.getBool("isSetUp") ?? false) &&
       FirebaseAuth.instance.currentUser != null) {
-    print(FirebaseAuth.instance.currentUser);
     await checkAccountDeleted();
   }
 
   ErrorWidget.builder = (FlutterErrorDetails details) {
-    return ErrorPage();
+    FlutterError.presentError(details);
+    // ErrorPage can itself be the root widget after an early build failure.
+    // Giving it a Material ancestor prevents the former all-black fallback.
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(colorScheme: lightScheme, fontFamily: 'Manrope'),
+      home: const ErrorPage(),
+    );
   };
 
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  if (firebaseReady) {
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-  FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-    print('Got a message whilst in the foreground!');
-    print('Message data: ${message.data}');
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      final notification = message.notification;
+      final title = notification?.title;
+      final body = notification?.body;
 
-    if (message.notification != null) {
-      print('Message also contained a notification: ${message.notification}');
-    }
+      if (title == null || title.isEmpty || body == null || body.isEmpty) {
+        return;
+      }
 
-    if (message.notification!.title != "" && message.notification!.body != "") {
+      final context = navigatorKey.currentContext;
+      if (context == null) {
+        return;
+      }
       showDialog(
-        context: navigatorKey.currentContext!,
+        context: context,
         builder: (context) => AlertDialog(
-          title: Text(message.notification!.title ?? 'Upcoming match'),
-          content: Text(message.notification!.body ?? 'No content'),
+          title: Text(title),
+          content: Text(body),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -95,8 +114,8 @@ void main() async {
           ],
         ),
       );
-    }
-  });
+    });
+  }
 
   runApp(MultiProvider(
     providers: [
@@ -121,28 +140,53 @@ class MyAppState extends State<MyApp> {
   int selectedIndex = 0;
   bool isTournamentMode = false;
   bool isLoggedIn = false;
-  late int teamID;
-  late String teamNumber;
+  int? teamID;
+  String? teamNumber;
+
+  TeamPreview? _savedTeam() {
+    final rawTeam = prefs.getString('savedTeam');
+    if (rawTeam == null || rawTeam.isEmpty) {
+      return null;
+    }
+
+    try {
+      final decoded = jsonDecode(rawTeam);
+      if (decoded is! Map<String, dynamic>) {
+        return null;
+      }
+      final id = decoded['teamID'];
+      final number = decoded['teamNumber'];
+      if (id is! num || number is! String || number.isEmpty) {
+        return null;
+      }
+      return TeamPreview(teamID: id.toInt(), teamNumber: number);
+    } catch (_) {
+      return null;
+    }
+  }
 
   @override
   void initState() {
     super.initState();
     _initPackageInfo();
-    if (prefs.getBool("isSetUp") ?? false) {
-      teamID = jsonDecode(prefs.getString("savedTeam")!)["teamID"];
-      teamNumber = jsonDecode(prefs.getString("savedTeam")!)["teamNumber"];
+    final savedTeam = _savedTeam();
+    if ((prefs.getBool("isSetUp") ?? false) && savedTeam != null) {
+      teamID = savedTeam.teamID;
+      teamNumber = savedTeam.teamNumber;
       initializeTournamentMode();
     }
   }
 
-
   void initializeTournamentMode() {
     if (prefs.getBool("isTournamentMode") ?? false) {
       int? tournamentID = prefs.getInt("tournamentID");
-      teamID = jsonDecode(prefs.getString("savedTeam")!)["teamID"];
-      teamNumber = jsonDecode(prefs.getString("savedTeam")!)["teamNumber"];
-      if (tournamentID != null) {
+      final savedTeam = _savedTeam();
+      if (tournamentID != null && savedTeam != null) {
+        teamID = savedTeam.teamID;
+        teamNumber = savedTeam.teamNumber;
         isTournamentMode = true;
+      } else {
+        isTournamentMode = false;
       }
     } else {
       isTournamentMode = false;
@@ -163,7 +207,8 @@ class MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    if (!(prefs.getBool("isSetUp") ?? false)) {
+    final savedTeam = _savedTeam();
+    if (!(prefs.getBool("isSetUp") ?? false) || savedTeam == null) {
       return Consumer<ColorProvider>(
         builder: (context, value, child) {
           prefs.setString("theme", "system");
@@ -187,17 +232,14 @@ class MyAppState extends State<MyApp> {
         },
       );
     }
-    TeamPreview savedTeam = TeamPreview(
-        teamNumber: jsonDecode(prefs.getString("savedTeam")!)["teamNumber"],
-        teamID: jsonDecode(prefs.getString("savedTeam")!)["teamID"]);
     List<Widget> screens;
 
     isTournamentMode
         ? screens = [
             TMHomePage(
               tournamentID: prefs.getInt("tournamentID") ?? 0,
-              teamID: teamID,
-              teamNumber: teamNumber,
+              teamID: teamID!,
+              teamNumber: teamNumber!,
             ),
             TMTournamentScreen(
               tournamentID: prefs.getInt("tournamentID") ?? 0,
