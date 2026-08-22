@@ -87,7 +87,7 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
   List<Game> allMatches = [];
   List<Game> qualiMatches = [];
   Map<int, TournamentSkills> skills = {};
-  var rankings;
+  int rankingsLastPage = 1;
   List parsedRankings = [];
 
   List<Future<void>> requestFutures = [];
@@ -95,20 +95,23 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
     allMatches = m;
     qualiMatches = m.where((e) => e.roundNum == 2).toList();
   }));
-  requestFutures.add(http.get(
-    Uri.parse(
-        "https://events.vex.com/api/v2/events/$eventId/divisions/$divisionId/rankings?per_page=250"),
-    headers: {
-      HttpHeaders.authorizationHeader: getToken(),
-    },
-  ).then((rankingsResponse) {
-    rankings = rankingsResponse;
-
-    if (rankingsResponse.statusCode != 200) {
-      throw Exception("Failed to get rankings");
-    }
-    parsedRankings = jsonDecode(rankingsResponse.body)["data"] as List;
-  }));
+  requestFutures.add(http
+      .get(
+        Uri.parse(
+            "https://events.vex.com/api/v2/events/$eventId/divisions/$divisionId/rankings?per_page=250"),
+        headers: {
+          HttpHeaders.authorizationHeader: getToken(),
+        },
+      )
+      .timeout(const Duration(seconds: 12))
+      .then((rankingsResponse) {
+        if (rankingsResponse.statusCode != 200) {
+          throw Exception("Failed to get rankings");
+        }
+        final decoded = jsonDecode(rankingsResponse.body);
+        parsedRankings = decoded["data"] as List;
+        rankingsLastPage = (decoded["meta"]["last_page"] as num).toInt();
+      }));
   await Future.wait(requestFutures);
   if (parsedRankings.isEmpty) {
     return [allMatches, null];
@@ -148,8 +151,7 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
   }
 
   List<Future<void>> pgFutures = [];
-  int teamsLastPage = jsonDecode(rankings.body)["meta"]["last_page"];
-  for (int pg = 2; pg <= teamsLastPage; pg++) {
+  for (int pg = 2; pg <= rankingsLastPage; pg++) {
     Future<void> pgResponse = http.get(
         Uri.parse(
             "https://events.vex.com/api/v2/events/$eventId/divisions/$divisionId/rankings?page=$pg"),

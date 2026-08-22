@@ -33,7 +33,8 @@ class BigErrorMessage extends StatelessWidget {
         Text(
           message,
           style: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75),
           ),
         ),
       ],

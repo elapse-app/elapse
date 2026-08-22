@@ -1,7 +1,4 @@
-import 'dart:io';
-
 import 'package:elapse_app/classes/ScoutSheet/scoutSheetUi.dart';
-import 'package:elapse_app/screens/team_screen/camera/camera.dart';
 import 'package:elapse_app/screens/team_screen/camera/photo_bottom_sheet.dart';
 import 'package:flutter/material.dart';
 
@@ -24,14 +21,19 @@ List<Widget> EditState(
     },
     child: Container(
       decoration: BoxDecoration(
-          borderRadius: const BorderRadius.all(Radius.circular(9)), color: Theme.of(context).colorScheme.tertiary),
+          borderRadius: const BorderRadius.all(Radius.circular(9)),
+          color: Theme.of(context).colorScheme.tertiary),
       height: 175,
       child: const Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Column(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: [Icon(Icons.add_photo_alternate_outlined), SizedBox(height: 5), Text("Add Photo")],
+            children: [
+              Icon(Icons.add_photo_alternate_outlined),
+              SizedBox(height: 5),
+              Text("Add Photo")
+            ],
           ),
         ],
       ),
@@ -61,7 +63,9 @@ List<Widget> EditState(
                 Container(
                   height: 50,
                   width: 50,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: Colors.black.withValues(alpha: 0.5)),
+                  decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.black.withValues(alpha: 0.5)),
                 ),
                 IconButton(
                     onPressed: () {
@@ -86,10 +90,12 @@ List<Widget> EditState(
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                            borderRadius: const BorderRadius.all(Radius.circular(9)),
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(9)),
                             color: Theme.of(context).colorScheme.tertiary),
                         height: 175,
-                        child: const Icon(Icons.add_photo_alternate_outlined, size: 40),
+                        child: const Icon(Icons.add_photo_alternate_outlined,
+                            size: 40),
                       ),
                     )
                   ]
@@ -114,7 +120,7 @@ List<Widget> EditState(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "${teamNumber} Specs",
+              "$teamNumber Specs",
               style: TextStyle(fontSize: 24),
             ),
             SizedBox(height: 18),
@@ -133,7 +139,8 @@ List<Widget> EditState(
                   flex: 2,
                   fit: FlexFit.tight,
                   child: TextFormField(
-                    decoration: ElapseInputDecoration(context, "# of DT Motors"),
+                    decoration:
+                        ElapseInputDecoration(context, "# of DT Motors"),
                     onChanged: (value) {
                       updateProperty("numMotors", value);
                     },
@@ -248,7 +255,8 @@ InputDecoration ElapseInputDecoration(BuildContext context, String label) {
     ),
     focusedBorder: OutlineInputBorder(
       borderRadius: BorderRadius.all(Radius.circular(9)),
-      borderSide: BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
+      borderSide:
+          BorderSide(color: Theme.of(context).colorScheme.primary, width: 2),
     ),
   );
 }

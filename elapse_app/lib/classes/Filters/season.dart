@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../screens/widgets/app_bar.dart';
@@ -157,10 +156,10 @@ class SeasonFilterPage extends StatefulWidget {
     super.key,
     required this.selected,
     List<Season>? seasonsList,
-  }) : this.seasonsList = seasonsList ?? seasons;
+  }) : seasonsList = seasonsList ?? seasons;
 
-  Season selected;
-  List<Season> seasonsList;
+  final Season selected;
+  final List<Season> seasonsList;
 
   @override
   State<SeasonFilterPage> createState() => _SeasonFilterPageState();
@@ -168,6 +167,13 @@ class SeasonFilterPage extends StatefulWidget {
 
 class _SeasonFilterPageState extends State<SeasonFilterPage> {
   String searchQuery = "";
+  late Season _selected;
+
+  @override
+  void initState() {
+    super.initState();
+    _selected = widget.selected;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -190,7 +196,7 @@ class _SeasonFilterPageState extends State<SeasonFilterPage> {
             ),
           ]),
           backNavigation: true,
-          returnData: widget.selected,
+          returnData: _selected,
         ),
         SliverPersistentHeader(
           pinned: true,
@@ -240,7 +246,7 @@ class _SeasonFilterPageState extends State<SeasonFilterPage> {
           delegate: SliverChildBuilderDelegate(
             (context, index) {
               final season = filteredSeason[index];
-              bool selected = widget.selected == season;
+              bool selected = _selected == season;
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 23),
                 child: Column(children: [
@@ -280,10 +286,10 @@ class _SeasonFilterPageState extends State<SeasonFilterPage> {
                       onTap: () {
                         setState(() {
                           if (widget.seasonsList.contains(season)) {
-                            widget.selected = season;
+                            _selected = season;
                           }
                         });
-                        Navigator.pop(context, widget.selected);
+                        Navigator.pop(context, _selected);
                       }),
                   index != filteredSeason.length - 1
                       ? Divider(

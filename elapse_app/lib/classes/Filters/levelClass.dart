@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../screens/widgets/app_bar.dart';
@@ -26,12 +25,12 @@ List<LevelClass> levelClasses = [
 ];
 
 class LevelClassFilterPage extends StatefulWidget {
-  LevelClassFilterPage({
+  const LevelClassFilterPage({
     super.key,
     required this.selected,
   });
 
-  LevelClass selected;
+  final LevelClass selected;
 
   @override
   State<LevelClassFilterPage> createState() => _LevelClassFilterPageState();
@@ -39,13 +38,21 @@ class LevelClassFilterPage extends StatefulWidget {
 
 class _LevelClassFilterPageState extends State<LevelClassFilterPage> {
   String searchQuery = "";
+  late LevelClass _selected;
+
+  @override
+  void initState() {
+    super.initState();
+    _selected = widget.selected;
+  }
 
   @override
   Widget build(BuildContext context) {
     List<LevelClass> filteredSeason = levelClasses;
     if (searchQuery.isNotEmpty) {
       filteredSeason = levelClasses
-          .where((e) => e.name.toLowerCase().contains(searchQuery.toLowerCase()))
+          .where(
+              (e) => e.name.toLowerCase().contains(searchQuery.toLowerCase()))
           .toList();
     }
 
@@ -60,7 +67,7 @@ class _LevelClassFilterPageState extends State<LevelClassFilterPage> {
             ),
           ]),
           backNavigation: true,
-          returnData: widget.selected,
+          returnData: _selected,
         ),
         SliverPersistentHeader(
           pinned: true,
@@ -108,9 +115,9 @@ class _LevelClassFilterPageState extends State<LevelClassFilterPage> {
         ),
         SliverList(
           delegate: SliverChildBuilderDelegate(
-                (context, index) {
+            (context, index) {
               final season = filteredSeason[index];
-              bool selected = widget.selected == season;
+              bool selected = _selected == season;
               return Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 23),
                 child: Column(children: [
@@ -120,7 +127,7 @@ class _LevelClassFilterPageState extends State<LevelClassFilterPage> {
                         alignment: Alignment.center,
                         decoration: BoxDecoration(
                           borderRadius:
-                          const BorderRadius.all(Radius.circular(10)),
+                              const BorderRadius.all(Radius.circular(10)),
                           color: selected
                               ? Theme.of(context).colorScheme.primary
                               : Theme.of(context).colorScheme.surface,
@@ -142,14 +149,14 @@ class _LevelClassFilterPageState extends State<LevelClassFilterPage> {
                       ),
                       onTap: () {
                         setState(() {
-                          widget.selected = season;
+                          _selected = season;
                         });
                       }),
                   index != filteredSeason.length - 1
                       ? Divider(
-                    height: 3,
-                    color: Theme.of(context).colorScheme.surfaceDim,
-                  )
+                          height: 3,
+                          color: Theme.of(context).colorScheme.surfaceDim,
+                        )
                       : Container(),
                 ]),
               );

@@ -10,8 +10,8 @@ import '../Filters/gradeLevel.dart';
 import '../Filters/season.dart';
 
 class TeamPreview {
-  String teamNumber;
-  int teamID;
+  final String teamNumber;
+  final int teamID;
   Location? location;
   String? teamName;
   GradeLevel? gradeLevel;
@@ -23,6 +23,26 @@ class TeamPreview {
     this.teamName,
     this.gradeLevel,
   });
+
+  factory TeamPreview.fromJson(Map<String, dynamic> json) {
+    final teamNumber = json['teamNumber'];
+    final teamId = json['teamID'];
+
+    if (teamNumber is! String || teamNumber.trim().isEmpty || teamId is! num) {
+      throw const FormatException('Invalid saved team');
+    }
+
+    final locationJson = json['location'];
+    return TeamPreview(
+      teamNumber: teamNumber,
+      teamID: teamId.toInt(),
+      location: locationJson is Map<String, dynamic>
+          ? loadLocation(locationJson)
+          : null,
+      teamName: json['teamName'] as String?,
+      gradeLevel: gradeLevels[json['grade']],
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -41,19 +61,32 @@ class TeamPreview {
   }
 
   @override
-  int get hashCode => teamNumber.hashCode;
+  int get hashCode => teamID.hashCode;
 }
 
-TeamPreview loadTeamPreview(teamPreview) {
-  dynamic preview = jsonDecode(teamPreview);
-  return TeamPreview(
-    teamNumber: preview["teamNumber"],
-    teamID: preview["teamID"],
-    location:
-        preview["location"] != null ? loadLocation(preview["location"]) : null,
-    teamName: preview["teamName"],
-    gradeLevel: gradeLevels[preview["grade"]],
-  );
+TeamPreview loadTeamPreview(String? teamPreview) {
+  if (teamPreview == null || teamPreview.trim().isEmpty) {
+    throw const FormatException('Invalid saved team');
+  }
+  final decoded = jsonDecode(teamPreview);
+  if (decoded is! Map<String, dynamic>) {
+    throw const FormatException('Invalid saved team');
+  }
+  return TeamPreview.fromJson(decoded);
+}
+
+TeamPreview? tryLoadTeamPreview(String? teamPreview) {
+  if (teamPreview == null || teamPreview.trim().isEmpty) {
+    return null;
+  }
+
+  try {
+    return loadTeamPreview(teamPreview);
+  } on FormatException {
+    return null;
+  } on TypeError {
+    return null;
+  }
 }
 
 Future<List<TeamPreview>> fetchTeamPreview(String searchQuery) async {

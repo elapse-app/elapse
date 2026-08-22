@@ -46,7 +46,9 @@ class Award {
       qualifications: qualifications,
       tournamentName: json["event"]["name"],
       teamWinners: teamWinners,
-      individualWinners: json["individualWinners"].isEmpty ? null : json["individualWinners"].cast<String>(),
+      individualWinners: json["individualWinners"].isEmpty
+          ? null
+          : json["individualWinners"].cast<String>(),
     );
   }
 

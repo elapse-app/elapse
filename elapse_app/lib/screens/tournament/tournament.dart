@@ -50,7 +50,7 @@ class _TournamentScreenState extends State<TournamentScreen> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const TournamentLoadingScreen();
         } else if (snapshot.hasData) {
-          Tournament tournament = snapshot.data! as Tournament;
+          Tournament tournament = snapshot.data!;
           prefs.setString(
               "recently-opened-tournament", jsonEncode(tournament.toJson()));
           return TournamentLoadedScreen(

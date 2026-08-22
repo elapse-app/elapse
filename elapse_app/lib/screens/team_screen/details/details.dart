@@ -11,7 +11,6 @@ import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/my_team/my_team.dart';
 import 'package:elapse_app/screens/tournament_mode/picklist/picklist.dart';
-import 'package:elapse_app/screens/tournament_mode/picklist/picklist_widget.dart';
 import 'package:elapse_app/screens/widgets/tournament_preview_widget.dart';
 import 'package:flutter/material.dart';
 
@@ -37,9 +36,11 @@ List<Widget> Details(
       padding: const EdgeInsets.symmetric(horizontal: 23),
       sliver: SliverToBoxAdapter(
         child: Container(
-          decoration:
-              BoxDecoration(borderRadius: BorderRadius.circular(18), color: Theme.of(context).colorScheme.tertiary),
-          padding: const EdgeInsets.only(left: 18, right: 18, bottom: 18, top: 18),
+          decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              color: Theme.of(context).colorScheme.tertiary),
+          padding:
+              const EdgeInsets.only(left: 18, right: 18, bottom: 18, top: 18),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -48,16 +49,20 @@ List<Widget> Details(
                 children: [
                   Text(
                     teamNumber,
-                    style: const TextStyle(fontSize: 64, height: 1, letterSpacing: -2),
+                    style: const TextStyle(
+                        fontSize: 64, height: 1, letterSpacing: -2),
                   ),
                   displaySave
                       ? IconButton(
                           focusColor: Colors.transparent,
                           highlightColor: Colors.transparent,
-                          padding: EdgeInsets.only(left: 10, top: 10, bottom: 10),
+                          padding:
+                              EdgeInsets.only(left: 10, top: 10, bottom: 10),
                           constraints: BoxConstraints(),
                           icon: Icon(
-                            isSaved ? Icons.bookmark_rounded : Icons.bookmark_add_outlined,
+                            isSaved
+                                ? Icons.bookmark_rounded
+                                : Icons.bookmark_add_outlined,
                             size: 36,
                           ),
                           onPressed: toggleSaveTeam)
@@ -90,7 +95,8 @@ List<Widget> Details(
                                 style: TextStyle(fontSize: 24),
                               ),
                               const Spacer(),
-                              Container(width: 75, child: LinearProgressIndicator()),
+                              SizedBox(
+                                  width: 75, child: LinearProgressIndicator()),
                             ],
                           ),
                           const SizedBox(
@@ -103,7 +109,8 @@ List<Widget> Details(
                                 style: TextStyle(fontSize: 24),
                               ),
                               const Spacer(),
-                              Container(width: 75, child: LinearProgressIndicator()),
+                              SizedBox(
+                                  width: 75, child: LinearProgressIndicator()),
                             ],
                           ),
                         ],
@@ -142,7 +149,8 @@ List<Widget> Details(
                               Spacer(),
                               Text(
                                 qualificationString,
-                                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                                style: const TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.w500),
                               ),
                             ],
                           ),
@@ -158,7 +166,8 @@ List<Widget> Details(
                               Spacer(),
                               Text(
                                 "${stats.winPercent == null ? "" : stats.winPercent!.toStringAsFixed(1)}%",
-                                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                                style: const TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.w500),
                               ),
                             ],
                           ),
@@ -196,7 +205,11 @@ List<Widget> Details(
                             organization: "",
                           );
                         } else {
-                          return TeamBio(grade: "", location: Location(), teamName: "", organization: "");
+                          return TeamBio(
+                              grade: "",
+                              location: Location(),
+                              teamName: "",
+                              organization: "");
                         }
                       },
                     )
@@ -225,14 +238,18 @@ List<Widget> Details(
                 case ConnectionState.active:
                   return const SliverToBoxAdapter(
                     child: Padding(
-                        padding: EdgeInsets.only(bottom: 28), child: Center(child: CircularProgressIndicator())),
+                        padding: EdgeInsets.only(bottom: 28),
+                        child: Center(child: CircularProgressIndicator())),
                   );
                 case ConnectionState.done:
                   if (snapshot.hasError) {
                     return const SliverToBoxAdapter(child: SizedBox.shrink());
                   }
 
-                  if ((snapshot.data as Tournament).teams.firstWhereOrNull((e) => e.id == teamSave.teamID) == null) {
+                  if ((snapshot.data as Tournament)
+                          .teams
+                          .firstWhereOrNull((e) => e.id == teamSave.teamID) ==
+                      null) {
                     return const SliverToBoxAdapter(child: SizedBox.shrink());
                   }
 
@@ -240,13 +257,16 @@ List<Widget> Details(
                       child: Column(children: [
                     GestureDetector(
                         onTap: () {
-                          List<String> picklist = prefs.getStringList("picklist") ?? [];
-                          if ((prefs.getStringList("picklist") ?? []).contains(jsonEncode(teamSave.toJson()))) {
+                          List<String> picklist =
+                              prefs.getStringList("picklist") ?? [];
+                          if ((prefs.getStringList("picklist") ?? [])
+                              .contains(jsonEncode(teamSave.toJson()))) {
                             picklist.remove(jsonEncode(teamSave.toJson()));
                           } else {
                             picklist.add(jsonEncode(teamSave.toJson()));
                           }
-                          prefs.setStringList("picklist", picklist.toSet().toList());
+                          prefs.setStringList(
+                              "picklist", picklist.toSet().toList());
                           setState;
                         },
                         onDoubleTap: () async {
@@ -264,35 +284,52 @@ List<Widget> Details(
                                   color: Theme.of(context).colorScheme.tertiary,
                                   borderRadius: BorderRadius.circular(18),
                                   border: Border.all(
-                                    color: Theme.of(context).colorScheme.tertiary,
+                                    color:
+                                        Theme.of(context).colorScheme.tertiary,
                                     width: 2,
                                   ),
                                 ),
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 21),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 24, vertical: 21),
                                 child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    children:
-                                        (prefs.getStringList("picklist") ?? []).contains(jsonEncode(teamSave.toJson()))
-                                            ? [
-                                                Text(
-                                                    "Rank ${prefs.getStringList("picklist")!.indexOf(jsonEncode(teamSave.toJson())) + 1} on Picklist",
-                                                    style: TextStyle(
-                                                      fontSize: 18,
-                                                      color: Theme.of(context).colorScheme.onSurface,
-                                                    )),
-                                                Icon(Icons.playlist_add_check,
-                                                    color: Theme.of(context).colorScheme.secondary, size: 24),
-                                              ]
-                                            : [
-                                                Text("Add to Picklist",
-                                                    style: TextStyle(
-                                                      fontSize: 18,
-                                                      color: Theme.of(context).colorScheme.onSurface,
-                                                    )),
-                                                Icon(Icons.playlist_add,
-                                                    color: Theme.of(context).colorScheme.secondary, size: 24),
-                                              ])))),
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: (prefs.getStringList(
+                                                    "picklist") ??
+                                                [])
+                                            .contains(
+                                                jsonEncode(teamSave.toJson()))
+                                        ? [
+                                            Text(
+                                                "Rank ${prefs.getStringList("picklist")!.indexOf(jsonEncode(teamSave.toJson())) + 1} on Picklist",
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurface,
+                                                )),
+                                            Icon(Icons.playlist_add_check,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .secondary,
+                                                size: 24),
+                                          ]
+                                        : [
+                                            Text("Add to Picklist",
+                                                style: TextStyle(
+                                                  fontSize: 18,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurface,
+                                                )),
+                                            Icon(Icons.playlist_add,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .secondary,
+                                                size: 24),
+                                          ])))),
                     const SizedBox(height: 28),
                   ]));
               }
@@ -336,7 +373,8 @@ List<Widget> Details(
                       children: [
                         Text(
                           stats.rank.toString(),
-                          style: const TextStyle(fontSize: 64, height: 1, letterSpacing: -2),
+                          style: const TextStyle(
+                              fontSize: 64, height: 1, letterSpacing: -2),
                         ),
                         const SizedBox(
                           height: 5,
@@ -355,9 +393,12 @@ List<Widget> Details(
                               children: [
                                 Text(
                                   stats.score.toString(),
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
                                 ),
-                                const Text("Score", style: TextStyle(fontSize: 16))
+                                const Text("Score",
+                                    style: TextStyle(fontSize: 16))
                               ],
                             ),
                             const SizedBox(
@@ -368,9 +409,12 @@ List<Widget> Details(
                               children: [
                                 Text(
                                   stats.driver.toString(),
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
                                 ),
-                                const Text("Driver", style: TextStyle(fontSize: 16))
+                                const Text("Driver",
+                                    style: TextStyle(fontSize: 16))
                               ],
                             ),
                             const SizedBox(
@@ -381,9 +425,12 @@ List<Widget> Details(
                               children: [
                                 Text(
                                   stats.auton.toString(),
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
                                 ),
-                                const Text("Auto", style: TextStyle(fontSize: 16))
+                                const Text("Auto",
+                                    style: TextStyle(fontSize: 16))
                               ],
                             )
                           ],
@@ -446,7 +493,8 @@ List<Widget> Details(
                       children: [
                         Text(
                           stats.trueSkillGlobalRank.toString(),
-                          style: const TextStyle(fontSize: 64, height: 1, letterSpacing: -2),
+                          style: const TextStyle(
+                              fontSize: 64, height: 1, letterSpacing: -2),
                         ),
                         const SizedBox(
                           height: 5,
@@ -465,9 +513,12 @@ List<Widget> Details(
                               children: [
                                 Text(
                                   stats.trueSkill.toString(),
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
                                 ),
-                                const Text("Score", style: TextStyle(fontSize: 16))
+                                const Text("Score",
+                                    style: TextStyle(fontSize: 16))
                               ],
                             ),
                             const SizedBox(
@@ -478,9 +529,12 @@ List<Widget> Details(
                               children: [
                                 Text(
                                   stats.trueSkillRegionRank.toString(),
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
                                 ),
-                                const Text("Region Rank", style: TextStyle(fontSize: 16))
+                                const Text("Region Rank",
+                                    style: TextStyle(fontSize: 16))
                               ],
                             ),
                             const SizedBox(
@@ -498,9 +552,12 @@ List<Widget> Details(
                               children: [
                                 Text(
                                   stats.opr.toString(),
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
                                 ),
-                                const Text("OPR", style: TextStyle(fontSize: 16))
+                                const Text("OPR",
+                                    style: TextStyle(fontSize: 16))
                               ],
                             ),
                             const SizedBox(
@@ -511,9 +568,12 @@ List<Widget> Details(
                               children: [
                                 Text(
                                   stats.dpr.toString(),
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
                                 ),
-                                const Text("DPR", style: TextStyle(fontSize: 16))
+                                const Text("DPR",
+                                    style: TextStyle(fontSize: 16))
                               ],
                             ),
                             const SizedBox(
@@ -524,9 +584,12 @@ List<Widget> Details(
                               children: [
                                 Text(
                                   stats.ccwm.toString(),
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
                                 ),
-                                const Text("CCWM", style: TextStyle(fontSize: 16))
+                                const Text("CCWM",
+                                    style: TextStyle(fontSize: 16))
                               ],
                             ),
                           ],
@@ -541,7 +604,7 @@ List<Widget> Details(
       ),
     ),
     const SliverToBoxAdapter(
-      child: const SizedBox(
+      child: SizedBox(
         height: 28,
       ),
     ),
@@ -595,7 +658,8 @@ List<Widget> Details(
                             children: [
                               Text(
                                 stats.wins.toString(),
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500),
                               ),
                               const Text("Wins", style: TextStyle(fontSize: 16))
                             ],
@@ -606,9 +670,11 @@ List<Widget> Details(
                             children: [
                               Text(
                                 stats.losses.toString(),
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500),
                               ),
-                              const Text("Losses", style: TextStyle(fontSize: 16))
+                              const Text("Losses",
+                                  style: TextStyle(fontSize: 16))
                             ],
                           ),
                           const SizedBox(width: 18),
@@ -617,7 +683,8 @@ List<Widget> Details(
                             children: [
                               Text(
                                 stats.ties.toString(),
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500),
                               ),
                               const Text("Ties", style: TextStyle(fontSize: 16))
                             ],
@@ -628,9 +695,11 @@ List<Widget> Details(
                             children: [
                               Text(
                                 stats.matches.toString(),
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500),
                               ),
-                              const Text("Matches", style: TextStyle(fontSize: 16))
+                              const Text("Matches",
+                                  style: TextStyle(fontSize: 16))
                             ],
                           ),
                           const SizedBox(width: 18),
@@ -672,7 +741,7 @@ List<Widget> Details(
                 }
 
                 List<Award> awards = snapshot.data as List<Award>;
-                if (awards.isNotEmpty)
+                if (awards.isNotEmpty) {
                   return Container(
                     padding: const EdgeInsets.all(18),
                     decoration: BoxDecoration(
@@ -688,9 +757,11 @@ List<Widget> Details(
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text("Awards", style: TextStyle(fontSize: 24)),
+                            const Text("Awards",
+                                style: TextStyle(fontSize: 24)),
                             Text(awards.length.toString(),
-                                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500))
+                                style: const TextStyle(
+                                    fontSize: 24, fontWeight: FontWeight.w500))
                           ],
                         ),
                         const SizedBox(height: 18),
@@ -702,7 +773,8 @@ List<Widget> Details(
                                   alignment: Alignment.centerLeft,
                                   height: 60,
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
@@ -710,7 +782,9 @@ List<Widget> Details(
                                         overflow: TextOverflow.ellipsis,
                                         textAlign: TextAlign.start,
                                         maxLines: 1,
-                                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                        style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500),
                                       ),
                                       Text(
                                         maxLines: 1,
@@ -723,7 +797,8 @@ List<Widget> Details(
                                   ),
                                 ),
                                 Divider(
-                                  color: Theme.of(context).colorScheme.surfaceDim,
+                                  color:
+                                      Theme.of(context).colorScheme.surfaceDim,
                                 )
                               ],
                             );
@@ -732,8 +807,9 @@ List<Widget> Details(
                       ],
                     ),
                   );
-                else
+                } else {
                   return Container();
+                }
             }
           },
         ),
@@ -776,11 +852,13 @@ List<Widget> Details(
                       return const Text("Tournaments Unavailable");
                     }
 
-                    List<TournamentPreview> tournaments = snapshot.data as List<TournamentPreview>;
+                    List<TournamentPreview> tournaments =
+                        snapshot.data as List<TournamentPreview>;
                     return Column(
                       children: tournaments
                           .map(
-                            (e) => TournamentPreviewWidget(tournamentPreview: e),
+                            (e) =>
+                                TournamentPreviewWidget(tournamentPreview: e),
                           )
                           .toList(),
                     );
@@ -797,5 +875,4 @@ List<Widget> Details(
       ),
     ),
   ];
-  ;
 }

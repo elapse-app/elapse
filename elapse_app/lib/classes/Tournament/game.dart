@@ -113,9 +113,9 @@ class Game {
     List<Map<String, dynamic>> redAlliancePreviewStrings;
     List<Map<String, dynamic>> blueAlliancePreviewStrings;
     redAlliancePreviewStrings =
-        this.redAlliancePreview!.map((team) => team.toJson()).toList();
+        redAlliancePreview!.map((team) => team.toJson()).toList();
     blueAlliancePreviewStrings =
-        this.blueAlliancePreview!.map((team) => team.toJson()).toList();
+        blueAlliancePreview!.map((team) => team.toJson()).toList();
     return {
       "redAlliancePreview": redAlliancePreviewStrings,
       "blueAlliancePreview": blueAlliancePreviewStrings,

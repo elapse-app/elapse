@@ -1,4 +1,3 @@
-import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/settings/settings.dart';
 import 'package:flutter/material.dart';
 
@@ -20,11 +19,13 @@ class SettingsButton extends StatelessWidget {
       iconSize: 30,
       color: Theme.of(context).colorScheme.onSurface,
       onPressed: () {
-        Navigator.of(context, rootNavigator: true).push(
-          MaterialPageRoute(
-            builder: (context) => SettingsScreen(),
-          ),
-        ).then((_) => (callback ?? (() {}))());
+        Navigator.of(context, rootNavigator: true)
+            .push(
+              MaterialPageRoute(
+                builder: (context) => SettingsScreen(),
+              ),
+            )
+            .then((_) => (callback ?? (() {}))());
       },
     );
   }

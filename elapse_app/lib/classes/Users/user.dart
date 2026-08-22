@@ -1,13 +1,4 @@
-import 'package:elapse_app/classes/Miscellaneous/location.dart';
-import 'package:elapse_app/classes/Tournament/tstats.dart';
-import 'package:elapse_app/classes/Groups/teamGroup.dart';
-import 'package:elapse_app/classes/Team/team.dart';
-
 import 'dart:convert';
-import 'package:elapse_app/extras/token.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:http/http.dart' as http;
-import 'dart:io';
 
 class ElapseUser {
   // User Class
@@ -32,7 +23,7 @@ class ElapseUser {
     this.teamNumber,
     List<String>? groupID,
     this.verified,
-  }) : this.groupID = groupID ?? [];
+  }) : groupID = groupID ?? [];
 
   factory ElapseUser.fromJson(Map<String, dynamic> json) {
     return ElapseUser(
@@ -41,20 +32,22 @@ class ElapseUser {
       fname: json["first-name"],
       lname: json["last-name"],
       teamNumber: json["team-number"],
-      groupID: json["group-id"] != null ? (json["group-id"] as List).map((e) => e.toString()).toList() : [],
+      groupID: json["group-id"] != null
+          ? (json["group-id"] as List).map((e) => e.toString()).toList()
+          : [],
       verified: json["verified"],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      "uid": this.uid,
-      "email": this.email,
-      "first-name": this.fname,
-      "last-name": this.lname,
-      "team-number": this.teamNumber,
-      "group-id": this.groupID,
-      "verified": this.verified,
+      "uid": uid,
+      "email": email,
+      "first-name": fname,
+      "last-name": lname,
+      "team-number": teamNumber,
+      "group-id": groupID,
+      "verified": verified,
     };
   }
 }

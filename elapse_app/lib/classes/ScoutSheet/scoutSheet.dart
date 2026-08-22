@@ -1,14 +1,5 @@
 // import 'package:elapse_app/classes/Miscellaneous/location.dart';
 // import 'package:elapse_app/classes/Tournament/tstats.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:elapse_app/classes/Team/team.dart';
-
-import 'dart:convert';
-import 'package:elapse_app/extras/token.dart';
-import 'package:http/http.dart' as http;
-import 'dart:io';
-
-
 
 // so then an example of properties could look like [{"drivetrain_rpm": 450, "type": "num"}, {"number_of_motors": 6, "type": "num"}]
 // [11:31 PM]
@@ -42,9 +33,7 @@ class ScoutSheet {
   // Bool For currently Editing
   bool isEditing = false;
 
-
   // ScoutSheet({
 
   // });
-
 }

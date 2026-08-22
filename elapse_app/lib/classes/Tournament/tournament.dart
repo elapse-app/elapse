@@ -7,25 +7,26 @@ import 'package:elapse_app/classes/Tournament/tskills.dart';
 import 'dart:convert';
 
 import 'package:elapse_app/classes/Tournament/tstats.dart';
+import 'package:elapse_app/extras/async_cache.dart';
 import 'package:elapse_app/extras/token.dart';
 import 'package:elapse_app/main.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
 
 class Tournament {
-  int id;
+  final int id;
 
-  int seasonID;
-  String name;
-  String sku;
+  final int seasonID;
+  final String name;
+  final String sku;
 
-  Location location;
+  final Location location;
 
-  DateTime startDate;
-  DateTime? endDate;
+  final DateTime startDate;
+  final DateTime? endDate;
 
-  List<Division> divisions;
-  List<Team> teams;
+  final List<Division> divisions;
+  final List<Team> teams;
 
   Map<int, TournamentSkills>? tournamentSkills;
   List<Award> awards;
@@ -70,12 +71,15 @@ Future<void> updateTournament(Tournament tournament) async {
     tournament.awards = awards;
   }));
 
-  tournamentFutures.add(getSkillsRankings(tournament.id, Future.value(tournament.teams)).then((skills) {
+  tournamentFutures.add(
+      getSkillsRankings(tournament.id, Future.value(tournament.teams))
+          .then((skills) {
     tournament.tournamentSkills = skills;
   }));
 
   for (Division division in tournament.divisions) {
-    tournamentFutures.add(calcEventStats(tournament.id, division.id).then((teamStats) {
+    tournamentFutures
+        .add(calcEventStats(tournament.id, division.id).then((teamStats) {
       division.teamStats = teamStats[1];
       division.games = teamStats[0];
     }));
@@ -84,9 +88,10 @@ Future<void> updateTournament(Tournament tournament) async {
   await Future.wait(tournamentFutures);
 }
 
-Tournament loadTournament(json) {
-
-  print("PRINT tournament loading...");
+Tournament loadTournament(String? json) {
+  if (json == null || json.isEmpty) {
+    throw const FormatException('Missing cached tournament.');
+  }
   List<Division> divisions = [];
   final tournament = jsonDecode(json);
   for (var a in tournament["divisions"]) {
@@ -118,7 +123,7 @@ Tournament loadTournament(json) {
     seasonID: tournament["seasonID"],
     location: loadLocation(tournament["location"]),
     startDate: DateTime.parse(tournament["startDate"]),
-    endDate: DateTime.tryParse(tournament["endDate"]),
+    endDate: DateTime.tryParse(tournament["endDate"]?.toString() ?? ''),
     divisions: divisions,
     teams: teams,
     awards: awards,
@@ -128,94 +133,123 @@ Tournament loadTournament(json) {
 
 Future<Tournament> getTournamentDetails(int tournamentID) async {
   final response = await http.get(
-    Uri.parse("https://events.vex.com/api/v2/events/$tournamentID"),
+    Uri.parse('https://events.vex.com/api/v2/events/$tournamentID'),
     headers: {
       HttpHeaders.authorizationHeader: getToken(),
+      HttpHeaders.acceptHeader: 'application/json',
     },
-  );
+  ).timeout(const Duration(seconds: 12));
+  if (response.statusCode != 200) {
+    throw StateError(
+      'Tournament request failed (${response.statusCode})',
+    );
+  }
 
-  try {
-    final parsed = jsonDecode(response.body);
-
-    List<Division> divisions = await Future.wait(parsed["divisions"].map<Future<Division>>((division) async {
-      Division returnDivision = Division(
+  final parsed = jsonDecode(response.body) as Map<String, dynamic>;
+  final divisionsFuture = Future.wait(
+    (parsed['divisions'] as List).map<Future<Division>>((division) async {
+      final returnDivision = Division(
         id: division["id"],
         name: division["name"],
         order: division["order"],
       );
-      List<Future<void>> divisionDetails = [];
-      divisionDetails.add(calcEventStats(tournamentID, division["id"]).then((teamStats) {
-        if (teamStats.length > 1) {
-          returnDivision.teamStats = teamStats[1];
-        } else {
-          returnDivision.teamStats = {};
-        }
-        returnDivision.games = teamStats[0];
-      }));
-
-      await Future.wait(divisionDetails);
+      final teamStats = await calcEventStats(tournamentID, division['id']);
+      returnDivision.teamStats = teamStats.length > 1 ? teamStats[1] : {};
+      returnDivision.games = teamStats[0];
       return returnDivision;
-    }).toList());
+    }),
+  );
+  final teamsFuture = getTeams(tournamentID);
+  final skillsFuture = getSkillsRankings(tournamentID, teamsFuture);
+  final awardsFuture = getTournamentAwards(tournamentID);
 
-    Future<List<Team>> futureTeams = getTeams(tournamentID);
-    Map<int, TournamentSkills> skills = await getSkillsRankings(tournamentID, futureTeams);
+  final divisions = await divisionsFuture;
+  final teams = await teamsFuture;
+  final skills = await skillsFuture;
+  final awards = await awardsFuture;
 
-    List<Team> teams = await futureTeams;
-
-    List<Award> awards = await getTournamentAwards(tournamentID);
-
-    return Tournament(
-      id: tournamentID,
-      name: parsed["name"],
-      seasonID: parsed["season"]["id"],
-      sku: parsed["sku"],
-      location: Location(
-        venue: parsed["location"]["venue"],
-        city: parsed["location"]["city"],
-        region: parsed["location"]["region"],
-        country: parsed["location"]["country"],
-        address1: parsed["location"]["address_1"],
-        address2: parsed["location"]["address_2"],
-        postalCode: parsed["location"]["postcode"],
-      ),
-      startDate: DateTime.parse(parsed["start"]),
-      endDate: DateTime.parse(parsed["end"]),
-      teams: teams,
-      divisions: divisions,
-      tournamentSkills: skills,
-      awards: awards,
-    );
-  } catch (e) {
-    throw (e);
-  }
+  return Tournament(
+    id: tournamentID,
+    name: parsed['name'],
+    seasonID: parsed['season']['id'],
+    sku: parsed['sku'],
+    location: Location(
+      venue: parsed['location']['venue'],
+      city: parsed['location']['city'],
+      region: parsed['location']['region'],
+      country: parsed['location']['country'],
+      address1: parsed['location']['address_1'],
+      address2: parsed['location']['address_2'],
+      postalCode: parsed['location']['postcode'],
+    ),
+    startDate: DateTime.parse(parsed['start']),
+    endDate: DateTime.tryParse(parsed['end']?.toString() ?? ''),
+    teams: teams,
+    divisions: divisions,
+    tournamentSkills: skills,
+    awards: awards,
+  );
 }
 
-Future<Tournament> TMTournamentDetails(int tournamentID, {bool forceRefresh = false}) async {
-  Tournament tournament;
-  if (prefs.getString("TMSavedTournament") == null || prefs.getString("TMSavedTournament") == "") {
-    tournament = await getTournamentDetails(tournamentID);
-    prefs.setString("TMSavedTournament", jsonEncode(tournament.toJson()));
-    print("Getting new tournament");
-    return tournament;
-  } else {
-    tournament = loadTournament(prefs.getString("TMSavedTournament")!);
-    print("Getting cached tournament");
+final _tournamentDetailsCache = AsyncCache<int, Tournament>(
+  timeToLive: const Duration(seconds: 30),
+);
 
-    DateTime? updateTime = DateTime.tryParse(prefs.getString("updateTime") ?? "");
+Future<Tournament> TMTournamentDetails(
+  int tournamentID, {
+  bool forceRefresh = false,
+}) {
+  return _tournamentDetailsCache.get(
+    tournamentID,
+    () => _loadTMTournamentDetails(
+      tournamentID,
+      forceRefresh: forceRefresh,
+    ),
+    forceRefresh: forceRefresh,
+  );
+}
 
-    if (updateTime == null || DateTime.now().isAfter(updateTime) || forceRefresh) {
-      await updateTournament(tournament);
-      prefs.setString("updateTime", DateTime.now().add(const Duration(seconds: 30)).toIso8601String());
-      // Update every minute
+Future<Tournament> _loadTMTournamentDetails(
+  int tournamentID, {
+  required bool forceRefresh,
+}) async {
+  final savedTournament = prefs.getString('TMSavedTournament');
+  Tournament? tournament;
+  if (savedTournament != null && savedTournament.isNotEmpty) {
+    try {
+      final cached = loadTournament(savedTournament);
+      if (cached.id == tournamentID) {
+        tournament = cached;
+      }
+    } catch (_) {
+      // Replace corrupt or outdated local data with a fresh API response.
     }
-
-    prefs.setString("TMSavedTournament", jsonEncode(tournament.toJson()));
-    prefs.setString("recently-opened-tournament", jsonEncode(tournament.toJson()));
-    return tournament;
   }
+
+  final updateTime = DateTime.tryParse(prefs.getString('updateTime') ?? '');
+  if (tournament == null) {
+    tournament = await getTournamentDetails(tournamentID);
+  } else if (forceRefresh ||
+      updateTime == null ||
+      !updateTime.isAfter(DateTime.now())) {
+    await updateTournament(tournament);
+  }
+
+  final encodedTournament = jsonEncode(tournament.toJson());
+  await Future.wait([
+    prefs.setString('TMSavedTournament', encodedTournament),
+    prefs.setString('recently-opened-tournament', encodedTournament),
+    prefs.setString(
+      'updateTime',
+      DateTime.now().add(const Duration(seconds: 30)).toIso8601String(),
+    ),
+  ]);
+  return tournament;
 }
 
 bool hasCachedTMTournamentDetails() {
   DateTime? updateTime = DateTime.tryParse(prefs.getString("updateTime") ?? "");
-  return prefs.getString("TMSavedTournament") != null && updateTime != null && DateTime.now().isBefore(updateTime);
+  return prefs.getString("TMSavedTournament") != null &&
+      updateTime != null &&
+      DateTime.now().isBefore(updateTime);
 }

@@ -1,8 +1,7 @@
 import 'dart:convert';
 
 import 'package:elapse_app/classes/Team/team.dart';
-import 'package:elapse_app/classes/Team/teamPreview.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:elapse_app/extras/async_cache.dart';
 
 import '../../main.dart';
 import '../Filters/gradeLevel.dart';
@@ -12,21 +11,21 @@ import '../Miscellaneous/location.dart';
 import "package:http/http.dart" as http;
 
 class WorldSkillsStats {
-  int teamId;
-  String teamNum;
-  String teamName;
+  final int teamId;
+  final String teamNum;
+  final String teamName;
 
-  int rank;
+  final int rank;
 
-  int score;
-  int auton;
-  int driver;
+  final int score;
+  final int auton;
+  final int driver;
 
-  int maxAuton;
-  int maxDriver;
+  final int maxAuton;
+  final int maxDriver;
 
-  Location? location;
-  Region? eventRegion;
+  final Location? location;
+  final Region? eventRegion;
 
   WorldSkillsStats({
     required this.teamId,
@@ -67,46 +66,77 @@ class WorldSkillsStats {
   }
 }
 
+final _worldSkillsCache = AsyncCache<String, List<WorldSkillsStats>>(
+  timeToLive: const Duration(hours: 2),
+);
+
 Future<List<WorldSkillsStats>> getWorldSkillsRankings(
-    int seasonID, GradeLevel grade) async {
-  final String? worldSkillsData = prefs.getString("worldSkillsData");
-
-  List<dynamic> parsed = [];
-
+    int seasonID, GradeLevel grade) {
   if (seasonID < 115) {
     // Starstruck season ID (earliest season that had world skills data)
-    return List<WorldSkillsStats>.empty();
+    return Future.value(const []);
   }
 
-  if (seasonID !=
+  return _worldSkillsCache.get(
+    '$seasonID:${grade.id}',
+    () => _loadWorldSkillsRankings(seasonID, grade),
+  );
+}
+
+Future<List<WorldSkillsStats>> _loadWorldSkillsRankings(
+  int seasonID,
+  GradeLevel grade,
+) async {
+  final worldSkillsData = prefs.getString('worldSkillsData');
+  late final List<dynamic> parsed;
+  final usesSharedPreferences = seasonID ==
           (grade == gradeLevels["College"]
               ? seasons[0].vexUId
-              : seasons[0].vrcId) ||
-      grade != getGradeLevel(prefs.getString("defaultGrade"))) {
-    final response = await http.get(
-      Uri.parse(
-          "https://events.vex.com/api/seasons/$seasonID/skills?grade_level=${grade.name.replaceAll(" ", "%20")}"),
-    );
+              : seasons[0].vrcId) &&
+      grade == getGradeLevel(prefs.getString('defaultGrade'));
 
-    parsed = jsonDecode(response.body) as List;
-  } else if (!hasCachedWorldSkillsRankings(seasonID, grade)) {
-    final response = await http.get(
-      Uri.parse(
-          "https://events.vex.com/api/seasons/$seasonID/skills?grade_level=${grade.name.replaceAll(" ", "%20")}"),
-    );
-
-    parsed = jsonDecode(response.body) as List;
-    prefs.setString("worldSkillsData", response.body);
-    prefs.setString("worldSkillsExpiry",
-        DateTime.now().add(const Duration(hours: 2)).toString());
-    prefs.setString("worldSkillsGrade", grade.name);
+  if (usesSharedPreferences && hasCachedWorldSkillsRankings(seasonID, grade)) {
+    final decoded = jsonDecode(worldSkillsData!);
+    if (decoded is! List) {
+      throw const FormatException('Invalid cached world skills response.');
+    }
+    parsed = decoded;
   } else {
-    parsed = jsonDecode(worldSkillsData!) as List;
+    final response = await http
+        .get(
+          Uri.https(
+            'events.vex.com',
+            '/api/seasons/$seasonID/skills',
+            {'grade_level': grade.name},
+          ),
+        )
+        .timeout(const Duration(seconds: 12));
+    if (response.statusCode != 200) {
+      throw StateError(
+        'World skills request failed (${response.statusCode})',
+      );
+    }
+
+    final decoded = jsonDecode(response.body);
+    if (decoded is! List) {
+      throw const FormatException('Unexpected world skills response.');
+    }
+    parsed = decoded;
+    if (usesSharedPreferences) {
+      await Future.wait([
+        prefs.setString('worldSkillsData', response.body),
+        prefs.setString(
+          'worldSkillsExpiry',
+          DateTime.now().add(const Duration(hours: 2)).toIso8601String(),
+        ),
+        prefs.setString('worldSkillsGrade', grade.name),
+      ]);
+    }
   }
 
-  List<WorldSkillsStats> ranking =
-      parsed.map((e) => WorldSkillsStats.fromJson(e)).toList();
-  return ranking;
+  return List.unmodifiable(
+    parsed.whereType<Map<String, dynamic>>().map(WorldSkillsStats.fromJson),
+  );
 }
 
 Future<WorldSkillsStats> getWorldSkillsForTeam(int seasonID, int teamID) async {
@@ -121,7 +151,9 @@ bool hasCachedWorldSkillsRankings(int seasonID, GradeLevel grade) {
           (grade == gradeLevels["College"]
               ? seasons[0].vexUId
               : seasons[0].vrcId) ||
-      grade != getGradeLevel(prefs.getString("defaultGrade"))) return false;
+      grade != getGradeLevel(prefs.getString("defaultGrade"))) {
+    return false;
+  }
 
   final String? worldSkillsData = prefs.getString("worldSkillsData");
   final String? expiryDate = prefs.getString("worldSkillsExpiry");
@@ -130,6 +162,6 @@ bool hasCachedWorldSkillsRankings(int seasonID, GradeLevel grade) {
   return worldSkillsData != null &&
       expiryDate != null &&
       cachedGrade != null &&
-      DateTime.parse(expiryDate).isAfter(DateTime.now()) &&
+      (DateTime.tryParse(expiryDate)?.isAfter(DateTime.now()) ?? false) &&
       grade == gradeLevels[cachedGrade];
 }

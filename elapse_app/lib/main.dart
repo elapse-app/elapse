@@ -1,10 +1,9 @@
-import 'dart:convert';
+import 'dart:async';
 
-import 'package:elapse_app/aesthetics/color_schemes.dart';
+import 'package:elapse_app/aesthetics/app_theme.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/extras/auth.dart';
 import 'package:elapse_app/providers/color_provider.dart';
-import 'package:elapse_app/providers/tournament_mode_provider.dart';
 import 'package:elapse_app/screens/error/error_page.dart';
 import 'package:elapse_app/screens/explore/explore.dart';
 import 'package:elapse_app/screens/home/home.dart';
@@ -29,7 +28,7 @@ import 'package:elapse_app/classes/Miscellaneous/remote_config.dart';
 final GlobalKey<MyAppState> myAppKey = GlobalKey<MyAppState>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 late SharedPreferences prefs;
-late PackageInfo appInfo;
+PackageInfo? appInfo;
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -40,92 +39,113 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   }
 }
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
 
   prefs = await SharedPreferences.getInstance();
-
-  var firebaseReady = false;
   try {
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    firebaseReady = true;
-    await FirebaseRemoteConfigService().initialize();
+    appInfo = await PackageInfo.fromPlatform();
   } catch (error, stackTrace) {
-    // Firebase-backed features can recover when connectivity returns. Do not
-    // prevent the locally cached app from starting in the meantime.
-    debugPrint('Firebase startup failed: $error\n$stackTrace');
+    debugPrint('Package information unavailable: $error\n$stackTrace');
   }
+
+  final firebaseReady = await _initializeFirebase();
 
   // Set android system navbar colour
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     systemNavigationBarColor: Colors.transparent, // Navigation bar color
   ));
 
-  SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+  await SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
-  if (firebaseReady &&
-      (prefs.getBool("isSetUp") ?? false) &&
-      FirebaseAuth.instance.currentUser != null) {
-    await checkAccountDeleted();
-  }
-
-  ErrorWidget.builder = (FlutterErrorDetails details) {
-    FlutterError.presentError(details);
-    // ErrorPage can itself be the root widget after an early build failure.
-    // Giving it a Material ancestor prevents the former all-black fallback.
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(colorScheme: lightScheme, fontFamily: 'Manrope'),
-      home: const ErrorPage(),
-    );
-  };
+  _configureBuildErrorFallback();
 
   if (firebaseReady) {
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      final notification = message.notification;
-      final title = notification?.title;
-      final body = notification?.body;
-
-      if (title == null || title.isEmpty || body == null || body.isEmpty) {
-        return;
-      }
-
-      final context = navigatorKey.currentContext;
-      if (context == null) {
-        return;
-      }
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text(title),
-          content: Text(body),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
-    });
+    _configureMessaging();
   }
 
-  runApp(MultiProvider(
-    providers: [
-      ChangeNotifierProvider(
-        create: (context) => ColorProvider(),
-      ),
-      ChangeNotifierProvider(create: (context) => TournamentModeProvider()),
-    ],
+  runApp(ChangeNotifierProvider(
+    create: (_) => ColorProvider(prefs),
     child: MyApp(key: myAppKey),
   ));
+
+  if (firebaseReady &&
+      (prefs.getBool('isSetUp') ?? false) &&
+      FirebaseAuth.instance.currentUser != null) {
+    unawaited(_verifyCurrentAccount());
+  }
+}
+
+Future<void> _verifyCurrentAccount() async {
+  final localSessionCleared = await checkAccountDeleted();
+  if (localSessionCleared) {
+    myAppKey.currentState?.reloadApp();
+  }
+}
+
+Future<bool> _initializeFirebase() async {
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    // Remote Config has local defaults and should never hold up first paint.
+    unawaited(FirebaseRemoteConfigService().initialize());
+    return true;
+  } catch (error, stackTrace) {
+    // Firebase-backed features can recover when connectivity returns. Do not
+    // prevent the locally cached app from starting in the meantime.
+    debugPrint('Firebase startup failed: $error\n$stackTrace');
+    return false;
+  }
+}
+
+void _configureBuildErrorFallback() {
+  ErrorWidget.builder = (details) {
+    FlutterError.presentError(details);
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      home: ErrorPage(
+        onRetry: () => myAppKey.currentState?.reloadApp(),
+      ),
+    );
+  };
+}
+
+void _configureMessaging() {
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onMessage.listen((message) {
+    final notification = message.notification;
+    final title = notification?.title?.trim();
+    final body = notification?.body?.trim();
+
+    if (title == null || title.isEmpty || body == null || body.isEmpty) {
+      return;
+    }
+
+    final context = navigatorKey.currentContext;
+    if (context == null || !context.mounted) {
+      return;
+    }
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Text(title),
+        content: Text(body),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(dialogContext),
+            child: const Text('OK'),
+          ),
+        ],
+      ),
+    );
+  });
 }
 
 class MyApp extends StatefulWidget {
@@ -136,216 +156,174 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  // This widget is the root of your application.
-  int selectedIndex = 0;
-  bool isTournamentMode = false;
-  bool isLoggedIn = false;
-  int? teamID;
-  String? teamNumber;
+  final PageStorageBucket _pageStorageBucket = PageStorageBucket();
+  final Set<int> _visitedIndices = {0};
+
+  int _selectedIndex = 0;
+  bool _isTournamentMode = false;
+  int? _teamId;
+  String? _teamNumber;
 
   TeamPreview? _savedTeam() {
-    final rawTeam = prefs.getString('savedTeam');
-    if (rawTeam == null || rawTeam.isEmpty) {
-      return null;
-    }
-
-    try {
-      final decoded = jsonDecode(rawTeam);
-      if (decoded is! Map<String, dynamic>) {
-        return null;
-      }
-      final id = decoded['teamID'];
-      final number = decoded['teamNumber'];
-      if (id is! num || number is! String || number.isEmpty) {
-        return null;
-      }
-      return TeamPreview(teamID: id.toInt(), teamNumber: number);
-    } catch (_) {
-      return null;
-    }
+    return tryLoadTeamPreview(prefs.getString('savedTeam'));
   }
 
   @override
   void initState() {
     super.initState();
-    _initPackageInfo();
     final savedTeam = _savedTeam();
     if ((prefs.getBool("isSetUp") ?? false) && savedTeam != null) {
-      teamID = savedTeam.teamID;
-      teamNumber = savedTeam.teamNumber;
-      initializeTournamentMode();
+      _teamId = savedTeam.teamID;
+      _teamNumber = savedTeam.teamNumber;
+      _initializeTournamentMode();
     }
   }
 
-  void initializeTournamentMode() {
-    if (prefs.getBool("isTournamentMode") ?? false) {
-      int? tournamentID = prefs.getInt("tournamentID");
-      final savedTeam = _savedTeam();
-      if (tournamentID != null && savedTeam != null) {
-        teamID = savedTeam.teamID;
-        teamNumber = savedTeam.teamNumber;
-        isTournamentMode = true;
-      } else {
-        isTournamentMode = false;
-      }
-    } else {
-      isTournamentMode = false;
-      prefs.setStringList("picklist", []);
+  void _initializeTournamentMode() {
+    final savedTeam = _savedTeam();
+    final tournamentID = prefs.getInt('tournamentID');
+    _isTournamentMode = (prefs.getBool('isTournamentMode') ?? false) &&
+        tournamentID != null &&
+        savedTeam != null;
+
+    if (!_isTournamentMode) {
+      unawaited(prefs.setStringList('picklist', const []));
     }
+
+    _teamId = savedTeam?.teamID;
+    _teamNumber = savedTeam?.teamNumber;
   }
 
   void reloadApp() {
     setState(() {
-      initializeTournamentMode();
+      _selectedIndex = 0;
+      _visitedIndices
+        ..clear()
+        ..add(0);
+      _initializeTournamentMode();
     });
-  }
-
-  void _initPackageInfo() async {
-    final info = await PackageInfo.fromPlatform();
-    appInfo = info;
   }
 
   @override
   Widget build(BuildContext context) {
     final savedTeam = _savedTeam();
-    if (!(prefs.getBool("isSetUp") ?? false) || savedTeam == null) {
-      return Consumer<ColorProvider>(
-        builder: (context, value, child) {
-          prefs.setString("theme", "system");
-          ColorScheme systemTheme =
-              MediaQuery.of(context).platformBrightness == Brightness.dark
-                  ? darkScheme
-                  : lightScheme;
+    final isConfigured =
+        (prefs.getBool('isSetUp') ?? false) && savedTeam != null;
 
-          ColorScheme chosenTheme = systemTheme;
-
-          return MaterialApp(
-            navigatorKey: navigatorKey,
-            home: const FirstSetupPage(),
-            theme: ThemeData(
-              colorScheme: chosenTheme,
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-              fontFamily: "Manrope",
+    return Consumer<ColorProvider>(
+      builder: (context, colorProvider, _) => MaterialApp(
+        navigatorKey: navigatorKey,
+        title: 'Elapse',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.light,
+        darkTheme: AppTheme.dark,
+        themeMode: colorProvider.themeMode,
+        themeAnimationDuration: const Duration(milliseconds: 250),
+        themeAnimationCurve: Curves.easeOutCubic,
+        builder: (context, child) {
+          final isDark = Theme.of(context).brightness == Brightness.dark;
+          return AnnotatedRegion<SystemUiOverlayStyle>(
+            value: (isDark
+                    ? SystemUiOverlayStyle.light
+                    : SystemUiOverlayStyle.dark)
+                .copyWith(
+              statusBarColor: Colors.transparent,
+              systemNavigationBarColor: Colors.transparent,
+              systemNavigationBarContrastEnforced: false,
             ),
+            child: child ?? const SizedBox.shrink(),
           );
         },
-      );
-    }
-    List<Widget> screens;
+        home: isConfigured ? _buildAppShell() : const FirstSetupPage(),
+      ),
+    );
+  }
 
-    isTournamentMode
-        ? screens = [
+  Widget _buildAppShell() {
+    final tournamentID = prefs.getInt('tournamentID') ?? 0;
+    final screens = _isTournamentMode
+        ? <Widget>[
             TMHomePage(
-              tournamentID: prefs.getInt("tournamentID") ?? 0,
-              teamID: teamID!,
-              teamNumber: teamNumber!,
+              key: const PageStorageKey('tournament-home'),
+              tournamentID: tournamentID,
+              teamID: _teamId!,
+              teamNumber: _teamNumber!,
             ),
             TMTournamentScreen(
-              tournamentID: prefs.getInt("tournamentID") ?? 0,
+              key: const PageStorageKey('tournament'),
+              tournamentID: tournamentID,
               isPreview: false,
             ),
-            CloudScoutScreen(),
+            CloudScoutScreen(key: const PageStorageKey('scout')),
             TMMyTeams(
-              tournamentID: prefs.getInt("tournamentID") ?? 0,
+              key: const PageStorageKey('tournament-my-teams'),
+              tournamentID: tournamentID,
             ),
-            ExploreScreen()
+            ExploreScreen(key: const PageStorageKey('explore')),
           ]
-        : screens = [
-            HomeScreen(
-              key: PageStorageKey<String>("home"),
-            ),
-            CloudScoutScreen(),
-            MyTeams(
-              key: PageStorageKey<String>("my-teams"),
-            ),
-            ExploreScreen(
-              key: PageStorageKey<String>("explore"),
-            ),
+        : <Widget>[
+            HomeScreen(key: const PageStorageKey('home')),
+            CloudScoutScreen(key: const PageStorageKey('scout')),
+            MyTeams(key: const PageStorageKey('my-teams')),
+            ExploreScreen(key: const PageStorageKey('explore')),
           ];
-    return Consumer2<ColorProvider, TournamentModeProvider>(
-      builder: (context, colorProvider, tournamentModeProvider, child) {
-        bool systemDefined = false;
-        ColorScheme systemTheme =
-            MediaQuery.of(context).platformBrightness == Brightness.dark
-                ? darkScheme
-                : lightScheme;
 
-        if (prefs.getString("theme") == "system") {
-          systemDefined = true;
-        }
+    final destinations = <NavigationDestination>[
+      const NavigationDestination(
+        selectedIcon: Icon(Icons.home_rounded),
+        icon: Icon(Icons.home_outlined),
+        label: 'Home',
+      ),
+      if (_isTournamentMode)
+        const NavigationDestination(
+          selectedIcon: Icon(Icons.emoji_events_rounded),
+          icon: Icon(Icons.emoji_events_outlined),
+          label: 'Tournament',
+        ),
+      const NavigationDestination(
+        selectedIcon: Icon(Icons.bubble_chart),
+        icon: Icon(Icons.bubble_chart_outlined),
+        label: 'Scout',
+      ),
+      const NavigationDestination(
+        selectedIcon: Icon(Icons.people_alt_rounded),
+        icon: Icon(Icons.people_alt_outlined),
+        label: 'My Team',
+      ),
+      const NavigationDestination(
+        selectedIcon: Icon(Icons.explore_rounded),
+        icon: Icon(Icons.explore_outlined),
+        label: 'Explore',
+      ),
+    ];
 
-        ColorScheme chosenTheme =
-            systemDefined ? systemTheme : colorProvider.colorScheme;
-
-        // Build the list of destinations dynamically
-        List<NavigationDestination> destinations = [
-          NavigationDestination(
-              selectedIcon:
-                  Icon(Icons.home_rounded, color: chosenTheme.secondary),
-              icon: const Icon(Icons.home_outlined),
-              label: "Home"),
-          NavigationDestination(
-              selectedIcon:
-                  Icon(Icons.bubble_chart, color: chosenTheme.secondary),
-              icon: const Icon(Icons.bubble_chart_outlined),
-              label: "Scout"),
-          NavigationDestination(
-            selectedIcon:
-                Icon(Icons.people_alt_rounded, color: chosenTheme.secondary),
-            icon: const Icon(Icons.people_alt_outlined),
-            label: "My Team",
+    return Scaffold(
+      body: PageStorage(
+        bucket: _pageStorageBucket,
+        child: IndexedStack(
+          index: _selectedIndex,
+          children: List.generate(
+            screens.length,
+            (index) => _visitedIndices.contains(index)
+                ? screens[index]
+                : const SizedBox.shrink(),
           ),
-          NavigationDestination(
-            selectedIcon:
-                Icon(Icons.explore_rounded, color: chosenTheme.secondary),
-            icon: const Icon(Icons.explore_outlined),
-            label: "Explore",
-          ),
-        ];
-
-        final PageStorageBucket _bucket = PageStorageBucket();
-
-        // Add the tournament destination if tournament mode is enabled
-        if (isTournamentMode) {
-          destinations.insert(
-            1, // Add it to the second position
-            NavigationDestination(
-              selectedIcon: Icon(Icons.emoji_events_rounded,
-                  color: chosenTheme.secondary),
-              icon: const Icon(Icons.emoji_events_outlined),
-              label: "Tournament",
-            ),
-          );
-        }
-        return MaterialApp(
-          navigatorKey: navigatorKey,
-          title: 'Elapse',
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-            colorScheme: chosenTheme,
-            splashColor: Colors.transparent,
-            highlightColor: Colors.transparent,
-            fontFamily: "Manrope",
-          ),
-          home: Scaffold(
-            body: PageStorage(
-              bucket: _bucket,
-              child: screens[selectedIndex],
-            ),
-            bottomNavigationBar: NavigationBar(
-              selectedIndex: selectedIndex,
-              indicatorColor: chosenTheme.primary,
-              animationDuration: const Duration(milliseconds: 500),
-              labelBehavior:
-                  NavigationDestinationLabelBehavior.onlyShowSelected,
-              onDestinationSelected: (value) =>
-                  setState(() => selectedIndex = value),
-              destinations: destinations,
-            ),
-          ),
-        );
-      },
+        ),
+      ),
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _selectedIndex,
+        animationDuration: const Duration(milliseconds: 350),
+        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        onDestinationSelected: (value) {
+          if (value != _selectedIndex) {
+            setState(() {
+              _selectedIndex = value;
+              _visitedIndices.add(value);
+            });
+          }
+        },
+        destinations: destinations,
+      ),
     );
   }
 }
