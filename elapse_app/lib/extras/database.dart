@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:elapse_app/classes/ScoutSheet/scout_sheet_data.dart';
+import 'package:elapse_app/classes/ScoutSheet/scout_sheet_template.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Users/user.dart';
 import 'package:random_string_generator/random_string_generator.dart';
@@ -316,53 +318,89 @@ class Database {
 // Add Realtime Listener
 
   Future<String> createTeamScoutSheet(
-      String teamGroupID, String teamid, String tournamentID) async {
-    String returnVal = '';
-    try {
-      await _firestore
-          .collection('teamGroups')
-          .doc(teamGroupID)
-          .collection('scoutsheets')
-          .add({
-        /* Made with creation */
-        // Comp Specific stuff
-        'teamID': teamid,
-        'tournamentID': tournamentID,
+    String teamGroupID,
+    String teamid,
+    String tournamentID,
+    ScoutSheetTemplate template,
+  ) async {
+    final sheet = ScoutSheetData.empty(template);
+    final document = await _firestore
+        .collection('teamGroups')
+        .doc(teamGroupID)
+        .collection('scoutsheets')
+        .add({
+      'teamID': teamid,
+      'tournamentID': tournamentID,
+      'createTime': FieldValue.serverTimestamp(),
+      'latestUpdate': FieldValue.serverTimestamp(),
+      ...sheet.toFirestore(),
+      'isEditing': true,
+      'allowJoin': false,
+    });
+    return document.id;
+  }
 
-        // Timestamp Stuff
-        'createTime': DateTime.now(),
+  DocumentReference<Map<String, dynamic>> _teamScoutSheetReference(
+    String teamGroupId,
+    String scoutSheetId,
+  ) {
+    return _firestore
+        .collection('teamGroups')
+        .doc(teamGroupId)
+        .collection('scoutsheets')
+        .doc(scoutSheetId);
+  }
 
-        /* Updated with Editing */
-        'latestUpdate': null,
-        // List of the properties of the scouted robot
-        'properties': {
-          "Specs": {
-            "dbMotors": "",
-            "dbRPM": "",
-            "intakeType": "",
-            "otherNotes": ""
-          },
-        },
-        // Picklist
-        // 'picklist': {
-        //   'teams': [],
-        //   'tournamentId': "",
-        // },
-        // Notes about the team & match
-        'teamNotes': "",
-        'gameNotes': "",
-        // List of the URLs for any pictures
-        'photos': [],
-        // Bool for Currently Editing and Ablility to Join?
-        'isEditing': false,
-        'allowJoin': false, // Not sure why this is here anymore tbh
-      }).then((onValue) {
-        returnVal = onValue.id;
-      });
-    } catch (e) {
-      print(e);
-    }
-    return returnVal;
+  Future<void> updateTeamScoutSheetAnswers(
+    String teamGroupId,
+    String scoutSheetId,
+    Map<String, Object?> answers,
+  ) {
+    return _teamScoutSheetReference(teamGroupId, scoutSheetId).update({
+      'schemaVersion': 2,
+      'answers': answers,
+      'latestUpdate': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> setTeamScoutSheetEditing(
+    String teamGroupId,
+    String scoutSheetId,
+    bool isEditing,
+  ) {
+    return _teamScoutSheetReference(teamGroupId, scoutSheetId).update({
+      'isEditing': isEditing,
+      'latestUpdate': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> addTeamScoutSheetPhoto(
+    String teamGroupId,
+    String scoutSheetId,
+    String url,
+  ) {
+    return _teamScoutSheetReference(teamGroupId, scoutSheetId).update({
+      'photos': FieldValue.arrayUnion([url]),
+      'latestUpdate': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> deleteTeamScoutSheetPhoto(
+    String teamGroupId,
+    String scoutSheetId,
+    String url,
+  ) {
+    return _teamScoutSheetReference(teamGroupId, scoutSheetId).update({
+      'photos': FieldValue.arrayRemove([url]),
+      'latestUpdate': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> removeTeamScoutSheetById(
+    String teamGroupId,
+    String scoutSheetId,
+  ) {
+    return _teamScoutSheetReference(teamGroupId, scoutSheetId).delete();
   }
 
   Future<void> removeTeamScoutSheet(
@@ -435,20 +473,15 @@ class Database {
 
   Future<DocumentSnapshot?> getTeamScoutSheetInfo(
       String teamGroupId, String teamID, String tournamentID) async {
-    try {
-      var collection = await _firestore
-          .collection('teamGroups')
-          .doc(teamGroupId)
-          .collection('scoutsheets')
-          .where('teamID', isEqualTo: teamID)
-          .where('tournamentID', isEqualTo: tournamentID)
-          .limit(1)
-          .get();
-      return collection.docs.first;
-    } catch (e) {
-      print(e);
-    }
-    return null;
+    final collection = await _firestore
+        .collection('teamGroups')
+        .doc(teamGroupId)
+        .collection('scoutsheets')
+        .where('teamID', isEqualTo: teamID)
+        .where('tournamentID', isEqualTo: tournamentID)
+        .limit(1)
+        .get();
+    return collection.docs.isEmpty ? null : collection.docs.first;
   }
 
   Future<Map<String, dynamic>?> updateProperty(String teamGroupId,

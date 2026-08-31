@@ -107,6 +107,7 @@ void main() {
   });
 
   test('API token is normalized into a Bearer authorization header', () {
+    expect(getToken(), startsWith('Bearer '));
     expect(buildAuthorizationHeader('token'), 'Bearer token');
     expect(buildAuthorizationHeader(' Bearer token '), 'Bearer token');
     expect(() => buildAuthorizationHeader('  '), throwsStateError);

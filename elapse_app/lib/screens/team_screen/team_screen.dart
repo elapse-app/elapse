@@ -1,10 +1,12 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:elapse_app/classes/Filters/season.dart';
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
-import 'package:elapse_app/classes/ScoutSheet/scoutSheetUi.dart';
+import 'package:elapse_app/classes/ScoutSheet/scout_sheet_data.dart';
+import 'package:elapse_app/classes/ScoutSheet/scout_sheet_template.dart';
+import 'package:elapse_app/classes/ScoutSheet/scout_template_repository.dart';
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Team/vdaStats.dart';
@@ -14,6 +16,7 @@ import 'package:elapse_app/classes/Tournament/tournament.dart';
 import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
 import 'package:elapse_app/extras/database.dart';
 import 'package:elapse_app/screens/settings/setup_group.dart';
+import 'package:elapse_app/screens/scout/templates/scout_template_list.dart';
 import 'package:elapse_app/screens/team_screen/details/details.dart';
 import 'package:elapse_app/screens/team_screen/scoutsheet/closed.dart';
 import 'package:elapse_app/screens/team_screen/scoutsheet/edit.dart';
@@ -42,23 +45,13 @@ class _TeamScreenState extends State<TeamScreen> {
   late TeamPreview teamSave;
 
   bool locationLoaded = false;
-  bool isEditing = false;
   int pageIndex = 0;
   int scoutSheetStateIndex = 0;
   int selectedTournamentIndex = 0;
-  String selectedTournamentName = "";
-  String teamGroupID = prefs.getString("teamGroup") != null
-      ? TeamGroup.fromJson(jsonDecode(prefs.getString("teamGroup")!)).groupId!
-      : "";
+  late String teamGroupID;
   TournamentPreview selectedTournament = TournamentPreview(id: 0, name: "");
-  ScoutSheetUI activeScoutSheet = ScoutSheetUI(
-    intakeType: "",
-    numMotors: "",
-    RPM: "",
-    otherNotes: "",
-    photos: [],
-    autonNotes: "",
-  );
+  ScoutSheetData activeScoutSheet =
+      ScoutSheetData.empty(ScoutSheetTemplate.standard);
 
   Future<Tournament>? tournament;
   Future<Team>? team;
@@ -66,21 +59,29 @@ class _TeamScreenState extends State<TeamScreen> {
   Future<WorldSkillsStats>? skillsStats;
   Future<List<TournamentPreview>>? teamTournaments;
   Future<List<Award>>? teamAwards;
-  Future<DocumentSnapshot<Object?>?>? scoutSheet;
 
   late Season season;
-  Database database = Database();
+  final Database database = Database();
+  late final ScoutTemplateRepository _templateRepository;
+  Timer? _saveDebounce;
+  bool _savingAnswers = false;
   String scoutsheetID = "";
 
   @override
   void initState() {
     super.initState();
+    _templateRepository = ScoutTemplateRepository(prefs);
+    teamGroupID = _readTeamGroupId();
+    activeScoutSheet = ScoutSheetData.empty(
+      _templateRepository.loadDefaultTemplate(),
+    );
     teamSave =
         TeamPreview(teamID: widget.teamID, teamNumber: widget.teamNumber);
     isSaved = false;
     displaySave = true;
     team = fetchTeam(widget.teamID).then(
       (value) {
+        if (!mounted) return value;
         setState(() {
           teamSave.location = value.location;
           teamSave.teamName = value.teamName;
@@ -94,53 +95,30 @@ class _TeamScreenState extends State<TeamScreen> {
     skillsStats = getWorldSkillsForTeam(season.vrcId, widget.teamID);
     teamAwards = getAwards(widget.teamID, season.vrcId);
 
-    teamTournaments = fetchTeamTournaments(widget.teamID, season.vrcId).then(
-      (value) {
-        if (value.isNotEmpty && teamGroupID.isNotEmpty) {
-          setState(() {
-            selectedTournament = value[0];
-          });
-          scoutSheet = database
-              .getTeamScoutSheetInfo(
-                  teamGroupID, widget.teamID.toString(), value[0].id.toString())
-              .then(
-            (value) {
-              if (value != null) {
-                print(value.data());
-                Map<String, dynamic> sheet =
-                    value.data() as Map<String, dynamic>;
-                Map<String, dynamic> specs = sheet["properties"]["Specs"];
-                setState(() {
-                  scoutsheetID = value.id;
-                  scoutSheetStateIndex = 1;
-                  activeScoutSheet = ScoutSheetUI(
-                      intakeType: specs["intakeType"] ?? "",
-                      numMotors: specs["numMotors"] ?? "",
-                      RPM: specs["RPM"] ?? "",
-                      otherNotes: specs["otherNotes"] ?? "",
-                      photos: specs["photos"] ?? [],
-                      autonNotes: specs["numMotors"] ?? "");
-                });
-                return value;
-              } else {
-                setState(() {
-                  scoutSheetStateIndex = 0;
-                });
-              }
-              return null;
-            },
-          );
-        }
-        return value;
-      },
-    );
-    teamAwards = getAwards(widget.teamID, season.vrcId);
+    teamTournaments = _fetchTournamentsForSeason(season);
     isSaved = alreadySaved();
     displaySave = !isMainTeam();
 
     if (prefs.getBool("isTournamentMode") ?? false) {
       tournament = TMTournamentDetails(prefs.getInt("tournamentID") ?? 0);
     }
+  }
+
+  @override
+  void dispose() {
+    _saveDebounce?.cancel();
+    if (scoutsheetID.isNotEmpty && activeScoutSheet.answers.isNotEmpty) {
+      unawaited(
+        database
+            .updateTeamScoutSheetAnswers(
+              teamGroupID,
+              scoutsheetID,
+              activeScoutSheet.answers,
+            )
+            .catchError((_) {}),
+      );
+    }
+    super.dispose();
   }
 
   bool alreadySaved() {
@@ -152,8 +130,105 @@ class _TeamScreenState extends State<TeamScreen> {
   }
 
   bool isMainTeam() {
-    return jsonDecode(prefs.getString("savedTeam") ?? "")["teamID"] ==
-        widget.teamID.toString();
+    return tryLoadTeamPreview(prefs.getString('savedTeam'))?.teamID ==
+        widget.teamID;
+  }
+
+  String _readTeamGroupId() {
+    final encodedGroup = prefs.getString('teamGroup');
+    if (encodedGroup == null || encodedGroup.isEmpty) return '';
+    try {
+      return TeamGroup.fromJson(jsonDecode(encodedGroup)).groupId ?? '';
+    } on Object {
+      return '';
+    }
+  }
+
+  Future<List<TournamentPreview>> _fetchTournamentsForSeason(
+    Season requestedSeason,
+  ) async {
+    final tournaments = await fetchTeamTournaments(
+      widget.teamID,
+      requestedSeason.vrcId,
+    );
+    if (!mounted || season.vrcId != requestedSeason.vrcId) return tournaments;
+
+    final firstTournament = tournaments.isEmpty
+        ? TournamentPreview(id: 0, name: '')
+        : tournaments.first;
+    setState(() {
+      selectedTournamentIndex = 0;
+      selectedTournament = firstTournament;
+      scoutsheetID = '';
+      scoutSheetStateIndex = 0;
+      activeScoutSheet = ScoutSheetData.empty(
+        _templateRepository.loadDefaultTemplate(),
+      );
+    });
+    if (firstTournament.id != 0 && teamGroupID.isNotEmpty) {
+      unawaited(_loadScoutSheet(firstTournament));
+    }
+    return tournaments;
+  }
+
+  Future<void> _loadScoutSheet(TournamentPreview tournament) async {
+    if (teamGroupID.isEmpty || tournament.id == 0) return;
+    final requestedTournamentId = tournament.id;
+    final DocumentSnapshot<Object?>? document;
+    try {
+      document = await database.getTeamScoutSheetInfo(
+        teamGroupID,
+        widget.teamID.toString(),
+        requestedTournamentId.toString(),
+      );
+    } on Object {
+      if (mounted && selectedTournament.id == requestedTournamentId) {
+        _showError('Could not load this scout sheet.');
+      }
+      return;
+    }
+    if (!mounted || selectedTournament.id != requestedTournamentId) return;
+
+    if (document == null) {
+      setState(() {
+        scoutsheetID = '';
+        scoutSheetStateIndex = 0;
+        activeScoutSheet = ScoutSheetData.empty(
+          _templateRepository.loadDefaultTemplate(),
+        );
+      });
+      return;
+    }
+
+    final rawData = document.data();
+    final data = rawData is Map
+        ? ScoutSheetData.fromFirestore(Map<String, dynamic>.from(rawData))
+        : ScoutSheetData.empty(ScoutSheetTemplate.standard);
+    final documentId = document.id;
+    setState(() {
+      scoutsheetID = documentId;
+      scoutSheetStateIndex = 1;
+      activeScoutSheet = data;
+    });
+  }
+
+  Future<void> _selectTournament(
+    List<TournamentPreview> tournaments,
+    int tournamentId,
+  ) async {
+    await _flushAnswerSave();
+    final index = tournaments.indexWhere((event) => event.id == tournamentId);
+    if (index < 0 || !mounted) return;
+    setState(() {
+      selectedTournamentIndex = index;
+      selectedTournament = tournaments[index];
+      scoutsheetID = '';
+      scoutSheetStateIndex = 0;
+      activeScoutSheet = ScoutSheetData.empty(
+        _templateRepository.loadDefaultTemplate(),
+      );
+    });
+    await _loadScoutSheet(tournaments[index]);
   }
 
   void toggleSaveTeam() {
@@ -174,82 +249,191 @@ class _TeamScreenState extends State<TeamScreen> {
     });
   }
 
-  List<File> photos = [];
-
   void addPhoto(String photo) {
+    if (scoutsheetID.isEmpty || activeScoutSheet.photos.length >= 6) return;
+    final previous = activeScoutSheet;
     setState(() {
-      activeScoutSheet.photos.add(photo);
-      database.addPhoto(teamGroupID, widget.teamID.toString(),
-          selectedTournament.id.toString(), photo);
+      activeScoutSheet = activeScoutSheet.withPhotos(
+        [...activeScoutSheet.photos, photo],
+      );
     });
+    unawaited(
+      database
+          .addTeamScoutSheetPhoto(teamGroupID, scoutsheetID, photo)
+          .catchError((Object error) {
+        if (mounted) {
+          setState(() => activeScoutSheet = previous);
+          _showError('Could not save that photo.');
+        }
+      }),
+    );
   }
 
-  void removePhoto(int index) async {
-    await database.deletePhoto(teamGroupID, widget.teamID.toString(),
-        selectedTournament.id.toString(), activeScoutSheet.photos[index]);
+  Future<void> removePhoto(int index) async {
+    if (scoutsheetID.isEmpty || index >= activeScoutSheet.photos.length) return;
+    final previous = activeScoutSheet;
+    final photo = activeScoutSheet.photos[index];
     setState(() {
-      activeScoutSheet.photos.removeAt(index);
+      final updatedPhotos = [...activeScoutSheet.photos]..removeAt(index);
+      activeScoutSheet = activeScoutSheet.withPhotos(updatedPhotos);
     });
-  }
-
-  void updateSheet(String property, String value) async {
-    switch (property) {
-      case "intakeType":
-        setState(() {
-          activeScoutSheet.intakeType = value;
-        });
-        await database.updateProperty(
-            teamGroupID,
-            widget.teamID.toString(),
-            selectedTournament.id.toString(),
-            "Specs",
-            activeScoutSheet.toMap());
-        break;
-      case "numMotors":
-        setState(() {
-          activeScoutSheet.numMotors = value;
-        });
-        await database.updateProperty(
-            teamGroupID,
-            widget.teamID.toString(),
-            selectedTournament.id.toString(),
-            "Specs",
-            activeScoutSheet.toMap());
-        break;
-      case "RPM":
-        setState(() {
-          activeScoutSheet.RPM = value;
-        });
-        await database.updateProperty(
-            teamGroupID,
-            widget.teamID.toString(),
-            selectedTournament.id.toString(),
-            "Specs",
-            activeScoutSheet.toMap());
-        break;
-      case "otherNotes":
-        setState(() {
-          activeScoutSheet.otherNotes = value;
-        });
-        await database.updateProperty(
-            teamGroupID,
-            widget.teamID.toString(),
-            selectedTournament.id.toString(),
-            "Specs",
-            activeScoutSheet.toMap());
-        break;
-      case "autonNotes":
-        setState(() {
-          activeScoutSheet.autonNotes = value;
-        });
-        await database.updateProperty(
-            teamGroupID,
-            widget.teamID.toString(),
-            selectedTournament.id.toString(),
-            "Specs",
-            activeScoutSheet.toMap());
-        break;
+    try {
+      await database.deleteTeamScoutSheetPhoto(
+        teamGroupID,
+        scoutsheetID,
+        photo,
+      );
+    } on Object {
+      if (!mounted) return;
+      setState(() => activeScoutSheet = previous);
+      _showError('Could not remove that photo.');
     }
+  }
+
+  void updateSheet(String fieldId, Object? value) {
+    setState(() {
+      activeScoutSheet = activeScoutSheet.withAnswer(fieldId, value);
+    });
+    _saveDebounce?.cancel();
+    _saveDebounce = Timer(
+      const Duration(milliseconds: 450),
+      () => unawaited(_flushAnswerSave()),
+    );
+  }
+
+  Future<void> _flushAnswerSave() async {
+    _saveDebounce?.cancel();
+    if (_savingAnswers || scoutsheetID.isEmpty) return;
+    _savingAnswers = true;
+    final sheetId = scoutsheetID;
+    final answers = activeScoutSheet.answers;
+    try {
+      await database.updateTeamScoutSheetAnswers(
+        teamGroupID,
+        sheetId,
+        answers,
+      );
+    } on Object {
+      if (mounted && sheetId == scoutsheetID) {
+        _showError('Answers could not be saved. Check your connection.');
+      }
+    } finally {
+      _savingAnswers = false;
+      if (mounted &&
+          sheetId == scoutsheetID &&
+          !identical(answers, activeScoutSheet.answers)) {
+        _saveDebounce = Timer(
+          const Duration(milliseconds: 200),
+          () => unawaited(_flushAnswerSave()),
+        );
+      }
+    }
+  }
+
+  void _showError(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  Future<void> _createScoutSheet() async {
+    final template = await _pickTemplate();
+    if (template == null || !mounted) return;
+
+    showDialog<void>(
+      barrierDismissible: false,
+      context: context,
+      builder: (context) => const AlertDialog(
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 18),
+            Expanded(child: Text('Creating scout sheet…')),
+          ],
+        ),
+      ),
+    );
+
+    try {
+      final id = await database.createTeamScoutSheet(
+        teamGroupID,
+        widget.teamID.toString(),
+        selectedTournament.id.toString(),
+        template,
+      );
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+      setState(() {
+        scoutsheetID = id;
+        activeScoutSheet = ScoutSheetData.empty(template);
+        scoutSheetStateIndex = 2;
+      });
+    } on Object {
+      if (!mounted) return;
+      Navigator.of(context, rootNavigator: true).pop();
+      _showError('Could not create the scout sheet.');
+    }
+  }
+
+  Future<ScoutSheetTemplate?> _pickTemplate() {
+    final templates = _templateRepository.loadTemplates();
+    final defaultTemplate = _templateRepository.loadDefaultTemplate();
+    return showModalBottomSheet<ScoutSheetTemplate>(
+      context: context,
+      showDragHandle: true,
+      builder: (sheetContext) => SafeArea(
+        child: ListView(
+          shrinkWrap: true,
+          padding: const EdgeInsets.only(bottom: 12),
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 10),
+              child: Text(
+                'Choose a template',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
+            for (final template in templates)
+              ListTile(
+                leading: Icon(
+                  template.id == defaultTemplate.id
+                      ? Icons.star_rounded
+                      : Icons.description_outlined,
+                ),
+                title: Text(template.name),
+                subtitle: Text('${template.fields.length} fields'),
+                onTap: () => Navigator.pop(sheetContext, template),
+              ),
+            const Divider(),
+            ListTile(
+              leading: const Icon(Icons.tune),
+              title: const Text('Manage templates'),
+              onTap: () {
+                Navigator.pop(sheetContext);
+                unawaited(_openTemplateManager());
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _openTemplateManager() async {
+    await Navigator.push<void>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ScoutTemplateListScreen(
+          repository: _templateRepository,
+        ),
+      ),
+    );
+    if (!mounted || scoutsheetID.isNotEmpty) return;
+    setState(() {
+      activeScoutSheet = ScoutSheetData.empty(
+        _templateRepository.loadDefaultTemplate(),
+      );
+    });
   }
 
   late bool isSaved;
@@ -268,20 +452,16 @@ class _TeamScreenState extends State<TeamScreen> {
         activeScoutSheet,
         widget.teamID.toString(),
         selectedTournament.id.toString(), () async {
-      await database.removeTeamScoutSheet(widget.teamID.toString(), teamGroupID,
-          selectedTournament.id.toString());
+      if (scoutsheetID.isEmpty) return;
+      await database.removeTeamScoutSheetById(teamGroupID, scoutsheetID);
+      if (!mounted) return;
       setState(() {
+        scoutsheetID = '';
         scoutSheetStateIndex = 0;
-        activeScoutSheet = ScoutSheetUI(
-          intakeType: "",
-          numMotors: "",
-          RPM: "",
-          otherNotes: "",
-          photos: [],
-          autonNotes: "",
+        activeScoutSheet = ScoutSheetData.empty(
+          _templateRepository.loadDefaultTemplate(),
         );
       });
-      Navigator.pop(context);
     });
     List<Widget> ScoutsheetEditScreen = EditState(
         context,
@@ -293,37 +473,7 @@ class _TeamScreenState extends State<TeamScreen> {
         activeScoutSheet);
     List<Widget> ScoutSheetEmpty =
         selectedTournament.id != 0 && teamGroupID.isNotEmpty
-            ? EmptyState(context, () async {
-                showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (context) {
-                    return AlertDialog(
-                      title: Text("Creating Scoutsheet"),
-                      content: Text(
-                          "You will be able to edit once the scoutsheet is created"),
-                    );
-                  },
-                );
-                await database
-                    .createTeamScoutSheet(teamGroupID, widget.teamID.toString(),
-                        selectedTournament.id.toString())
-                    .then(
-                  (id) async {
-                    await database.updateMemberEditing(
-                        teamGroupID,
-                        widget.teamID.toString(),
-                        selectedTournament.id.toString(),
-                        true);
-                    print(id);
-                    Navigator.pop(context);
-                    setState(() {
-                      scoutsheetID = id;
-                      scoutSheetStateIndex = 2;
-                    });
-                  },
-                );
-              })
+            ? EmptyState(context, _createScoutSheet)
             : [
                 SliverToBoxAdapter(
                   child: Container(
@@ -351,9 +501,14 @@ class _TeamScreenState extends State<TeamScreen> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) => GroupSetupPage()));
+                            if (!context.mounted) return;
                             setState(() {
-                              teamGroupID = prefs.getString("teamGroup") ?? "";
+                              teamGroupID = _readTeamGroupId();
                             });
+                            if (teamGroupID.isNotEmpty &&
+                                selectedTournament.id != 0) {
+                              await _loadScoutSheet(selectedTournament);
+                            }
                           },
                           text: "Set Up a Team Group")
                     ]),
@@ -372,10 +527,19 @@ class _TeamScreenState extends State<TeamScreen> {
     switch (scoutSheetStateIndex) {
       case 1:
         button = IconButton(
-          onPressed: () {
-            setState(() {
-              scoutSheetStateIndex = 2;
-            });
+          tooltip: 'Edit scout sheet',
+          onPressed: () async {
+            if (scoutsheetID.isEmpty) return;
+            try {
+              await database.setTeamScoutSheetEditing(
+                teamGroupID,
+                scoutsheetID,
+                true,
+              );
+              if (mounted) setState(() => scoutSheetStateIndex = 2);
+            } on Object {
+              if (mounted) _showError('Could not start editing.');
+            }
           },
           icon: Icon(
             Icons.edit_outlined,
@@ -387,15 +551,24 @@ class _TeamScreenState extends State<TeamScreen> {
         break;
       case 2:
         button = IconButton(
+          tooltip: 'Finish editing',
           onPressed: () async {
-            await database.updateMemberEditing(
+            final missing = activeScoutSheet.missingRequiredFields;
+            if (missing.isNotEmpty) {
+              _showError('Complete required field: ${missing.first.label}');
+              return;
+            }
+            await _flushAnswerSave();
+            try {
+              await database.setTeamScoutSheetEditing(
                 teamGroupID,
-                widget.teamID.toString(),
-                selectedTournament.id.toString(),
-                false);
-            setState(() {
-              scoutSheetStateIndex = 1;
-            });
+                scoutsheetID,
+                false,
+              );
+              if (mounted) setState(() => scoutSheetStateIndex = 1);
+            } on Object {
+              if (mounted) _showError('Could not finish editing.');
+            }
           },
           icon: Icon(
             Icons.check,
@@ -509,39 +682,12 @@ class _TeamScreenState extends State<TeamScreen> {
                                     ),
                                   );
                                 }).toList(),
-                                onChanged: (value) => {
-                                  setState(
-                                    () {
-                                      selectedTournamentIndex =
-                                          tournaments.indexWhere(
-                                              (element) => element.id == value);
-                                      selectedTournament =
-                                          tournaments[selectedTournamentIndex];
-                                      if (teamGroupID.isNotEmpty) {
-                                        scoutSheet = database
-                                            .getTeamScoutSheetInfo(
-                                                teamGroupID,
-                                                widget.teamID.toString(),
-                                                selectedTournament.id
-                                                    .toString())
-                                            .then(
-                                          (value) {
-                                            if (value != null) {
-                                              setState(() {
-                                                scoutsheetID = value.id;
-                                                scoutSheetStateIndex = 1;
-                                              });
-                                            } else {
-                                              setState(() {
-                                                scoutSheetStateIndex = 0;
-                                              });
-                                            }
-                                            return value;
-                                          },
-                                        );
-                                      }
-                                    },
-                                  ),
+                                onChanged: (value) {
+                                  if (value != null) {
+                                    unawaited(
+                                      _selectTournament(tournaments, value),
+                                    );
+                                  }
                                 },
                               ),
                             );
@@ -590,21 +736,21 @@ class _TeamScreenState extends State<TeamScreen> {
               const Spacer(),
               GestureDetector(
                   onTap: () async {
-                    Season updated = await Navigator.push(
+                    final updated = await Navigator.push<Season>(
                       context,
                       MaterialPageRoute(
                         builder: (context) =>
                             SeasonFilterPage(selected: season),
                       ),
                     );
+                    if (updated == null || !context.mounted) return;
                     setState(() {
                       season = updated;
                       skillsStats =
                           getWorldSkillsForTeam(season.vrcId, widget.teamID);
                       teamStats = getTrueSkillDataForTeam(
                           season.vrcId, widget.teamNumber);
-                      teamTournaments =
-                          fetchTeamTournaments(widget.teamID, season.vrcId);
+                      teamTournaments = _fetchTournamentsForSeason(season);
                       teamAwards = getAwards(widget.teamID, season.vrcId);
                     });
                   },

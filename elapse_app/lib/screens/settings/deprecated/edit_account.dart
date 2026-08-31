@@ -3,7 +3,6 @@ import 'package:elapse_app/main.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-import '../../team_screen/scoutsheet/edit.dart';
 import '../../widgets/app_bar.dart';
 import '../../widgets/rounded_top.dart';
 
@@ -55,15 +54,18 @@ class _EditAccountPageState extends State<EditAccountPage> {
                             style: TextStyle(fontSize: 24)),
                         const SizedBox(height: 18),
                         TextFormField(
-                            decoration:
-                                ElapseInputDecoration(context, "Display Name"),
+                            decoration: const InputDecoration(
+                              labelText: "Display Name",
+                            ),
                             initialValue: displayName,
                             onChanged: (val) {
                               displayName = val;
                             }),
                         const SizedBox(height: 10),
                         TextFormField(
-                            decoration: ElapseInputDecoration(context, "Email"),
+                            decoration: const InputDecoration(
+                              labelText: "Email",
+                            ),
                             initialValue: email,
                             onChanged: (val) {
                               email = val;

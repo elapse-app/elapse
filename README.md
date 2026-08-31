@@ -43,14 +43,14 @@ class firebaseTokens {
 }
 ```  
   
-Elapse uses the [VEX Events API v2](https://events.vex.com/api/v2). Supply its
-access token at build time so credentials never enter source control:
+Elapse uses the [VEX Events API v2](https://events.vex.com/api/v2). The app
+ships with the repository token as its default. You can override it at build
+time when rotating credentials:
 
 ```sh
 flutter run --dart-define=VEX_API_TOKEN=your_token_here
 ```
 
-Use the same `--dart-define` for release builds. Never commit the token or a
-file containing it to the repository.
+Use the same `--dart-define` for release builds that need a different token.
 
 In addition, Elapse pulls data from [https://vrc-data-analysis.com/](https://vrc-data-analysis.com/), which provides TrueSkill information, some skills data, and more.
