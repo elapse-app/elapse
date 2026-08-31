@@ -33,10 +33,11 @@ migrate_working_dir/
 .packages
 .pub-cache/
 .pub/
+node_modules/
 /build/
 linux/flutter/*
 windows/flutter/*
-pubspec.lock
+# Flutter applications commit pubspec.lock for reproducible release builds.
 
 # Symbolication related
 app.*.symbols

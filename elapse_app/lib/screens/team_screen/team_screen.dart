@@ -261,6 +261,7 @@ class _TeamScreenState extends State<TeamScreen> {
       database
           .addTeamScoutSheetPhoto(teamGroupID, scoutsheetID, photo)
           .catchError((Object error) {
+        unawaited(database.deleteUploadedPhoto(photo).catchError((_) {}));
         if (mounted) {
           setState(() => activeScoutSheet = previous);
           _showError('Could not save that photo.');
@@ -283,6 +284,7 @@ class _TeamScreenState extends State<TeamScreen> {
         scoutsheetID,
         photo,
       );
+      unawaited(database.deleteUploadedPhoto(photo).catchError((_) {}));
     } on Object {
       if (!mounted) return;
       setState(() => activeScoutSheet = previous);
@@ -466,6 +468,7 @@ class _TeamScreenState extends State<TeamScreen> {
     List<Widget> ScoutsheetEditScreen = EditState(
         context,
         widget.teamNumber,
+        teamGroupID,
         addPhoto,
         removePhoto,
         activeScoutSheet.photos,

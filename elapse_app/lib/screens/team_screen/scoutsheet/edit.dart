@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 List<Widget> EditState(
   BuildContext context,
   String teamNumber,
+  String teamGroupId,
   void Function(String) addPhoto,
   void Function(int) removePhoto,
   List<String> photos,
@@ -43,6 +44,7 @@ List<Widget> EditState(
       ),
     SliverToBoxAdapter(
       child: _PhotoEditor(
+        teamGroupId: teamGroupId,
         photos: photos,
         onAdd: addPhoto,
         onRemove: removePhoto,
@@ -160,11 +162,13 @@ class _ScoutFieldEditor extends StatelessWidget {
 
 class _PhotoEditor extends StatelessWidget {
   const _PhotoEditor({
+    required this.teamGroupId,
     required this.photos,
     required this.onAdd,
     required this.onRemove,
   });
 
+  final String teamGroupId;
   final List<String> photos;
   final void Function(String) onAdd;
   final void Function(int) onRemove;
@@ -200,7 +204,10 @@ class _PhotoEditor extends StatelessWidget {
             ),
             itemBuilder: (context, index) {
               if (index == photos.length) {
-                return _AddPhotoTile(onAdd: onAdd);
+                return _AddPhotoTile(
+                  teamGroupId: teamGroupId,
+                  onAdd: onAdd,
+                );
               }
               return Stack(
                 fit: StackFit.expand,
@@ -235,8 +242,12 @@ class _PhotoEditor extends StatelessWidget {
 }
 
 class _AddPhotoTile extends StatelessWidget {
-  const _AddPhotoTile({required this.onAdd});
+  const _AddPhotoTile({
+    required this.teamGroupId,
+    required this.onAdd,
+  });
 
+  final String teamGroupId;
   final void Function(String) onAdd;
 
   @override
@@ -244,7 +255,7 @@ class _AddPhotoTile extends StatelessWidget {
     return InkWell(
       borderRadius: BorderRadius.circular(9),
       onTap: () async {
-        final result = await getPhoto(context);
+        final result = await getPhoto(context, teamGroupId: teamGroupId);
         if (result != null) onAdd(result);
       },
       child: Ink(
