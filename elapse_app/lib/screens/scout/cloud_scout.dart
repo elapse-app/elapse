@@ -2,6 +2,7 @@ import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/ScoutSheet/scout_template_repository.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/scout/templates/scout_template_list.dart';
+import 'package:elapse_app/screens/scout/start_scouting.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
@@ -41,6 +42,32 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
             settingsCallback: () => setState(() {}),
           ),
           RoundedTop(),
+          SliverToBoxAdapter(
+              child: Padding(
+            padding: const EdgeInsets.fromLTRB(23, 0, 23, 18),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text('Scout a team',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  const Text(
+                      'Choose a team and event, then fill in a sheet. Sheets are shared with your team group; templates are reusable blank forms.'),
+                  const SizedBox(height: 12),
+                  FilledButton.icon(
+                    onPressed: () => Navigator.push<void>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => StartScoutingScreen(
+                              template:
+                                  _templateRepository.loadDefaultTemplate()),
+                        )),
+                    icon: const Icon(Icons.edit_note),
+                    label: const Text('Start scouting'),
+                  ),
+                ]),
+          )),
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(23, 0, 23, 18),
             sliver: SliverToBoxAdapter(
@@ -57,7 +84,7 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
                   ),
                   title: const Text('Scout sheet templates'),
                   subtitle: Text(
-                    '${_templateRepository.loadTemplates().length} available • Create custom forms',
+                    '${_templateRepository.loadTemplates().length} blank forms • Use or customize a template',
                   ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () async {
@@ -143,7 +170,8 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
               ? SliverToBoxAdapter(
                   child: BigErrorMessage(
                       icon: Icons.bookmark_add_outlined,
-                      message: "Add some teams from the explore menu"),
+                      message:
+                          "No saved teams yet. Tap Start scouting to find any team—no bookmark needed."),
                 )
               : SliverPadding(
                   padding: EdgeInsets.symmetric(horizontal: 23),

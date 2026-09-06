@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:elapse_app/setup/signup/login_or_signup.dart';
 import 'package:elapse_app/classes/Filters/season.dart';
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/classes/ScoutSheet/scout_sheet_data.dart';
@@ -32,10 +34,17 @@ import '../widgets/long_button.dart';
 
 class TeamScreen extends StatefulWidget {
   const TeamScreen(
-      {super.key, required this.teamID, required this.teamNumber, this.team});
+      {super.key,
+      required this.teamID,
+      required this.teamNumber,
+      this.team,
+      this.scoutTemplate,
+      this.openScoutSheet = false});
   final int teamID;
   final String teamNumber;
   final Team? team;
+  final ScoutSheetTemplate? scoutTemplate;
+  final bool openScoutSheet;
 
   @override
   State<TeamScreen> createState() => _TeamScreenState();
@@ -70,6 +79,7 @@ class _TeamScreenState extends State<TeamScreen> {
   @override
   void initState() {
     super.initState();
+    pageIndex = widget.openScoutSheet ? 1 : 0;
     _templateRepository = ScoutTemplateRepository(prefs);
     teamGroupID = _readTeamGroupId();
     activeScoutSheet = ScoutSheetData.empty(
@@ -339,8 +349,17 @@ class _TeamScreenState extends State<TeamScreen> {
   }
 
   Future<void> _createScoutSheet() async {
-    final template = await _pickTemplate();
+    final template = widget.scoutTemplate ?? await _pickTemplate();
     if (template == null || !mounted) return;
+
+    await _createScoutSheetWithTemplate(template);
+  }
+
+  Future<void> _createScoutSheetWithTemplate(
+      ScoutSheetTemplate template) async {
+    if (teamGroupID.isEmpty ||
+        selectedTournament.id == 0 ||
+        scoutsheetID.isNotEmpty) return;
 
     showDialog<void>(
       barrierDismissible: false,
@@ -422,15 +441,22 @@ class _TeamScreenState extends State<TeamScreen> {
   }
 
   Future<void> _openTemplateManager() async {
-    await Navigator.push<void>(
+    final selected = await Navigator.push<ScoutSheetTemplate>(
       context,
       MaterialPageRoute(
         builder: (context) => ScoutTemplateListScreen(
           repository: _templateRepository,
+          onUseTemplate: (template) => Navigator.pop(context, template),
         ),
       ),
     );
     if (!mounted || scoutsheetID.isNotEmpty) return;
+    if (selected != null &&
+        selectedTournament.id != 0 &&
+        teamGroupID.isNotEmpty) {
+      await _createScoutSheetWithTemplate(selected);
+      return;
+    }
     setState(() {
       activeScoutSheet = ScoutSheetData.empty(
         _templateRepository.loadDefaultTemplate(),
@@ -474,9 +500,19 @@ class _TeamScreenState extends State<TeamScreen> {
         activeScoutSheet.photos,
         updateSheet,
         activeScoutSheet);
-    List<Widget> ScoutSheetEmpty =
-        selectedTournament.id != 0 && teamGroupID.isNotEmpty
-            ? EmptyState(context, _createScoutSheet)
+    List<Widget> ScoutSheetEmpty = selectedTournament.id != 0 &&
+            teamGroupID.isNotEmpty
+        ? EmptyState(context, _createScoutSheet,
+            templateName: widget.scoutTemplate?.name)
+        : teamGroupID.isNotEmpty
+            ? [
+                const SliverToBoxAdapter(
+                    child: Padding(
+                  padding: EdgeInsets.all(23),
+                  child: Text(
+                      'Choose an event above to start a sheet. If no events are listed, try another season using the season selector at the top.'),
+                ))
+              ]
             : [
                 SliverToBoxAdapter(
                   child: Container(
@@ -493,13 +529,33 @@ class _TeamScreenState extends State<TeamScreen> {
                     child: Column(children: [
                       BigErrorMessage(
                         icon: Icons.people_alt_outlined,
-                        message: "Not in a team group",
+                        message: FirebaseAuth.instance.currentUser == null
+                            ? 'Sign in to save scout sheets'
+                            : 'Set up your group to save scout sheets',
                         topPadding: 0,
                         textPadding: 5,
                       ),
                       const SizedBox(height: 18),
+                      const Text(
+                          'Scout sheets are shared with your team group. Create a group or join your teammates, then return here to start this sheet.',
+                          textAlign: TextAlign.center),
+                      const SizedBox(height: 18),
                       LongButton(
                           onPressed: () async {
+                            if (FirebaseAuth.instance.currentUser == null) {
+                              await Navigator.push<void>(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const SignUpPage(),
+                                  ));
+                              if (!context.mounted) return;
+                              setState(() => teamGroupID = _readTeamGroupId());
+                              if (teamGroupID.isNotEmpty &&
+                                  selectedTournament.id != 0) {
+                                await _loadScoutSheet(selectedTournament);
+                              }
+                              return;
+                            }
                             await Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -513,7 +569,9 @@ class _TeamScreenState extends State<TeamScreen> {
                               await _loadScoutSheet(selectedTournament);
                             }
                           },
-                          text: "Set Up a Team Group")
+                          text: FirebaseAuth.instance.currentUser == null
+                              ? 'Sign in or create account'
+                              : 'Set up a team group')
                     ]),
                   ),
                 )
@@ -598,6 +656,20 @@ class _TeamScreenState extends State<TeamScreen> {
     }
 
     List<Widget> ScoutSheetScreen = [
+      SliverToBoxAdapter(
+          child: Padding(
+        padding: const EdgeInsets.fromLTRB(23, 8, 23, 12),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Scout ${widget.teamNumber}',
+              style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 4),
+          Text(scoutSheetStateIndex == 2
+              ? 'Fill in the fields below, then tap the checkmark to finish. Changes are saved to your team group as you type.'
+              : scoutsheetID.isNotEmpty
+                  ? 'Saved sheet • ${activeScoutSheet.template.name}. Tap the pencil to edit. Choose another event below to view its sheet.'
+                  : '2. Choose an event below, then create your sheet.${widget.scoutTemplate == null ? '' : '\nTemplate: ${widget.scoutTemplate!.name}'}'),
+        ]),
+      )),
       SliverToBoxAdapter(
         child: Padding(
           padding: const EdgeInsets.only(left: 23.0, right: 11),
@@ -771,7 +843,8 @@ class _TeamScreenState extends State<TeamScreen> {
         ),
       ),
       CustomTabBar(
-          tabs: ["Details", "Scoutsheet"],
+          initIndex: widget.openScoutSheet ? 1 : 0,
+          tabs: ["Details", "Scout sheet"],
           onPressed: (value) {
             setState(() {
               pageIndex = value;

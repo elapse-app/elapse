@@ -1,15 +1,18 @@
 import 'package:elapse_app/classes/ScoutSheet/scout_sheet_template.dart';
 import 'package:elapse_app/classes/ScoutSheet/scout_template_repository.dart';
 import 'package:elapse_app/screens/scout/templates/scout_template_editor.dart';
+import 'package:elapse_app/screens/scout/start_scouting.dart';
 import 'package:flutter/material.dart';
 
 class ScoutTemplateListScreen extends StatefulWidget {
   const ScoutTemplateListScreen({
     super.key,
     required this.repository,
+    this.onUseTemplate,
   });
 
   final ScoutTemplateRepository repository;
+  final ValueChanged<ScoutSheetTemplate>? onUseTemplate;
 
   @override
   State<ScoutTemplateListScreen> createState() =>
@@ -44,7 +47,7 @@ class _ScoutTemplateListScreenState extends State<ScoutTemplateListScreen> {
         padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
         children: [
           Text(
-            'Pick a default or build reusable forms for different scouting jobs.',
+            'A template is a blank form. Tap Use template, choose a team, then create a scout sheet for an event and fill in your answers.',
             style: Theme.of(context).textTheme.bodyLarge,
           ),
           const SizedBox(height: 16),
@@ -53,6 +56,7 @@ class _ScoutTemplateListScreenState extends State<ScoutTemplateListScreen> {
               template: template,
               isDefault: template.id == _defaultTemplateId,
               onSetDefault: () => _setDefault(template),
+              onUse: () => _useTemplate(template),
               onEdit: template.isBuiltIn ? null : () => _openEditor(template),
               onDuplicate: () => _duplicate(template),
               onDelete: template.isBuiltIn ? null : () => _delete(template),
@@ -60,6 +64,18 @@ class _ScoutTemplateListScreenState extends State<ScoutTemplateListScreen> {
         ],
       ),
     );
+  }
+
+  void _useTemplate(ScoutSheetTemplate template) {
+    if (widget.onUseTemplate != null) {
+      widget.onUseTemplate!(template);
+    } else {
+      Navigator.push<void>(
+          context,
+          MaterialPageRoute(
+            builder: (_) => StartScoutingScreen(template: template),
+          ));
+    }
   }
 
   Future<void> _openEditor([ScoutSheetTemplate? template]) async {
@@ -93,9 +109,13 @@ class _ScoutTemplateListScreenState extends State<ScoutTemplateListScreen> {
   }
 
   Future<void> _setDefault(ScoutSheetTemplate template) async {
-    await widget.repository.setDefaultTemplate(template.id);
-    if (!mounted) return;
-    setState(() => _defaultTemplateId = template.id);
+    try {
+      await widget.repository.setDefaultTemplate(template.id);
+      if (!mounted) return;
+      setState(() => _defaultTemplateId = template.id);
+    } on Object catch (error) {
+      if (mounted) _showError(error);
+    }
   }
 
   Future<void> _delete(ScoutSheetTemplate template) async {
@@ -137,6 +157,7 @@ class _TemplateCard extends StatelessWidget {
     required this.isDefault,
     required this.onSetDefault,
     required this.onDuplicate,
+    required this.onUse,
     this.onEdit,
     this.onDelete,
   });
@@ -145,6 +166,7 @@ class _TemplateCard extends StatelessWidget {
   final bool isDefault;
   final VoidCallback onSetDefault;
   final VoidCallback onDuplicate;
+  final VoidCallback onUse;
   final VoidCallback? onEdit;
   final VoidCallback? onDelete;
 
@@ -154,48 +176,52 @@ class _TemplateCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 6),
-        child: ListTile(
-          leading: Radio<String>(
-            value: template.id,
-            groupValue: isDefault ? template.id : null,
-            onChanged: (_) => onSetDefault(),
+        child: Column(children: [
+          ListTile(
+            onTap: onUse,
+            title: Text(template.name),
+            subtitle: Text(
+              '${template.fields.length} fields'
+              '${template.isBuiltIn ? ' • Built in' : ''}'
+              '${template.description.isEmpty ? '' : '\n${template.description}'}',
+            ),
+            isThreeLine: template.description.isNotEmpty,
+            trailing: PopupMenuButton<String>(
+              onSelected: (action) {
+                switch (action) {
+                  case 'edit':
+                    onEdit?.call();
+                  case 'duplicate':
+                    onDuplicate();
+                  case 'delete':
+                    onDelete?.call();
+                }
+              },
+              itemBuilder: (context) => [
+                if (onEdit != null)
+                  const PopupMenuItem(value: 'edit', child: Text('Edit')),
+                const PopupMenuItem(
+                    value: 'duplicate', child: Text('Duplicate')),
+                if (onDelete != null)
+                  const PopupMenuItem(value: 'delete', child: Text('Delete')),
+              ],
+            ),
           ),
-          onTap: onSetDefault,
-          title: Row(
-            children: [
-              Expanded(child: Text(template.name)),
-              if (template.isBuiltIn)
-                const Chip(
-                  label: Text('Built in'),
-                  visualDensity: VisualDensity.compact,
-                ),
-            ],
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+            child: Wrap(spacing: 8, runSpacing: 4, children: [
+              FilledButton.icon(
+                  onPressed: onUse,
+                  icon: const Icon(Icons.edit_note),
+                  label: const Text('Use template')),
+              TextButton.icon(
+                  onPressed: isDefault ? null : onSetDefault,
+                  icon: Icon(isDefault ? Icons.star : Icons.star_border),
+                  label: Text(
+                      isDefault ? 'Default for new sheets' : 'Make default')),
+            ]),
           ),
-          subtitle: Text(
-            '${template.fields.length} fields'
-            '${template.description.isEmpty ? '' : '\n${template.description}'}',
-          ),
-          isThreeLine: template.description.isNotEmpty,
-          trailing: PopupMenuButton<String>(
-            onSelected: (action) {
-              switch (action) {
-                case 'edit':
-                  onEdit?.call();
-                case 'duplicate':
-                  onDuplicate();
-                case 'delete':
-                  onDelete?.call();
-              }
-            },
-            itemBuilder: (context) => [
-              if (onEdit != null)
-                const PopupMenuItem(value: 'edit', child: Text('Edit')),
-              const PopupMenuItem(value: 'duplicate', child: Text('Duplicate')),
-              if (onDelete != null)
-                const PopupMenuItem(value: 'delete', child: Text('Delete')),
-            ],
-          ),
-        ),
+        ]),
       ),
     );
   }
