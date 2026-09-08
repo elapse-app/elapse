@@ -70,7 +70,7 @@ class _ScoutTemplateListScreenState extends State<ScoutTemplateListScreen> {
     if (widget.onUseTemplate != null) {
       widget.onUseTemplate!(template);
     } else {
-      Navigator.push<void>(
+      Navigator.pushReplacement<void, void>(
           context,
           MaterialPageRoute(
             builder: (_) => StartScoutingScreen(template: template),

@@ -27,7 +27,8 @@ void main() {
       ),
       home: ScoutTemplateListScreen(repository: repository),
     ));
-    await tester.scrollUntilVisible(find.text('Use template').hitTestable(), 150);
+    await tester.scrollUntilVisible(
+        find.text('Use template').hitTestable(), 150);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Use template'));
     await tester.pumpAndSettle();
@@ -48,9 +49,8 @@ void main() {
     expect(find.text('1. Choose a team'), findsOneWidget);
     expect(find.text('Using: Robot overview'), findsOneWidget);
     expect(repository.loadDefaultTemplate().id, ScoutSheetTemplate.standard.id);
-    await tester.pageBack();
-    await tester.pumpAndSettle();
-    expect(find.text('Scout sheet templates'), findsOneWidget);
+    expect(find.byType(ScoutTemplateListScreen), findsNothing);
+    expect(find.widgetWithText(TextField, 'e.g. 1523W'), findsOneWidget);
   });
 
   testWidgets('in-sheet template manager returns the selected form',
@@ -114,7 +114,7 @@ void main() {
     await tester.tap(find.text('Find team'));
     await tester.pumpAndSettle();
     expect(calls, 0);
-    expect(find.text('Enter a team number, like 10K.'), findsOneWidget);
+    expect(find.text('Enter a team number, like 1523W.'), findsOneWidget);
     await tester.enterText(find.byType(TextField), 'UNKNOWN');
     await tester.tap(find.text('Find team'));
     await tester.pumpAndSettle();

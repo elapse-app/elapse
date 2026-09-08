@@ -42,7 +42,7 @@ class _StartScoutingScreenState extends State<StartScoutingScreen> {
       setState(() {
         _loading = false;
         _teams = [];
-        _error = 'Enter a team number, like 10K.';
+        _error = 'Enter a team number, like 1523W.';
       });
       return;
     }
@@ -74,7 +74,7 @@ class _StartScoutingScreenState extends State<StartScoutingScreen> {
       widget.onTeamSelected!(team, widget.template);
       return;
     }
-    Navigator.push<void>(
+    Navigator.pushReplacement<void, void>(
         context,
         MaterialPageRoute(
             builder: (_) => TeamScreen(
@@ -82,6 +82,7 @@ class _StartScoutingScreenState extends State<StartScoutingScreen> {
                   teamNumber: team.teamNumber,
                   scoutTemplate: widget.template,
                   openScoutSheet: true,
+                  returnAfterSave: true,
                 )));
   }
 
@@ -105,7 +106,7 @@ class _StartScoutingScreenState extends State<StartScoutingScreen> {
               textInputAction: TextInputAction.search,
               decoration: const InputDecoration(
                   labelText: 'Team number',
-                  hintText: 'e.g. 10K',
+                  hintText: 'e.g. 1523W',
                   border: OutlineInputBorder()),
               onSubmitted: (_) => _search(),
             ),

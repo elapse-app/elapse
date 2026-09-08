@@ -23,7 +23,7 @@ import 'package:elapse_app/screens/team_screen/details/details.dart';
 import 'package:elapse_app/screens/team_screen/scoutsheet/closed.dart';
 import 'package:elapse_app/screens/team_screen/scoutsheet/edit.dart';
 import 'package:elapse_app/screens/team_screen/scoutsheet/empty.dart';
-import 'package:elapse_app/screens/widgets/app_bar.dart';
+import 'package:elapse_app/screens/team_screen/team_page_header.dart';
 import 'package:elapse_app/screens/widgets/custom_tab_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
@@ -39,12 +39,18 @@ class TeamScreen extends StatefulWidget {
       required this.teamNumber,
       this.team,
       this.scoutTemplate,
-      this.openScoutSheet = false});
+      this.openScoutSheet = false,
+      this.returnAfterSave = false,
+      this.initialSheetId,
+      this.initialEvent});
   final int teamID;
   final String teamNumber;
   final Team? team;
   final ScoutSheetTemplate? scoutTemplate;
   final bool openScoutSheet;
+  final bool returnAfterSave;
+  final String? initialSheetId;
+  final TournamentPreview? initialEvent;
 
   @override
   State<TeamScreen> createState() => _TeamScreenState();
@@ -73,8 +79,11 @@ class _TeamScreenState extends State<TeamScreen> {
   final Database database = Database();
   late final ScoutTemplateRepository _templateRepository;
   Timer? _saveDebounce;
-  bool _savingAnswers = false;
+  Future<void>? _answerSave;
   String scoutsheetID = "";
+  bool _loadingSheet = false;
+  String? _sheetLoadError;
+  bool _initialEventPending = true;
 
   @override
   void initState() {
@@ -157,17 +166,31 @@ class _TeamScreenState extends State<TeamScreen> {
   Future<List<TournamentPreview>> _fetchTournamentsForSeason(
     Season requestedSeason,
   ) async {
-    final tournaments = await fetchTeamTournaments(
-      widget.teamID,
-      requestedSeason.vrcId,
-    );
+    final tournaments = <TournamentPreview>[];
+    try {
+      tournaments.addAll(await fetchTeamTournaments(
+        widget.teamID,
+        requestedSeason.vrcId,
+      ));
+    } on Object {
+      if (widget.initialEvent == null || !_initialEventPending) rethrow;
+    }
     if (!mounted || season.vrcId != requestedSeason.vrcId) return tournaments;
 
-    final firstTournament = tournaments.isEmpty
-        ? TournamentPreview(id: 0, name: '')
-        : tournaments.first;
+    final requestedEvent = _initialEventPending ? widget.initialEvent : null;
+    _initialEventPending = false;
+    if (requestedEvent != null &&
+        !tournaments.any((event) => event.id == requestedEvent.id)) {
+      tournaments.insert(0, requestedEvent);
+    }
+    final firstTournament = requestedEvent ??
+        (tournaments.isEmpty
+            ? TournamentPreview(id: 0, name: '')
+            : tournaments.first);
     setState(() {
-      selectedTournamentIndex = 0;
+      selectedTournamentIndex = tournaments.isEmpty
+          ? 0
+          : tournaments.indexWhere((event) => event.id == firstTournament.id);
       selectedTournament = firstTournament;
       scoutsheetID = '';
       scoutSheetStateIndex = 0;
@@ -184,22 +207,39 @@ class _TeamScreenState extends State<TeamScreen> {
   Future<void> _loadScoutSheet(TournamentPreview tournament) async {
     if (teamGroupID.isEmpty || tournament.id == 0) return;
     final requestedTournamentId = tournament.id;
+    setState(() {
+      _loadingSheet = true;
+      _sheetLoadError = null;
+    });
     final DocumentSnapshot<Object?>? document;
     try {
-      document = await database.getTeamScoutSheetInfo(
-        teamGroupID,
-        widget.teamID.toString(),
-        requestedTournamentId.toString(),
-      );
+      document = widget.initialSheetId != null &&
+              requestedTournamentId == widget.initialEvent?.id
+          ? await FirebaseFirestore.instance
+              .collection('teamGroups')
+              .doc(teamGroupID)
+              .collection('scoutsheets')
+              .doc(widget.initialSheetId)
+              .get()
+          : await database.getTeamScoutSheetInfo(
+              teamGroupID,
+              widget.teamID.toString(),
+              requestedTournamentId.toString(),
+            );
     } on Object {
       if (mounted && selectedTournament.id == requestedTournamentId) {
-        _showError('Could not load this scout sheet.');
+        setState(() => _sheetLoadError =
+            'Could not load this sheet. Retry before creating a new one.');
       }
       return;
+    } finally {
+      if (mounted && selectedTournament.id == requestedTournamentId) {
+        setState(() => _loadingSheet = false);
+      }
     }
     if (!mounted || selectedTournament.id != requestedTournamentId) return;
 
-    if (document == null) {
+    if (document == null || !document.exists) {
       setState(() {
         scoutsheetID = '';
         scoutSheetStateIndex = 0;
@@ -226,7 +266,7 @@ class _TeamScreenState extends State<TeamScreen> {
     List<TournamentPreview> tournaments,
     int tournamentId,
   ) async {
-    await _flushAnswerSave();
+    if (!await _flushAnswerSave()) return;
     final index = tournaments.indexWhere((event) => event.id == tournamentId);
     if (index < 0 || !mounted) return;
     setState(() {
@@ -313,10 +353,15 @@ class _TeamScreenState extends State<TeamScreen> {
     );
   }
 
-  Future<void> _flushAnswerSave() async {
+  Future<bool> _flushAnswerSave() async {
     _saveDebounce?.cancel();
-    if (_savingAnswers || scoutsheetID.isEmpty) return;
-    _savingAnswers = true;
+    if (_answerSave != null) {
+      await _answerSave;
+      return _flushAnswerSave();
+    }
+    if (scoutsheetID.isEmpty) return true;
+    final completion = Completer<void>();
+    _answerSave = completion.future;
     final sheetId = scoutsheetID;
     final answers = activeScoutSheet.answers;
     try {
@@ -325,12 +370,15 @@ class _TeamScreenState extends State<TeamScreen> {
         sheetId,
         answers,
       );
+      return true;
     } on Object {
       if (mounted && sheetId == scoutsheetID) {
         _showError('Answers could not be saved. Check your connection.');
       }
+      return false;
     } finally {
-      _savingAnswers = false;
+      _answerSave = null;
+      completion.complete();
       if (mounted &&
           sheetId == scoutsheetID &&
           !identical(answers, activeScoutSheet.answers)) {
@@ -349,6 +397,7 @@ class _TeamScreenState extends State<TeamScreen> {
   }
 
   Future<void> _createScoutSheet() async {
+    if (_loadingSheet || _sheetLoadError != null) return;
     final template = widget.scoutTemplate ?? await _pickTemplate();
     if (template == null || !mounted) return;
 
@@ -389,6 +438,8 @@ class _TeamScreenState extends State<TeamScreen> {
         activeScoutSheet = ScoutSheetData.empty(template);
         scoutSheetStateIndex = 2;
       });
+      // Make the new sheet's team easy to reopen from the Scout tab.
+      if (!isSaved) toggleSaveTeam();
     } on Object {
       if (!mounted) return;
       Navigator.of(context, rootNavigator: true).pop();
@@ -559,7 +610,8 @@ class _TeamScreenState extends State<TeamScreen> {
                             await Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => GroupSetupPage()));
+                                    builder: (context) => const GroupSetupPage(
+                                        returnToScouting: true)));
                             if (!context.mounted) return;
                             setState(() {
                               teamGroupID = _readTeamGroupId();
@@ -587,8 +639,8 @@ class _TeamScreenState extends State<TeamScreen> {
 
     switch (scoutSheetStateIndex) {
       case 1:
-        button = IconButton(
-          tooltip: 'Edit scout sheet',
+        button = FilledButton.icon(
+          label: const Text('Edit sheet'),
           onPressed: () async {
             if (scoutsheetID.isEmpty) return;
             try {
@@ -606,27 +658,31 @@ class _TeamScreenState extends State<TeamScreen> {
             Icons.edit_outlined,
             color: Theme.of(context).colorScheme.secondary,
           ),
-          padding: EdgeInsets.all(8),
-          constraints: BoxConstraints(),
         );
         break;
       case 2:
-        button = IconButton(
-          tooltip: 'Finish editing',
+        button = FilledButton.icon(
+          label: const Text('Save sheet'),
           onPressed: () async {
             final missing = activeScoutSheet.missingRequiredFields;
             if (missing.isNotEmpty) {
               _showError('Complete required field: ${missing.first.label}');
               return;
             }
-            await _flushAnswerSave();
+            if (!await _flushAnswerSave() || !mounted) return;
             try {
               await database.setTeamScoutSheetEditing(
                 teamGroupID,
                 scoutsheetID,
                 false,
               );
-              if (mounted) setState(() => scoutSheetStateIndex = 1);
+              if (mounted) {
+                setState(() => scoutSheetStateIndex = 1);
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text(
+                        'Sheet saved. Reopen it from Scout → My scout sheets.')));
+                if (widget.returnAfterSave) Navigator.pop(context);
+              }
             } on Object {
               if (mounted) _showError('Could not finish editing.');
             }
@@ -635,8 +691,6 @@ class _TeamScreenState extends State<TeamScreen> {
             Icons.check,
             color: Theme.of(context).colorScheme.secondary,
           ),
-          padding: EdgeInsets.all(8),
-          constraints: BoxConstraints(),
         );
         break;
       default:
@@ -664,9 +718,9 @@ class _TeamScreenState extends State<TeamScreen> {
               style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 4),
           Text(scoutSheetStateIndex == 2
-              ? 'Fill in the fields below, then tap the checkmark to finish. Changes are saved to your team group as you type.'
+              ? 'Fill in the fields below, then tap Save sheet. Changes also save to your team group as you type.'
               : scoutsheetID.isNotEmpty
-                  ? 'Saved sheet • ${activeScoutSheet.template.name}. Tap the pencil to edit. Choose another event below to view its sheet.'
+                  ? 'Saved sheet • ${activeScoutSheet.template.name}. Tap Edit sheet to add notes. Choose another event below to view its sheet.'
                   : '2. Choose an event below, then create your sheet.${widget.scoutTemplate == null ? '' : '\nTemplate: ${widget.scoutTemplate!.name}'}'),
         ]),
       )),
@@ -777,70 +831,69 @@ class _TeamScreenState extends State<TeamScreen> {
                         ),
                 ),
               ),
-              Flexible(flex: 2, fit: FlexFit.tight, child: SizedBox()),
-              Flexible(fit: FlexFit.tight, child: button)
             ],
           ),
         ),
       ),
     ];
 
-    ScoutSheetScreen.addAll(ScoutSheetScreens[scoutSheetStateIndex]);
+    if (scoutSheetStateIndex != 0) {
+      ScoutSheetScreen.add(SliverToBoxAdapter(
+          child: Padding(
+        padding: const EdgeInsets.fromLTRB(23, 12, 23, 8),
+        child: button,
+      )));
+    }
+    if (_loadingSheet) {
+      ScoutSheetScreen.add(const SliverToBoxAdapter(
+          child: Padding(
+        padding: EdgeInsets.all(23),
+        child: LinearProgressIndicator(),
+      )));
+    } else if (_sheetLoadError != null) {
+      ScoutSheetScreen.add(SliverToBoxAdapter(
+          child: Padding(
+        padding: const EdgeInsets.all(23),
+        child: Column(children: [
+          Text(_sheetLoadError!),
+          TextButton(
+              onPressed: () => _loadScoutSheet(selectedTournament),
+              child: const Text('Retry loading sheet')),
+        ]),
+      )));
+    } else {
+      ScoutSheetScreen.addAll(ScoutSheetScreens[scoutSheetStateIndex]);
+    }
+    if (scoutSheetStateIndex == 2) {
+      ScoutSheetScreen.add(SliverToBoxAdapter(
+          child: Padding(
+        padding: const EdgeInsets.all(23),
+        child: button,
+      )));
+    }
 
     List<List<Widget>> screens = [DetailsScreen, ScoutSheetScreen];
 
     List<Widget> MainSlivers = [
-      ElapseAppBar(
-        title: const Text(
-          "Team Info",
-          style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
-        ),
-        backNavigation: true,
-        background: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.5),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Icon(Icons.arrow_back,
-                    color: Theme.of(context).colorScheme.onSurface),
-              ),
-              const Spacer(),
-              GestureDetector(
-                  onTap: () async {
-                    final updated = await Navigator.push<Season>(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) =>
-                            SeasonFilterPage(selected: season),
-                      ),
-                    );
-                    if (updated == null || !context.mounted) return;
-                    setState(() {
-                      season = updated;
-                      skillsStats =
-                          getWorldSkillsForTeam(season.vrcId, widget.teamID);
-                      teamStats = getTrueSkillDataForTeam(
-                          season.vrcId, widget.teamNumber);
-                      teamTournaments = _fetchTournamentsForSeason(season);
-                      teamAwards = getAwards(widget.teamID, season.vrcId);
-                    });
-                  },
-                  child: Row(children: [
-                    const Icon(Icons.event_note),
-                    const SizedBox(width: 4),
-                    Text(
-                      season.name.substring(10),
-                      style: const TextStyle(fontSize: 16),
-                    ),
-                    const Icon(Icons.arrow_right)
-                  ]))
-            ],
-          ),
-        ),
+      TeamPageHeader(
+        teamNumber: widget.teamNumber,
+        onSeason: () async {
+          if (!await _flushAnswerSave() || !mounted) return;
+          final updated = await Navigator.push<Season>(
+              context,
+              MaterialPageRoute(
+                builder: (_) => SeasonFilterPage(selected: season),
+              ));
+          if (updated == null || !mounted) return;
+          setState(() {
+            season = updated;
+            skillsStats = getWorldSkillsForTeam(season.vrcId, widget.teamID);
+            teamStats =
+                getTrueSkillDataForTeam(season.vrcId, widget.teamNumber);
+            teamTournaments = _fetchTournamentsForSeason(season);
+            teamAwards = getAwards(widget.teamID, season.vrcId);
+          });
+        },
       ),
       CustomTabBar(
           initIndex: widget.openScoutSheet ? 1 : 0,
