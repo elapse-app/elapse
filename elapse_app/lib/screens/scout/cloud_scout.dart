@@ -1,11 +1,15 @@
+import 'dart:convert';
+
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/ScoutSheet/scout_template_repository.dart';
 import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/scout/templates/scout_template_list.dart';
+import 'package:elapse_app/screens/scout/start_scouting.dart';
+import 'package:elapse_app/screens/scout/scouted_sheets.dart';
+import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
-import 'package:elapse_app/screens/widgets/team_widget.dart';
 import 'package:flutter/material.dart';
 
 import '../tournament_mode/picklist/picklist.dart';
@@ -26,6 +30,24 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
     _templateRepository = ScoutTemplateRepository(prefs);
   }
 
+  void _openSheets() {
+    String? groupId;
+    try {
+      final group = jsonDecode(prefs.getString('teamGroup') ?? 'null');
+      if (group is Map) groupId = group['groupId'] as String?;
+    } on Object {/* The start flow can repair missing setup. */}
+    if (groupId == null || groupId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text(
+              'No group selected yet. Tap Start scouting to sign in and set up your group.')));
+      return;
+    }
+    Navigator.push<void>(
+        context,
+        MaterialPageRoute(
+            builder: (_) => ScoutedSheetsScreen(groupId: groupId!)));
+  }
+
   @override
   Widget build(BuildContext context) {
     List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
@@ -41,6 +63,40 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
             settingsCallback: () => setState(() {}),
           ),
           RoundedTop(),
+          SliverToBoxAdapter(
+              child: Padding(
+            padding: const EdgeInsets.fromLTRB(23, 0, 23, 18),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const Text('Scout a team',
+                      style:
+                          TextStyle(fontSize: 24, fontWeight: FontWeight.w600)),
+                  const SizedBox(height: 8),
+                  const Text(
+                      'Choose a team and event, then fill in a sheet. Sheets are shared with your team group; templates are reusable blank forms.'),
+                  const SizedBox(height: 12),
+                  OutlinedButton.icon(
+                      onPressed: _openSheets,
+                      icon: const Icon(Icons.table_chart_outlined),
+                      label: const Text('My scout sheets')),
+                  const SizedBox(height: 8),
+                  FilledButton.icon(
+                    onPressed: () async {
+                      await Navigator.push<void>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => StartScoutingScreen(
+                                template:
+                                    _templateRepository.loadDefaultTemplate()),
+                          ));
+                      if (mounted) setState(() {});
+                    },
+                    icon: const Icon(Icons.edit_note),
+                    label: const Text('Start scouting'),
+                  ),
+                ]),
+          )),
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(23, 0, 23, 18),
             sliver: SliverToBoxAdapter(
@@ -57,7 +113,7 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
                   ),
                   title: const Text('Scout sheet templates'),
                   subtitle: Text(
-                    '${_templateRepository.loadTemplates().length} available • Create custom forms',
+                    '${_templateRepository.loadTemplates().length} blank forms • Use or customize a template',
                   ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () async {
@@ -143,7 +199,8 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
               ? SliverToBoxAdapter(
                   child: BigErrorMessage(
                       icon: Icons.bookmark_add_outlined,
-                      message: "Add some teams from the explore menu"),
+                      message:
+                          "No saved teams yet. Tap Start scouting to find any team—no bookmark needed."),
                 )
               : SliverPadding(
                   padding: EdgeInsets.symmetric(horizontal: 23),
@@ -154,12 +211,21 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
                         print(savedTeam.teamName);
                         return Column(
                           children: [
-                            TeamWidget(
-                                teamNumber: savedTeam.teamNumber,
-                                teamID: savedTeam.teamID,
-                                subInfo:
-                                    '${savedTeam.location?.city ?? ""}${savedTeam.location?.city != null ? "," : ""} ${savedTeam.location?.region ?? ""}',
-                                teamName: savedTeam.teamName),
+                            ListTile(
+                              title: Text(savedTeam.teamNumber),
+                              subtitle: Text(
+                                  '${savedTeam.teamName ?? ''}\nOpen scout sheet'),
+                              isThreeLine: true,
+                              trailing: const Icon(Icons.chevron_right),
+                              onTap: () => Navigator.push<void>(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => TeamScreen(
+                                        teamID: savedTeam.teamID,
+                                        teamNumber: savedTeam.teamNumber,
+                                        openScoutSheet: true),
+                                  )),
+                            ),
                             Divider(
                               color: Theme.of(context).colorScheme.surfaceDim,
                               height: 3,

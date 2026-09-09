@@ -13,7 +13,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
-  const hasToken = bool.hasEnvironment('VEX_API_TOKEN');
+  const runLive = bool.hasEnvironment('VEX_API_TOKEN') ||
+      bool.fromEnvironment('RUN_LIVE_API_TESTS');
 
   test(
     'team 10K loads every MOA feature from the live VEX API',
@@ -83,7 +84,8 @@ void main() {
           await getWorldSkillsRankings(204, gradeLevels['High School']!);
       expect(worldSkills, isNotEmpty);
     },
-    skip: hasToken ? false : 'Set VEX_API_TOKEN to run live API checks.',
+    skip:
+        runLive ? false : 'Set RUN_LIVE_API_TESTS=true to run live API checks.',
     timeout: const Timeout(Duration(minutes: 4)),
   );
 }
