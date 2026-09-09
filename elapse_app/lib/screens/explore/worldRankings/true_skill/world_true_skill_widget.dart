@@ -20,7 +20,8 @@ class WorldTrueSkillWidget extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        worldTrueSkillPage(context, stats.id, stats.teamNum, stats.teamName!, stats);
+        worldTrueSkillPage(
+            context, stats.id, stats.teamNum, stats.teamName!, stats);
       },
       child: Container(
           height: 72,
@@ -38,32 +39,30 @@ class WorldTrueSkillWidget extends StatelessWidget {
                           fit: FlexFit.tight,
                           flex: 30,
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(stats.teamNum,
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                  style: TextStyle(
-                                      fontSize: 32,
-                                      height: 1,
-                                      letterSpacing: -1.5,
-                                      fontWeight: FontWeight.w400,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface)),
-                              Text(stats.teamName!,
-                                softWrap: false,
-                                overflow: TextOverflow.fade,
-                                style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w300,
-                                    color: Theme.of(context)
-                                        .colorScheme
-                                        .onSurfaceVariant)
-                              )
-                            ]
-                          )),
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(stats.teamNum,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        fontSize: 32,
+                                        height: 1,
+                                        letterSpacing: -1.5,
+                                        fontWeight: FontWeight.w400,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface)),
+                                Text(stats.teamName!,
+                                    softWrap: false,
+                                    overflow: TextOverflow.fade,
+                                    style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w300,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurfaceVariant))
+                              ])),
                       const Spacer(flex: 5),
                       Flexible(
                         flex: 15,

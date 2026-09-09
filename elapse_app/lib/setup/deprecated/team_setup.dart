@@ -45,7 +45,8 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                   ),
                   const Text(
                     "Welcome to Elapse!",
-                    style: TextStyle(fontSize: 64, fontWeight: FontWeight.w500, height: 1),
+                    style: TextStyle(
+                        fontSize: 64, fontWeight: FontWeight.w500, height: 1),
                   ),
                   const SizedBox(
                     height: 15,
@@ -70,16 +71,21 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                             });
                           }),
                           cursorColor: Theme.of(context).colorScheme.secondary,
-                          style: TextStyle(fontSize: 32, fontWeight: FontWeight.w500),
-                          decoration: const InputDecoration(hintText: "Enter your team"),
+                          style: TextStyle(
+                              fontSize: 32, fontWeight: FontWeight.w500),
+                          decoration: const InputDecoration(
+                              hintText: "Enter your team"),
                         ),
                       ),
                       Flexible(
                         flex: 1,
                         child: TextButton(
-                          child: Text("Search",
-                              style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.secondary)),
                           onPressed: searchTeam,
+                          child: Text("Search",
+                              style: TextStyle(
+                                  fontSize: 18,
+                                  color:
+                                      Theme.of(context).colorScheme.secondary)),
                         ),
                       )
                     ],
@@ -90,7 +96,8 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                   FutureBuilder(
                       future: teamSearch,
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState == ConnectionState.waiting) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
                           return Container();
                         }
                         if (snapshot.hasData) {
@@ -98,12 +105,19 @@ class _FirstSetupPageState extends State<FirstSetupPage> {
                             return Text(
                               "No teams found",
                               style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.75), fontSize: 18),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.75),
+                                  fontSize: 18),
                             );
                           } else {
                             return TextButton(
                                 style: ButtonStyle(
-                                    foregroundColor: WidgetStateProperty.all(Theme.of(context).colorScheme.secondary)),
+                                    foregroundColor: WidgetStateProperty.all(
+                                        Theme.of(context)
+                                            .colorScheme
+                                            .secondary)),
                                 onPressed: () {
                                   saveTeam(snapshot.data![0]);
                                 },

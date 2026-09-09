@@ -1,0 +1,209 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function groupExists(groupId) {
+      return exists(/databases/$(database)/documents/teamGroups/$(groupId));
+    }
+
+    function groupData(groupId) {
+      return get(/databases/$(database)/documents/teamGroups/$(groupId)).data;
+    }
+
+    function isGroupMember(groupId) {
+      return signedIn()
+        && groupExists(groupId)
+        && request.auth.uid in groupData(groupId).members;
+    }
+
+    function isGroupAdmin(groupId) {
+      return signedIn()
+        && groupExists(groupId)
+        && groupData(groupId).adminId == request.auth.uid;
+    }
+
+    function validDisplayName(name) {
+      return name is string && name.size() > 0 && name.size() <= 100;
+    }
+
+    function validGroupState(data) {
+      return data.adminId is string
+        && data.groupName is string
+        && data.groupName.size() > 0
+        && data.groupName.size() <= 80
+        && data.joinCode is string
+        && data.joinCode.size() == 9
+        && data.allowJoin is bool
+        && data.members is map
+        && data.members.size() > 0
+        && data.members.size() <= 100
+        && data.adminId in data.members;
+    }
+
+    match /users/{userId} {
+      allow read: if signedIn() && request.auth.uid == userId;
+
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.keys().hasAll([
+          'email', 'firstName', 'lastName', 'team', 'groupId', 'verified'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'email', 'firstName', 'lastName', 'team', 'groupId', 'verified'
+        ])
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.firstName is string
+        && request.resource.data.lastName is string
+        && request.resource.data.team is map
+        && request.resource.data.groupId is list
+        && request.resource.data.groupId.size() == 0
+        && request.resource.data.verified == false;
+
+      allow update: if signedIn()
+        && request.auth.uid == userId
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'firstName', 'lastName', 'team', 'groupId', 'verified'
+        ])
+        && request.resource.data.firstName is string
+        && request.resource.data.lastName is string
+        && request.resource.data.team is map
+        && request.resource.data.groupId is list
+        && (
+          request.resource.data.verified == resource.data.verified
+          || request.auth.token.email_verified == true
+        );
+
+      // The existing client keeps group ids denormalized on user documents.
+      // A group's current admin may remove that group from a member profile.
+      allow update: if signedIn()
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['groupId'])
+        && resource.data.groupId is list
+        && resource.data.groupId.size() > 0
+        && isGroupAdmin(resource.data.groupId[0])
+        && request.resource.data.groupId is list;
+
+      allow delete: if signedIn() && request.auth.uid == userId;
+    }
+
+    match /teamGroups/{groupId} {
+      allow get: if isGroupMember(groupId)
+        || (signedIn() && resource.data.allowJoin == true);
+
+      // Join-code lookups must include `allowJoin == true` in the query.
+      allow list: if signedIn() && resource.data.allowJoin == true;
+
+      allow create: if signedIn()
+        && request.resource.data.keys().hasAll([
+          'adminId', 'joinCode', 'allowJoin', 'members', 'groupName'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'adminId', 'joinCode', 'allowJoin', 'members', 'groupName',
+          'createdAt', 'updatedAt'
+        ])
+        && request.resource.data.adminId == request.auth.uid
+        && request.resource.data.members.keys().hasOnly([request.auth.uid])
+        && validDisplayName(request.resource.data.members[request.auth.uid])
+        && validGroupState(request.resource.data);
+
+      allow update: if isGroupAdmin(groupId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'adminId', 'joinCode', 'allowJoin', 'members', 'groupName', 'updatedAt'
+        ])
+        && validGroupState(request.resource.data);
+
+      allow update: if signedIn()
+        && resource.data.allowJoin == true
+        && !(request.auth.uid in resource.data.members)
+        && request.auth.uid in request.resource.data.members
+        && request.resource.data.members.size() == resource.data.members.size() + 1
+        && request.resource.data.members.diff(resource.data.members)
+          .affectedKeys().hasOnly([request.auth.uid])
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['members', 'updatedAt'])
+        && validDisplayName(request.resource.data.members[request.auth.uid])
+        && validGroupState(request.resource.data);
+
+      allow update: if isGroupMember(groupId)
+        && request.auth.uid in resource.data.members
+        && !(request.auth.uid in request.resource.data.members)
+        && request.resource.data.members.size() == resource.data.members.size() - 1
+        && request.resource.data.members.diff(resource.data.members)
+          .affectedKeys().hasOnly([request.auth.uid])
+        && request.resource.data.diff(resource.data).affectedKeys()
+          .hasOnly(['members', 'adminId', 'updatedAt'])
+        && (
+          resource.data.adminId != request.auth.uid
+            ? request.resource.data.adminId == resource.data.adminId
+            : request.resource.data.adminId in request.resource.data.members
+        )
+        && validGroupState(request.resource.data);
+
+      allow delete: if isGroupAdmin(groupId);
+
+      match /scoutsheets/{sheetId} {
+        function validNewScoutSheet(data) {
+          return data.keys().hasAll([
+              'teamID', 'tournamentID', 'createTime', 'latestUpdate',
+              'schemaVersion', 'template', 'answers', 'photos', 'isEditing'
+            ])
+            && data.keys().hasOnly([
+              'teamID', 'tournamentID', 'createTime', 'latestUpdate',
+              'schemaVersion', 'template', 'answers', 'photos', 'isEditing',
+              'allowJoin'
+            ])
+            && data.teamID is string
+            && data.teamID.size() > 0
+            && data.teamID.size() <= 24
+            && data.tournamentID is string
+            && data.tournamentID.size() > 0
+            && data.tournamentID.size() <= 24
+            && data.schemaVersion == 2
+            && data.template is map
+            && data.answers is map
+            && data.photos is list
+            && data.photos.size() <= 6
+            && data.isEditing is bool;
+        }
+
+        allow read: if isGroupMember(groupId);
+        allow create: if isGroupMember(groupId)
+          && validNewScoutSheet(request.resource.data);
+        allow update: if isGroupMember(groupId)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'answers', 'photos', 'isEditing', 'latestUpdate', 'schemaVersion'
+          ])
+          && (!('answers' in request.resource.data)
+            || request.resource.data.answers is map)
+          && (!('photos' in request.resource.data)
+            || (request.resource.data.photos is list
+              && request.resource.data.photos.size() <= 6))
+          && (!('isEditing' in request.resource.data)
+            || request.resource.data.isEditing is bool);
+        allow delete: if isGroupMember(groupId);
+      }
+
+      match /matchNotes/{noteId} {
+        allow read, create, update, delete: if isGroupMember(groupId);
+      }
+
+      match /picklist/{picklistId} {
+        allow read, create, update, delete: if isGroupMember(groupId);
+      }
+
+      match /scoutSheetTemplates/{templateId} {
+        allow read, create, update, delete: if isGroupMember(groupId);
+      }
+    }
+
+    // Backwards compatibility for the old, user-owned scout-sheet path.
+    match /Users/{userId}/scoutsheets/{sheetId} {
+      allow read, create, update, delete: if signedIn()
+        && request.auth.uid == userId;
+    }
+  }
+}

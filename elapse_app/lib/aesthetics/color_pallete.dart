@@ -1,16 +1,7 @@
 import 'package:flutter/material.dart';
 
 class ColorPallete {
-  Color redAllianceBackground;
-  Color redAllianceText;
-
-  Color blueAllianceBackground;
-  Color blueAllianceText;
-
-  Color greenBackground;
-  Color greenText;
-
-  ColorPallete({
+  const ColorPallete({
     required this.redAllianceBackground,
     required this.redAllianceText,
     required this.blueAllianceBackground,
@@ -18,4 +9,13 @@ class ColorPallete {
     required this.greenBackground,
     required this.greenText,
   });
+
+  final Color redAllianceBackground;
+  final Color redAllianceText;
+
+  final Color blueAllianceBackground;
+  final Color blueAllianceText;
+
+  final Color greenBackground;
+  final Color greenText;
 }

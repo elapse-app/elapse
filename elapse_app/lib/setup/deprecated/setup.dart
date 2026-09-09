@@ -3,6 +3,7 @@ import 'package:elapse_app/providers/color_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 class SetupScreen extends StatelessWidget {
   const SetupScreen({super.key, required this.prefs});
   final SharedPreferences prefs;

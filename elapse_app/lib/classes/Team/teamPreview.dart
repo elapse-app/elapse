@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -11,18 +10,39 @@ import '../Filters/gradeLevel.dart';
 import '../Filters/season.dart';
 
 class TeamPreview {
-  String teamNumber;
-  int teamID;
+  final String teamNumber;
+  final int teamID;
   Location? location;
   String? teamName;
   GradeLevel? gradeLevel;
 
-  TeamPreview(
-      {required this.teamNumber,
-      required this.teamID,
-      this.location,
-      this.teamName,
-      this.gradeLevel,});
+  TeamPreview({
+    required this.teamNumber,
+    required this.teamID,
+    this.location,
+    this.teamName,
+    this.gradeLevel,
+  });
+
+  factory TeamPreview.fromJson(Map<String, dynamic> json) {
+    final teamNumber = json['teamNumber'];
+    final teamId = json['teamID'];
+
+    if (teamNumber is! String || teamNumber.trim().isEmpty || teamId is! num) {
+      throw const FormatException('Invalid saved team');
+    }
+
+    final locationJson = json['location'];
+    return TeamPreview(
+      teamNumber: teamNumber,
+      teamID: teamId.toInt(),
+      location: locationJson is Map<String, dynamic>
+          ? loadLocation(locationJson)
+          : null,
+      teamName: json['teamName'] as String?,
+      gradeLevel: gradeLevels[json['grade']],
+    );
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -41,105 +61,87 @@ class TeamPreview {
   }
 
   @override
-  int get hashCode => teamNumber.hashCode;
+  int get hashCode => teamID.hashCode;
 }
 
-TeamPreview loadTeamPreview(teamPreview) {
-  dynamic preview = jsonDecode(teamPreview);
-  return TeamPreview(
-    teamNumber: preview["teamNumber"],
-    teamID: preview["teamID"],
-    location:
-        preview["location"] != null ? loadLocation(preview["location"]) : null,
-    teamName: preview["teamName"],
-    gradeLevel: gradeLevels[preview["grade"]],
-  );
+TeamPreview loadTeamPreview(String? teamPreview) {
+  if (teamPreview == null || teamPreview.trim().isEmpty) {
+    throw const FormatException('Invalid saved team');
+  }
+  final decoded = jsonDecode(teamPreview);
+  if (decoded is! Map<String, dynamic>) {
+    throw const FormatException('Invalid saved team');
+  }
+  return TeamPreview.fromJson(decoded);
+}
+
+TeamPreview? tryLoadTeamPreview(String? teamPreview) {
+  if (teamPreview == null || teamPreview.trim().isEmpty) {
+    return null;
+  }
+
+  try {
+    return loadTeamPreview(teamPreview);
+  } on FormatException {
+    return null;
+  } on TypeError {
+    return null;
+  }
 }
 
 Future<List<TeamPreview>> fetchTeamPreview(String searchQuery) async {
-  List<TeamPreview> teams = [];
-  Completer<void> robotEventsCompleter = Completer<void>();
-  Completer<void> vdaStatsCompleter = Completer<void>();
+  final normalizedQuery = searchQuery.trim();
+  if (normalizedQuery.isEmpty) {
+    return [];
+  }
 
-  http.get(
+  final vdaSearch = getTrueSkillData(seasons[0].vrcId)
+      .timeout(const Duration(seconds: 5))
+      .then((value) => value.where((element) {
+            final query = normalizedQuery.toLowerCase();
+            return element.teamNum.toLowerCase().contains(query) ||
+                (element.teamName?.toLowerCase().contains(query) ?? false);
+          }).map((e) => TeamPreview(
+                teamNumber: e.teamNum,
+                teamID: e.id,
+                location: e.location,
+                teamName: e.teamName,
+                gradeLevel: e.gradeLevel,
+              )))
+      .catchError((_) => <TeamPreview>[]);
+
+  final response = await http.get(
     Uri.parse(
-        'https://www.robotevents.com/api/v2/teams?number%5B%5D=$searchQuery&program%5B%5D=1&program%5B%5D=4&myTeams=false'),
+        'https://events.vex.com/api/v2/teams?number%5B%5D=${Uri.encodeQueryComponent(normalizedQuery)}&program%5B%5D=1&program%5B%5D=4&myTeams=false'),
     headers: {
       HttpHeaders.authorizationHeader: getToken(),
     },
-  ).then((response) {
-    if (response.statusCode == 200) {
-      var responseData = jsonDecode(response.body)["data"];
-      if (responseData.isNotEmpty) {
-        teams.add(TeamPreview(
-            teamNumber: responseData[0]["number"],
-            teamID: responseData[0]["id"],
-            teamName: responseData[0]["team_name"],
+  );
+
+  if (response.statusCode != 200) {
+    throw Exception('Failed to load team preview (${response.statusCode})');
+  }
+
+  final responseData = jsonDecode(response.body)['data'] as List;
+  final teams = responseData
+      .map<TeamPreview>((team) => TeamPreview(
+            teamNumber: team['number'],
+            teamID: team['id'],
+            teamName: team['team_name'],
             location: Location(
-              address1: responseData[0]["location"]["address_1"],
-              address2: responseData[0]["location"]["address_2"],
-              city: responseData[0]["location"]["city"],
-              region: responseData[0]["location"]["region"],
-              country: responseData[0]["location"]["country"],
-              venue: responseData[0]["location"]["venue"],
+              address1: team['location']['address_1'],
+              address2: team['location']['address_2'],
+              city: team['location']['city'],
+              region: team['location']['region'],
+              country: team['location']['country'],
+              venue: team['location']['venue'],
             ),
-            gradeLevel: gradeLevels[responseData[0]["grade"]],
-        ));
+            gradeLevel: gradeLevels[team['grade']],
+          ))
+      .toList();
 
-        if (!vdaStatsCompleter.isCompleted) {
-          vdaStatsCompleter.complete();
-        }
-      }
-      if (!robotEventsCompleter.isCompleted) {
-        robotEventsCompleter.complete();
-      }
-    } else {
-      throw Exception('Failed to load team preview');
-    }
-  });
-
-  getTrueSkillData(seasons[0].vrcId).then((value) {
-    if (!vdaStatsCompleter.isCompleted) {
-      List<TeamPreview> vdaTeams = value.where((element) {
-        if (searchQuery.isEmpty) {
-          return false;
-        }
-        if (element.teamName != null) {
-          return element.teamNum
-                  .toLowerCase()
-                  .contains(searchQuery.toLowerCase()) ||
-              element.teamName!
-                  .toLowerCase()
-                  .contains(searchQuery.toLowerCase());
-        } else {
-          return element.teamNum.contains(searchQuery.toLowerCase());
-        }
-      }).map((e) {
-        return TeamPreview(
-            teamNumber: e.teamNum,
-            teamID: e.id,
-            location: e.location,
-            teamName: e.teamName,
-            gradeLevel: e.gradeLevel,
-        );
-      }).toList();
-
-      teams.addAll(vdaTeams);
-      if (!robotEventsCompleter.isCompleted && vdaTeams.isNotEmpty) {
-        robotEventsCompleter.complete();
-      }
-
-      if (!vdaStatsCompleter.isCompleted && vdaTeams.isNotEmpty) {
-        vdaStatsCompleter.complete();
-      }
-    }
-  });
-
-  await Future.any([robotEventsCompleter.future, vdaStatsCompleter.future]);
-  // remove duplicates from teams
-  // Remove duplicates based on teamNumber
-  final uniqueTeams = teams.toSet();
-  teams = uniqueTeams.toList();
-
-  return teams;
+  if (teams.isEmpty) {
+    teams.addAll(await vdaSearch);
+  }
+  return {for (final team in teams) team.teamID: team}.values.toList();
 }
