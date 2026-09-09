@@ -20,7 +20,8 @@ class WorldSkillsWidget extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        worldSkillsPage(context, stats.teamId, stats.teamNum, stats.teamName, stats);
+        worldSkillsPage(
+            context, stats.teamId, stats.teamNum, stats.teamName, stats);
       },
       child: Container(
           height: 72,
@@ -35,35 +36,33 @@ class WorldSkillsWidget extends StatelessWidget {
                     flex: 120,
                     child: Row(children: [
                       Flexible(
-                          fit: FlexFit.tight,
-                          flex: 30,
-                          child: Column(
+                        fit: FlexFit.tight,
+                        flex: 30,
+                        child: Column(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(stats.teamNum,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontSize: 32,
-                                  height: 1,
-                                  letterSpacing: -1.5,
-                                  fontWeight: FontWeight.w400,
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .onSurface)),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                      fontSize: 32,
+                                      height: 1,
+                                      letterSpacing: -1.5,
+                                      fontWeight: FontWeight.w400,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface)),
                               Text(stats.teamName,
-                                softWrap: false,
-                                overflow: TextOverflow.fade,
+                                  softWrap: false,
+                                  overflow: TextOverflow.fade,
                                   style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w300,
                                       color: Theme.of(context)
                                           .colorScheme
-                                          .onSurfaceVariant)
-                              )
-                            ]
-                          ),
+                                          .onSurfaceVariant))
+                            ]),
                       ),
                       const Spacer(flex: 5),
                       Flexible(

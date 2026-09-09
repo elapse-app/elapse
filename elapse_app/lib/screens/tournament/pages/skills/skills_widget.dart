@@ -5,14 +5,16 @@ import 'package:flutter/material.dart';
 import '../rankings/tournament_stats_page.dart';
 
 class SkillsWidget extends StatelessWidget {
-  const SkillsWidget({Key? key, required this.team, required this.stats}) : super(key: key);
+  const SkillsWidget({super.key, required this.team, required this.stats});
 
   final Team team;
   final TournamentSkills stats;
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
-      onTap: () => tournamentStatsPage(context, team.id, team.teamNumber!, team.teamName!),
+      onTap: () => tournamentStatsPage(
+          context, team.id, team.teamNumber!, team.teamName!),
       child: Container(
           height: 72,
           alignment: Alignment.center,
@@ -40,13 +42,17 @@ class SkillsWidget extends StatelessWidget {
                                         height: 1,
                                         letterSpacing: -1.5,
                                         fontWeight: FontWeight.w400,
-                                        color: Theme.of(context).colorScheme.onSurface)),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface)),
                                 Text(team.teamName!,
                                     softWrap: false,
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.w300,
-                                      color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurfaceVariant,
                                       overflow: TextOverflow.fade,
                                     ))
                               ])),

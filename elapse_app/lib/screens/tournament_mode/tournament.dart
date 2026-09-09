@@ -46,7 +46,6 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
                   expandedHeight: 125,
                   centerTitle: false,
                   backgroundColor: Theme.of(context).colorScheme.primary,
-                  
                 ),
                 SliverPersistentHeader(
                     pinned: true,
@@ -129,7 +128,7 @@ class _TMTournamentScreenState extends State<TMTournamentScreen> {
     return Stack(
       alignment: Alignment.center,
       children: [
-        Container(
+        SizedBox(
           width: 50,
           height: 50,
         ),
