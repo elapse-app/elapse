@@ -1,6 +1,5 @@
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/long_button.dart';
-import 'package:elapse_app/setup/configure/complete_setup.dart';
 import 'package:elapse_app/setup/configure/create_team_group.dart';
 import 'package:elapse_app/setup/configure/join_team_group.dart';
 import 'package:flutter/material.dart';
@@ -128,7 +127,7 @@ class _CloudScoutSetupPageState extends State<CloudScoutSetupPage> {
                           ),
                           SizedBox(height: 24),
                           Center(
-                            child: Container(
+                            child: SizedBox(
                               height: MediaQuery.of(context).size.height *
                                   0.1, // Fixed height
                               width: MediaQuery.of(context).size.height *

@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/screens/widgets/long_button.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -10,9 +9,6 @@ import 'package:path/path.dart' as p;
 const int maxFileSize = 5 * 1024 * 1024; // 5 MB
 
 Future<String?> getPhoto(BuildContext context) async {
-  Color redColor =
-      Theme.of(context).brightness == Brightness.light ? lightPallete.redAllianceText : darkPallete.redAllianceText;
-
   File? image;
   XFile? imageData;
   String? imageURL;
@@ -69,7 +65,9 @@ Future<String?> getPhoto(BuildContext context) async {
                                             height: 36,
                                             width: 36,
                                             decoration: BoxDecoration(
-                                                shape: BoxShape.circle, color: Colors.black.withValues(alpha: 0.5)),
+                                                shape: BoxShape.circle,
+                                                color: Colors.black
+                                                    .withValues(alpha: 0.5)),
                                           ),
                                           IconButton(
                                             onPressed: () {
@@ -95,13 +93,18 @@ Future<String?> getPhoto(BuildContext context) async {
                                   children: [
                                     TextButton.icon(
                                       style: TextButton.styleFrom(
-                                        foregroundColor: Theme.of(context).colorScheme.secondary,
+                                        foregroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .secondary,
                                         shape: RoundedRectangleBorder(
                                           side: BorderSide(
-                                            color: Theme.of(context).colorScheme.primary,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .primary,
                                             width: 2,
                                           ),
-                                          borderRadius: BorderRadius.circular(30),
+                                          borderRadius:
+                                              BorderRadius.circular(30),
                                         ),
                                       ),
                                       onPressed: () async {
@@ -110,7 +113,8 @@ Future<String?> getPhoto(BuildContext context) async {
                                           builder: (context) {
                                             return AlertDialog(
                                               title: Text("Uploading Photo"),
-                                              content: Text("You will be navigated back once the photo is uploaded"),
+                                              content: Text(
+                                                  "You will be navigated back once the photo is uploaded"),
                                             );
                                           },
                                         );
@@ -129,9 +133,11 @@ Future<String?> getPhoto(BuildContext context) async {
                       SizedBox(height: 36),
                       LongButton(
                         onPressed: () async {
-                          final returnedImage = await ImagePicker().pickImage(source: ImageSource.camera);
+                          final returnedImage = await ImagePicker()
+                              .pickImage(source: ImageSource.camera);
                           if (returnedImage != null) {
-                            if (await File(returnedImage.path).length() <= maxFileSize) {
+                            if (await File(returnedImage.path).length() <=
+                                maxFileSize) {
                               setState(() {
                                 imageData = returnedImage;
                                 image = File(returnedImage.path);
@@ -147,9 +153,11 @@ Future<String?> getPhoto(BuildContext context) async {
                       SizedBox(height: 18),
                       LongButton(
                         onPressed: () async {
-                          final returnedImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+                          final returnedImage = await ImagePicker()
+                              .pickImage(source: ImageSource.gallery);
                           if (returnedImage != null) {
-                            if (await File(returnedImage.path).length() <= maxFileSize) {
+                            if (await File(returnedImage.path).length() <=
+                                maxFileSize) {
                               setState(() {
                                 imageData = returnedImage;
                                 image = File(returnedImage.path);
@@ -186,12 +194,13 @@ void _showSizeError(BuildContext context) {
 }
 
 Future<String?> uploadFile(XFile? pic) async {
-  final path = 'images/${FirebaseAuth.instance.currentUser?.uid}/scoutsheet/images/${pic!.name}';
+  final path =
+      'images/${FirebaseAuth.instance.currentUser?.uid}/scoutsheet/images/${pic!.name}';
   final file = File(pic.path);
 
   final ref = FirebaseStorage.instance.ref().child(path);
-  final snapshot = await ref.putData(
-      file.readAsBytesSync(), SettableMetadata(contentType: 'image/${p.extension(path).substring(1)}'));
+  final snapshot = await ref.putData(file.readAsBytesSync(),
+      SettableMetadata(contentType: 'image/${p.extension(path).substring(1)}'));
 
   return await snapshot.ref.getDownloadURL();
 

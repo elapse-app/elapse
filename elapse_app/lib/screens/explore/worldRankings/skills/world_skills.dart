@@ -32,23 +32,34 @@ class WorldSkillsPage extends StatelessWidget {
     List<WorldSkillsStats> teams = rankings.toList();
 
     if (filter.regions!.isNotEmpty) {
-      teams = teams.where((e) => filter.regions!.any((e2) => e2 == (e.eventRegion?.name ?? ""))).toList();
+      teams = teams
+          .where((e) =>
+              filter.regions!.any((e2) => e2 == (e.eventRegion?.name ?? "")))
+          .toList();
     }
 
     if (filter.saved) {
-      teams = teams.where((e) => savedTeams.any((e2) => e2.teamID == e.teamId)).toList();
+      teams = teams
+          .where((e) => savedTeams.any((e2) => e2.teamID == e.teamId))
+          .toList();
     }
 
     if (filter.onPicklist && picklistTeams.isNotEmpty) {
-      teams = teams.where((e) => picklistTeams.any((e2) => e2.teamID == e.teamId)).toList();
+      teams = teams
+          .where((e) => picklistTeams.any((e2) => e2.teamID == e.teamId))
+          .toList();
     }
 
     if (filter.atTournament && tournament != null) {
-      teams = teams.where((e) => tournament!.teams.any((e2) => e2.id == e.teamId)).toList();
+      teams = teams
+          .where((e) => tournament!.teams.any((e2) => e2.id == e.teamId))
+          .toList();
     }
 
     if (filter.scouted) {
-      teams = teams.where((e) => scoutedTeams.any((e2) => e2.teamID == e.teamId)).toList();
+      teams = teams
+          .where((e) => scoutedTeams.any((e2) => e2.teamID == e.teamId))
+          .toList();
     }
 
     if (sort == 0) {
@@ -75,7 +86,9 @@ class WorldSkillsPage extends StatelessWidget {
 
     if (teams.isEmpty) {
       return const SliverToBoxAdapter(
-        child: BigErrorMessage(icon: Icons.sports_esports_outlined, message: "Skills ranking not available"),
+        child: BigErrorMessage(
+            icon: Icons.sports_esports_outlined,
+            message: "Skills ranking not available"),
       );
     }
 

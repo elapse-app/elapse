@@ -1,4 +1,3 @@
-import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:elapse_app/main.dart';
@@ -52,7 +51,7 @@ class TeamWidget extends StatelessWidget {
           ),
         );
       },
-      child: Container(
+      child: SizedBox(
         height: 72,
         child: Flex(
           direction: Axis.horizontal,
@@ -85,8 +84,7 @@ class TeamWidget extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 16,
                       )),
-                  Text(
-                      subInfo ?? "",
+                  Text(subInfo ?? "",
                       textAlign: TextAlign.end,
                       style: TextStyle(
                         fontSize: 16,
