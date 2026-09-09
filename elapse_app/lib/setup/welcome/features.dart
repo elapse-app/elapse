@@ -54,7 +54,9 @@ class _FeaturesState extends State<Features> {
           ),
         ),
         const SizedBox(height: 20),
-        Expanded(child: PhotoPreview(imageLocation: 'assets/onboardingHome$imageStringAddition.png'))
+        Expanded(
+            child: PhotoPreview(
+                imageLocation: 'assets/onboardingHome$imageStringAddition.png'))
       ]),
       Column(children: [
         Text(
@@ -75,7 +77,10 @@ class _FeaturesState extends State<Features> {
           ),
         ),
         const SizedBox(height: 20),
-        Expanded(child: PhotoPreview(imageLocation: "assets/onboardingSchedule$imageStringAddition.png"))
+        Expanded(
+            child: PhotoPreview(
+                imageLocation:
+                    "assets/onboardingSchedule$imageStringAddition.png"))
       ]),
       Column(children: [
         Text(
@@ -96,7 +101,10 @@ class _FeaturesState extends State<Features> {
           ),
         ),
         const SizedBox(height: 20),
-        Expanded(child: PhotoPreview(imageLocation: 'assets/onboardingRankings$imageStringAddition.png'))
+        Expanded(
+            child: PhotoPreview(
+                imageLocation:
+                    'assets/onboardingRankings$imageStringAddition.png'))
       ]),
       Column(children: [
         Text(
@@ -117,7 +125,10 @@ class _FeaturesState extends State<Features> {
           ),
         ),
         const SizedBox(height: 20),
-        Expanded(child: PhotoPreview(imageLocation: 'assets/onboardingMyTeam$imageStringAddition.png'))
+        Expanded(
+            child: PhotoPreview(
+                imageLocation:
+                    'assets/onboardingMyTeam$imageStringAddition.png'))
       ]),
     ];
 
@@ -162,7 +173,8 @@ class _FeaturesState extends State<Features> {
                       Navigator.pop(context);
                     } else {
                       carouselController.previousPage(
-                          duration: const Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.fastOutSlowIn);
                     }
                   },
                   child: const Icon(Icons.arrow_back),
@@ -203,7 +215,8 @@ class _FeaturesState extends State<Features> {
                             items: featurePages,
                             carouselController: carouselController,
                             options: CarouselOptions(
-                                height: MediaQuery.of(context).size.height * 0.7,
+                                height:
+                                    MediaQuery.of(context).size.height * 0.7,
                                 enableInfiniteScroll: false,
                                 autoPlay: false,
                                 viewportFraction: 1,
@@ -222,7 +235,9 @@ class _FeaturesState extends State<Features> {
                         position: currIndex,
                         mainAxisSize: MainAxisSize.min,
                         decorator: DotsDecorator(
-                          color: Theme.of(context).colorScheme.surfaceDim, // Inactive color
+                          color: Theme.of(context)
+                              .colorScheme
+                              .surfaceDim, // Inactive color
                           size: const Size.fromRadius(3.0),
                           activeSize: const Size.fromRadius(3.0),
                           activeColor: Theme.of(context).colorScheme.onSurface,
@@ -247,7 +262,8 @@ class _FeaturesState extends State<Features> {
                                 );
                               } else {
                                 carouselController.nextPage(
-                                    duration: const Duration(milliseconds: 500), curve: Curves.fastOutSlowIn);
+                                    duration: const Duration(milliseconds: 500),
+                                    curve: Curves.fastOutSlowIn);
                               }
                             },
                             text: "Next"),
@@ -271,8 +287,11 @@ class PhotoPreview extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(width: 1, color: Theme.of(context).colorScheme.surface)),
-      child: ClipRRect(borderRadius: BorderRadius.circular(18), child: Image.asset(imageLocation, fit: BoxFit.fill)),
+          border: Border.all(
+              width: 1, color: Theme.of(context).colorScheme.surface)),
+      child: ClipRRect(
+          borderRadius: BorderRadius.circular(18),
+          child: Image.asset(imageLocation, fit: BoxFit.fill)),
     );
   }
 }
