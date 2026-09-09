@@ -1,5 +1,4 @@
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../screens/widgets/app_bar.dart';
@@ -18,16 +17,16 @@ class Region {
 }
 
 class RegionFilterPage extends StatefulWidget {
-  RegionFilterPage({
+  const RegionFilterPage({
     super.key,
     required this.filter,
     required this.skills,
     required this.vda,
   });
 
-  List<String> filter;
-  Future<List<WorldSkillsStats>> skills;
-  Future<List<VDAStats>> vda;
+  final List<String> filter;
+  final Future<List<WorldSkillsStats>> skills;
+  final Future<List<VDAStats>> vda;
 
   @override
   State<RegionFilterPage> createState() => _RegionFilterPageState();
@@ -61,14 +60,14 @@ class _RegionFilterPageState extends State<RegionFilterPage> {
 }
 
 class LoadedRegionFilterPage extends StatefulWidget {
-  LoadedRegionFilterPage({
+  const LoadedRegionFilterPage({
     super.key,
     required this.regions,
     required this.filter,
   });
 
   final List<String> regions;
-  List<String> filter;
+  final List<String> filter;
 
   @override
   State<LoadedRegionFilterPage> createState() => _LoadedRegionFilterPageState();
