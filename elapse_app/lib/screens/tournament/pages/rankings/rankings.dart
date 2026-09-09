@@ -37,43 +37,60 @@ class RankingsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Tournament tournament = loadTournament(prefs.getString("recently-opened-tournament"));
+    Tournament tournament =
+        loadTournament(prefs.getString("recently-opened-tournament"));
 
     List<Team> teams = tournament.teams;
     List<TeamPreview> savedTeams = [];
     if (filter.saved) {
       final String savedTeam = prefs.getString("savedTeam") ?? "";
-      TeamPreview savedTeamPreview =
-          TeamPreview(teamID: jsonDecode(savedTeam)["teamID"], teamNumber: jsonDecode(savedTeam)["teamNumber"]);
+      TeamPreview savedTeamPreview = TeamPreview(
+          teamID: jsonDecode(savedTeam)["teamID"],
+          teamNumber: jsonDecode(savedTeam)["teamNumber"]);
       List<String> savedTeamsString = prefs.getStringList("savedTeams") ?? [];
       savedTeams.add(savedTeamPreview);
       savedTeams.addAll(savedTeamsString
-          .map((e) => TeamPreview(teamID: jsonDecode(e)["teamID"], teamNumber: jsonDecode(e)["teamNumber"]))
+          .map((e) => TeamPreview(
+              teamID: jsonDecode(e)["teamID"],
+              teamNumber: jsonDecode(e)["teamNumber"]))
           .toList());
-      teams = tournament.teams.where((element) => savedTeams.any((element2) => element2.teamID == element.id)).toList();
+      teams = tournament.teams
+          .where((element) =>
+              savedTeams.any((element2) => element2.teamID == element.id))
+          .toList();
     } else {
       teams = tournament.teams;
     }
 
     List<TeamPreview> scoutedTeams = [];
     if (filter.scouted) {
-      teams = tournament.teams.where((e) => scoutedTeams.any((e2) => e2.teamID == e.id)).toList();
+      teams = tournament.teams
+          .where((e) => scoutedTeams.any((e2) => e2.teamID == e.id))
+          .toList();
     }
 
-    List<TeamPreview> pickListTeams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
+    List<TeamPreview> pickListTeams = (prefs.getStringList("picklist") ?? [])
+        .map((e) => loadTeamPreview(e))
+        .toList();
     if (filter.onPicklist) {
-      teams = tournament.teams.where((e) => pickListTeams.any((e2) => e2.teamID == e.id)).toList();
+      teams = tournament.teams
+          .where((e) => pickListTeams.any((e2) => e2.teamID == e.id))
+          .toList();
     }
 
-    Map<int, TeamStats>? rankings = tournament.divisions[divisionIndex].teamStats;
+    Map<int, TeamStats>? rankings =
+        tournament.divisions[divisionIndex].teamStats;
 
     if (rankings == null || rankings.isEmpty) {
       return SliverToBoxAdapter(
-        child: BigErrorMessage(icon: Icons.format_list_numbered_outlined, message: "Rankings not available"),
+        child: BigErrorMessage(
+            icon: Icons.format_list_numbered_outlined,
+            message: "Rankings not available"),
       );
     }
 
-    List<Team> divisionTeams = teams.where((e) => rankings[e.id] != null).toList();
+    List<Team> divisionTeams =
+        teams.where((e) => rankings[e.id] != null).toList();
     if (sort == "Rank") {
       divisionTeams.sort((a, b) {
         return rankings[a.id]!.rank.compareTo(rankings[b.id]!.rank);
@@ -110,20 +127,21 @@ class RankingsPage extends StatelessWidget {
       divisionTeams.sort((a, b) {
         return worldSkills
             .singleWhere((e) => e.teamId == b.id, orElse: () {
-              return WorldSkillsStats(teamId: b.id, teamNum: b.teamNumber ?? "");
+              return WorldSkillsStats(
+                  teamId: b.id, teamNum: b.teamNumber ?? "");
             })
             .score
-            .compareTo(worldSkills.singleWhere((e) => e.teamId == a.id, orElse: () {
-              return WorldSkillsStats(teamId: b.id, teamNum: b.teamNumber ?? "");
+            .compareTo(
+                worldSkills.singleWhere((e) => e.teamId == a.id, orElse: () {
+              return WorldSkillsStats(
+                  teamId: b.id, teamNum: b.teamNumber ?? "");
             }).score);
       });
     } else if (sort == "TrueSkill") {
       if (vda != null) {
         divisionTeams.sort((a, b) {
-          return vda!
-                  .singleWhere((e) => e.id == b.id)
-                  .trueSkill
-                  ?.compareTo(vda!.singleWhere((e) => e.id == a.id).trueSkill ?? 0) ??
+          return vda!.singleWhere((e) => e.id == b.id).trueSkill?.compareTo(
+                  vda!.singleWhere((e) => e.id == a.id).trueSkill ?? 0) ??
               0;
         });
       } else {
@@ -163,7 +181,8 @@ class RankingsPage extends StatelessWidget {
                 sort: sort,
                 allianceColor: Theme.of(context).colorScheme.onSurface,
                 skills: skills[team.id],
-                worldSkills: worldSkills.firstWhereOrNull((e) => e.teamId == team.id),
+                worldSkills:
+                    worldSkills.firstWhereOrNull((e) => e.teamId == team.id),
                 vda: vda?.firstWhereOrNull((e) => e.id == team.id),
               ),
               Divider(

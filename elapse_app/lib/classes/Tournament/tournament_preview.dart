@@ -1,51 +1,48 @@
-import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:elapse_app/classes/Miscellaneous/location.dart';
+import 'package:elapse_app/extras/async_cache.dart';
 import 'package:elapse_app/extras/token.dart';
 import 'package:http/http.dart' as http;
 
-import 'package:elapse_app/classes/Filters/eventSearchFilters.dart';
-import 'package:chaleno/chaleno.dart';
-import 'package:intl/intl.dart';
-
-import 'dart:core';
-
-import '../../main.dart';
 import '../../screens/explore/filters.dart';
-import '../Team/teamPreview.dart';
 
 class TournamentPreview {
-  int id;
-  String name;
-  String? sku;
-  Location? location;
-  DateTime? startDate;
-  DateTime? endDate;
+  final int id;
+  final String name;
+  final String? sku;
+  final Location? location;
+  final DateTime? startDate;
+  final DateTime? endDate;
 
   TournamentPreview({
     required this.id,
     required this.name,
+    this.sku,
     this.location,
     this.startDate,
     this.endDate,
   });
 
   factory TournamentPreview.fromJson(Map<String, dynamic> json) {
-    Map<String, dynamic> locationJson = json['location'];
-    Location location = new Location(
-        address1: locationJson['address_1'],
-        address2: locationJson['address_2'],
-        city: locationJson['city'],
-        region: locationJson['region'],
-        country: locationJson['country'],
-        venue: locationJson['venue']);
+    final locationJson = json['location'];
     return TournamentPreview(
-      id: json['id'],
-      name: json['name'],
-      location: location,
-      startDate: DateTime.parse(json['start']),
-      endDate: DateTime.parse(json['end']),
+      id: (json['id'] as num).toInt(),
+      name: json['name'] as String,
+      sku: json['sku'] as String?,
+      location: locationJson is Map<String, dynamic>
+          ? Location(
+              address1: locationJson['address_1'],
+              address2: locationJson['address_2'],
+              city: locationJson['city'],
+              region: locationJson['region'],
+              country: locationJson['country'],
+              venue: locationJson['venue'],
+            )
+          : null,
+      startDate: DateTime.tryParse(json['start']?.toString() ?? ''),
+      endDate: DateTime.tryParse(json['end']?.toString() ?? ''),
     );
   }
 
@@ -60,127 +57,203 @@ class TournamentPreview {
 }
 
 class TournamentList {
-  List<TournamentPreview> tournaments;
-  int maxPage;
+  final List<TournamentPreview> tournaments;
+  final int maxPage;
 
   TournamentList({required this.tournaments, required this.maxPage});
 }
 
+final _teamTournamentCache = AsyncCache<String, List<TournamentPreview>>(
+  timeToLive: const Duration(minutes: 5),
+);
+
 Future<List<TournamentPreview>> fetchTeamTournaments(
+  int teamId,
+  int seasonID, {
+  bool forceRefresh = false,
+}) {
+  return _teamTournamentCache.get(
+    '$teamId:$seasonID',
+    () => _fetchTeamTournaments(teamId, seasonID),
+    forceRefresh: forceRefresh,
+  );
+}
+
+Future<List<TournamentPreview>> _fetchTeamTournaments(
   int teamId,
   int seasonID,
 ) async {
-  // Fetch team data
-
-  final tournamentInfo = http.get(
-    Uri.parse("https://www.robotevents.com/api/v2/teams/$teamId/events?season%5B%5D=$seasonID&per_page=250"),
+  final loadedTournamentInfo = await http.get(
+    Uri.parse(
+        "https://events.vex.com/api/v2/teams/$teamId/events?season%5B%5D=$seasonID&per_page=250"),
     headers: {
       HttpHeaders.authorizationHeader: getToken(),
+      HttpHeaders.acceptHeader: 'application/json',
     },
-  );
+  ).timeout(const Duration(seconds: 12));
 
-  final loadedTournamentInfo = await tournamentInfo;
-  final parsedTournamentInfo = jsonDecode(loadedTournamentInfo.body)["data"] as List;
-  List<TournamentPreview> tournaments =
-      parsedTournamentInfo.map<TournamentPreview>((json) => TournamentPreview.fromJson(json)).toList();
+  if (loadedTournamentInfo.statusCode != 200) {
+    throw Exception(
+      'Failed to load team tournaments (${loadedTournamentInfo.statusCode})',
+    );
+  }
 
-  return tournaments;
+  final decoded = jsonDecode(loadedTournamentInfo.body);
+  if (decoded is! Map<String, dynamic> || decoded['data'] is! List) {
+    throw const FormatException('Unexpected VEX team events response.');
+  }
+  final parsedTournamentInfo = decoded['data'] as List;
+  final tournaments = parsedTournamentInfo
+      .whereType<Map<String, dynamic>>()
+      .map(TournamentPreview.fromJson)
+      .toList()
+    ..sort(_compareTournamentDates);
+
+  return List.unmodifiable(tournaments);
 }
 
-Future<TournamentList> getTournaments(String eventName, ExploreSearchFilter filters,
+/// Returns a sorted copy and never mutates the API result shared by callers.
+List<TournamentPreview> upcomingTournaments(
+  Iterable<TournamentPreview> tournaments,
+  DateTime now,
+) {
+  final oldestRelevantDate = now.subtract(const Duration(days: 2));
+  final result = tournaments.where((tournament) {
+    final lastEventDate = tournament.endDate ?? tournament.startDate;
+    return lastEventDate != null && !lastEventDate.isBefore(oldestRelevantDate);
+  }).toList()
+    ..sort(_compareTournamentDates);
+  return List.unmodifiable(result);
+}
+
+bool isTournamentActive(TournamentPreview tournament, DateTime now) {
+  final start = tournament.startDate;
+  final end = tournament.endDate;
+  if (start == null || end == null) {
+    return false;
+  }
+
+  // Compare calendar dates because API event timestamps commonly represent
+  // midnight at the start of the first and last event dates.
+  final today = DateTime.utc(now.year, now.month, now.day);
+  final firstDay = DateTime.utc(start.year, start.month, start.day);
+  final lastDay = DateTime.utc(end.year, end.month, end.day);
+  return !today.isBefore(firstDay) && !today.isAfter(lastDay);
+}
+
+int _compareTournamentDates(TournamentPreview first, TournamentPreview second) {
+  final firstDate = first.startDate;
+  final secondDate = second.startDate;
+  if (firstDate == null) return secondDate == null ? 0 : 1;
+  if (secondDate == null) return -1;
+  return firstDate.compareTo(secondDate);
+}
+
+Future<TournamentList> getTournaments(
+    String eventName, ExploreSearchFilter filters,
     {bool getAllPages = false, int page = 1}) async {
-  try {
-    dynamic parser, regions;
-    List<Future<dynamic>> futures = [];
-    futures.add(Chaleno().load(
-        "https://www.robotevents.com/robot-competitions/${filters.gradeLevel.id == 4 ? "college-competition" : "vex-robotics-competition"}?country_id=*&seasonId=${filters.gradeLevel.id == 4 ? filters.season.vexUId ?? "" : filters.season.vrcId}&eventType=&name=$eventName&grade_level_id=${filters.gradeLevel.id != 0 ? filters.gradeLevel.id : ""}&level_class_id=${filters.levelClass.id == 0 ? "" : filters.levelClass.id}&from_date=${DateFormat("yyyy-MM-dd").format(filters.startDate)}&to_date=${DateFormat("yyyy-MM-dd").format(filters.endDate)}&event_region=&city=${filters.location != null ? filters.location!.city : ""}&distance=250&page=$page"));
-    if (filters.location != null) {
-      futures.add(http.get(
-        Uri.parse(
-            "https://www.robotevents.com/api/v2/events?season%5B%5D=${filters.gradeLevel.id == 4 ? filters.season.vexUId ?? "" : filters.season.vrcId}&start=${DateFormat("yyyy-MM-dd").format(filters.startDate)}&end=${DateFormat("yyyy-MM-dd").format(filters.endDate)}&region=${filters.location?.region ?? ""}&myEvents=false"),
-        headers: {
-          HttpHeaders.authorizationHeader: getToken(),
-        },
-      ));
-    }
-    await Future.wait(futures).then((v) {
-      parser = v[0];
-      if (v.length > 1) regions = v[1];
-    });
+  const apiPageSize = 250;
+  const uiPageSize = 25;
+  final seasonId =
+      filters.gradeLevel.id == 4 ? filters.season.vexUId : filters.season.vrcId;
 
-    List<Result> result = parser!.querySelectorAll('#competitions-app > div.col-sm-8.results > div > div > div');
+  final query = <String, String>{
+    'season[]': seasonId.toString(),
+    'start': _startOfUtcDate(filters.startDate).toIso8601String(),
+    'end': _endOfUtcDate(filters.endDate).toIso8601String(),
+    'myEvents': 'false',
+    'per_page': apiPageSize.toString(),
+  };
 
-    List<Result> pages = parser.querySelectorAll('#competitions-app > div.col-sm-8.results > nav > ul > li');
-    int maxPage = pages.length - 2;
-    if (maxPage < 1) {
-      maxPage = 1;
-    }
-
-    if (getAllPages && maxPage > 1) {
-      List<Future<dynamic>> pages = [];
-      for (int pg = 1; pg <= maxPage; pg++) {
-        if (pg == page) continue;
-
-        pages.add(Chaleno().load(
-            "https://www.robotevents.com/robot-competitions/${filters.gradeLevel.id == 4 ? "college-competition" : "vex-robotics-competition"}?country_id=*&seasonId=${filters.gradeLevel.id == 4 ? filters.season.vexUId ?? "" : filters.season.vrcId}&eventType=&name=$eventName&grade_level_id=${filters.gradeLevel.id != 0 ? filters.gradeLevel.id : ""}&level_class_id=${filters.levelClass.id == 0 ? "" : filters.levelClass.id}&from_date=${DateFormat("yyyy-MM-dd").format(filters.startDate)}&to_date=${DateFormat("yyyy-MM-dd").format(filters.endDate)}&event_region=&city=${filters.location != null ? filters.location!.city : ""}&distance=250&page=$pg"));
-      }
-      await Future.wait(pages).then((v) {
-        for (final p in v) {
-          List<Result> results = p!.querySelectorAll('#competitions-app > div.col-sm-8.results > div > div > div');
-          result.addAll(results);
-        }
-      });
-    }
-
-    List<TournamentPreview> regionTournaments = [];
-    if (filters.location != null) {
-      final parsedRegions = jsonDecode(regions.body)["data"] as List;
-      regionTournaments = parsedRegions.map((e) => TournamentPreview.fromJson(e)).toList();
-    }
-
-    List<Future<TournamentPreview?>> tournamentFutures = [];
-    List<TournamentPreview> tournaments = [];
-    for (var e in result) {
-      tournamentFutures.add(itemParse(e.text));
-    }
-
-    await Future.wait(tournamentFutures).then((value) {
-      tournaments = value
-          .where((element) => element != null && (regionTournaments.isEmpty || regionTournaments.contains(element)))
-          .where((e) => e != null)
-          .toList()
-          .cast<TournamentPreview>();
-    });
-
-    return TournamentList(tournaments: tournaments, maxPage: maxPage);
-  } catch (e) {
-    throw e;
+  final region = filters.location?.region?.trim();
+  if (region != null && region.isNotEmpty) {
+    query['region'] = region;
   }
+
+  final level = _apiLevel(filters.levelClass.id);
+  if (level != null) {
+    query['level[]'] = level;
+  }
+
+  final firstResponse = await _fetchEventsPage(query, 1);
+  final firstBody = jsonDecode(firstResponse.body) as Map<String, dynamic>;
+  final lastApiPage = (firstBody['meta']['last_page'] as num).toInt();
+  final allData = <dynamic>[...(firstBody['data'] as List)];
+
+  if (lastApiPage > 1) {
+    final remaining = await Future.wait([
+      for (var apiPage = 2; apiPage <= lastApiPage; apiPage++)
+        _fetchEventsPage(query, apiPage),
+    ]);
+    for (final response in remaining) {
+      allData.addAll(jsonDecode(response.body)['data'] as List);
+    }
+  }
+
+  final normalizedName = eventName.trim().toLowerCase();
+  final tournaments = allData
+      .cast<Map<String, dynamic>>()
+      .where((event) =>
+          normalizedName.isEmpty ||
+          (event['name'] as String? ?? '')
+              .toLowerCase()
+              .contains(normalizedName) ||
+          (event['sku'] as String? ?? '')
+              .toLowerCase()
+              .contains(normalizedName))
+      .map(TournamentPreview.fromJson)
+      .toList()
+    ..sort(_compareTournamentDates);
+
+  final maxPage =
+      tournaments.isEmpty ? 1 : (tournaments.length / uiPageSize).ceil();
+  if (getAllPages) {
+    return TournamentList(tournaments: tournaments, maxPage: maxPage);
+  }
+
+  final safePage = page.clamp(1, maxPage).toInt();
+  final start = (safePage - 1) * uiPageSize;
+  final end = (start + uiPageSize).clamp(0, tournaments.length).toInt();
+  return TournamentList(
+    tournaments: tournaments.sublist(start, end),
+    maxPage: maxPage,
+  );
 }
 
-Future<TournamentPreview?> itemParse(String? item) async {
-  if (item == null) {
-    print("returning null");
-    return null;
-  }
-  print(item);
-  String scrapedData = item;
-
-  // Regular expressions to match the desired data
-  RegExp codeRegExp = RegExp(r"Event Code:\s+([\w-]+)");
-  Match? codeMatch = codeRegExp.firstMatch(scrapedData);
-  String eventCode = codeMatch?.group(1) ?? "";
-
+Future<http.Response> _fetchEventsPage(
+    Map<String, String> query, int page) async {
   final response = await http.get(
-    Uri.parse("https://www.robotevents.com/api/v2/events?sku%5B%5D=$eventCode&myEvents=false"),
+    Uri.https('events.vex.com', '/api/v2/events', {
+      ...query,
+      'page': page.toString(),
+    }),
     headers: {
       HttpHeaders.authorizationHeader: getToken(),
+      HttpHeaders.acceptHeader: 'application/json',
     },
-  );
-
-  final parsed = jsonDecode(response.body)["data"] as List;
-  TournamentPreview tournamentPreview =
-      parsed.map<TournamentPreview>((json) => TournamentPreview.fromJson(json)).toList()[0];
-
-  return tournamentPreview;
+  ).timeout(const Duration(seconds: 12));
+  if (response.statusCode != 200) {
+    throw Exception(
+      'VEX event search failed (${response.statusCode}): ${response.body}',
+    );
+  }
+  return response;
 }
+
+String? _apiLevel(int levelClassId) {
+  return switch (levelClassId) {
+    1 => 'Regional',
+    2 || 13 => 'National',
+    3 => 'World',
+    9 => 'Signature',
+    12 => 'Regional',
+    16 => 'Other',
+    _ => null,
+  };
+}
+
+DateTime _startOfUtcDate(DateTime date) =>
+    DateTime.utc(date.year, date.month, date.day);
+
+DateTime _endOfUtcDate(DateTime date) =>
+    DateTime.utc(date.year, date.month, date.day, 23, 59, 59, 999);

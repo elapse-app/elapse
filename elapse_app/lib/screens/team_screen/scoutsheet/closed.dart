@@ -1,335 +1,260 @@
-import 'dart:ui';
-
-import 'package:elapse_app/classes/ScoutSheet/scoutSheetUi.dart';
-import 'package:elapse_app/extras/database.dart';
+import 'package:elapse_app/classes/ScoutSheet/scout_sheet_data.dart';
+import 'package:elapse_app/classes/ScoutSheet/scout_sheet_template.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
-List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI sheet, String teamID,
-    String tournamentID, void Function() updateIndex) {
-  Database database = Database();
+List<Widget> ClosedState(
+  BuildContext context,
+  String teamNumber,
+  ScoutSheetData sheet,
+  String teamID,
+  String tournamentID,
+  void Function() deleteSheet,
+) {
+  final sections = _groupFields(sheet.template.fields);
+  return [
+    SliverPadding(
+      padding: const EdgeInsets.fromLTRB(23, 8, 23, 0),
+      sliver: SliverToBoxAdapter(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              sheet.template.name,
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            if (sheet.template.description.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(sheet.template.description),
+            ],
+          ],
+        ),
+      ),
+    ),
+    for (final section in sections.entries)
+      SliverToBoxAdapter(
+        child: _ScoutAnswersSection(
+          title: section.key,
+          fields: section.value,
+          sheet: sheet,
+        ),
+      ),
+    SliverToBoxAdapter(child: _PhotoGallery(photos: sheet.photos)),
+    SliverToBoxAdapter(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(23, 15, 23, 0),
+        child: TextButton.icon(
+          icon: const Icon(Icons.delete_outline),
+          label: const Text('Delete scout sheet'),
+          style: TextButton.styleFrom(
+            foregroundColor: Theme.of(context).colorScheme.error,
+          ),
+          onPressed: () => _confirmDelete(context, deleteSheet),
+        ),
+      ),
+    ),
+    SliverToBoxAdapter(
+      child: SizedBox(height: MediaQuery.paddingOf(context).bottom + 16),
+    ),
+  ];
+}
 
-  Widget photosDisplay = Container(
-    decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(9)), color: Theme.of(context).colorScheme.tertiary),
-    height: 175,
-    child: Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+class _ScoutAnswersSection extends StatelessWidget {
+  const _ScoutAnswersSection({
+    required this.title,
+    required this.fields,
+    required this.sheet,
+  });
+
+  final String title;
+  final List<ScoutTemplateField> fields;
+  final ScoutSheetData sheet;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 15, left: 23, right: 23),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Theme.of(context).colorScheme.primary),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 14),
+          for (var index = 0; index < fields.length; index++) ...[
+            _Answer(
+                field: fields[index], value: sheet.answerFor(fields[index].id)),
+            if (index != fields.length - 1)
+              Divider(
+                height: 24,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.14),
+              ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _Answer extends StatelessWidget {
+  const _Answer({required this.field, required this.value});
+
+  final ScoutTemplateField field;
+  final Object? value;
+
+  @override
+  Widget build(BuildContext context) {
+    final displayValue = switch (field.type) {
+      ScoutFieldType.toggle => value == null
+          ? 'Not provided'
+          : value == true
+              ? 'Yes'
+              : 'No',
+      _ => value?.toString().trim().isNotEmpty == true
+          ? value.toString()
+          : 'Not provided',
+    };
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [Text("No Photos uploaded")],
+        Text(displayValue, style: Theme.of(context).textTheme.bodyLarge),
+        const SizedBox(height: 2),
+        Text(
+          field.label,
+          style: Theme.of(context).textTheme.bodySmall,
+        ),
+      ],
+    );
+  }
+}
+
+class _PhotoGallery extends StatelessWidget {
+  const _PhotoGallery({required this.photos});
+
+  final List<String> photos;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 15, left: 23, right: 23),
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: Theme.of(context).colorScheme.primary),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('Photos', style: Theme.of(context).textTheme.titleLarge),
+          const SizedBox(height: 14),
+          if (photos.isEmpty)
+            const SizedBox(
+              height: 96,
+              child: Center(child: Text('No photos uploaded')),
+            )
+          else
+            GridView.builder(
+              primary: false,
+              shrinkWrap: true,
+              itemCount: photos.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 8,
+                mainAxisSpacing: 8,
+              ),
+              itemBuilder: (context, index) => InkWell(
+                onTap: () => _openPhotoViewer(context, photos, index),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(9),
+                  child: Image.network(
+                    photos[index],
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) => const ColoredBox(
+                      color: Colors.black12,
+                      child: Icon(Icons.broken_image_outlined),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+Map<String, List<ScoutTemplateField>> _groupFields(
+  List<ScoutTemplateField> fields,
+) {
+  final sections = <String, List<ScoutTemplateField>>{};
+  for (final field in fields) {
+    sections.putIfAbsent(field.section, () => []).add(field);
+  }
+  return sections;
+}
+
+Future<void> _confirmDelete(
+  BuildContext context,
+  void Function() deleteSheet,
+) async {
+  final confirmed = await showDialog<bool>(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Delete scout sheet?'),
+      content: const Text('This removes its answers and photos for the team.'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () => Navigator.pop(context, true),
+          child: const Text('Delete'),
         ),
       ],
     ),
   );
-  if (sheet.photos.isNotEmpty) {
-    photosDisplay = Row(children: [
-      Expanded(
-          child: StaggeredGrid.count(
-        crossAxisCount: sheet.photos.length == 1
-            ? 2
-            : sheet.photos.length == 2
-                ? 4
-                : 3,
-        mainAxisSpacing: 8,
-        crossAxisSpacing: 8,
-        children: [
-          StaggeredGridTile.count(
-            crossAxisCellCount: 2,
-            mainAxisCellCount: 2,
-            child: Hero(
-                tag: sheet.photos[0].hashCode,
-                child: GestureDetector(
-                    onTap: () => _openPhotoViewer(context, sheet.photos, 0),
-                    child: ClipRRect(
-                        borderRadius: BorderRadius.circular(9),
-                        child: Image.network(sheet.photos[0], width: double.infinity, fit: BoxFit.cover,
-                            loadingBuilder: (context, widget, progress) {
-                          if (progress == null) return widget;
-                          return Center(
-                              child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              value: progress.cumulativeBytesLoaded / progress.expectedTotalBytes!,
-                            ),
-                          ));
-                        })))),
-          ),
-          sheet.photos.length > 1
-              ? StaggeredGridTile.count(
-                  crossAxisCellCount: sheet.photos.length == 2 ? 2 : 1,
-                  mainAxisCellCount: sheet.photos.length > 2 ? 1 : 2,
-                  child: Hero(
-                      tag: sheet.photos[1].hashCode,
-                      child: GestureDetector(
-                          onTap: () => _openPhotoViewer(context, sheet.photos, 1),
-                          child: ClipRRect(
-                              borderRadius: BorderRadius.circular(9),
-                              child: Image.network(sheet.photos[1], width: double.infinity, fit: BoxFit.cover,
-                                  loadingBuilder: (context, widget, progress) {
-                                if (progress == null) return widget;
-                                return Center(
-                                    child: SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    value: progress.cumulativeBytesLoaded / progress.expectedTotalBytes!,
-                                  ),
-                                ));
-                              })))))
-              : const SizedBox.shrink(),
-          sheet.photos.length > 2
-              ? StaggeredGridTile.count(
-                  crossAxisCellCount: 1,
-                  mainAxisCellCount: 1,
-                  child: Hero(
-                      tag: sheet.photos[2].hashCode,
-                      child: GestureDetector(
-                          onTap: () => _openPhotoViewer(context, sheet.photos, 2),
-                          child: ClipRRect(
-                              borderRadius: BorderRadius.circular(9),
-                              child: sheet.photos.length > 3
-                                  ? Stack(children: [
-                                      Image.network(sheet.photos[2], width: double.infinity, fit: BoxFit.cover,
-                                          loadingBuilder: (context, widget, progress) {
-                                        if (progress == null) return widget;
-                                        return Center(
-                                            child: SizedBox(
-                                          width: 20,
-                                          height: 20,
-                                          child: CircularProgressIndicator(
-                                            value: progress.cumulativeBytesLoaded / progress.expectedTotalBytes!,
-                                          ),
-                                        ));
-                                      }),
-                                      BackdropFilter(
-                                          filter: ImageFilter.blur(sigmaX: 2.5, sigmaY: 2.5),
-                                          child: Container(
-                                              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.1)))),
-                                      Center(
-                                          child: DefaultTextStyle(
-                                              style: const TextStyle(),
-                                              child: Text("${sheet.photos.length - 2}+",
-                                                  style: TextStyle(
-                                                      fontSize: 48,
-                                                      fontWeight: FontWeight.w600,
-                                                      color: Theme.of(context).colorScheme.surface)))),
-                                    ])
-                                  : Image.network(sheet.photos[2], width: double.infinity, fit: BoxFit.cover,
-                                      loadingBuilder: (context, widget, progress) {
-                                      if (progress == null) return widget;
-                                      return Center(
-                                          child: SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          value: progress.cumulativeBytesLoaded / progress.expectedTotalBytes!,
-                                        ),
-                                      ));
-                                    })))))
-              : const SizedBox.shrink(),
-        ],
-      ))
-    ]);
-  }
-
-  return [
-    SliverToBoxAdapter(
-      child: Container(
-        margin: EdgeInsets.only(top: 8, left: 23, right: 23),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.primary,
-            width: 2,
-          ),
-        ),
-        padding: EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("$teamNumber Specs", style: TextStyle(fontSize: 24)),
-            SizedBox(height: 18),
-            Text(sheet.intakeType, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-            Text("Intake Type", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400)),
-            SizedBox(height: 12),
-            Divider(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
-            ),
-            SizedBox(height: 12),
-            Row(
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      sheet.numMotors,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    Text("# of Motors", style: TextStyle(fontSize: 12)),
-                  ],
-                ),
-                SizedBox(width: 18),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      sheet.RPM,
-                      style: TextStyle(fontSize: 16),
-                    ),
-                    Text("RPM", style: TextStyle(fontSize: 12)),
-                  ],
-                ),
-              ],
-            ),
-            SizedBox(height: 12),
-            sheet.otherNotes != ""
-                ? Divider(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
-                  )
-                : SizedBox(),
-            sheet.otherNotes != "" ? SizedBox(height: 12) : SizedBox(),
-            sheet.otherNotes != "" ? Text(sheet.otherNotes, style: TextStyle(fontSize: 16)) : SizedBox(),
-          ],
-        ),
-      ),
-    ),
-    SliverToBoxAdapter(
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.primary,
-            width: 2,
-          ),
-        ),
-        margin: EdgeInsets.only(left: 23, right: 23, top: 15),
-        padding: EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Photos", style: TextStyle(fontSize: 24)),
-            SizedBox(
-              height: 18,
-            ),
-            photosDisplay
-          ],
-        ),
-      ),
-    ),
-    SliverToBoxAdapter(
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(
-            color: Theme.of(context).colorScheme.primary,
-            width: 2,
-          ),
-        ),
-        margin: EdgeInsets.only(
-          left: 23,
-          right: 23,
-          top: 15,
-        ),
-        padding: EdgeInsets.all(18),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("Auton Notes", style: TextStyle(fontSize: 24)),
-            SizedBox(
-              height: 18,
-            ),
-            Text(sheet.autonNotes != "" ? sheet.autonNotes : "No notes provided", style: TextStyle(fontSize: 16)),
-          ],
-        ),
-      ),
-    ),
-    SliverToBoxAdapter(
-      child: Container(
-        margin: EdgeInsets.only(top: 15, left: 23, right: 23),
-        child: TextButton(
-            child: Text(
-              "Delete ScoutSheet",
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-            ),
-            onPressed: () {
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return AlertDialog(
-                    title: Text("Confirm Deletion"),
-                    content: Text("Are you sure you want to delete this scoutsheet?"),
-                    actions: [
-                      TextButton(
-                        onPressed: updateIndex,
-                        child: Text(
-                          "Delete",
-                          style: TextStyle(color: Theme.of(context).colorScheme.error),
-                        ),
-                      ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        child: Text(
-                          "Cancel",
-                          style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-                        ),
-                      )
-                    ],
-                  );
-                },
-              );
-            }),
-      ),
-    ),
-    SliverToBoxAdapter(
-      child: SizedBox(
-        height: MediaQuery.of(context).padding.bottom,
-      ),
-    )
-  ];
+  if (confirmed == true) deleteSheet();
 }
 
-void _openPhotoViewer(BuildContext context, List<dynamic> photos, int initIndex) {
-  Navigator.push(context, MaterialPageRoute(builder: (context) {
-    return Scaffold(
-        body: Container(
-            decoration: const BoxDecoration(color: Colors.black),
-            padding: const EdgeInsets.only(top: 50),
-            constraints: BoxConstraints.expand(
-              height: MediaQuery.of(context).size.height,
+void _openPhotoViewer(
+  BuildContext context,
+  List<String> photos,
+  int initialIndex,
+) {
+  Navigator.push(
+    context,
+    MaterialPageRoute<void>(
+      builder: (context) => Scaffold(
+        backgroundColor: Colors.black,
+        appBar: AppBar(
+          backgroundColor: Colors.black,
+          foregroundColor: Colors.white,
+        ),
+        body: PhotoViewGallery.builder(
+          pageController: PageController(initialPage: initialIndex),
+          itemCount: photos.length,
+          builder: (context, index) => PhotoViewGalleryPageOptions(
+            imageProvider: NetworkImage(photos[index]),
+            initialScale: PhotoViewComputedScale.contained,
+          ),
+          loadingBuilder: (context, progress) => Center(
+            child: CircularProgressIndicator(
+              value: progress?.expectedTotalBytes == null
+                  ? null
+                  : progress!.cumulativeBytesLoaded /
+                      progress.expectedTotalBytes!,
             ),
-            child: Stack(alignment: AlignmentDirectional.topEnd, children: [
-              PhotoViewGallery.builder(
-                itemCount: photos.length,
-                builder: (context, index) {
-                  return PhotoViewGalleryPageOptions(
-                    imageProvider: NetworkImage(photos[index]),
-                    initialScale: PhotoViewComputedScale.contained,
-                    heroAttributes:
-                        PhotoViewHeroAttributes(tag: index > 2 ? photos[2].hashCode : photos[index].hashCode),
-                  );
-                },
-                scrollPhysics: const BouncingScrollPhysics(),
-                loadingBuilder: (context, event) => Center(
-                    child: SizedBox(
-                  width: 20,
-                  height: 20,
-                  child: CircularProgressIndicator(
-                    value: event != null ? event.cumulativeBytesLoaded / event.expectedTotalBytes! : null,
-                  ),
-                )),
-                pageController: PageController(initialPage: initIndex),
-              ),
-              GestureDetector(
-                onTap: () => Navigator.pop(context),
-                child: const Icon(Icons.close, color: Colors.white, size: 50),
-              )
-            ])));
-  }));
+          ),
+        ),
+      ),
+    ),
+  );
 }

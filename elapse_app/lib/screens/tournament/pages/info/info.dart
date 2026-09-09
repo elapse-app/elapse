@@ -29,7 +29,8 @@ class InfoPage extends StatelessWidget {
           children: [
             Container(
               decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).colorScheme.primary, width: 1),
+                  border: Border.all(
+                      color: Theme.of(context).colorScheme.primary, width: 1),
                   borderRadius: BorderRadius.circular(18)),
               padding: EdgeInsets.all(18),
               child: Column(
@@ -51,10 +52,11 @@ class InfoPage extends StatelessWidget {
                   ),
                   TextButton(
                     style: TextButton.styleFrom(
-                        foregroundColor: Theme.of(context).colorScheme.secondary,
+                        foregroundColor:
+                            Theme.of(context).colorScheme.secondary,
                         padding: EdgeInsets.only(right: 10, bottom: 10)),
                     onPressed: () {
-                      launchUrl(Uri.https("www.robotevents.com",
+                      launchUrl(Uri.https("events.vex.com",
                           "/robot-competitions/vex-robotics-competition/${tournament.sku}.html"));
                     },
                     child: const Text("View on RobotEvents"),
@@ -94,7 +96,8 @@ class InfoPage extends StatelessWidget {
                   ),
                   TextButton(
                     style: TextButton.styleFrom(
-                        foregroundColor: Theme.of(context).colorScheme.secondary,
+                        foregroundColor:
+                            Theme.of(context).colorScheme.secondary,
                         padding: EdgeInsets.only(right: 10, bottom: 10)),
                     onPressed: () {
                       MapsLauncher.launchQuery(
@@ -119,9 +122,11 @@ class InfoPage extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      tournament.endDate != null && tournament.endDate != tournament.startDate
+                      tournament.endDate != null &&
+                              tournament.endDate != tournament.startDate
                           ? Text(
-                              DateFormat("EEE, MMM d, y").format(tournament.endDate!),
+                              DateFormat("EEE, MMM d, y")
+                                  .format(tournament.endDate!),
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.w500,
@@ -158,11 +163,14 @@ class InfoPage extends StatelessWidget {
                                   ),
                                   TextButton.icon(
                                     style: TextButton.styleFrom(
-                                        foregroundColor: Theme.of(context).colorScheme.secondary,
-                                        padding: const EdgeInsets.only(right: 10, bottom: 10)),
+                                        foregroundColor: Theme.of(context)
+                                            .colorScheme
+                                            .secondary,
+                                        padding: const EdgeInsets.only(
+                                            right: 10, bottom: 10)),
                                     onPressed: () {
                                       launchUrl(Uri.parse(
-                                          "https://www.robotevents.com/robot-competitions/vex-robotics-competition/${tournament.sku}.html#webcast"));
+                                          "https://events.vex.com/robot-competitions/vex-robotics-competition/${tournament.sku}.html#webcast"));
                                     },
                                     icon: const Icon(Icons.live_tv),
                                     label: const Text(
@@ -214,8 +222,9 @@ class InfoPage extends StatelessWidget {
             ),
             Container(
               width: double.infinity,
-              decoration:
-                  BoxDecoration(color: Theme.of(context).colorScheme.tertiary, borderRadius: BorderRadius.circular(18)),
+              decoration: BoxDecoration(
+                  color: Theme.of(context).colorScheme.tertiary,
+                  borderRadius: BorderRadius.circular(18)),
               padding: EdgeInsets.all(18),
               child: Column(
                 children: [
@@ -230,7 +239,9 @@ class InfoPage extends StatelessWidget {
                     height: 15,
                   ),
                   Column(
-                    children: awards.map((award) => AwardWidget(award: award)).toList(),
+                    children: awards
+                        .map((award) => AwardWidget(award: award))
+                        .toList(),
                   )
                 ],
               ),
@@ -246,8 +257,8 @@ class InfoPage extends StatelessWidget {
 }
 
 Future<bool> hasLivestream(String sku) async {
-  final response = await http
-      .get(Uri.parse("https://www.robotevents.com/robot-competitions/vex-robotics-competition/$sku.html#general-info"));
+  final response = await http.get(Uri.parse(
+      "https://events.vex.com/robot-competitions/vex-robotics-competition/$sku.html#general-info"));
   print(response.body.contains("<h4>Webcast</h4>"));
   return response.body.contains("<h4>Webcast</h4>");
 }

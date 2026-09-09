@@ -10,7 +10,8 @@ class AwardWidget extends StatelessWidget {
     String winnersString;
     if (award.teamWinners != null && award.teamWinners!.isNotEmpty) {
       winnersString = award.teamWinners!.map((e) => e.teamNumber).join(", ");
-    } else if (award.individualWinners != null && award.individualWinners!.isNotEmpty) {
+    } else if (award.individualWinners != null &&
+        award.individualWinners!.isNotEmpty) {
       winnersString = award.individualWinners!.join(", ");
     } else {
       winnersString = "N/A";
@@ -38,14 +39,22 @@ class AwardWidget extends StatelessWidget {
                 flex: 1,
                 child: Text(
                   award.qualifications.join(", "),
-                  style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+                  style: TextStyle(
+                      fontSize: 18,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7)),
                 ),
               )
             ],
           ),
           Text(
             winnersString,
-            style: TextStyle(fontSize: 18, color: Theme.of(context).colorScheme.secondary, fontWeight: FontWeight.w500),
+            style: TextStyle(
+                fontSize: 18,
+                color: Theme.of(context).colorScheme.secondary,
+                fontWeight: FontWeight.w500),
           ),
           SizedBox(
             height: 5,

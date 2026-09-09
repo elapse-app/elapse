@@ -12,7 +12,6 @@ import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
 
 import '../../classes/Tournament/division.dart';
-import '../../classes/Tournament/tstats.dart';
 
 import 'package:elapse_app/classes/Miscellaneous/remote_config.dart';
 
@@ -85,12 +84,10 @@ class _TMHomePageState extends State<TMHomePage> {
                     child: Column(
                       children: [
                         const Spacer(),
-                        
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            
                             Text(
                               welcomeMessage,
                               style: TextStyle(
@@ -98,59 +95,56 @@ class _TMHomePageState extends State<TMHomePage> {
                             ),
                             showVDAWarn
                                 ? IconButton(
-                                      splashRadius:2,
-                                      icon: const Icon(Icons.sync_problem,
-                                          size: 24,
-                                          color: Color.fromRGBO(0, 0, 0, 1)),
-                                      onPressed: () {
-                                        showDialog(
-                                            context: context,
-                                            builder: (context) {
-                                              return AlertDialog(
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            18)),
-                                                title: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        "Some experiences may be limited",
-                                                        style: TextStyle(
-                                                            fontSize: 20),
-                                                      ),
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                top: 5),
-                                                        child: Text(
-                                                          "One of our data sources, vrc-data-analysis, isn't functioning properly right now. Some features may be temporarily unavailable.",
-                                                          style: TextStyle(
-                                                              fontSize: 15),
-                                                        ),
-                                                      ),
-                                                    ]),
-                                                actions: [
-                                                  TextButton(
-                                                    onPressed: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    child: Text(
-                                                      "OK",
+                                    splashRadius: 2,
+                                    icon: const Icon(Icons.sync_problem,
+                                        size: 24,
+                                        color: Color.fromRGBO(0, 0, 0, 1)),
+                                    onPressed: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          18)),
+                                              title: Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      "Some experiences may be limited",
                                                       style: TextStyle(
-                                                          color:
-                                                              Theme.of(context)
-                                                                  .colorScheme
-                                                                  .secondary),
+                                                          fontSize: 20),
                                                     ),
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                          top: 5),
+                                                      child: Text(
+                                                        "One of our data sources, vrc-data-analysis, isn't functioning properly right now. Some features may be temporarily unavailable.",
+                                                        style: TextStyle(
+                                                            fontSize: 15),
+                                                      ),
+                                                    ),
+                                                  ]),
+                                              actions: [
+                                                TextButton(
+                                                  onPressed: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  child: Text(
+                                                    "OK",
+                                                    style: TextStyle(
+                                                        color: Theme.of(context)
+                                                            .colorScheme
+                                                            .secondary),
                                                   ),
-                                                ],
-                                              );
-                                            });
-                                      },
-                                    )
+                                                ),
+                                              ],
+                                            );
+                                          });
+                                    },
+                                  )
                                 : Container(height: 1)
                           ],
                         ),
@@ -592,7 +586,7 @@ class _TMHomePageState extends State<TMHomePage> {
                   onPressed: () {
                     prefs.setBool("isTournamentMode", false);
                     prefs.remove("TMSavedTournament");
-                    myAppKey.currentState!.reloadApp();
+                    myAppKey.currentState?.reloadApp();
                   }),
               Spacer(),
             ],
