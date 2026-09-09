@@ -1,8 +1,5 @@
 import 'package:elapse_app/screens/widgets/settings_button.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:firebase_remote_config/firebase_remote_config.dart';
-import 'package:elapse_app/main.dart';
 import 'package:elapse_app/classes/Miscellaneous/remote_config.dart';
 
 class ElapseAppBar extends StatelessWidget {
@@ -30,10 +27,17 @@ class ElapseAppBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void handleBackNavigation() {
+      if (backBehavior != null) {
+        backBehavior!();
+        return;
+      }
+      Navigator.of(context).maybePop(returnData);
+    }
+
     final remoteConfig = FirebaseRemoteConfigService();
     final showVDAWarn =
         !remoteConfig.getBool(FirebaseRemoteConfigKeys.vdaStatusKey);
-    print("PRINT showVDAWarm $showVDAWarn");
     Widget? appBarBackground = background;
     if (includeSettings && background == null) {
       appBarBackground = SafeArea(
@@ -47,11 +51,9 @@ class ElapseAppBar extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   backNavigation
-                      ? GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context, returnData);
-                          },
-                          child: Icon(Icons.arrow_back,
+                      ? IconButton(
+                          onPressed: handleBackNavigation,
+                          icon: Icon(Icons.arrow_back,
                               color: Theme.of(context).colorScheme.onSurface),
                         )
                       : Container(),
@@ -72,11 +74,9 @@ class ElapseAppBar extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               backNavigation
-                  ? GestureDetector(
-                      onTap: () {
-                        Navigator.pop(context, returnData);
-                      },
-                      child: Icon(Icons.arrow_back,
+                  ? IconButton(
+                      onPressed: handleBackNavigation,
+                      icon: Icon(Icons.arrow_back,
                           color: Theme.of(context).colorScheme.onSurface),
                     )
                   : Container(),
@@ -86,20 +86,10 @@ class ElapseAppBar extends StatelessWidget {
       );
     }
 
-    late void Function() backBehaviorFunction;
-
-    if (backBehavior == null) {
-      backBehaviorFunction = () {
-        Navigator.pop(context);
-      };
-    } else {
-      backBehaviorFunction = backBehavior!;
-    }
     return SliverAppBar.large(
       automaticallyImplyLeading: false,
       expandedHeight: maxHeight,
       centerTitle: false,
-      
       flexibleSpace: LayoutBuilder(
         builder: (BuildContext context, BoxConstraints constraints) {
           double leftPadding = backNavigation
@@ -119,78 +109,85 @@ class ElapseAppBar extends StatelessWidget {
               title: Stack(
                 alignment: AlignmentDirectional.centerStart,
                 children: [
-                  showVDAWarning ? Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: leftPadding),
-                          child: title,
-                        ),
-                        Padding(
-                            padding: EdgeInsets.only(right: leftPadding + 5),
-                            child: showVDAWarn
-                                ? IconButton(
-                                    icon: const Icon(Icons.sync_problem,
-                                        size: 24,
-                                        color: Color.fromRGBO(0, 0, 0, 1)),
-                                    onPressed: () {
-                                      showDialog(
-                                          context: context,
-                                          builder: (context) {
-                                            return AlertDialog(
-                                              shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          18)),
-                                              title: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
-                                                      "Some experiences may be limited",
-                                                      style: TextStyle(
-                                                          fontSize: 20),
-                                                    ),
-                                                    Padding(
-                                                      padding: EdgeInsets.only(
-                                                          top: 5),
-                                                      child: Text(
-                                                        "One of our data sources, vrc-data-analysis, isn't functioning properly right now. Some features may be temporarily unavailable.",
-                                                        style: TextStyle(
-                                                            fontSize: 15),
+                  showVDAWarning
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                              Padding(
+                                padding: EdgeInsets.only(left: leftPadding),
+                                child: title,
+                              ),
+                              Padding(
+                                  padding:
+                                      EdgeInsets.only(right: leftPadding + 5),
+                                  child: showVDAWarn
+                                      ? IconButton(
+                                          icon: const Icon(Icons.sync_problem,
+                                              size: 24,
+                                              color:
+                                                  Color.fromRGBO(0, 0, 0, 1)),
+                                          onPressed: () {
+                                            showDialog(
+                                                context: context,
+                                                builder: (context) {
+                                                  return AlertDialog(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        18)),
+                                                    title: Column(
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .start,
+                                                        children: [
+                                                          Text(
+                                                            "Some experiences may be limited",
+                                                            style: TextStyle(
+                                                                fontSize: 20),
+                                                          ),
+                                                          Padding(
+                                                            padding:
+                                                                EdgeInsets.only(
+                                                                    top: 5),
+                                                            child: Text(
+                                                              "One of our data sources, vrc-data-analysis, isn't functioning properly right now. Some features may be temporarily unavailable.",
+                                                              style: TextStyle(
+                                                                  fontSize: 15),
+                                                            ),
+                                                          ),
+                                                        ]),
+                                                    actions: [
+                                                      TextButton(
+                                                        onPressed: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        child: Text(
+                                                          "OK",
+                                                          style: TextStyle(
+                                                              color: Theme.of(
+                                                                      context)
+                                                                  .colorScheme
+                                                                  .secondary),
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ]),
-                                              actions: [
-                                                TextButton(
-                                                  onPressed: () {
-                                                    Navigator.pop(context);
-                                                  },
-                                                  child: Text(
-                                                    "OK",
-                                                    style: TextStyle(
-                                                        color: Theme.of(context)
-                                                            .colorScheme
-                                                            .secondary),
-                                                  ),
-                                                ),
-                                              ],
-                                            );
-                                          });
-                                    },
-                                  )
-                                : Container(height:1))
-                        
-                      ]) : Padding(
+                                                    ],
+                                                  );
+                                                });
+                                          },
+                                        )
+                                      : Container(height: 1))
+                            ])
+                      : Padding(
                           padding: EdgeInsets.only(left: leftPadding),
                           child: title,
                         ),
                   backNavigation
-                      ? GestureDetector(
-                          onTap: () {
-                            Navigator.pop(context, returnData);
-                          },
-                          child: Icon(
+                      ? IconButton(
+                          onPressed: handleBackNavigation,
+                          icon: Icon(
                             Icons.arrow_back,
                             color: Theme.of(context)
                                 .colorScheme

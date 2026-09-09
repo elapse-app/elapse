@@ -62,7 +62,7 @@ class DefaultFirebaseOptions {
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: firebaseTokens.ios_api_key,
     appId: firebaseTokens.ios_app_id,
-    messagingSenderId:firebaseTokens.messagingSenderID,
+    messagingSenderId: firebaseTokens.messagingSenderID,
     projectId: 'elapse',
     storageBucket: 'elapse.appspot.com',
     iosClientId:
