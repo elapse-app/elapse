@@ -1,5 +1,3 @@
-import 'dart:io';
-
 class ScoutSheetUI {
   String intakeType;
   String numMotors;

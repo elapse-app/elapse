@@ -1,8 +1,6 @@
 import 'package:elapse_app/classes/Users/user.dart';
 import 'package:elapse_app/main.dart';
-import 'package:elapse_app/setup/signup/login_or_signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../team_screen/scoutsheet/edit.dart';

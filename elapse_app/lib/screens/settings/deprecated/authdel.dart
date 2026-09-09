@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthDel extends StatefulWidget {
@@ -70,7 +68,7 @@ class _AuthDelState extends State<AuthDel> {
 
   Future<void> updatePass() async {
     try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController2.text,
         password: passwordController1.text,
       );
