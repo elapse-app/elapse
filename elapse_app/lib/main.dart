@@ -14,6 +14,8 @@ import 'package:elapse_app/screens/tournament_mode/my_teams.dart';
 import 'package:elapse_app/screens/tournament_mode/tournament.dart';
 import 'package:elapse_app/setup/welcome/first_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -91,6 +93,7 @@ Future<bool> _initializeFirebase() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    await _activateAppCheck();
     // Remote Config has local defaults and should never hold up first paint.
     unawaited(FirebaseRemoteConfigService().initialize());
     return true;
@@ -99,6 +102,31 @@ Future<bool> _initializeFirebase() async {
     // prevent the locally cached app from starting in the meantime.
     debugPrint('Firebase startup failed: $error\n$stackTrace');
     return false;
+  }
+}
+
+Future<void> _activateAppCheck() async {
+  // Web requires a project-specific reCAPTCHA key. Keep desktop builds out of
+  // enforcement until their Firebase app registrations are production-ready.
+  if (kIsWeb ||
+      (defaultTargetPlatform != TargetPlatform.android &&
+          defaultTargetPlatform != TargetPlatform.iOS)) {
+    return;
+  }
+
+  try {
+    await FirebaseAppCheck.instance.activate(
+      androidProvider:
+          kDebugMode ? AndroidProvider.debug : AndroidProvider.playIntegrity,
+      appleProvider: kDebugMode
+          ? AppleProvider.debug
+          : AppleProvider.appAttestWithDeviceCheckFallback,
+    );
+  } catch (error, stackTrace) {
+    // Keep local development usable before its debug token is registered.
+    // Firebase enforcement must remain disabled until App Check metrics show
+    // that production clients are sending valid tokens.
+    debugPrint('Firebase App Check unavailable: $error\n$stackTrace');
   }
 }
 

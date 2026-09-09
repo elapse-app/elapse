@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:elapse_app/classes/ScoutSheet/scout_sheet_data.dart';
+import 'package:elapse_app/classes/ScoutSheet/scout_sheet_template.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
 import 'package:elapse_app/classes/Users/user.dart';
 import 'package:random_string_generator/random_string_generator.dart';
@@ -97,17 +99,21 @@ class Database {
       String joinCode =
           '${alphanumericGenerator.generate()}-${alphanumericGenerator.generate()}';
       Map<String, String> members = {adminID: "$fname $lname"};
-      var group = await _firestore.collection('teamGroups').add({
+      final group = _firestore.collection('teamGroups').doc();
+      final batch = _firestore.batch();
+      batch.set(group, {
         'adminId': adminID,
         'joinCode': joinCode,
         'allowJoin': true,
         'members': members,
-        'groupName': gname,
+        'groupName': gname.trim(),
+        'createdAt': FieldValue.serverTimestamp(),
+        'updatedAt': FieldValue.serverTimestamp(),
       });
-
-      await _firestore.collection('users').doc(adminID).update({
+      batch.update(_firestore.collection('users').doc(adminID), {
         'groupId': FieldValue.arrayUnion([group.id]),
       });
+      await batch.commit();
 
       return TeamGroup(
           groupId: group.id,
@@ -123,39 +129,58 @@ class Database {
   }
 
   Future<TeamGroup?> joinTeamGroup(String joinCode, String uid) async {
-    var Data = await getUserInfo(uid);
     try {
-      // Get the Users Name
-      String firstName = Data!['firstName'];
-      String lastName = Data['lastName'];
-
-      // Get the Team Group Document from joinCode and add user to list of members
-      var teamDoc = await _firestore
+      final normalizedCode = joinCode.trim().toUpperCase();
+      final matches = await _firestore
           .collection('teamGroups')
-          .where('joinCode', isEqualTo: joinCode)
+          .where('joinCode', isEqualTo: normalizedCode)
+          .where('allowJoin', isEqualTo: true)
           .limit(1)
           .get();
-      DocumentSnapshot? userDoc = teamDoc.docs.first;
-      userDoc.reference.update({
-        'members.$uid': "$firstName $lastName",
-      });
-      // Update the users list of team groups
-      await _firestore.collection('users').doc(uid).update({
-        'groupId': FieldValue.arrayUnion([userDoc.reference.id]),
-      });
+      if (matches.docs.isEmpty) return null;
 
-      Map<String, String> members = userDoc.get("members").map<String, String>(
-          (key, val) => MapEntry(key.toString(), val.toString()));
-      members.addAll({uid: "$firstName $lastName"});
+      final groupReference = matches.docs.first.reference;
+      final userReference = _firestore.collection('users').doc(uid);
+      return await _firestore.runTransaction((transaction) async {
+        final group = await transaction.get(groupReference);
+        final user = await transaction.get(userReference);
+        final groupData = group.data();
+        final userData = user.data();
+        if (groupData == null ||
+            userData == null ||
+            groupData['allowJoin'] != true ||
+            groupData['joinCode'] != normalizedCode) {
+          return null;
+        }
 
-      return TeamGroup(
-        groupId: userDoc.id,
-        groupName: userDoc.get("groupName"),
-        adminId: userDoc.get("adminId"),
-        joinCode: joinCode,
-        allowJoin: userDoc.get("allowJoin"),
-        members: members,
-      );
+        final firstName = userData['firstName']?.toString().trim() ?? '';
+        final lastName = userData['lastName']?.toString().trim() ?? '';
+        final displayName = '$firstName $lastName'.trim();
+        final members = Map<String, String>.from(
+          (groupData['members'] as Map).map(
+            (key, value) => MapEntry(key.toString(), value.toString()),
+          ),
+        );
+        if (!members.containsKey(uid)) {
+          members[uid] = displayName.isEmpty ? 'Team member' : displayName;
+          transaction.update(groupReference, {
+            'members.$uid': members[uid],
+            'updatedAt': FieldValue.serverTimestamp(),
+          });
+        }
+        transaction.update(userReference, {
+          'groupId': FieldValue.arrayUnion([groupReference.id]),
+        });
+
+        return TeamGroup(
+          groupId: groupReference.id,
+          groupName: groupData['groupName']?.toString(),
+          adminId: groupData['adminId']?.toString(),
+          joinCode: normalizedCode,
+          allowJoin: true,
+          members: members,
+        );
+      });
     } catch (e) {
       print(e);
     }
@@ -181,20 +206,31 @@ class Database {
 
   Future<void> leaveTeamGroup(String groupid, String memberid) async {
     try {
-      await _firestore.collection('teamGroups').doc(groupid).update({
-        'members.$memberid': FieldValue.delete(),
-      });
-      var info = await _firestore.collection('teamGroups').doc(groupid).get();
-      if (info.get("members").isEmpty) {
-        await deleteTeamGroup(groupid);
-      } else if (info.get("adminId") == memberid) {
-        await _firestore.collection('teamGroups').doc(groupid).update({
-          'adminId': info.get("members").keys.toList()[0],
-        });
-      }
+      final groupReference = _firestore.collection('teamGroups').doc(groupid);
+      final userReference = _firestore.collection('users').doc(memberid);
+      await _firestore.runTransaction((transaction) async {
+        final group = await transaction.get(groupReference);
+        final groupData = group.data();
+        if (groupData == null) return;
 
-      await _firestore.collection('users').doc(memberid).update({
-        'groupId': FieldValue.arrayRemove([groupid]),
+        final members = Map<String, dynamic>.from(
+          groupData['members'] as Map? ?? const {},
+        )..remove(memberid);
+        if (members.isEmpty) {
+          transaction.delete(groupReference);
+        } else {
+          final updates = <String, Object?>{
+            'members': members,
+            'updatedAt': FieldValue.serverTimestamp(),
+          };
+          if (groupData['adminId'] == memberid) {
+            updates['adminId'] = members.keys.first;
+          }
+          transaction.update(groupReference, updates);
+        }
+        transaction.update(userReference, {
+          'groupId': FieldValue.arrayRemove([groupid]),
+        });
       });
     } catch (e) {
       print(e);
@@ -273,12 +309,12 @@ class Database {
 
   Future<void> clearScoutsheets(String groupID) async {
     try {
-      var scoutsheets = await _firestore
+      final scoutsheets = await _firestore
           .collection('teamGroups')
           .doc(groupID)
           .collection('scoutsheets')
           .get();
-      scoutsheets.docs.first.reference.delete();
+      await _deleteDocuments(scoutsheets.docs);
     } catch (e) {
       print(e);
     }
@@ -286,14 +322,27 @@ class Database {
 
   Future<void> clearMatchNotes(String groupID) async {
     try {
-      var matchNotes = await _firestore
+      final matchNotes = await _firestore
           .collection('teamGroups')
           .doc(groupID)
           .collection('matchNotes')
           .get();
-      matchNotes.docs.first.reference.delete();
+      await _deleteDocuments(matchNotes.docs);
     } catch (e) {
       print(e);
+    }
+  }
+
+  Future<void> _deleteDocuments(
+    List<QueryDocumentSnapshot<Map<String, dynamic>>> documents,
+  ) async {
+    for (var offset = 0; offset < documents.length; offset += 450) {
+      final batch = _firestore.batch();
+      final end = (offset + 450).clamp(0, documents.length);
+      for (final document in documents.sublist(offset, end)) {
+        batch.delete(document.reference);
+      }
+      await batch.commit();
     }
   }
 
@@ -316,53 +365,93 @@ class Database {
 // Add Realtime Listener
 
   Future<String> createTeamScoutSheet(
-      String teamGroupID, String teamid, String tournamentID) async {
-    String returnVal = '';
-    try {
-      await _firestore
-          .collection('teamGroups')
-          .doc(teamGroupID)
-          .collection('scoutsheets')
-          .add({
-        /* Made with creation */
-        // Comp Specific stuff
-        'teamID': teamid,
-        'tournamentID': tournamentID,
+    String teamGroupID,
+    String teamid,
+    String tournamentID,
+    ScoutSheetTemplate template,
+  ) async {
+    final sheet = ScoutSheetData.empty(template);
+    final document = await _firestore
+        .collection('teamGroups')
+        .doc(teamGroupID)
+        .collection('scoutsheets')
+        .add({
+      'teamID': teamid,
+      'tournamentID': tournamentID,
+      'createTime': FieldValue.serverTimestamp(),
+      'latestUpdate': FieldValue.serverTimestamp(),
+      ...sheet.toFirestore(),
+      'isEditing': true,
+      'allowJoin': false,
+    });
+    return document.id;
+  }
 
-        // Timestamp Stuff
-        'createTime': DateTime.now(),
+  DocumentReference<Map<String, dynamic>> _teamScoutSheetReference(
+    String teamGroupId,
+    String scoutSheetId,
+  ) {
+    return _firestore
+        .collection('teamGroups')
+        .doc(teamGroupId)
+        .collection('scoutsheets')
+        .doc(scoutSheetId);
+  }
 
-        /* Updated with Editing */
-        'latestUpdate': null,
-        // List of the properties of the scouted robot
-        'properties': {
-          "Specs": {
-            "dbMotors": "",
-            "dbRPM": "",
-            "intakeType": "",
-            "otherNotes": ""
-          },
-        },
-        // Picklist
-        // 'picklist': {
-        //   'teams': [],
-        //   'tournamentId': "",
-        // },
-        // Notes about the team & match
-        'teamNotes': "",
-        'gameNotes': "",
-        // List of the URLs for any pictures
-        'photos': [],
-        // Bool for Currently Editing and Ablility to Join?
-        'isEditing': false,
-        'allowJoin': false, // Not sure why this is here anymore tbh
-      }).then((onValue) {
-        returnVal = onValue.id;
-      });
-    } catch (e) {
-      print(e);
-    }
-    return returnVal;
+  Future<void> updateTeamScoutSheetAnswers(
+    String teamGroupId,
+    String scoutSheetId,
+    Map<String, Object?> answers,
+  ) {
+    return _teamScoutSheetReference(teamGroupId, scoutSheetId).update({
+      'schemaVersion': 2,
+      'answers': answers,
+      'latestUpdate': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> setTeamScoutSheetEditing(
+    String teamGroupId,
+    String scoutSheetId,
+    bool isEditing,
+  ) {
+    return _teamScoutSheetReference(teamGroupId, scoutSheetId).update({
+      'isEditing': isEditing,
+      'latestUpdate': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> addTeamScoutSheetPhoto(
+    String teamGroupId,
+    String scoutSheetId,
+    String url,
+  ) {
+    return _teamScoutSheetReference(teamGroupId, scoutSheetId).update({
+      'photos': FieldValue.arrayUnion([url]),
+      'latestUpdate': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> deleteTeamScoutSheetPhoto(
+    String teamGroupId,
+    String scoutSheetId,
+    String url,
+  ) {
+    return _teamScoutSheetReference(teamGroupId, scoutSheetId).update({
+      'photos': FieldValue.arrayRemove([url]),
+      'latestUpdate': FieldValue.serverTimestamp(),
+    });
+  }
+
+  Future<void> deleteUploadedPhoto(String downloadUrl) {
+    return storage.refFromURL(downloadUrl).delete();
+  }
+
+  Future<void> removeTeamScoutSheetById(
+    String teamGroupId,
+    String scoutSheetId,
+  ) {
+    return _teamScoutSheetReference(teamGroupId, scoutSheetId).delete();
   }
 
   Future<void> removeTeamScoutSheet(
@@ -435,20 +524,15 @@ class Database {
 
   Future<DocumentSnapshot?> getTeamScoutSheetInfo(
       String teamGroupId, String teamID, String tournamentID) async {
-    try {
-      var collection = await _firestore
-          .collection('teamGroups')
-          .doc(teamGroupId)
-          .collection('scoutsheets')
-          .where('teamID', isEqualTo: teamID)
-          .where('tournamentID', isEqualTo: tournamentID)
-          .limit(1)
-          .get();
-      return collection.docs.first;
-    } catch (e) {
-      print(e);
-    }
-    return null;
+    final collection = await _firestore
+        .collection('teamGroups')
+        .doc(teamGroupId)
+        .collection('scoutsheets')
+        .where('teamID', isEqualTo: teamID)
+        .where('tournamentID', isEqualTo: tournamentID)
+        .limit(1)
+        .get();
+    return collection.docs.isEmpty ? null : collection.docs.first;
   }
 
   Future<Map<String, dynamic>?> updateProperty(String teamGroupId,
