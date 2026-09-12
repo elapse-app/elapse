@@ -5,7 +5,7 @@ import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
-import 'package:elapse_app/classes/Team/vdaStats.dart';
+import 'package:elapse_app/classes/Team/vexDexStats.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournament_preview.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
@@ -58,14 +58,14 @@ class _MyTeamsState extends State<MyTeams> {
     savedTeamPreviews = savedTeamPreviews.toSet().toList();
     season = seasons[0];
     team = fetchTeam(savedTeamPreview.teamID);
-    teamStats = getTrueSkillDataForTeam(season.vrcId, savedTeamPreview.teamNumber);
+    teamStats = getVexDexTeamByNumber(season.vrcId, savedTeamPreview.teamNumber);
     skillsStats = getWorldSkillsForTeam(season.vrcId, savedTeamPreview.teamID);
     teamTournaments = fetchTeamTournaments(savedTeamPreview.teamID, season.vrcId);
     teamAwards = getAwards(savedTeamPreview.teamID, season.vrcId);
   }
 
   Future<Team>? team;
-  Future<VDAStats?>? teamStats;
+  Future<VexDexStats?>? teamStats;
   Future<WorldSkillsStats?>? skillsStats;
   Future<List<TournamentPreview>>? teamTournaments;
   Future<List<Award>>? teamAwards;
@@ -114,7 +114,7 @@ class _MyTeamsState extends State<MyTeams> {
                             setState(() {
                               season = updated;
                               skillsStats = getWorldSkillsForTeam(season.vrcId, savedTeamPreview.teamID);
-                              teamStats = getTrueSkillDataForTeam(season.vrcId, savedTeamPreview.teamNumber);
+                              teamStats = getVexDexTeamByNumber(season.vrcId, savedTeamPreview.teamNumber);
                               teamTournaments = fetchTeamTournaments(savedTeamPreview.teamID, season.vrcId);
                               teamAwards = getAwards(savedTeamPreview.teamID, season.vrcId);
                             });
@@ -211,13 +211,13 @@ class _MyTeamsState extends State<MyTeams> {
                                 return const Text("No Data Available");
                               }
 
-                              VDAStats stats = snapshot.data as VDAStats;
+                              VexDexStats stats = snapshot.data as VexDexStats;
                               List<String> qualifications = [];
                               String qualificationString = "";
-                              if (stats.regionalQual == 1) {
+                              if (stats.regionalQual) {
                                 qualifications.add("RC");
                               }
-                              if (stats.worldsQual == 1) {
+                              if (stats.worldsQual) {
                                 qualifications.add("WC");
                               }
                               for (int i = 0; i < qualifications.length; i++) {
@@ -255,7 +255,7 @@ class _MyTeamsState extends State<MyTeams> {
                                       ),
                                       const Spacer(),
                                       Text(
-                                        "${stats.winPercent == null ? "" : stats.winPercent!.toStringAsFixed(1)}%",
+                                        "${stats.winPercent.toStringAsFixed(1)}%",
                                         style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                                       ),
                                     ],
@@ -439,15 +439,7 @@ class _MyTeamsState extends State<MyTeams> {
                               return const Text("TrueSkill Data Unavailable");
                             }
 
-                            VDAStats stats = snapshot.data as VDAStats;
-                            if (stats.trueSkill == null) {
-                              stats.trueSkillGlobalRank = 0;
-                              stats.trueSkill = 0;
-                              stats.trueSkillRegionRank = 0;
-                              stats.opr = 0;
-                              stats.dpr = 0;
-                              stats.ccwm = 0;
-                            }
+                            VexDexStats stats = snapshot.data as VexDexStats;
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -484,7 +476,7 @@ class _MyTeamsState extends State<MyTeams> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          stats.trueSkillRegionRank.toString(),
+                                          stats.trueSkillRegionRank?.toString() ?? "N/A",
                                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                         ),
                                         const Text("Region Rank", style: TextStyle(fontSize: 16))
@@ -504,7 +496,7 @@ class _MyTeamsState extends State<MyTeams> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          stats.opr.toString(),
+                                          stats.oprAvg.toString(),
                                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                         ),
                                         const Text("OPR", style: TextStyle(fontSize: 16))
@@ -517,7 +509,7 @@ class _MyTeamsState extends State<MyTeams> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          stats.dpr.toString(),
+                                          stats.dprAvg.toString(),
                                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                         ),
                                         const Text("DPR", style: TextStyle(fontSize: 16))
@@ -530,7 +522,7 @@ class _MyTeamsState extends State<MyTeams> {
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          stats.ccwm.toString(),
+                                          stats.ccwmAvg.toString(),
                                           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                         ),
                                         const Text("CCWM", style: TextStyle(fontSize: 16))
@@ -588,13 +580,7 @@ class _MyTeamsState extends State<MyTeams> {
                                 return const Text("Total Stats Unavailable");
                               }
 
-                              VDAStats stats = snapshot.data as VDAStats;
-                              if (stats.wins == null) {
-                                stats.wins = 0;
-                                stats.losses = 0;
-                                stats.ties = 0;
-                                stats.matches = 0;
-                              }
+                              VexDexStats stats = snapshot.data as VexDexStats;
                               return Row(
                                 children: [
                                   Column(
@@ -623,7 +609,7 @@ class _MyTeamsState extends State<MyTeams> {
                                     crossAxisAlignment: CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        stats.ties.toString(),
+                                        stats.draws.toString(),
                                         style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                       ),
                                       const Text("Ties", style: TextStyle(fontSize: 16))

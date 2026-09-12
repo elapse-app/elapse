@@ -9,7 +9,7 @@ import 'package:collection/collection.dart';
 
 import '../../../../classes/Filters/gradeLevel.dart';
 import '../../../../classes/Team/teamPreview.dart';
-import '../../../../classes/Team/vdaStats.dart';
+import '../../../../classes/Team/vexDexStats.dart';
 import '../../../../classes/Team/world_skills.dart';
 import '../../../../classes/Tournament/tournament.dart';
 import '../../../../main.dart';
@@ -42,8 +42,8 @@ class _AllTeamsState extends State<AllTeams> {
 
   Future<List<WorldSkillsStats>>? skillsStats;
   List<WorldSkillsStats>? loadedSkills;
-  Future<List<VDAStats>>? vdaStats;
-  List<VDAStats>? loadedVDA;
+  Future<Map<String, VexDexStats>>? vdaStats;
+  Map<String, VexDexStats>? loadedVDA;
 
   WorldRankingsFilter filter = WorldRankingsFilter();
 
@@ -67,7 +67,10 @@ class _AllTeamsState extends State<AllTeams> {
       }
       return data;
     });
-    vdaStats = getTrueSkillData(tournament.seasonID).then((data) {
+    vdaStats = getVexDexTeamsByNumber(
+      tournament.seasonID,
+      tournament.teams.map((t) => t.teamNumber ?? "").where((n) => n.isNotEmpty).toList(),
+    ).then((data) {
       if (mounted) {
         setState(() {
           loadedVDA = data;
@@ -151,26 +154,26 @@ class _AllTeamsState extends State<AllTeams> {
         break;
       case 2:
         teams.sort((a, b) {
-          return (loadedVDA!.singleWhereOrNull((e) => e.id == b.id)?.opr ?? -1e5)
-              .compareTo(loadedVDA!.singleWhereOrNull((e) => e.id == a.id)?.opr ?? -1e5);
+          return (loadedVDA![b.teamNumber]?.oprAvg ?? -1e5)
+              .compareTo(loadedVDA![a.teamNumber]?.oprAvg ?? -1e5);
         });
         break;
       case 3:
         teams.sort((a, b) {
-          return (loadedVDA!.singleWhereOrNull((e) => e.id == a.id)?.dpr ?? 1e5)
-              .compareTo(loadedVDA!.singleWhereOrNull((e) => e.id == b.id)?.dpr ?? 1e5);
+          return (loadedVDA![a.teamNumber]?.dprAvg ?? 1e5)
+              .compareTo(loadedVDA![b.teamNumber]?.dprAvg ?? 1e5);
         });
         break;
       case 4:
         teams.sort((a, b) {
-          return (loadedVDA!.singleWhereOrNull((e) => e.id == b.id)?.ccwm ?? -1e5)
-              .compareTo(loadedVDA!.singleWhereOrNull((e) => e.id == a.id)?.ccwm ?? -1e5);
+          return (loadedVDA![b.teamNumber]?.ccwmAvg ?? -1e5)
+              .compareTo(loadedVDA![a.teamNumber]?.ccwmAvg ?? -1e5);
         });
         break;
       case 5:
         teams.sort((a, b) {
-          return (loadedVDA!.singleWhereOrNull((e) => e.id == b.id)?.winPercent ?? -1e5)
-              .compareTo(loadedVDA!.singleWhereOrNull((e) => e.id == a.id)?.winPercent ?? -1e5);
+          return (loadedVDA![b.teamNumber]?.winPercent ?? -1e5)
+              .compareTo(loadedVDA![a.teamNumber]?.winPercent ?? -1e5);
         });
         break;
       case 6:
@@ -181,8 +184,8 @@ class _AllTeamsState extends State<AllTeams> {
         break;
       case 7:
         teams.sort((a, b) {
-          return (loadedVDA!.singleWhereOrNull((e) => e.id == b.id)?.trueSkill ?? 0)
-              .compareTo(loadedVDA!.singleWhereOrNull((e) => e.id == a.id)?.trueSkill ?? 0);
+          return (loadedVDA![b.teamNumber]?.trueSkill ?? 0)
+              .compareTo(loadedVDA![a.teamNumber]?.trueSkill ?? 0);
         });
         break;
     }
@@ -319,7 +322,7 @@ class _AllTeamsState extends State<AllTeams> {
                           ),
                           onPressed: () async {
                             List<String> regions = loadedSkills?.map((e) => e.eventRegion!.name).toList() ?? [];
-                            regions.addAll(loadedVDA?.map((e) => e.eventRegion!) ?? []);
+                            regions.addAll(loadedVDA?.values.map((e) => e.region ?? "") ?? []);
                             regions = regions.toSet().toList();
                             regions.sort();
 
@@ -345,22 +348,22 @@ class _AllTeamsState extends State<AllTeams> {
                       subInfo = '${teams[index].location?.city ?? ""}${teams[index].location?.city != null ? "," : ""} ${teams[index].location?.region ?? ""}';
                       break;
                     case 2:
-                      subInfo = "OPR ${loadedVDA!.singleWhereOrNull((e) => e.id == teams[index].id)?.opr ?? "—"}";
+                      subInfo = "OPR ${loadedVDA![teams[index].teamNumber]?.oprAvg ?? "—"}";
                       break;
                     case 3:
-                      subInfo = "DPR ${loadedVDA!.singleWhereOrNull((e) => e.id == teams[index].id)?.dpr ?? "—"}";
+                      subInfo = "DPR ${loadedVDA![teams[index].teamNumber]?.dprAvg ?? "—"}";
                       break;
                     case 4:
-                      subInfo = "CCWM ${loadedVDA!.singleWhereOrNull((e) => e.id == teams[index].id)?.ccwm ?? "—"}";
+                      subInfo = "CCWM ${loadedVDA![teams[index].teamNumber]?.ccwmAvg ?? "—"}";
                       break;
                     case 5:
-                      subInfo = "${loadedVDA!.singleWhereOrNull((e) => e.id == teams[index].id)?.winPercent ?? "—"}%";
+                      subInfo = "${loadedVDA![teams[index].teamNumber]?.winPercent ?? "—"}%";
                       break;
                     case 6:
                       subInfo = "${loadedSkills!.singleWhereOrNull((e) => e.teamId == teams[index].id)?.score ?? "—"} pts";
                       break;
                     case 7:
-                      subInfo = loadedVDA!.singleWhereOrNull((e) => e.id == teams[index].id)?.trueSkill.toString() ?? "—";
+                      subInfo = loadedVDA![teams[index].teamNumber]?.trueSkill.toString() ?? "—";
                       break;
                   }
 

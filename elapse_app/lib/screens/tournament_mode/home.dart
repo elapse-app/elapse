@@ -477,7 +477,7 @@ class _TMHomePageState extends State<TMHomePage> {
                                                             EdgeInsets.only(
                                                                 top: 5),
                                                         child: Text(
-                                                          "One of our data sources, vrc-data-analysis, isn't functioning properly right now. Some features may be temporarily unavailable.",
+                                                          "One of our data sources isn't functioning properly right now. Some features may be temporarily unavailable.",
                                                           style: TextStyle(
                                                               fontSize: 15),
                                                         ),

@@ -62,5 +62,9 @@ String getToken() {
   int randomIndex = Random().nextInt(tokens.length);
   return tokens[randomIndex];
 }
+
+String getVexDexToken() {
+  return "Bearer ";
+}
 ```  
-In addition, Elapse pulls data from [https://vrc-data-analysis.com/](https://vrc-data-analysis.com/), which provides TrueSkill information, some skills data, and more.
+In addition, Elapse pulls TrueSkill, OPR/DPR/CCWM, and skills-ranking data from [VexDex](https://github.com/elapse-app/VexDex), our own service hosted at `https://vexdex.fly.dev`. Add the `getVexDexToken()` function above to your `token.dart`, returning a bearer token minted via VexDex's `manage_tokens.py create` CLI against its database.

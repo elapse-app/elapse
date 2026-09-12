@@ -5,7 +5,7 @@ import 'package:elapse_app/screens/tournament/pages/rankings/tournament_stats_pa
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../classes/Team/vdaStats.dart';
+import '../../../../classes/Team/vexDexStats.dart';
 import '../../../../classes/Team/world_skills.dart';
 import '../../../../classes/Tournament/tskills.dart';
 
@@ -33,7 +33,7 @@ class RankingsWidget extends StatelessWidget {
   final String sort;
   final TournamentSkills? skills;
   final WorldSkillsStats? worldSkills;
-  final VDAStats? vda;
+  final VexDexStats? vda;
 
   @override
   Widget build(BuildContext context) {

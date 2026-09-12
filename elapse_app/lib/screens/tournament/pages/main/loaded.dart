@@ -28,6 +28,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../classes/Filters/gradeLevel.dart';
 import '../../../../classes/Filters/season.dart';
+import '../../../../classes/Team/vexDexStats.dart';
 import '../../../../classes/Team/world_skills.dart';
 
 class TournamentLoadedScreen extends StatefulWidget {
@@ -52,7 +53,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   late int selectedIndex;
   int sortIndex = 0;
   List<String> titles = ["Schedule", "Rankings", "Skills", "Info"];
-  List<String> rankingSorts = ["Rank", "AP", "SP", "AWP", "OPR", "DPR", "CCWM", "Skills", "World Skills"];
+  List<String> rankingSorts = ["Rank", "AP", "SP", "AWP", "OPR", "DPR", "CCWM", "Skills", "World Skills", "TrueSkill"];
   List<String> skillsSorts = ["Rank", "Driver", "Auton", "Driver Attempts", "Auton Attempts"];
   TournamentRankingsFilter filter = TournamentRankingsFilter();
 
@@ -83,6 +84,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   List<Widget> widgets = [SliverToBoxAdapter(), SliverToBoxAdapter()];
 
   late Future<List<WorldSkillsStats>> worldSkillsStats;
+  List<VexDexStats>? loadedVexDex;
 
   void savedPress() {
     setState(() {
@@ -191,6 +193,16 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
     savedQuery = "";
 
     worldSkillsStats = getWorldSkillsRankings(tournament.seasonID, getGradeLevel(prefs.getString("defaultGrade")));
+    getVexDexTeamsByNumber(
+      tournament.seasonID,
+      tournament.teams.map((t) => t.teamNumber ?? "").where((n) => n.isNotEmpty).toList(),
+    ).then((data) {
+      if (mounted) {
+        setState(() {
+          loadedVexDex = data.values.toList();
+        });
+      }
+    });
 
     // Process games once on init, not every build
     _processGames();
@@ -369,7 +381,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             skills: tournament.tournamentSkills!,
             worldSkills:
                 jsonDecode(worldSkillsData).map<WorldSkillsStats>((e) => WorldSkillsStats.fromJson(e)).toList(),
-            vda: null,
+            vda: loadedVexDex,
           );
         }
         return FutureBuilder(
@@ -397,7 +409,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                   filter: filter,
                   skills: tournament.tournamentSkills!,
                   worldSkills: snapshot.data as List<WorldSkillsStats>,
-                  vda: null,
+                  vda: loadedVexDex,
                 );
             }
           },
@@ -458,6 +470,16 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                   tournament.seasonID,
                   getGradeLevel(prefs.getString("defaultGrade")),
                 );
+                getVexDexTeamsByNumber(
+                  tournament.seasonID,
+                  tournament.teams.map((t) => t.teamNumber ?? "").where((n) => n.isNotEmpty).toList(),
+                ).then((data) {
+                  if (mounted) {
+                    setState(() {
+                      loadedVexDex = data.values.toList();
+                    });
+                  }
+                });
               }
             } catch (e) {
               if (kDebugMode) debugPrint('Refresh failed: $e');

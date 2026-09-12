@@ -10,7 +10,7 @@ import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 
-import '../../../../classes/Team/vdaStats.dart';
+import '../../../../classes/Team/vexDexStats.dart';
 import '../../../../classes/Team/world_skills.dart';
 import '../../../../classes/Tournament/tskills.dart';
 
@@ -34,7 +34,7 @@ class RankingsPage extends StatelessWidget {
   final TournamentRankingsFilter filter;
   final Map<int, TournamentSkills> skills;
   final List<WorldSkillsStats> worldSkills;
-  final List<VDAStats>? vda;
+  final List<VexDexStats>? vda;
 
   @override
   Widget build(BuildContext context) {
@@ -117,8 +117,8 @@ class RankingsPage extends StatelessWidget {
     } else if (sort == "TrueSkill") {
       if (vda != null) {
         divisionTeams.sort((a, b) {
-          final vdaB = vda!.singleWhereOrNull((e) => e.id == b.id);
-          final vdaA = vda!.singleWhereOrNull((e) => e.id == a.id);
+          final vdaB = vda!.singleWhereOrNull((e) => e.teamNum == b.teamNumber);
+          final vdaA = vda!.singleWhereOrNull((e) => e.teamNum == a.teamNumber);
           return (vdaB?.trueSkill ?? 0).compareTo(vdaA?.trueSkill ?? 0);
         });
       } else {
@@ -160,7 +160,7 @@ class RankingsPage extends StatelessWidget {
                 allianceColor: Theme.of(context).colorScheme.onSurface,
                 skills: skills[team.id],
                 worldSkills: worldSkills.firstWhereOrNull((e) => e.teamId == team.id),
-                vda: vda?.firstWhereOrNull((e) => e.id == team.id),
+                vda: vda?.firstWhereOrNull((e) => e.teamNum == team.teamNumber),
               ),
               Divider(
                 color: Theme.of(context).colorScheme.surfaceDim,

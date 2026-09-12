@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
-import 'package:elapse_app/classes/Team/vdaStats.dart';
+import 'package:elapse_app/classes/Team/vexDexStats.dart';
 import 'package:elapse_app/extras/token.dart';
 import 'package:http/http.dart' as http;
 
@@ -59,11 +59,11 @@ TeamPreview loadTeamPreview(teamPreview) {
 Future<List<TeamPreview>> fetchTeamPreview(String searchQuery) async {
   List<TeamPreview> teams = [];
   Completer<void> robotEventsCompleter = Completer<void>();
-  Completer<void> vdaStatsCompleter = Completer<void>();
+  Completer<void> vexDexCompleter = Completer<void>();
 
   http.get(
     Uri.parse(
-        'https://www.robotevents.com/api/v2/teams?number%5B%5D=$searchQuery&program%5B%5D=1&program%5B%5D=4&myTeams=false'),
+        'https://events.vex.com/api/v2/teams?number%5B%5D=$searchQuery&program%5B%5D=1&program%5B%5D=4&myTeams=false'),
     headers: {
       HttpHeaders.authorizationHeader: getToken(),
     },
@@ -86,8 +86,8 @@ Future<List<TeamPreview>> fetchTeamPreview(String searchQuery) async {
             gradeLevel: gradeLevels[responseData[0]["grade"]],
         ));
 
-        if (!vdaStatsCompleter.isCompleted) {
-          vdaStatsCompleter.complete();
+        if (!vexDexCompleter.isCompleted) {
+          vexDexCompleter.complete();
         }
       }
       if (!robotEventsCompleter.isCompleted) {
@@ -98,44 +98,29 @@ Future<List<TeamPreview>> fetchTeamPreview(String searchQuery) async {
     }
   });
 
-  getTrueSkillData(seasons[0].vrcId).then((value) {
-    if (!vdaStatsCompleter.isCompleted) {
-      List<TeamPreview> vdaTeams = value.where((element) {
-        if (searchQuery.isEmpty) {
-          return false;
+  // VexDex has no substring/name search, only exact-number lookup — this
+  // fallback only catches "typed an exact team number RobotEvents missed",
+  // not the old partial-name-match search VDA used to support.
+  if (searchQuery.isNotEmpty) {
+    getVexDexTeamByNumber(seasons[0].vrcId, searchQuery.toUpperCase()).then((team) {
+      if (!vexDexCompleter.isCompleted && team != null) {
+        teams.add(TeamPreview(
+          teamNumber: team.teamNum,
+          teamID: team.teamId,
+          location: team.region != null ? Location(region: team.region) : null,
+          teamName: team.teamName,
+          gradeLevel: team.gradeLevel,
+        ));
+
+        if (!robotEventsCompleter.isCompleted) {
+          robotEventsCompleter.complete();
         }
-        if (element.teamName != null) {
-          return element.teamNum
-                  .toLowerCase()
-                  .contains(searchQuery.toLowerCase()) ||
-              element.teamName!
-                  .toLowerCase()
-                  .contains(searchQuery.toLowerCase());
-        } else {
-          return element.teamNum.contains(searchQuery.toLowerCase());
-        }
-      }).map((e) {
-        return TeamPreview(
-            teamNumber: e.teamNum,
-            teamID: e.id,
-            location: e.location,
-            teamName: e.teamName,
-            gradeLevel: e.gradeLevel,
-        );
-      }).toList();
-
-      teams.addAll(vdaTeams);
-      if (!robotEventsCompleter.isCompleted && vdaTeams.isNotEmpty) {
-        robotEventsCompleter.complete();
+        vexDexCompleter.complete();
       }
+    });
+  }
 
-      if (!vdaStatsCompleter.isCompleted && vdaTeams.isNotEmpty) {
-        vdaStatsCompleter.complete();
-      }
-    }
-  });
-
-  await Future.any([robotEventsCompleter.future, vdaStatsCompleter.future]);
+  await Future.any([robotEventsCompleter.future, vexDexCompleter.future]);
   // remove duplicates from teams
   // Remove duplicates based on teamNumber
   final uniqueTeams = teams.toSet();

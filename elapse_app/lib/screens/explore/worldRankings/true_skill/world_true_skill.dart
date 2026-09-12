@@ -2,7 +2,7 @@ import 'package:elapse_app/screens/explore/worldRankings/true_skill/world_true_s
 import 'package:flutter/material.dart';
 
 import '../../../../classes/Team/teamPreview.dart';
-import '../../../../classes/Team/vdaStats.dart';
+import '../../../../classes/Team/vexDexStats.dart';
 import '../../../../classes/Tournament/tournament.dart';
 import '../../../widgets/big_error_message.dart';
 import '../world_rankings_filter.dart';
@@ -18,7 +18,7 @@ class WorldTrueSkillPage extends StatelessWidget {
     required this.tournament,
   });
 
-  final List<VDAStats> stats;
+  final List<VexDexStats> stats;
   final int sort;
   final WorldRankingsFilter filter;
   final List<TeamPreview> savedTeams;
@@ -27,43 +27,43 @@ class WorldTrueSkillPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    List<VDAStats> teams = stats.where((e) => e.trueSkill != null).toList();
+    List<VexDexStats> teams = stats.where((e) => e.matches > 0).toList();
 
     if (filter.regions!.isNotEmpty) {
-      teams = teams.where((e) => filter.regions!.any((e2) => e2 == (e.eventRegion ?? ""))).toList();
+      teams = teams.where((e) => filter.regions!.any((e2) => e2 == (e.region ?? ""))).toList();
     }
 
     if (filter.saved) {
-      teams = teams.where((e) => savedTeams.any((e2) => e2.teamID == e.id)).toList();
+      teams = teams.where((e) => savedTeams.any((e2) => e2.teamID == e.teamId)).toList();
     }
 
     if (filter.onPicklist && picklistTeams.isNotEmpty) {
-      teams = teams.where((e) => picklistTeams.any((e2) => e2.teamID == e.id)).toList();
+      teams = teams.where((e) => picklistTeams.any((e2) => e2.teamID == e.teamId)).toList();
     }
 
     if (filter.atTournament && tournament != null) {
-      teams = teams.where((e) => tournament!.teams.any((e2) => e2.id == e.id)).toList();
+      teams = teams.where((e) => tournament!.teams.any((e2) => e2.id == e.teamId)).toList();
     }
 
     if (sort == 0) {
       teams.sort((a, b) {
-        return a.trueSkillGlobalRank!.compareTo(b.trueSkillGlobalRank!);
+        return a.trueSkillGlobalRank.compareTo(b.trueSkillGlobalRank);
       });
     } else if (sort == 1) {
       teams.sort((a, b) {
-        return b.opr!.compareTo(a.opr!);
+        return b.oprAvg.compareTo(a.oprAvg);
       });
     } else if (sort == 2) {
       teams.sort((a, b) {
-        return a.dpr!.compareTo(b.dpr!);
+        return a.dprAvg.compareTo(b.dprAvg);
       });
     } else if (sort == 3) {
       teams.sort((a, b) {
-        return b.ccwm!.compareTo(a.ccwm!);
+        return b.ccwmAvg.compareTo(a.ccwmAvg);
       });
     } else if (sort == 4) {
       teams.sort((a, b) {
-        return b.winPercent!.compareTo(a.winPercent!);
+        return b.winPercent.compareTo(a.winPercent);
       });
     }
 

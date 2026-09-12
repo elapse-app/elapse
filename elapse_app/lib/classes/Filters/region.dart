@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../screens/widgets/app_bar.dart';
 import '../../screens/widgets/custom_tab_bar.dart';
-import '../Team/vdaStats.dart';
+import '../Team/vexDexStats.dart';
 import '../Team/world_skills.dart';
 
 class Region {
@@ -27,7 +27,7 @@ class RegionFilterPage extends StatefulWidget {
 
   List<String> filter;
   Future<List<WorldSkillsStats>> skills;
-  Future<List<VDAStats>> vda;
+  Future<List<VexDexStats>> vda;
 
   @override
   State<RegionFilterPage> createState() => _RegionFilterPageState();
@@ -45,8 +45,8 @@ class _RegionFilterPageState extends State<RegionFilterPage> {
             List<String> regions = (snapshot.data?[0] as List<WorldSkillsStats>)
                 .map((e) => e.eventRegion!.name)
                 .toList();
-            regions.addAll((snapshot.data?[1] as List<VDAStats>)
-                .map((e) => e.eventRegion!));
+            regions.addAll((snapshot.data?[1] as List<VexDexStats>)
+                .map((e) => e.region ?? ""));
             regions = regions.toSet().toList();
             regions.sort();
             return LoadedRegionFilterPage(

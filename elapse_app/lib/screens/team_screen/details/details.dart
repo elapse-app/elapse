@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
-import 'package:elapse_app/classes/Team/vdaStats.dart';
+import 'package:elapse_app/classes/Team/vexDexStats.dart';
 import 'package:elapse_app/classes/Team/world_skills.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
@@ -27,7 +27,7 @@ List<Widget> Details(
     void Function() setState,
     Team? team,
     Future? teamFuture,
-    Future<VDAStats?>? teamStats,
+    Future<VexDexStats?>? teamStats,
     Future? teamAwards,
     Future? teamTournaments,
     Future? tournament,
@@ -113,13 +113,13 @@ List<Widget> Details(
                         return const Text("No Data Available");
                       }
 
-                      VDAStats stats = snapshot.data as VDAStats;
+                      VexDexStats stats = snapshot.data as VexDexStats;
                       List<String> qualifications = [];
                       String qualificationString = "";
-                      if (stats.regionalQual == 1) {
+                      if (stats.regionalQual) {
                         qualifications.add("RC");
                       }
-                      if (stats.worldsQual == 1) {
+                      if (stats.worldsQual) {
                         qualifications.add("WC");
                       }
                       for (int i = 0; i < qualifications.length; i++) {
@@ -157,7 +157,7 @@ List<Widget> Details(
                               ),
                               Spacer(),
                               Text(
-                                "${stats.winPercent == null ? "" : stats.winPercent!.toStringAsFixed(1)}%",
+                                "${stats.winPercent.toStringAsFixed(1)}%",
                                 style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                               ),
                             ],
@@ -432,15 +432,7 @@ List<Widget> Details(
                       return const Text("TrueSkill Data Unavailable");
                     }
 
-                    VDAStats stats = snapshot.data as VDAStats;
-                    if (stats.trueSkill == null) {
-                      stats.trueSkillGlobalRank = 0;
-                      stats.trueSkill = 0;
-                      stats.trueSkillRegionRank = 0;
-                      stats.opr = 0;
-                      stats.dpr = 0;
-                      stats.ccwm = 0;
-                    }
+                    VexDexStats stats = snapshot.data as VexDexStats;
                     return Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -477,7 +469,7 @@ List<Widget> Details(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  stats.trueSkillRegionRank.toString(),
+                                  stats.trueSkillRegionRank?.toString() ?? "N/A",
                                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                 ),
                                 const Text("Region Rank", style: TextStyle(fontSize: 16))
@@ -497,7 +489,7 @@ List<Widget> Details(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  stats.opr.toString(),
+                                  stats.oprAvg.toString(),
                                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                 ),
                                 const Text("OPR", style: TextStyle(fontSize: 16))
@@ -510,7 +502,7 @@ List<Widget> Details(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  stats.dpr.toString(),
+                                  stats.dprAvg.toString(),
                                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                 ),
                                 const Text("DPR", style: TextStyle(fontSize: 16))
@@ -523,7 +515,7 @@ List<Widget> Details(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  stats.ccwm.toString(),
+                                  stats.ccwmAvg.toString(),
                                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                 ),
                                 const Text("CCWM", style: TextStyle(fontSize: 16))
@@ -581,13 +573,7 @@ List<Widget> Details(
                         return const Text("Total Stats Unavailable");
                       }
 
-                      VDAStats stats = snapshot.data as VDAStats;
-                      if (stats.wins == null) {
-                        stats.wins = 0;
-                        stats.losses = 0;
-                        stats.ties = 0;
-                        stats.matches = 0;
-                      }
+                      VexDexStats stats = snapshot.data as VexDexStats;
                       return Row(
                         children: [
                           Column(
@@ -616,7 +602,7 @@ List<Widget> Details(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                stats.ties.toString(),
+                                stats.draws.toString(),
                                 style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                               ),
                               const Text("Ties", style: TextStyle(fontSize: 16))

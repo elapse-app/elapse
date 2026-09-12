@@ -181,7 +181,7 @@ Tournament loadTournament(json) {
 
 Future<Tournament> getTournamentDetails(int tournamentID) async {
   final response = await http.get(
-    Uri.parse("https://www.robotevents.com/api/v2/events/$tournamentID"),
+    Uri.parse("https://events.vex.com/api/v2/events/$tournamentID"),
     headers: {
       HttpHeaders.authorizationHeader: getToken(),
     },
@@ -337,7 +337,7 @@ Stream<Tournament> streamTournamentDetails(int tournamentID) {
       // Timeout only applies to this initial connection — once the overview
       // arrives the UI is usable and individual segments handle their own errors.
       final response = await http.get(
-        Uri.parse("https://www.robotevents.com/api/v2/events/$tournamentID"),
+        Uri.parse("https://events.vex.com/api/v2/events/$tournamentID"),
         headers: {
           HttpHeaders.authorizationHeader: getToken(),
         },
