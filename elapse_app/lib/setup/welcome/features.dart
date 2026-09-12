@@ -219,7 +219,7 @@ class _FeaturesState extends State<Features> {
                       flex: 5,
                       child: DotsIndicator(
                         dotsCount: featurePages.length,
-                        position: currIndex,
+                        position: currIndex.toDouble(),
                         mainAxisSize: MainAxisSize.min,
                         decorator: DotsDecorator(
                           color: Theme.of(context).colorScheme.surfaceDim, // Inactive color
