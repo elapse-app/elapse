@@ -1,13 +1,9 @@
 // import 'package:elapse_app/classes/Miscellaneous/location.dart';
 // import 'package:elapse_app/classes/Tournament/tstats.dart';
-import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Users/user.dart';
 
 import 'dart:convert';
-import 'package:elapse_app/extras/token.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:http/http.dart' as http;
-import 'dart:io';
 
 import '../../extras/database.dart';
 import '../../main.dart';
@@ -42,7 +38,8 @@ class TeamGroup {
       adminId: json["adminId"],
       joinCode: json["joinCode"],
       allowJoin: json["allowJoin"] == true,
-      members: json["members"].map<String, String>((key, val) => MapEntry(key.toString(), val.toString())),
+      members: json["members"].map<String, String>(
+          (key, val) => MapEntry(key.toString(), val.toString())),
     );
   }
 
@@ -70,10 +67,12 @@ Future<TeamGroup?> getUserTeamGroup(String userId) async {
   if (!FirebaseAuth.instance.currentUser!.emailVerified) return null;
 
   Database database = Database();
-  ElapseUser user = elapseUserDecode(jsonEncode(await database.getUserInfo(userId)));
+  ElapseUser user =
+      elapseUserDecode(jsonEncode(await database.getUserInfo(userId)));
   if (user.groupID.isEmpty) return null;
 
-  TeamGroup group = TeamGroup.fromJson((await database.getGroupInfo(user.groupID[0]))!);
+  TeamGroup group =
+      TeamGroup.fromJson((await database.getGroupInfo(user.groupID[0]))!);
   prefs.setString("teamGroup", jsonEncode(group.toJson()));
   return group;
 }

@@ -46,7 +46,9 @@ class Award {
       qualifications: qualifications,
       tournamentName: json["event"]["name"],
       teamWinners: teamWinners,
-      individualWinners: json["individualWinners"].isEmpty ? null : json["individualWinners"].cast<String>(),
+      individualWinners: json["individualWinners"].isEmpty
+          ? null
+          : json["individualWinners"].cast<String>(),
     );
   }
 
@@ -84,7 +86,7 @@ Award loadAward(award) {
 Future<List<Award>> getAwards(int teamID, int seasonID) async {
   final response = await http.get(
     Uri.parse(
-        "https://www.robotevents.com/api/v2/teams/$teamID/awards?season%5B%5D=$seasonID&per_page=250"),
+        "https://events.vex.com/api/v2/teams/$teamID/awards?season%5B%5D=$seasonID&per_page=250"),
     headers: {
       HttpHeaders.authorizationHeader: getToken(),
     },
@@ -99,7 +101,7 @@ Future<List<Award>> getAwards(int teamID, int seasonID) async {
 
 Future<List<Award>> getTournamentAwards(int tournamentID) async {
   final response = await http.get(
-    Uri.parse("https://www.robotevents.com/api/v2/events/$tournamentID/awards"),
+    Uri.parse("https://events.vex.com/api/v2/events/$tournamentID/awards"),
     headers: {
       HttpHeaders.authorizationHeader: getToken(),
     },

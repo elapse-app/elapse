@@ -45,7 +45,7 @@ Division loadDivision(division) {
   }
 
   Map<String, dynamic>? stringedTeamStats = division["teamStats"];
-  Map<int, TeamStats>? teamStats = null;
+  Map<int, TeamStats>? teamStats;
 
   if (stringedTeamStats != null) {
     teamStats = stringedTeamStats.map((key, value) {

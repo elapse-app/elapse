@@ -1,11 +1,5 @@
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:flutter/services.dart';
 
 class FirebaseRemoteConfigService {
   FirebaseRemoteConfigService._()
@@ -21,7 +15,9 @@ class FirebaseRemoteConfigService {
 
   Future<void> _setConfigSettings() async => _remoteConfig.setConfigSettings(
         RemoteConfigSettings(
-          fetchTimeout: const Duration(minutes: 1),
+          // Remote Config only controls optional feature availability. A slow
+          // network should never delay the app becoming usable.
+          fetchTimeout: const Duration(seconds: 8),
           minimumFetchInterval: const Duration(hours: 4),
         ),
       );
@@ -43,14 +39,17 @@ class FirebaseRemoteConfigService {
   }
 
   Future<void> initialize() async {
-    await _setConfigSettings();
-    await _setDefaults();
-    await fetchAndActivate();
+    try {
+      await _setConfigSettings();
+      await _setDefaults();
+      await fetchAndActivate();
+    } catch (error) {
+      // The local defaults keep the existing UI functional while Firebase is
+      // temporarily unavailable (for example, on an airplane or weak network).
+      debugPrint('Remote Config unavailable: $error');
+    }
   }
 }
-
-final vdaStatus = FirebaseRemoteConfigService()
-    .getBool(FirebaseRemoteConfigKeys.vdaStatusKey);
 
 class FirebaseRemoteConfigKeys {
   static const String vdaStatusKey = 'isVDAWorking';

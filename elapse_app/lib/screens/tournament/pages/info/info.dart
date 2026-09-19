@@ -54,7 +54,7 @@ class InfoPage extends StatelessWidget {
                         foregroundColor: Theme.of(context).colorScheme.secondary,
                         padding: EdgeInsets.only(right: 10, bottom: 10)),
                     onPressed: () {
-                      launchUrl(Uri.https("www.robotevents.com",
+                      launchUrl(Uri.https("events.vex.com",
                           "/robot-competitions/vex-robotics-competition/${tournament.sku}.html"));
                     },
                     child: const Text("View on RobotEvents"),
@@ -162,7 +162,7 @@ class InfoPage extends StatelessWidget {
                                         padding: const EdgeInsets.only(right: 10, bottom: 10)),
                                     onPressed: () {
                                       launchUrl(Uri.parse(
-                                          "https://www.robotevents.com/robot-competitions/vex-robotics-competition/${tournament.sku}.html#webcast"));
+                                          "https://events.vex.com/robot-competitions/vex-robotics-competition/${tournament.sku}.html#webcast"));
                                     },
                                     icon: const Icon(Icons.live_tv),
                                     label: const Text(
@@ -247,7 +247,7 @@ class InfoPage extends StatelessWidget {
 
 Future<bool> hasLivestream(String sku) async {
   final response = await http
-      .get(Uri.parse("https://www.robotevents.com/robot-competitions/vex-robotics-competition/$sku.html#general-info"));
+      .get(Uri.parse("https://events.vex.com/robot-competitions/vex-robotics-competition/$sku.html#general-info"));
   print(response.body.contains("<h4>Webcast</h4>"));
   return response.body.contains("<h4>Webcast</h4>");
 }

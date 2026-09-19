@@ -4,9 +4,7 @@ import 'package:elapse_app/classes/Users/user.dart';
 import 'package:elapse_app/extras/database.dart';
 import 'package:elapse_app/main.dart';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import '../classes/Groups/teamGroup.dart';
@@ -21,7 +19,7 @@ Future<String?> signUp(String email, String password) async {
     );
     return "success";
   } on FirebaseAuthException catch (e) {
-    print(e.message);
+    debugPrint('Account creation failed: ${e.code}');
     return e.code;
   }
 }
@@ -34,10 +32,8 @@ Future<void> signIN(String email, String password) async {
 
   final User? user = credential.user;
   // Add to the Database
-  print('authSucc - signed in user with uuid: ${user?.uid}');
   Database database = Database();
   Map<String, dynamic>? userInfo = await database.getUserInfo(user!.uid);
-  print(userInfo);
   if (userInfo == null) {
     throw Exception("No user in database");
   }
@@ -51,7 +47,8 @@ Future<void> signIN(String email, String password) async {
     verified: userInfo["verified"],
   );
   if (userInfo["groupId"].isNotEmpty) {
-    Map<String, dynamic>? group = await database.getGroupInfo(userInfo["groupId"][0]);
+    Map<String, dynamic>? group =
+        await database.getGroupInfo(userInfo["groupId"][0]);
     final teamGroup = TeamGroup.fromJson(group!);
     currentUser.groupID.add(userInfo["groupId"][0]);
     teamGroup.groupId = userInfo["groupId"][0];
@@ -72,21 +69,34 @@ void clearPrefs() {
   prefs.setBool("isSetUp", false);
 }
 
-Future<void> checkAccountDeleted() async {
+Future<bool> checkAccountDeleted() async {
   try {
-    IdTokenResult? idToken = await FirebaseAuth.instance.currentUser?.getIdTokenResult(true);
+    IdTokenResult? idToken =
+        await FirebaseAuth.instance.currentUser?.getIdTokenResult(true);
 
     if (idToken == null || idToken.token == null) {
-      print("User was deleted");
+      debugPrint('The signed-in account is no longer available.');
       clearPrefs();
-      FirebaseAuth.instance.signOut();
+      await FirebaseAuth.instance.signOut();
+      return true;
     }
   } on FirebaseAuthException catch (e) {
-    if (e.code == "firebase_auth/network-request-failed") {}
-  } catch (e) {
-    print(e);
-    print("User was deleted");
-    clearPrefs();
-    FirebaseAuth.instance.signOut();
+    const invalidAccountCodes = {
+      'user-disabled',
+      'user-not-found',
+      'invalid-user-token',
+      'user-token-expired',
+    };
+    if (invalidAccountCodes.contains(e.code)) {
+      clearPrefs();
+      await FirebaseAuth.instance.signOut();
+      return true;
+    }
+    // Connectivity and service errors must not sign a user out or discard
+    // their locally cached app state.
+    debugPrint('Account verification deferred: ${e.code}');
+  } catch (error) {
+    debugPrint('Account verification deferred: $error');
   }
+  return false;
 }

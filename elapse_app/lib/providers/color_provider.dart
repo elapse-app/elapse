@@ -1,51 +1,65 @@
 import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:flutter/material.dart';
-import 'package:elapse_app/main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+enum AppThemePreference {
+  system,
+  light,
+  dark;
+
+  static AppThemePreference fromStorage(String? value) {
+    return AppThemePreference.values.firstWhere(
+      (preference) => preference.name == value,
+      orElse: () => AppThemePreference.system,
+    );
+  }
+}
 
 class ColorProvider extends ChangeNotifier {
-  ColorProvider() {
-    getScheme();
-  }
-  ColorScheme get colorScheme => _colorScheme;
-  ColorScheme _colorScheme = lightScheme;
-  ColorPallete alliancePallete = lightPallete;
+  ColorProvider(this._preferences)
+      : _preference = AppThemePreference.fromStorage(
+          _preferences.getString(_themeKey),
+        );
 
-  void setDark() {
-    _colorScheme = darkScheme;
-    alliancePallete = darkPallete;
-    prefs.setString("theme", "dark");
-    notifyListeners();
-  }
+  static const _themeKey = 'theme';
 
-  void setLight() {
-    _colorScheme = lightScheme;
-    alliancePallete = lightPallete;
-    prefs.setString("theme", "light");
-    notifyListeners();
-  }
+  final SharedPreferences _preferences;
+  AppThemePreference _preference;
 
-  void setSystem() {
-    prefs.setString("theme", "system");
-    notifyListeners();
-  }
+  AppThemePreference get preference => _preference;
 
-  void getScheme() {
-    String? theme = prefs.getString("theme");
-    switch (theme) {
-      case "dark":
-        _colorScheme = darkScheme;
-        alliancePallete = darkPallete;
-        break;
-      case "light":
-        _colorScheme = lightScheme;
-        alliancePallete = lightPallete;
-        break;
+  String get storageValue => _preference.name;
 
-      default:
-        _colorScheme = lightScheme;
-        alliancePallete = lightPallete;
+  ThemeMode get themeMode => switch (_preference) {
+        AppThemePreference.system => ThemeMode.system,
+        AppThemePreference.light => ThemeMode.light,
+        AppThemePreference.dark => ThemeMode.dark,
+      };
+
+  // Kept for older consumers while they migrate to Theme.of(context).
+  ColorScheme get colorScheme =>
+      _preference == AppThemePreference.dark ? darkScheme : lightScheme;
+
+  ColorPallete get alliancePallete =>
+      _preference == AppThemePreference.dark ? darkPallete : lightPallete;
+
+  Future<void> setDark() => _setPreference(AppThemePreference.dark);
+
+  Future<void> setLight() => _setPreference(AppThemePreference.light);
+
+  Future<void> setSystem() => _setPreference(AppThemePreference.system);
+
+  Future<void> _setPreference(AppThemePreference preference) async {
+    if (_preference == preference) {
+      if (_preferences.getString(_themeKey) != preference.name) {
+        await _preferences.setString(_themeKey, preference.name);
+      }
+      return;
     }
+
+    _preference = preference;
     notifyListeners();
+    await _preferences.setString(_themeKey, preference.name);
   }
 }

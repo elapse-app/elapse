@@ -31,8 +31,6 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-String theme = "system";
-
 class _SettingsScreenState extends State<SettingsScreen> {
   _SettingsScreenState();
 
@@ -630,7 +628,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
 
                     // ---- THE FOLLOWING IS MATCH NOTIFICATIONS CODE. UNCOMMENT TO ENABLE MATCH NOTIFICATIONS UI ---- //
-                    
+
                     Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
@@ -658,7 +656,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Divider(
                       color: Theme.of(context).colorScheme.surfaceDim,
                     ),
-                    
+
                     const SizedBox(height: 32),
                     const SizedBox(
                       width: double.infinity,
@@ -678,7 +676,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             DropdownButtonHideUnderline(
                               child: DropdownButton(
                                 elevation: 2,
-                                value: theme,
+                                value: colorProvider.storageValue,
                                 items: const [
                                   DropdownMenuItem(
                                     value: "system",
@@ -720,10 +718,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                       colorProvider.setSystem();
                                       break;
                                   }
-
-                                  setState(() {
-                                    theme = value!;
-                                  });
                                 },
                                 style: TextStyle(
                                     color:
@@ -799,7 +793,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 style: TextStyle(
                                     fontSize: 18, fontWeight: FontWeight.w400)),
                             Text(
-                                "${appInfo.version} (Build ${appInfo.buildNumber})",
+                                appInfo == null
+                                    ? "Unavailable"
+                                    : "${appInfo!.version} (Build ${appInfo!.buildNumber})",
                                 style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.w400,
@@ -955,8 +951,8 @@ Widget buildTeamDropdown(
                                       prefs.remove(
                                           "tournament-${tournament!.id}");
                                       prefs.remove("TMSavedTournament");
-                                      myAppKey.currentState!.reloadApp();
                                       Navigator.pop(context);
+                                      myAppKey.currentState?.reloadApp();
                                     })
                               ],
                               actionsPadding:
@@ -1003,7 +999,7 @@ Widget buildTeamDropdown(
 Future<void> askForNotifPerms() async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-  NotificationSettings settings = await messaging.requestPermission(
+  await messaging.requestPermission(
     alert: true,
     announcement: false,
     badge: true,

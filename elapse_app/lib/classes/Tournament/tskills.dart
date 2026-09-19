@@ -44,27 +44,30 @@ Future<Map<int, TournamentSkills>> getSkillsRankings(
   Map<int, TournamentSkills> rankings = {};
 
   List<Team> teams = [];
-  var skills;
+  int skillsLastPage = 1;
   List parsedSkills = [];
 
   List<Future<void>> requestFutures = [];
   requestFutures.add(futureTeams.then((t) {
     teams = t;
   }));
-  requestFutures.add(http.get(
-    Uri.parse(
-        "https://www.robotevents.com/api/v2/events/$eventId/skills?per_page=250"),
-    headers: {
-      HttpHeaders.authorizationHeader: getToken(),
-    },
-  ).then((s) {
-    skills = s;
-
-    if (s.statusCode != 200) {
-      throw Exception("Failed to get rankings");
-    }
-    parsedSkills = jsonDecode(s.body)["data"] as List;
-  }));
+  requestFutures.add(http
+      .get(
+        Uri.parse(
+            "https://events.vex.com/api/v2/events/$eventId/skills?per_page=250"),
+        headers: {
+          HttpHeaders.authorizationHeader: getToken(),
+        },
+      )
+      .timeout(const Duration(seconds: 12))
+      .then((s) {
+        if (s.statusCode != 200) {
+          throw Exception("Failed to get rankings");
+        }
+        final decoded = jsonDecode(s.body);
+        parsedSkills = decoded["data"] as List;
+        skillsLastPage = (decoded["meta"]["last_page"] as num).toInt();
+      }));
   await Future.wait(requestFutures);
 
   rankings.addAll(Map<int, TournamentSkills>.fromEntries(
@@ -87,11 +90,10 @@ Future<Map<int, TournamentSkills>> getSkillsRankings(
         rankings[teamId]!.autonScore + rankings[teamId]!.driverScore;
   }
   List<Future<void>> pgFutures = [];
-  int teamsLastPage = jsonDecode(skills.body)["meta"]["last_page"];
-  for (int pg = 2; pg <= teamsLastPage; pg++) {
+  for (int pg = 2; pg <= skillsLastPage; pg++) {
     Future<void> pgResponse = http.get(
         Uri.parse(
-            "https://www.robotevents.com/api/v2/events/$eventId/skills?page=$pg&per_page=250"),
+            "https://events.vex.com/api/v2/events/$eventId/skills?page=$pg&per_page=250"),
         headers: {
           HttpHeaders.authorizationHeader: getToken(),
         }).then((pgResponse) {
