@@ -1,0 +1,19 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "scoutsheets",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "teamID",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "tournamentID",
+          "order": "ASCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

@@ -8,7 +8,10 @@ import 'package:path/path.dart' as p;
 
 const int maxFileSize = 5 * 1024 * 1024; // 5 MB
 
-Future<String?> getPhoto(BuildContext context) async {
+Future<String?> getPhoto(
+  BuildContext context, {
+  required String teamGroupId,
+}) async {
   File? image;
   XFile? imageData;
   String? imageURL;
@@ -118,9 +121,26 @@ Future<String?> getPhoto(BuildContext context) async {
                                             );
                                           },
                                         );
-                                        imageURL = await uploadFile(imageData);
-                                        Navigator.pop(context);
-                                        Navigator.pop(context);
+                                        try {
+                                          imageURL = await uploadFile(
+                                            imageData,
+                                            teamGroupId: teamGroupId,
+                                          );
+                                          if (!context.mounted) return;
+                                          Navigator.pop(context);
+                                          Navigator.pop(context);
+                                        } on Object {
+                                          if (!context.mounted) return;
+                                          Navigator.pop(context);
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
+                                            const SnackBar(
+                                              content: Text(
+                                                'Photo upload failed. Try again.',
+                                              ),
+                                            ),
+                                          );
+                                        }
                                       },
                                       icon: Icon(Icons.upload_outlined),
                                       label: Text("Upload"),
@@ -193,16 +213,43 @@ void _showSizeError(BuildContext context) {
   );
 }
 
-Future<String?> uploadFile(XFile? pic) async {
-  final path =
-      'images/${FirebaseAuth.instance.currentUser?.uid}/scoutsheet/images/${pic!.name}';
+Future<String> uploadFile(
+  XFile? pic, {
+  required String teamGroupId,
+}) async {
+  final uid = FirebaseAuth.instance.currentUser?.uid;
+  if (pic == null || uid == null || teamGroupId.isEmpty) {
+    throw StateError('A signed-in team member is required to upload photos.');
+  }
+
+  final extension = p.extension(pic.name).toLowerCase();
+  final contentType = switch (extension) {
+    '.jpg' || '.jpeg' => 'image/jpeg',
+    '.png' => 'image/png',
+    '.heic' || '.heif' => 'image/heic',
+    '.webp' => 'image/webp',
+    _ => 'image/jpeg',
+  };
+  final safeName = p
+      .basenameWithoutExtension(pic.name)
+      .replaceAll(RegExp('[^a-zA-Z0-9_-]+'), '-')
+      .replaceAll(RegExp(r'^-+|-+$'), '');
+  final uniqueName =
+      '${DateTime.now().microsecondsSinceEpoch}-${safeName.isEmpty ? 'photo' : safeName}$extension';
+  final path = 'teamGroups/$teamGroupId/scoutsheets/images/$uid/$uniqueName';
   final file = File(pic.path);
 
   final ref = FirebaseStorage.instance.ref().child(path);
-  final snapshot = await ref.putData(file.readAsBytesSync(),
-      SettableMetadata(contentType: 'image/${p.extension(path).substring(1)}'));
+  final snapshot = await ref.putFile(
+    file,
+    SettableMetadata(
+      contentType: contentType,
+      customMetadata: {
+        'ownerUid': uid,
+        'teamGroupId': teamGroupId,
+      },
+    ),
+  );
 
   return await snapshot.ref.getDownloadURL();
-
-  // Database().addPhoto("", "", "", URL);
 }

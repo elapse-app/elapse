@@ -1,5 +1,7 @@
 import 'package:elapse_app/classes/Team/teamPreview.dart';
+import 'package:elapse_app/classes/ScoutSheet/scout_template_repository.dart';
 import 'package:elapse_app/main.dart';
+import 'package:elapse_app/screens/scout/templates/scout_template_list.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:elapse_app/screens/widgets/rounded_top.dart';
@@ -16,6 +18,14 @@ class CloudScoutScreen extends StatefulWidget {
 }
 
 class _CloudScoutScreenState extends State<CloudScoutScreen> {
+  late final ScoutTemplateRepository _templateRepository;
+
+  @override
+  void initState() {
+    super.initState();
+    _templateRepository = ScoutTemplateRepository(prefs);
+  }
+
   @override
   Widget build(BuildContext context) {
     List<String> savedTeams = prefs.getStringList("savedTeams") ?? [];
@@ -31,6 +41,40 @@ class _CloudScoutScreenState extends State<CloudScoutScreen> {
             settingsCallback: () => setState(() {}),
           ),
           RoundedTop(),
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(23, 0, 23, 18),
+            sliver: SliverToBoxAdapter(
+              child: Card(
+                margin: EdgeInsets.zero,
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 8,
+                  ),
+                  leading: Icon(
+                    Icons.dynamic_form_outlined,
+                    color: Theme.of(context).colorScheme.secondary,
+                  ),
+                  title: const Text('Scout sheet templates'),
+                  subtitle: Text(
+                    '${_templateRepository.loadTemplates().length} available • Create custom forms',
+                  ),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () async {
+                    await Navigator.push<void>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ScoutTemplateListScreen(
+                          repository: _templateRepository,
+                        ),
+                      ),
+                    );
+                    if (mounted) setState(() {});
+                  },
+                ),
+              ),
+            ),
+          ),
           SliverToBoxAdapter(
             child: prefs.getBool("isTournamentMode") ?? false
                 ? Column(children: [

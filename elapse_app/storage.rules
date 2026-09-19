@@ -1,0 +1,43 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isGroupMember(groupId) {
+      return signedIn()
+        && request.auth.uid in firestore.get(
+          /databases/(default)/documents/teamGroups/$(groupId)
+        ).data.members;
+    }
+
+    function validImageUpload() {
+      return request.resource != null
+        && request.resource.size > 0
+        && request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|heic|heif|webp)');
+    }
+
+    match /teamGroups/{groupId}/scoutsheets/images/{userId}/{fileName} {
+      allow read: if isGroupMember(groupId);
+      allow create: if isGroupMember(groupId)
+        && request.auth.uid == userId
+        && validImageUpload();
+      allow delete: if isGroupMember(groupId);
+      allow update: if false;
+    }
+
+    // Keep existing scout photos readable while new uploads move to the
+    // group-scoped path above. Only the original owner can modify them.
+    match /images/{userId}/scoutsheet/images/{fileName} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.auth.uid == userId
+        && validImageUpload();
+      allow delete: if signedIn() && request.auth.uid == userId;
+      allow update: if false;
+    }
+  }
+}

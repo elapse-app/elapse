@@ -15,7 +15,21 @@ List<Widget> EmptyState(BuildContext context, void Function() onPressed) {
         margin: EdgeInsets.only(left: 23, right: 23, top: 8),
         padding: EdgeInsets.all(18),
         alignment: Alignment.center,
-        child: Text("Nothing here yet"),
+        child: const Column(
+          children: [
+            Icon(Icons.dynamic_form_outlined, size: 40),
+            SizedBox(height: 10),
+            Text(
+              'Nothing here yet',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+            ),
+            SizedBox(height: 4),
+            Text(
+              'Choose a template to start scouting this team.',
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     ),
     SliverToBoxAdapter(
@@ -27,7 +41,7 @@ List<Widget> EmptyState(BuildContext context, void Function() onPressed) {
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 23.0),
         child: LongButton(
-          text: "Create Scoutsheet",
+          text: "Create Scout Sheet",
           gradient: true,
           icon: Icons.list_alt_outlined,
           trailingIcon: Icons.edit_outlined,
