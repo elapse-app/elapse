@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../../classes/Team/world_skills.dart';
 import '../../../team_screen/team_screen.dart';
 
-Future<void> worldSkillsPage(
-    BuildContext context, int teamID, String teamNum, String teamName, WorldSkillsStats stats) {
+Future<void> worldSkillsPage(BuildContext context, int teamID, String teamNum,
+    String teamName, WorldSkillsStats stats) {
   final DraggableScrollableController dra = DraggableScrollableController();
 
   return showModalBottomSheet<void>(
@@ -36,26 +36,25 @@ Future<void> worldSkillsPage(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "$teamNum Skills",
-                              style: const TextStyle(
-                                fontSize: 24,
-                                height: 1,
-                                fontWeight: FontWeight.w500,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "$teamNum Skills",
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  height: 1,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            ),
-                            Text(
-                              teamName,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w300,
+                              Text(
+                                teamName,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w300,
+                                ),
                               ),
-                            ),
-                          ]
-                        ),
+                            ]),
                         GestureDetector(
                           onTap: () {
                             Navigator.push(
@@ -69,13 +68,12 @@ Future<void> worldSkillsPage(
                             );
                           },
                           child: Text(
-                                "View More",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                ),
-                              ),
+                            "View More",
+                            style: TextStyle(
+                              fontSize: 16,
+                              color: Theme.of(context).colorScheme.secondary,
+                            ),
+                          ),
                         )
                       ],
                     ),

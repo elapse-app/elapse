@@ -35,24 +35,36 @@ class SkillsPage extends StatelessWidget {
     List<TeamPreview> savedTeams = [];
     if (filter.saved) {
       final String savedTeam = prefs.getString("savedTeam") ?? "";
-      TeamPreview savedTeamPreview =
-      TeamPreview(teamID: jsonDecode(savedTeam)["teamID"], teamNumber: jsonDecode(savedTeam)["teamNumber"]);
+      TeamPreview savedTeamPreview = TeamPreview(
+          teamID: jsonDecode(savedTeam)["teamID"],
+          teamNumber: jsonDecode(savedTeam)["teamNumber"]);
       List<String> savedTeamsString = prefs.getStringList("savedTeams") ?? [];
       savedTeams.add(savedTeamPreview);
       savedTeams.addAll(savedTeamsString
-          .map((e) => TeamPreview(teamID: jsonDecode(e)["teamID"], teamNumber: jsonDecode(e)["teamNumber"]))
+          .map((e) => TeamPreview(
+              teamID: jsonDecode(e)["teamID"],
+              teamNumber: jsonDecode(e)["teamNumber"]))
           .toList());
-      filteredTeams = filteredTeams.where((element) => savedTeams.any((element2) => element2.teamID == element.id)).toList();
+      filteredTeams = filteredTeams
+          .where((element) =>
+              savedTeams.any((element2) => element2.teamID == element.id))
+          .toList();
     }
 
     List<TeamPreview> scoutedTeams = [];
     if (filter.scouted) {
-      filteredTeams = filteredTeams.where((e) => scoutedTeams.any((e2) => e2.teamID == e.id)).toList();
+      filteredTeams = filteredTeams
+          .where((e) => scoutedTeams.any((e2) => e2.teamID == e.id))
+          .toList();
     }
 
-    List<TeamPreview> pickListTeams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
+    List<TeamPreview> pickListTeams = (prefs.getStringList("picklist") ?? [])
+        .map((e) => loadTeamPreview(e))
+        .toList();
     if (filter.onPicklist) {
-      filteredTeams = filteredTeams.where((e) => pickListTeams.any((e2) => e2.teamID == e.id)).toList();
+      filteredTeams = filteredTeams
+          .where((e) => pickListTeams.any((e2) => e2.teamID == e.id))
+          .toList();
     }
 
     if (filteredTeams.isEmpty) {
@@ -86,14 +98,18 @@ class SkillsPage extends StatelessWidget {
         if (skills[b.id]!.driverAttempts == skills[a.id]!.driverAttempts) {
           return skills[a.id]!.rank.compareTo(skills[b.id]!.rank);
         }
-        return skills[b.id]!.driverAttempts.compareTo(skills[a.id]!.driverAttempts);
+        return skills[b.id]!
+            .driverAttempts
+            .compareTo(skills[a.id]!.driverAttempts);
       });
     } else if (sort == 4) {
       filteredTeams.sort((a, b) {
         if (skills[b.id]!.autonAttempts == skills[a.id]!.autonAttempts) {
           return skills[a.id]!.rank.compareTo(skills[b.id]!.rank);
         }
-        return skills[b.id]!.autonAttempts.compareTo(skills[a.id]!.autonAttempts);
+        return skills[b.id]!
+            .autonAttempts
+            .compareTo(skills[a.id]!.autonAttempts);
       });
     }
 

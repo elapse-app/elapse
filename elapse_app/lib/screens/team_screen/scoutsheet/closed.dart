@@ -1,19 +1,22 @@
 import 'dart:ui';
 
 import 'package:elapse_app/classes/ScoutSheet/scoutSheetUi.dart';
-import 'package:elapse_app/extras/database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
-List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI sheet, String teamID,
-    String tournamentID, void Function() updateIndex) {
-  Database database = Database();
-
+List<Widget> ClosedState(
+    BuildContext context,
+    String teamNumber,
+    ScoutSheetUI sheet,
+    String teamID,
+    String tournamentID,
+    void Function() updateIndex) {
   Widget photosDisplay = Container(
     decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(9)), color: Theme.of(context).colorScheme.tertiary),
+        borderRadius: BorderRadius.all(Radius.circular(9)),
+        color: Theme.of(context).colorScheme.tertiary),
     height: 175,
     child: Row(
       mainAxisAlignment: MainAxisAlignment.center,
@@ -46,7 +49,8 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
                     onTap: () => _openPhotoViewer(context, sheet.photos, 0),
                     child: ClipRRect(
                         borderRadius: BorderRadius.circular(9),
-                        child: Image.network(sheet.photos[0], width: double.infinity, fit: BoxFit.cover,
+                        child: Image.network(sheet.photos[0],
+                            width: double.infinity, fit: BoxFit.cover,
                             loadingBuilder: (context, widget, progress) {
                           if (progress == null) return widget;
                           return Center(
@@ -54,7 +58,8 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
-                              value: progress.cumulativeBytesLoaded / progress.expectedTotalBytes!,
+                              value: progress.cumulativeBytesLoaded /
+                                  progress.expectedTotalBytes!,
                             ),
                           ));
                         })))),
@@ -66,10 +71,12 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
                   child: Hero(
                       tag: sheet.photos[1].hashCode,
                       child: GestureDetector(
-                          onTap: () => _openPhotoViewer(context, sheet.photos, 1),
+                          onTap: () =>
+                              _openPhotoViewer(context, sheet.photos, 1),
                           child: ClipRRect(
                               borderRadius: BorderRadius.circular(9),
-                              child: Image.network(sheet.photos[1], width: double.infinity, fit: BoxFit.cover,
+                              child: Image.network(sheet.photos[1],
+                                  width: double.infinity, fit: BoxFit.cover,
                                   loadingBuilder: (context, widget, progress) {
                                 if (progress == null) return widget;
                                 return Center(
@@ -77,7 +84,8 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
                                   width: 20,
                                   height: 20,
                                   child: CircularProgressIndicator(
-                                    value: progress.cumulativeBytesLoaded / progress.expectedTotalBytes!,
+                                    value: progress.cumulativeBytesLoaded /
+                                        progress.expectedTotalBytes!,
                                   ),
                                 ));
                               })))))
@@ -89,45 +97,62 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
                   child: Hero(
                       tag: sheet.photos[2].hashCode,
                       child: GestureDetector(
-                          onTap: () => _openPhotoViewer(context, sheet.photos, 2),
+                          onTap: () =>
+                              _openPhotoViewer(context, sheet.photos, 2),
                           child: ClipRRect(
                               borderRadius: BorderRadius.circular(9),
                               child: sheet.photos.length > 3
                                   ? Stack(children: [
-                                      Image.network(sheet.photos[2], width: double.infinity, fit: BoxFit.cover,
-                                          loadingBuilder: (context, widget, progress) {
+                                      Image.network(sheet.photos[2],
+                                          width: double.infinity,
+                                          fit: BoxFit.cover, loadingBuilder:
+                                              (context, widget, progress) {
                                         if (progress == null) return widget;
                                         return Center(
                                             child: SizedBox(
                                           width: 20,
                                           height: 20,
                                           child: CircularProgressIndicator(
-                                            value: progress.cumulativeBytesLoaded / progress.expectedTotalBytes!,
+                                            value: progress
+                                                    .cumulativeBytesLoaded /
+                                                progress.expectedTotalBytes!,
                                           ),
                                         ));
                                       }),
                                       BackdropFilter(
-                                          filter: ImageFilter.blur(sigmaX: 2.5, sigmaY: 2.5),
+                                          filter: ImageFilter.blur(
+                                              sigmaX: 2.5, sigmaY: 2.5),
                                           child: Container(
-                                              decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.1)))),
+                                              decoration: BoxDecoration(
+                                                  color: Colors.white
+                                                      .withValues(
+                                                          alpha: 0.1)))),
                                       Center(
                                           child: DefaultTextStyle(
                                               style: const TextStyle(),
-                                              child: Text("${sheet.photos.length - 2}+",
+                                              child: Text(
+                                                  "${sheet.photos.length - 2}+",
                                                   style: TextStyle(
                                                       fontSize: 48,
-                                                      fontWeight: FontWeight.w600,
-                                                      color: Theme.of(context).colorScheme.surface)))),
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .surface)))),
                                     ])
-                                  : Image.network(sheet.photos[2], width: double.infinity, fit: BoxFit.cover,
-                                      loadingBuilder: (context, widget, progress) {
+                                  : Image.network(sheet.photos[2],
+                                      width: double.infinity,
+                                      fit: BoxFit.cover, loadingBuilder:
+                                          (context, widget, progress) {
                                       if (progress == null) return widget;
                                       return Center(
                                           child: SizedBox(
                                         width: 20,
                                         height: 20,
                                         child: CircularProgressIndicator(
-                                          value: progress.cumulativeBytesLoaded / progress.expectedTotalBytes!,
+                                          value:
+                                              progress.cumulativeBytesLoaded /
+                                                  progress.expectedTotalBytes!,
                                         ),
                                       ));
                                     })))))
@@ -154,11 +179,16 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
           children: [
             Text("$teamNumber Specs", style: TextStyle(fontSize: 24)),
             SizedBox(height: 18),
-            Text(sheet.intakeType, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
-            Text("Intake Type", style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400)),
+            Text(sheet.intakeType,
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            Text("Intake Type",
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400)),
             SizedBox(height: 12),
             Divider(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.2),
             ),
             SizedBox(height: 12),
             Row(
@@ -189,11 +219,16 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
             SizedBox(height: 12),
             sheet.otherNotes != ""
                 ? Divider(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.2),
                   )
                 : SizedBox(),
             sheet.otherNotes != "" ? SizedBox(height: 12) : SizedBox(),
-            sheet.otherNotes != "" ? Text(sheet.otherNotes, style: TextStyle(fontSize: 16)) : SizedBox(),
+            sheet.otherNotes != ""
+                ? Text(sheet.otherNotes, style: TextStyle(fontSize: 16))
+                : SizedBox(),
           ],
         ),
       ),
@@ -243,7 +278,9 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
             SizedBox(
               height: 18,
             ),
-            Text(sheet.autonNotes != "" ? sheet.autonNotes : "No notes provided", style: TextStyle(fontSize: 16)),
+            Text(
+                sheet.autonNotes != "" ? sheet.autonNotes : "No notes provided",
+                style: TextStyle(fontSize: 16)),
           ],
         ),
       ),
@@ -262,13 +299,15 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
                 builder: (context) {
                   return AlertDialog(
                     title: Text("Confirm Deletion"),
-                    content: Text("Are you sure you want to delete this scoutsheet?"),
+                    content: Text(
+                        "Are you sure you want to delete this scoutsheet?"),
                     actions: [
                       TextButton(
                         onPressed: updateIndex,
                         child: Text(
                           "Delete",
-                          style: TextStyle(color: Theme.of(context).colorScheme.error),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.error),
                         ),
                       ),
                       TextButton(
@@ -277,7 +316,8 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
                         },
                         child: Text(
                           "Cancel",
-                          style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.secondary),
                         ),
                       )
                     ],
@@ -295,7 +335,8 @@ List<Widget> ClosedState(BuildContext context, String teamNumber, ScoutSheetUI s
   ];
 }
 
-void _openPhotoViewer(BuildContext context, List<dynamic> photos, int initIndex) {
+void _openPhotoViewer(
+    BuildContext context, List<dynamic> photos, int initIndex) {
   Navigator.push(context, MaterialPageRoute(builder: (context) {
     return Scaffold(
         body: Container(
@@ -311,8 +352,10 @@ void _openPhotoViewer(BuildContext context, List<dynamic> photos, int initIndex)
                   return PhotoViewGalleryPageOptions(
                     imageProvider: NetworkImage(photos[index]),
                     initialScale: PhotoViewComputedScale.contained,
-                    heroAttributes:
-                        PhotoViewHeroAttributes(tag: index > 2 ? photos[2].hashCode : photos[index].hashCode),
+                    heroAttributes: PhotoViewHeroAttributes(
+                        tag: index > 2
+                            ? photos[2].hashCode
+                            : photos[index].hashCode),
                   );
                 },
                 scrollPhysics: const BouncingScrollPhysics(),
@@ -321,7 +364,10 @@ void _openPhotoViewer(BuildContext context, List<dynamic> photos, int initIndex)
                   width: 20,
                   height: 20,
                   child: CircularProgressIndicator(
-                    value: event != null ? event.cumulativeBytesLoaded / event.expectedTotalBytes! : null,
+                    value: event != null
+                        ? event.cumulativeBytesLoaded /
+                            event.expectedTotalBytes!
+                        : null,
                   ),
                 )),
                 pageController: PageController(initialPage: initIndex),

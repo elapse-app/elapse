@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:ui';
 
 import 'package:carousel_slider/carousel_controller.dart';
-import 'package:elapse_app/classes/Tournament/tstats.dart';
 import 'package:elapse_app/screens/tournament_mode/picklist/picklist_widget.dart';
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:flutter/cupertino.dart';
@@ -29,7 +28,9 @@ class _PicklistPageState extends State<PicklistPage> {
 
   void refreshTeams() {
     setState(() {
-      teams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
+      teams = (prefs.getStringList("picklist") ?? [])
+          .map((e) => loadTeamPreview(e))
+          .toList();
       carouselControllers = [];
       for (var _ in teams) {
         carouselControllers.add(CarouselSliderController());
@@ -67,20 +68,27 @@ class _PicklistPageState extends State<PicklistPage> {
                           .map<int, Widget>((i, e) {
                             return MapEntry(
                                 i,
-                                Column(key: UniqueKey(), mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                  PicklistWidget(
-                                      index: i,
-                                      team: e,
-                                      tournament: tournament,
-                                      carouselControllers: carouselControllers,
-                                      refresh: refreshTeams),
-                                  i != teams.length - 1
-                                      ? Divider(
-                                          color: Theme.of(context).colorScheme.surfaceDim,
-                                          height: 3,
-                                        )
-                                      : const SizedBox.shrink(),
-                                ]));
+                                Column(
+                                    key: UniqueKey(),
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      PicklistWidget(
+                                          index: i,
+                                          team: e,
+                                          tournament: tournament,
+                                          carouselControllers:
+                                              carouselControllers,
+                                          refresh: refreshTeams),
+                                      i != teams.length - 1
+                                          ? Divider(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .surfaceDim,
+                                              height: 3,
+                                            )
+                                          : const SizedBox.shrink(),
+                                    ]));
                           })
                           .values
                           .toList(),
@@ -92,14 +100,19 @@ class _PicklistPageState extends State<PicklistPage> {
                         });
                       },
                       onReorderEnd: (int index) {
-                        prefs.setStringList("picklist", teams.map((e) => jsonEncode(e.toJson())).toList());
+                        prefs.setStringList("picklist",
+                            teams.map((e) => jsonEncode(e.toJson())).toList());
                       },
-                      proxyDecorator: (child, index, animation) => AnimatedBuilder(
+                      proxyDecorator: (child, index, animation) =>
+                          AnimatedBuilder(
                             animation: animation,
                             builder: (context, child) => Material(
-                              elevation: lerpDouble(0, 6, Curves.easeInOut.transform(animation.value))!,
-                              borderRadius: const BorderRadius.all(Radius.circular(18)),
-                              shadowColor: Theme.of(context).colorScheme.tertiary,
+                              elevation: lerpDouble(0, 6,
+                                  Curves.easeInOut.transform(animation.value))!,
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(18)),
+                              shadowColor:
+                                  Theme.of(context).colorScheme.tertiary,
                               child: child,
                             ),
                             child: child,
@@ -107,7 +120,9 @@ class _PicklistPageState extends State<PicklistPage> {
                 )
               : const SliverToBoxAdapter(
                   child: BigErrorMessage(
-                      icon: Icons.list_alt_outlined, message: "Picklist is only available during tournament mode")),
+                      icon: Icons.list_alt_outlined,
+                      message:
+                          "Picklist is only available during tournament mode")),
         ]));
   }
 }

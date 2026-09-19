@@ -13,9 +13,7 @@ class TournamentRankingsFilter {
 }
 
 Future<TournamentRankingsFilter> worldRankingsFilter(
-    BuildContext context,
-    TournamentRankingsFilter filter,
-    bool inTM) async {
+    BuildContext context, TournamentRankingsFilter filter, bool inTM) async {
   final DraggableScrollableController dra = DraggableScrollableController();
 
   return await showModalBottomSheet<TournamentRankingsFilter>(
@@ -57,29 +55,29 @@ Future<TournamentRankingsFilter> worldRankingsFilter(
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                                  filter.saved ||
-                                  filter.onPicklist ||
-                                  filter.scouted
+                              filter.saved ||
+                                      filter.onPicklist ||
+                                      filter.scouted
                                   ? TextButton(
-                                child: Text("Clear",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      height: 1,
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .secondary,
-                                      fontWeight: FontWeight.w400,
-                                    )),
-                                onPressed: () {
-                                  setModalState(() {
-                                    filter = TournamentRankingsFilter();
-                                  });
-                                },
-                              )
+                                      child: Text("Clear",
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            height: 1,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .secondary,
+                                            fontWeight: FontWeight.w400,
+                                          )),
+                                      onPressed: () {
+                                        setModalState(() {
+                                          filter = TournamentRankingsFilter();
+                                        });
+                                      },
+                                    )
                                   : TextButton(
-                                child: const SizedBox(),
-                                onPressed: () {},
-                              ),
+                                      child: const SizedBox(),
+                                      onPressed: () {},
+                                    ),
                             ]),
                         const SizedBox(
                           height: 20,
@@ -94,7 +92,7 @@ Future<TournamentRankingsFilter> worldRankingsFilter(
                             border: Border.all(
                                 color: Theme.of(context).colorScheme.primary),
                             borderRadius:
-                            const BorderRadius.all(Radius.circular(100)),
+                                const BorderRadius.all(Radius.circular(100)),
                           ),
                           child: InkWell(
                             child: Row(
@@ -110,8 +108,8 @@ Future<TournamentRankingsFilter> worldRankingsFilter(
                                     ]),
                                 filter.saved
                                     ? const Row(children: [
-                                  Icon(Icons.check),
-                                ])
+                                        Icon(Icons.check),
+                                      ])
                                     : const SizedBox(),
                               ],
                             ),
@@ -124,50 +122,50 @@ Future<TournamentRankingsFilter> worldRankingsFilter(
                         ),
                         inTM ? const SizedBox(height: 12) : const SizedBox(),
                         inTM
-                        ? Container(
-                          height: 50,
-                          padding:
-                          const EdgeInsets.only(left: 20, right: 20),
-                          decoration: BoxDecoration(
-                            color: filter.onPicklist
-                                ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.surface,
-                            border: Border.all(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .primary),
-                            borderRadius: const BorderRadius.all(
-                                Radius.circular(100)),
-                          ),
-                          child: InkWell(
-                            child: Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
-                              children: [
-                                const Row(
+                            ? Container(
+                                height: 50,
+                                padding:
+                                    const EdgeInsets.only(left: 20, right: 20),
+                                decoration: BoxDecoration(
+                                  color: filter.onPicklist
+                                      ? Theme.of(context).colorScheme.primary
+                                      : Theme.of(context).colorScheme.surface,
+                                  border: Border.all(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .primary),
+                                  borderRadius: const BorderRadius.all(
+                                      Radius.circular(100)),
+                                ),
+                                child: InkWell(
+                                  child: Row(
                                     mainAxisAlignment:
-                                    MainAxisAlignment.start,
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Icon(Icons.person_add_alt),
-                                      SizedBox(width: 10),
-                                      Text("On Picklist",
-                                          style: TextStyle(fontSize: 16)),
-                                    ]),
-                                filter.onPicklist
-                                    ? const Row(children: [
-                                  Icon(Icons.check),
-                                ])
-                                    : const SizedBox(),
-                              ],
-                            ),
-                            onTap: () {
-                              setModalState(() {
-                                filter.onPicklist = !filter.onPicklist;
-                              });
-                            },
-                          ),
-                        )
-                        : const SizedBox(),
+                                      const Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          children: [
+                                            Icon(Icons.person_add_alt),
+                                            SizedBox(width: 10),
+                                            Text("On Picklist",
+                                                style: TextStyle(fontSize: 16)),
+                                          ]),
+                                      filter.onPicklist
+                                          ? const Row(children: [
+                                              Icon(Icons.check),
+                                            ])
+                                          : const SizedBox(),
+                                    ],
+                                  ),
+                                  onTap: () {
+                                    setModalState(() {
+                                      filter.onPicklist = !filter.onPicklist;
+                                    });
+                                  },
+                                ),
+                              )
+                            : const SizedBox(),
                         const SizedBox(height: 12),
                         Container(
                           height: 50,
@@ -179,7 +177,7 @@ Future<TournamentRankingsFilter> worldRankingsFilter(
                             border: Border.all(
                                 color: Theme.of(context).colorScheme.primary),
                             borderRadius:
-                            const BorderRadius.all(Radius.circular(100)),
+                                const BorderRadius.all(Radius.circular(100)),
                           ),
                           child: InkWell(
                             child: Row(
@@ -195,8 +193,8 @@ Future<TournamentRankingsFilter> worldRankingsFilter(
                                     ]),
                                 filter.scouted
                                     ? const Row(children: [
-                                  Icon(Icons.check),
-                                ])
+                                        Icon(Icons.check),
+                                      ])
                                     : const SizedBox(),
                               ],
                             ),

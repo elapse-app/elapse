@@ -52,14 +52,17 @@ class TMMyTeamsState extends State<TMMyTeams> {
   void reload() {
     final String savedTeam = prefs.getString("savedTeam") ?? "";
     final parsed = jsonDecode(savedTeam);
-    savedTeamPreview = TeamPreview(teamID: parsed["teamID"], teamNumber: parsed["teamNumber"]);
+    savedTeamPreview =
+        TeamPreview(teamID: parsed["teamID"], teamNumber: parsed["teamNumber"]);
 
     tournament = TMTournamentDetails(widget.tournamentID);
 
     savedTeamStrings = prefs.getStringList("savedTeams") ?? [];
     savedTeamPreviews.add(savedTeamPreview);
     savedTeamPreviews.addAll(savedTeamStrings
-        .map((e) => TeamPreview(teamID: jsonDecode(e)["teamID"], teamNumber: jsonDecode(e)["teamNumber"]))
+        .map((e) => TeamPreview(
+            teamID: jsonDecode(e)["teamID"],
+            teamNumber: jsonDecode(e)["teamNumber"]))
         .toList());
 
     selectedTeamPreview = savedTeamPreview;
@@ -67,9 +70,11 @@ class TMMyTeamsState extends State<TMMyTeams> {
     savedTeamPreviews = savedTeamPreviews.toSet().toList();
     season = seasons[0];
     team = fetchTeam(savedTeamPreview.teamID);
-    teamStats = getTrueSkillDataForTeam(season.vrcId, savedTeamPreview.teamNumber);
+    teamStats =
+        getTrueSkillDataForTeam(season.vrcId, savedTeamPreview.teamNumber);
     skillsStats = getWorldSkillsForTeam(season.vrcId, savedTeamPreview.teamID);
-    teamTournaments = fetchTeamTournaments(savedTeamPreview.teamID, season.vrcId);
+    teamTournaments =
+        fetchTeamTournaments(savedTeamPreview.teamID, season.vrcId);
     teamAwards = getAwards(savedTeamPreview.teamID, season.vrcId);
   }
 
@@ -118,15 +123,20 @@ class TMMyTeamsState extends State<TMMyTeams> {
                         Season updated = await Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => SeasonFilterPage(selected: season),
+                            builder: (context) =>
+                                SeasonFilterPage(selected: season),
                           ),
                         );
                         setState(() {
                           season = updated;
-                          skillsStats = getWorldSkillsForTeam(season.vrcId, savedTeamPreview.teamID);
-                          teamStats = getTrueSkillDataForTeam(season.vrcId, savedTeamPreview.teamNumber);
-                          teamTournaments = fetchTeamTournaments(savedTeamPreview.teamID, season.vrcId);
-                          teamAwards = getAwards(savedTeamPreview.teamID, season.vrcId);
+                          skillsStats = getWorldSkillsForTeam(
+                              season.vrcId, savedTeamPreview.teamID);
+                          teamStats = getTrueSkillDataForTeam(
+                              season.vrcId, savedTeamPreview.teamNumber);
+                          teamTournaments = fetchTeamTournaments(
+                              savedTeamPreview.teamID, season.vrcId);
+                          teamAwards =
+                              getAwards(savedTeamPreview.teamID, season.vrcId);
                         });
                       },
                       child: Row(children: [
@@ -154,8 +164,10 @@ class TMMyTeamsState extends State<TMMyTeams> {
             sliver: SliverToBoxAdapter(
               child: Container(
                 decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(18), color: Theme.of(context).colorScheme.tertiary),
-                padding: const EdgeInsets.only(left: 18, right: 18, bottom: 18, top: 18),
+                    borderRadius: BorderRadius.circular(18),
+                    color: Theme.of(context).colorScheme.tertiary),
+                padding: const EdgeInsets.only(
+                    left: 18, right: 18, bottom: 18, top: 18),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -194,7 +206,9 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                       style: TextStyle(fontSize: 24),
                                     ),
                                     const Spacer(),
-                                    Container(width: 75, child: const LinearProgressIndicator()),
+                                    SizedBox(
+                                        width: 75,
+                                        child: const LinearProgressIndicator()),
                                   ],
                                 ),
                                 const SizedBox(
@@ -207,7 +221,9 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                       style: TextStyle(fontSize: 24),
                                     ),
                                     const Spacer(),
-                                    Container(width: 75, child: const LinearProgressIndicator()),
+                                    SizedBox(
+                                        width: 75,
+                                        child: const LinearProgressIndicator()),
                                   ],
                                 ),
                               ],
@@ -246,7 +262,9 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                     const Spacer(),
                                     Text(
                                       qualificationString,
-                                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w500),
                                     ),
                                   ],
                                 ),
@@ -262,7 +280,9 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                     const Spacer(),
                                     Text(
                                       "${stats.winPercent == null ? "" : stats.winPercent!.toStringAsFixed(1)}%",
-                                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w500),
                                     ),
                                   ],
                                 ),
@@ -299,7 +319,11 @@ class TMMyTeamsState extends State<TMMyTeams> {
                             organization: "",
                           );
                         } else {
-                          return TeamBio(grade: "", location: Location(), teamName: "", organization: "");
+                          return TeamBio(
+                              grade: "",
+                              location: Location(),
+                              teamName: "",
+                              organization: "");
                         }
                       },
                     )
@@ -318,7 +342,8 @@ class TMMyTeamsState extends State<TMMyTeams> {
                       Tournament tournament = snapshot.data as Tournament;
                       if (!tournament.teams.any(
                         (element) {
-                          return element.teamNumber == selectedTeamPreview.teamNumber;
+                          return element.teamNumber ==
+                              selectedTeamPreview.teamNumber;
                         },
                       )) {
                         return Container();
@@ -339,25 +364,31 @@ class TMMyTeamsState extends State<TMMyTeams> {
                               height: 10,
                             ),
                             RankingOverviewWidget(
-                                teamStats: tournament.divisions[0].teamStats![selectedTeamPreview.teamID]!,
+                                teamStats: tournament.divisions[0]
+                                    .teamStats![selectedTeamPreview.teamID]!,
                                 skills: tournament.tournamentSkills!,
                                 teamID: selectedTeamPreview.teamID),
                             SizedBox(
                               height: 10,
                             ),
                             Column(
-                              children:
-                                  getTeamGames(tournament.divisions[0].games!, selectedTeamPreview.teamNumber).map(
+                              children: getTeamGames(
+                                      tournament.divisions[0].games!,
+                                      selectedTeamPreview.teamNumber)
+                                  .map(
                                 (e) {
                                   return Column(
                                     children: [
                                       GameWidget(
                                         game: e,
-                                        teamName: selectedTeamPreview.teamNumber,
+                                        teamName:
+                                            selectedTeamPreview.teamNumber,
                                         isAllianceColoured: false,
                                       ),
                                       Divider(
-                                        color: Theme.of(context).colorScheme.surfaceDim,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surfaceDim,
                                       )
                                     ],
                                   );
@@ -406,7 +437,8 @@ class TMMyTeamsState extends State<TMMyTeams> {
                           children: [
                             Text(
                               stats.worldSkillsRank.toString(),
-                              style: const TextStyle(fontSize: 64, height: 1, letterSpacing: -2),
+                              style: const TextStyle(
+                                  fontSize: 64, height: 1, letterSpacing: -2),
                             ),
                             const SizedBox(
                               height: 5,
@@ -425,9 +457,12 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                   children: [
                                     Text(
                                       stats.skillsScore.toString(),
-                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500),
                                     ),
-                                    const Text("Score", style: TextStyle(fontSize: 16))
+                                    const Text("Score",
+                                        style: TextStyle(fontSize: 16))
                                   ],
                                 ),
                                 const SizedBox(
@@ -438,9 +473,12 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                   children: [
                                     Text(
                                       stats.maxDriver.toString(),
-                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500),
                                     ),
-                                    const Text("Driver", style: TextStyle(fontSize: 16))
+                                    const Text("Driver",
+                                        style: TextStyle(fontSize: 16))
                                   ],
                                 ),
                                 const SizedBox(
@@ -451,9 +489,12 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                   children: [
                                     Text(
                                       stats.maxAuto.toString(),
-                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500),
                                     ),
-                                    const Text("Auto", style: TextStyle(fontSize: 16))
+                                    const Text("Auto",
+                                        style: TextStyle(fontSize: 16))
                                   ],
                                 )
                               ],
@@ -511,7 +552,8 @@ class TMMyTeamsState extends State<TMMyTeams> {
                           children: [
                             Text(
                               stats.trueSkillGlobalRank.toString(),
-                              style: const TextStyle(fontSize: 64, height: 1, letterSpacing: -2),
+                              style: const TextStyle(
+                                  fontSize: 64, height: 1, letterSpacing: -2),
                             ),
                             const SizedBox(
                               height: 5,
@@ -530,9 +572,12 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                   children: [
                                     Text(
                                       stats.trueSkill.toString(),
-                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500),
                                     ),
-                                    const Text("Score", style: TextStyle(fontSize: 16))
+                                    const Text("Score",
+                                        style: TextStyle(fontSize: 16))
                                   ],
                                 ),
                                 const SizedBox(
@@ -543,9 +588,12 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                   children: [
                                     Text(
                                       stats.trueSkillRegionRank.toString(),
-                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500),
                                     ),
-                                    const Text("Region Rank", style: TextStyle(fontSize: 16))
+                                    const Text("Region Rank",
+                                        style: TextStyle(fontSize: 16))
                                   ],
                                 ),
                                 const SizedBox(
@@ -563,9 +611,12 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                   children: [
                                     Text(
                                       stats.opr.toString(),
-                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500),
                                     ),
-                                    const Text("OPR", style: TextStyle(fontSize: 16))
+                                    const Text("OPR",
+                                        style: TextStyle(fontSize: 16))
                                   ],
                                 ),
                                 const SizedBox(
@@ -576,9 +627,12 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                   children: [
                                     Text(
                                       stats.dpr.toString(),
-                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500),
                                     ),
-                                    const Text("DPR", style: TextStyle(fontSize: 16))
+                                    const Text("DPR",
+                                        style: TextStyle(fontSize: 16))
                                   ],
                                 ),
                                 const SizedBox(
@@ -589,9 +643,12 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                   children: [
                                     Text(
                                       stats.ccwm.toString(),
-                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500),
                                     ),
-                                    const Text("CCWM", style: TextStyle(fontSize: 16))
+                                    const Text("CCWM",
+                                        style: TextStyle(fontSize: 16))
                                   ],
                                 ),
                               ],
@@ -616,7 +673,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
             ),
           ),
           const SliverToBoxAdapter(
-            child: const SizedBox(
+            child: SizedBox(
               height: 28,
             ),
           ),
@@ -655,9 +712,12 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                 children: [
                                   Text(
                                     stats.wins.toString(),
-                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
                                   ),
-                                  const Text("Wins", style: TextStyle(fontSize: 16))
+                                  const Text("Wins",
+                                      style: TextStyle(fontSize: 16))
                                 ],
                               ),
                               const SizedBox(width: 18),
@@ -666,9 +726,12 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                 children: [
                                   Text(
                                     stats.losses.toString(),
-                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
                                   ),
-                                  const Text("Losses", style: TextStyle(fontSize: 16))
+                                  const Text("Losses",
+                                      style: TextStyle(fontSize: 16))
                                 ],
                               ),
                               const SizedBox(width: 18),
@@ -677,9 +740,12 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                 children: [
                                   Text(
                                     stats.ties.toString(),
-                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
                                   ),
-                                  const Text("Ties", style: TextStyle(fontSize: 16))
+                                  const Text("Ties",
+                                      style: TextStyle(fontSize: 16))
                                 ],
                               ),
                               const SizedBox(width: 18),
@@ -688,9 +754,12 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                 children: [
                                   Text(
                                     stats.matches.toString(),
-                                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
                                   ),
-                                  const Text("Matches", style: TextStyle(fontSize: 16))
+                                  const Text("Matches",
+                                      style: TextStyle(fontSize: 16))
                                 ],
                               ),
                               const SizedBox(width: 18),
@@ -742,7 +811,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                       }
 
                       List<Award> awards = snapshot.data as List<Award>;
-                      if (awards.isNotEmpty)
+                      if (awards.isNotEmpty) {
                         return Container(
                           padding: const EdgeInsets.all(18),
                           decoration: BoxDecoration(
@@ -756,11 +825,15 @@ class TMMyTeamsState extends State<TMMyTeams> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  const Text("Awards", style: TextStyle(fontSize: 24)),
+                                  const Text("Awards",
+                                      style: TextStyle(fontSize: 24)),
                                   Text(awards.length.toString(),
-                                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500))
+                                      style: const TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.w500))
                                 ],
                               ),
                               const SizedBox(height: 18),
@@ -772,28 +845,35 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                         alignment: Alignment.centerLeft,
                                         height: 60,
                                         child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
                                           children: [
                                             Text(
                                               e.name,
                                               overflow: TextOverflow.ellipsis,
                                               textAlign: TextAlign.start,
                                               maxLines: 1,
-                                              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                              style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500),
                                             ),
                                             Text(
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
                                               textAlign: TextAlign.start,
                                               e.tournamentName ?? "",
-                                              style: const TextStyle(fontSize: 16),
+                                              style:
+                                                  const TextStyle(fontSize: 16),
                                             )
                                           ],
                                         ),
                                       ),
                                       Divider(
-                                        color: Theme.of(context).colorScheme.surfaceDim,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surfaceDim,
                                       )
                                     ],
                                   );
@@ -802,8 +882,9 @@ class TMMyTeamsState extends State<TMMyTeams> {
                             ],
                           ),
                         );
-                      else
+                      } else {
                         return Container();
+                      }
                   }
                 },
               ),
@@ -831,11 +912,13 @@ class TMMyTeamsState extends State<TMMyTeams> {
                     future: teamTournaments,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        List<TournamentPreview> tournaments = snapshot.data as List<TournamentPreview>;
+                        List<TournamentPreview> tournaments =
+                            snapshot.data as List<TournamentPreview>;
                         return Column(
                           children: tournaments
                               .map(
-                                (e) => TournamentPreviewWidget(tournamentPreview: e),
+                                (e) => TournamentPreviewWidget(
+                                    tournamentPreview: e),
                               )
                               .toList(),
                         );
@@ -860,7 +943,8 @@ class TMMyTeamsState extends State<TMMyTeams> {
                   child: TextButton(
                     child: Text(
                       "Remove Team",
-                      style: TextStyle(fontSize: 18, color: colorPallete.redAllianceText),
+                      style: TextStyle(
+                          fontSize: 18, color: colorPallete.redAllianceText),
                     ),
                     onPressed: () {
                       setState(

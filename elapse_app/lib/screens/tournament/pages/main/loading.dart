@@ -74,7 +74,7 @@ class TournamentLoadingScreen extends StatelessWidget {
     return Stack(
       alignment: Alignment.center,
       children: [
-        Container(
+        SizedBox(
           width: 50,
           height: 50,
         ),

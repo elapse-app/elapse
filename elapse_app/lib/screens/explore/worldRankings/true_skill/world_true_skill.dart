@@ -30,19 +30,28 @@ class WorldTrueSkillPage extends StatelessWidget {
     List<VDAStats> teams = stats.where((e) => e.trueSkill != null).toList();
 
     if (filter.regions!.isNotEmpty) {
-      teams = teams.where((e) => filter.regions!.any((e2) => e2 == (e.eventRegion ?? ""))).toList();
+      teams = teams
+          .where(
+              (e) => filter.regions!.any((e2) => e2 == (e.eventRegion ?? "")))
+          .toList();
     }
 
     if (filter.saved) {
-      teams = teams.where((e) => savedTeams.any((e2) => e2.teamID == e.id)).toList();
+      teams = teams
+          .where((e) => savedTeams.any((e2) => e2.teamID == e.id))
+          .toList();
     }
 
     if (filter.onPicklist && picklistTeams.isNotEmpty) {
-      teams = teams.where((e) => picklistTeams.any((e2) => e2.teamID == e.id)).toList();
+      teams = teams
+          .where((e) => picklistTeams.any((e2) => e2.teamID == e.id))
+          .toList();
     }
 
     if (filter.atTournament && tournament != null) {
-      teams = teams.where((e) => tournament!.teams.any((e2) => e2.id == e.id)).toList();
+      teams = teams
+          .where((e) => tournament!.teams.any((e2) => e2.id == e.id))
+          .toList();
     }
 
     if (sort == 0) {
@@ -69,7 +78,9 @@ class WorldTrueSkillPage extends StatelessWidget {
 
     if (teams.isEmpty) {
       return const SliverToBoxAdapter(
-        child: BigErrorMessage(icon: Icons.list_outlined, message: "TrueSkill ranking not available"),
+        child: BigErrorMessage(
+            icon: Icons.list_outlined,
+            message: "TrueSkill ranking not available"),
       );
     }
 

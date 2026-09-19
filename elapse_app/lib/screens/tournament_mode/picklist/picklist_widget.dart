@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:collection/collection.dart';
@@ -40,9 +39,12 @@ class PicklistWidget extends StatelessWidget {
             key: Key("$index"),
             direction: DismissDirection.endToStart,
             onDismissed: (direction) {
-              final picklist = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
+              final picklist = (prefs.getStringList("picklist") ?? [])
+                  .map((e) => loadTeamPreview(e))
+                  .toList();
               picklist.remove(team);
-              prefs.setStringList("picklist", picklist.map((e) => jsonEncode(e.toJson())).toList());
+              prefs.setStringList("picklist",
+                  picklist.map((e) => jsonEncode(e.toJson())).toList());
               print(picklist);
               refresh();
             },
@@ -50,7 +52,8 @@ class PicklistWidget extends StatelessWidget {
               padding: const EdgeInsets.only(right: 20),
               alignment: Alignment.centerRight,
               color: Theme.of(context).colorScheme.error,
-              child: Icon(Icons.delete, color: Theme.of(context).colorScheme.surface),
+              child: Icon(Icons.delete,
+                  color: Theme.of(context).colorScheme.surface),
             ),
             child: Container(
                 height: 72,
@@ -64,21 +67,26 @@ class PicklistWidget extends StatelessWidget {
                   Flexible(
                     flex: 15,
                     fit: FlexFit.tight,
-                    child: ReorderableDragStartListener(index: index, child: const Icon(Icons.drag_indicator)),
+                    child: ReorderableDragStartListener(
+                        index: index, child: const Icon(Icons.drag_indicator)),
                   ),
                   Flexible(
                     flex: 20,
                     fit: FlexFit.tight,
                     child: Text("${index + 1}.",
                         style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface, fontSize: 24, fontWeight: FontWeight.w600)),
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 24,
+                            fontWeight: FontWeight.w600)),
                   ),
                   Flexible(
                     flex: 100,
                     fit: FlexFit.tight,
                     child: Text(team.teamNumber,
                         style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface, fontSize: 36, fontWeight: FontWeight.w400)),
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontSize: 36,
+                            fontWeight: FontWeight.w400)),
                   ),
                   Flexible(
                     flex: 90,
@@ -90,7 +98,8 @@ class PicklistWidget extends StatelessWidget {
                             case ConnectionState.none:
                             case ConnectionState.waiting:
                             case ConnectionState.active:
-                              return const Center(child: CircularProgressIndicator());
+                              return const Center(
+                                  child: CircularProgressIndicator());
                             case ConnectionState.done:
                               if (snapshot.hasError) {
                                 print(snapshot.error);
@@ -99,22 +108,31 @@ class PicklistWidget extends StatelessWidget {
 
                               TeamStats stats = (snapshot.data as Tournament)
                                   .divisions
-                                  .firstWhereOrNull((e) => e.teamStats?.containsKey(team.teamID) ?? false)!
+                                  .firstWhereOrNull((e) =>
+                                      e.teamStats?.containsKey(team.teamID) ??
+                                      false)!
                                   .teamStats![team.teamID]!;
 
                               List<Widget> pages = [
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 5),
                                   child: Row(children: [
                                     Flexible(
                                         flex: 50,
                                         fit: FlexFit.tight,
                                         child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Text("Rank ${stats.rank}", style: const TextStyle(fontSize: 16)),
-                                              Text("${stats.wp} WP", style: const TextStyle(fontSize: 16)),
+                                              Text("Rank ${stats.rank}",
+                                                  style: const TextStyle(
+                                                      fontSize: 16)),
+                                              Text("${stats.wp} WP",
+                                                  style: const TextStyle(
+                                                      fontSize: 16)),
                                             ])),
                                     Flexible(
                                       flex: 5,
@@ -122,35 +140,51 @@ class PicklistWidget extends StatelessWidget {
                                       child: SizedBox(
                                         height: 50,
                                         child: VerticalDivider(
-                                            thickness: 0.5, color: Theme.of(context).colorScheme.surfaceDim),
+                                            thickness: 0.5,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .surfaceDim),
                                       ),
                                     ),
                                     Flexible(
                                         flex: 50,
                                         fit: FlexFit.tight,
                                         child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
                                             children: [
-                                              Text("${stats.ap} AP", style: const TextStyle(fontSize: 16)),
-                                              Text("${stats.sp} SP", style: const TextStyle(fontSize: 16)),
+                                              Text("${stats.ap} AP",
+                                                  style: const TextStyle(
+                                                      fontSize: 16)),
+                                              Text("${stats.sp} SP",
+                                                  style: const TextStyle(
+                                                      fontSize: 16)),
                                             ])),
                                   ]),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 5),
                                   child: Row(children: [
                                     Flexible(
                                         flex: 50,
                                         fit: FlexFit.tight,
                                         child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Text("${stats.wins}-${stats.losses}-${stats.ties}",
-                                                  style: const TextStyle(fontSize: 16)),
-                                              Text("${(stats.wins / stats.totalMatches * 100).toStringAsFixed(1)}%",
-                                                  style: const TextStyle(fontSize: 16)),
+                                              Text(
+                                                  "${stats.wins}-${stats.losses}-${stats.ties}",
+                                                  style: const TextStyle(
+                                                      fontSize: 16)),
+                                              Text(
+                                                  "${(stats.wins / stats.totalMatches * 100).toStringAsFixed(1)}%",
+                                                  style: const TextStyle(
+                                                      fontSize: 16)),
                                             ])),
                                     Flexible(
                                       flex: 5,
@@ -158,36 +192,52 @@ class PicklistWidget extends StatelessWidget {
                                       child: SizedBox(
                                         height: 50,
                                         child: VerticalDivider(
-                                            thickness: 0.5, color: Theme.of(context).colorScheme.surfaceDim),
+                                            thickness: 0.5,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .surfaceDim),
                                       ),
                                     ),
                                     Flexible(
                                         flex: 50,
                                         fit: FlexFit.tight,
                                         child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
                                             children: [
-                                              Text("${stats.awp} AWP", style: const TextStyle(fontSize: 16)),
-                                              Text("${(stats.awpRate * 100).toStringAsFixed(1)}%",
-                                                  style: const TextStyle(fontSize: 16)),
+                                              Text("${stats.awp} AWP",
+                                                  style: const TextStyle(
+                                                      fontSize: 16)),
+                                              Text(
+                                                  "${(stats.awpRate * 100).toStringAsFixed(1)}%",
+                                                  style: const TextStyle(
+                                                      fontSize: 16)),
                                             ])),
                                   ]),
                                 ),
                                 Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 5),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 5),
                                   child: Row(children: [
                                     Flexible(
                                         flex: 50,
                                         fit: FlexFit.tight,
                                         child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
                                             children: [
-                                              Text("${stats.opr.toStringAsFixed(1)} OPR",
-                                                  style: const TextStyle(fontSize: 16)),
-                                              Text("${stats.dpr.toStringAsFixed(1)} DPR",
-                                                  style: const TextStyle(fontSize: 16)),
+                                              Text(
+                                                  "${stats.opr.toStringAsFixed(1)} OPR",
+                                                  style: const TextStyle(
+                                                      fontSize: 16)),
+                                              Text(
+                                                  "${stats.dpr.toStringAsFixed(1)} DPR",
+                                                  style: const TextStyle(
+                                                      fontSize: 16)),
                                             ])),
                                     Flexible(
                                       flex: 5,
@@ -195,18 +245,28 @@ class PicklistWidget extends StatelessWidget {
                                       child: SizedBox(
                                         height: 50,
                                         child: VerticalDivider(
-                                            thickness: 0.5, color: Theme.of(context).colorScheme.surfaceDim),
+                                            thickness: 0.5,
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .surfaceDim),
                                       ),
                                     ),
                                     Flexible(
                                         flex: 40,
                                         fit: FlexFit.tight,
                                         child: Column(
-                                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                            crossAxisAlignment: CrossAxisAlignment.end,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceEvenly,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
                                             children: [
-                                              Text(stats.ccwm.toStringAsFixed(1), style: const TextStyle(fontSize: 16)),
-                                              const Text("CCWM", style: TextStyle(fontSize: 16)),
+                                              Text(
+                                                  stats.ccwm.toStringAsFixed(1),
+                                                  style: const TextStyle(
+                                                      fontSize: 16)),
+                                              const Text("CCWM",
+                                                  style:
+                                                      TextStyle(fontSize: 16)),
                                             ])),
                                   ]),
                                 ),
@@ -221,7 +281,9 @@ class PicklistWidget extends StatelessWidget {
                                   onPageChanged: (index, reason) {
                                     for (final c in carouselControllers) {
                                       c.animateToPage(index,
-                                          duration: const Duration(milliseconds: 100), curve: Curves.fastOutSlowIn);
+                                          duration:
+                                              const Duration(milliseconds: 100),
+                                          curve: Curves.fastOutSlowIn);
                                     }
                                   },
                                 ),

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../../classes/Team/vdaStats.dart';
 import '../../../team_screen/team_screen.dart';
 
-Future<void> worldTrueSkillPage(
-    BuildContext context, int teamID, String teamNum, String teamName, VDAStats stats) {
+Future<void> worldTrueSkillPage(BuildContext context, int teamID,
+    String teamNum, String teamName, VDAStats stats) {
   final DraggableScrollableController dra = DraggableScrollableController();
 
   return showModalBottomSheet<void>(
@@ -36,48 +36,47 @@ Future<void> worldTrueSkillPage(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "$teamNum TrueSkill",
-                              style: const TextStyle(
-                                fontSize: 24,
-                                height: 1,
-                                fontWeight: FontWeight.w500,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "$teamNum TrueSkill",
+                                style: const TextStyle(
+                                  fontSize: 24,
+                                  height: 1,
+                                  fontWeight: FontWeight.w500,
+                                ),
                               ),
-                            ),
-                            Text(
-                              teamName,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w300,
-                              ),
-                            )
-                          ]
-                        ),
+                              Text(
+                                teamName,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w300,
+                                ),
+                              )
+                            ]),
                         teamID != 0
                             ? GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => TeamScreen(
-                                  teamID: teamID,
-                                  teamNumber: teamNum,
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => TeamScreen(
+                                        teamID: teamID,
+                                        teamNumber: teamNum,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: Text(
+                                  "View More",
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                  ),
                                 ),
-                              ),
-                            );
-                          },
-                          child: Text(
-                                "View More",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  color:
-                                      Theme.of(context).colorScheme.secondary,
-                                ),
-                              ),
-                        )
+                              )
                             : const SizedBox(),
                       ],
                     ),
@@ -122,7 +121,9 @@ Future<void> worldTrueSkillPage(
                           Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(stats.trueSkill?.toStringAsFixed(1) ?? "N/A",
+                                Text(
+                                    stats.trueSkill?.toStringAsFixed(1) ??
+                                        "N/A",
                                     style: const TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.w500,
@@ -140,7 +141,8 @@ Future<void> worldTrueSkillPage(
                           Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("${stats.trueSkillRegionRank == 0 ? "N/A" : stats.trueSkillRegionRank}",
+                                Text(
+                                    "${stats.trueSkillRegionRank == 0 ? "N/A" : stats.trueSkillRegionRank}",
                                     style: const TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.w500,
@@ -158,7 +160,8 @@ Future<void> worldTrueSkillPage(
                           Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("${stats.winPercent?.toStringAsFixed(1)} %",
+                                Text(
+                                    "${stats.winPercent?.toStringAsFixed(1)} %",
                                     style: const TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.w500,

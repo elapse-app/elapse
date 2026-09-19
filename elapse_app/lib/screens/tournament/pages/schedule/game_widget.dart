@@ -1,11 +1,7 @@
 import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
-import 'package:elapse_app/classes/Tournament/division.dart';
 import 'package:elapse_app/classes/Tournament/game.dart';
-import 'package:elapse_app/classes/Tournament/tournament.dart';
-import 'package:elapse_app/classes/Tournament/tournament_mode_functions.dart';
 import 'package:elapse_app/extras/twelve_hour.dart';
-import 'package:elapse_app/main.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -66,17 +62,22 @@ class GameWidget extends StatelessWidget {
     if (isAllianceColoured == false) {
       gameColor = Theme.of(context).colorScheme.onSurface;
     } else {
-      if (game.redAlliancePreview!.any((element) => element.teamNumber == teamName)) {
+      if (game.redAlliancePreview!
+          .any((element) => element.teamNumber == teamName)) {
         gameColor = colorPallete.redAllianceText;
-      } else if (game.blueAlliancePreview!.any((element) => element.teamNumber == teamName)) {
+      } else if (game.blueAlliancePreview!
+          .any((element) => element.teamNumber == teamName)) {
         gameColor = colorPallete.blueAllianceText;
       }
     }
 
-    if (winningAlliance == "red" && game.redAlliancePreview!.any((element) => element.teamNumber == teamName)) {
+    if (winningAlliance == "red" &&
+        game.redAlliancePreview!
+            .any((element) => element.teamNumber == teamName)) {
       gameColor = colorPallete.greenText;
     } else if (winningAlliance == "blue" &&
-        game.blueAlliancePreview!.any((element) => element.teamNumber == teamName)) {
+        game.blueAlliancePreview!
+            .any((element) => element.teamNumber == teamName)) {
       gameColor = colorPallete.greenText;
     } else if (winningAlliance != "none" && teamName != null) {
       gameColor = colorPallete.redAllianceText;
@@ -119,9 +120,10 @@ class GameWidget extends StatelessWidget {
           ));
     }
 
-    Color timeColor = Theme.of(context).colorScheme.brightness == Brightness.dark
-        ? const Color.fromARGB(255, 168, 168, 168)
-        : const Color.fromARGB(255, 118, 118, 118);
+    Color timeColor =
+        Theme.of(context).colorScheme.brightness == Brightness.dark
+            ? const Color.fromARGB(255, 168, 168, 168)
+            : const Color.fromARGB(255, 118, 118, 118);
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -162,12 +164,15 @@ class GameWidget extends StatelessWidget {
                       children: [
                         Text(
                           time,
-                          style: TextStyle(fontSize: 16, height: 1, color: timeColor),
+                          style: TextStyle(
+                              fontSize: 16, height: 1, color: timeColor),
                           maxLines: 1,
                         ),
-                        (game.redScore != 0 && game.blueScore != 0) || game.startedTime != null
+                        (game.redScore != 0 && game.blueScore != 0) ||
+                                game.startedTime != null
                             ? Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     game.redScore.toString(),
@@ -179,7 +184,10 @@ class GameWidget extends StatelessWidget {
                                   ),
                                   Text("-",
                                       style: TextStyle(
-                                          color: timeColor, fontSize: 16, fontWeight: FontWeight.w500, height: 1)),
+                                          color: timeColor,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                          height: 1)),
                                   Text(
                                     game.blueScore.toString(),
                                     style: TextStyle(
@@ -193,7 +201,10 @@ class GameWidget extends StatelessWidget {
                             : Text(game.fieldName ?? "",
                                 maxLines: 1,
                                 style: TextStyle(
-                                    fontSize: 16, height: 1, color: timeColor, overflow: TextOverflow.ellipsis))
+                                    fontSize: 16,
+                                    height: 1,
+                                    color: timeColor,
+                                    overflow: TextOverflow.ellipsis))
                       ],
                     ),
                   ),
@@ -202,7 +213,7 @@ class GameWidget extends StatelessWidget {
             ),
             Flexible(
               flex: 25,
-              child: Container(
+              child: SizedBox(
                   height: 50,
                   child: VerticalDivider(
                     thickness: 0.5,

@@ -57,7 +57,7 @@ class TournamentPreviewWidget extends StatelessWidget {
               ),
             );
           },
-          child: Container(
+          child: SizedBox(
             height: 60,
             child: Flex(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

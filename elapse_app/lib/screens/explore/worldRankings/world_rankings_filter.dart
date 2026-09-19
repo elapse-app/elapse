@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../classes/Filters/region.dart';
-import '../../../classes/Team/vdaStats.dart';
-import '../../../classes/Team/world_skills.dart';
 
 class WorldRankingsFilter {
   List<String>? regions;
@@ -17,14 +15,11 @@ class WorldRankingsFilter {
     this.onPicklist = false,
     this.atTournament = false,
     this.scouted = false,
-  }) : this.regions = regions ?? [];
+  }) : regions = regions ?? [];
 }
 
-Future<WorldRankingsFilter> worldRankingsFilter(
-    BuildContext context,
-    WorldRankingsFilter filter,
-    bool isInTM,
-    List<String> regions) async {
+Future<WorldRankingsFilter> worldRankingsFilter(BuildContext context,
+    WorldRankingsFilter filter, bool isInTM, List<String> regions) async {
   final DraggableScrollableController dra = DraggableScrollableController();
 
   bool inTM = isInTM;

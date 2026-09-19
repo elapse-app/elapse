@@ -7,8 +7,10 @@ import 'package:elapse_app/screens/team_screen/team_screen.dart';
 import 'package:elapse_app/screens/tournament/pages/schedule/game_widget.dart';
 import 'package:flutter/material.dart';
 
-Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNumber, String teamName) {
-  Tournament tournament = loadTournament(prefs.getString("recently-opened-tournament"));
+Future<void> tournamentStatsPage(
+    BuildContext context, int teamID, String teamNumber, String teamName) {
+  Tournament tournament =
+      loadTournament(prefs.getString("recently-opened-tournament"));
 
   int divisionIndex = getTeamDivisionIndex(tournament.divisions, teamID);
 
@@ -67,11 +69,15 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                         children: [
                           Text(
                             "$teamNumber Stats",
-                            style: const TextStyle(fontSize: 24, height: 1, fontWeight: FontWeight.w500),
+                            style: const TextStyle(
+                                fontSize: 24,
+                                height: 1,
+                                fontWeight: FontWeight.w500),
                           ),
                           Text(
                             teamName,
-                            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w300),
+                            style: const TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w300),
                           )
                         ]),
                     GestureDetector(
@@ -88,7 +94,9 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                       },
                       child: Text(
                         "View More",
-                        style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.secondary),
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: Theme.of(context).colorScheme.secondary),
                       ),
                     )
                   ],
@@ -99,7 +107,8 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                 Container(
                   height: 300,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(18), color: Theme.of(context).colorScheme.primary),
+                      borderRadius: BorderRadius.circular(18),
+                      color: Theme.of(context).colorScheme.primary),
                   padding: EdgeInsets.all(18),
                   child: Column(children: [
                     Row(
@@ -111,7 +120,8 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                           children: [
                             Text(
                               "$rank",
-                              style: const TextStyle(fontSize: 64, letterSpacing: -2, height: 1),
+                              style: const TextStyle(
+                                  fontSize: 64, letterSpacing: -2, height: 1),
                             ),
                             const SizedBox(
                               height: 4,
@@ -132,7 +142,10 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                                 children: [
                                   Text(
                                     "${teamStats.wp}",
-                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500, height: 1),
+                                    style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w500,
+                                        height: 1),
                                   ),
                                   const SizedBox(height: 4),
                                   const Text(
@@ -146,7 +159,10 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                                 children: [
                                   Text(
                                     "${teamStats.ap}",
-                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500, height: 1),
+                                    style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w500,
+                                        height: 1),
                                   ),
                                   const SizedBox(height: 4),
                                   const Text(
@@ -160,7 +176,10 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                                 children: [
                                   Text(
                                     "${teamStats.sp}",
-                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500, height: 1),
+                                    style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.w500,
+                                        height: 1),
                                   ),
                                   const SizedBox(height: 4),
                                   const Text(
@@ -183,7 +202,9 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                           "Record",
                           style: TextStyle(fontSize: 24),
                         ),
-                        Text("$wins-$losses-$ties", style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500))
+                        Text("$wins-$losses-$ties",
+                            style: const TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.w500))
                       ],
                     ),
                     const SizedBox(
@@ -196,8 +217,10 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                           "Skills Rank",
                           style: TextStyle(fontSize: 24),
                         ),
-                        Text("${tournament.tournamentSkills![teamID]?.rank ?? "N/A"}",
-                            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500))
+                        Text(
+                            "${tournament.tournamentSkills![teamID]?.rank ?? "N/A"}",
+                            style: const TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.w500))
                       ],
                     ),
                     const SizedBox(
@@ -218,7 +241,8 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                             children: [
                               Text(
                                 "$awp",
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500),
                               ),
                               const Text(
                                 "AWP",
@@ -234,7 +258,8 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                             children: [
                               Text(
                                 "${(awpRate * 100).toStringAsFixed(1)}%",
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                style: const TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.w500),
                               ),
                               const Text(
                                 "AWP %",
@@ -250,7 +275,9 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                               children: [
                                 Text(
                                   "$opr",
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
                                 ),
                                 const Text(
                                   "OPR",
@@ -266,7 +293,9 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                               children: [
                                 Text(
                                   "$dpr",
-                                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                                  style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500),
                                 ),
                                 Text(
                                   "DPR",
@@ -277,16 +306,20 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                             const SizedBox(
                               width: 18,
                             ),
-                            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                              Text(
-                                "$ccwm",
-                                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                              ),
-                              Text(
-                                "CCWM",
-                                style: TextStyle(fontSize: 16),
-                              )
-                            ])
+                            Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    "$ccwm",
+                                    style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500),
+                                  ),
+                                  Text(
+                                    "CCWM",
+                                    style: TextStyle(fontSize: 16),
+                                  )
+                                ])
                           ],
                         ),
                       ],
@@ -298,7 +331,7 @@ Future<void> tournamentStatsPage(BuildContext context, int teamID, String teamNu
                 ),
                 const Text(
                   "Matches",
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 24,
                   ),
                 ),

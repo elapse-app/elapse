@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:elapse_app/aesthetics/color_pallete.dart';
 import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/classes/Team/team.dart';
@@ -27,9 +25,11 @@ class GameScreen extends StatefulWidget {
 
 class _GameScreenState extends State<GameScreen> {
   List<Team> teams = [];
+  @override
   void initState() {
     super.initState();
-    Tournament tournament = loadTournament(prefs.getString("recently-opened-tournament"));
+    Tournament tournament =
+        loadTournament(prefs.getString("recently-opened-tournament"));
     teams = tournament.teams;
   }
 
@@ -50,7 +50,8 @@ class _GameScreenState extends State<GameScreen> {
     }
 
     String status = "Not played";
-    if ((widget.game.redScore != 0 && widget.game.blueScore != 0) || widget.game.startedTime != null) {
+    if ((widget.game.redScore != 0 && widget.game.blueScore != 0) ||
+        widget.game.startedTime != null) {
       status = "Played";
     }
 
@@ -97,7 +98,9 @@ class _GameScreenState extends State<GameScreen> {
       body: CustomScrollView(
         slivers: [
           ElapseAppBar(
-            title: Text("Game Info", style: const TextStyle(fontSize: 24, height: 1, fontWeight: FontWeight.w600)),
+            title: Text("Game Info",
+                style: const TextStyle(
+                    fontSize: 24, height: 1, fontWeight: FontWeight.w600)),
             backNavigation: true,
           ),
           const RoundedTop(),
@@ -107,7 +110,9 @@ class _GameScreenState extends State<GameScreen> {
               delegate: SliverChildListDelegate([
                 Container(
                   height: 220,
-                  decoration: BoxDecoration(color: gameColor, borderRadius: BorderRadius.circular(18)),
+                  decoration: BoxDecoration(
+                      color: gameColor,
+                      borderRadius: BorderRadius.circular(18)),
                   child: Padding(
                     padding: const EdgeInsets.all(18.0),
                     child: Column(
@@ -127,7 +132,8 @@ class _GameScreenState extends State<GameScreen> {
                                 ),
                                 Text(
                                   status,
-                                  style: const TextStyle(fontSize: 16, height: 1),
+                                  style:
+                                      const TextStyle(fontSize: 16, height: 1),
                                 ),
                               ],
                             ),
@@ -135,19 +141,35 @@ class _GameScreenState extends State<GameScreen> {
                         ),
                         Column(
                           children: [
-                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                              const Text("Start Time", style: TextStyle(fontSize: 24, height: 1)),
-                              Text(twelveHour(time),
-                                  style: const TextStyle(fontSize: 24, height: 1, fontWeight: FontWeight.w500))
-                            ]),
+                            Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text("Start Time",
+                                      style:
+                                          TextStyle(fontSize: 24, height: 1)),
+                                  Text(twelveHour(time),
+                                      style: const TextStyle(
+                                          fontSize: 24,
+                                          height: 1,
+                                          fontWeight: FontWeight.w500))
+                                ]),
                             SizedBox(
                               height: 20,
                             ),
-                            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                              const Text("Field", style: TextStyle(fontSize: 24, height: 1)),
-                              Text(widget.game.fieldName ?? "",
-                                  style: const TextStyle(fontSize: 24, height: 1, fontWeight: FontWeight.w500))
-                            ])
+                            Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  const Text("Field",
+                                      style:
+                                          TextStyle(fontSize: 24, height: 1)),
+                                  Text(widget.game.fieldName ?? "",
+                                      style: const TextStyle(
+                                          fontSize: 24,
+                                          height: 1,
+                                          fontWeight: FontWeight.w500))
+                                ])
                           ],
                         ),
                       ],
@@ -198,9 +220,12 @@ class _GameScreenState extends State<GameScreen> {
                                       teamID: e.teamID,
                                       teamNumber: e.teamNumber,
                                       teamName: teamName,
-                                      allianceColor: colorPallete.redAllianceText),
+                                      allianceColor:
+                                          colorPallete.redAllianceText),
                                   Divider(
-                                    color: Theme.of(context).colorScheme.surfaceDim,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .surfaceDim,
                                     thickness: 1,
                                   )
                                 ],
@@ -256,9 +281,12 @@ class _GameScreenState extends State<GameScreen> {
                                       teamID: e.teamID,
                                       teamNumber: e.teamNumber,
                                       teamName: teamName,
-                                      allianceColor: colorPallete.blueAllianceText),
+                                      allianceColor:
+                                          colorPallete.blueAllianceText),
                                   Divider(
-                                    color: Theme.of(context).colorScheme.surfaceDim,
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .surfaceDim,
                                     thickness: 1,
                                   )
                                 ],

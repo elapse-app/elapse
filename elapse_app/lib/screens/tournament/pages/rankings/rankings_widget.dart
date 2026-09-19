@@ -36,11 +36,13 @@ class RankingsWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Tournament tournament = loadTournament(prefs.getString("recently-opened-tournament"));
+    Tournament tournament =
+        loadTournament(prefs.getString("recently-opened-tournament"));
 
     int divisionIndex = getTeamDivisionIndex(tournament.divisions, teamID);
 
-    Map<int, TeamStats> rankings = tournament.divisions[divisionIndex].teamStats!;
+    Map<int, TeamStats> rankings =
+        tournament.divisions[divisionIndex].teamStats!;
     TeamStats stats = rankings[teamID]!;
 
     String val1 = "${stats.wins}-${stats.losses}-${stats.ties}",
@@ -106,7 +108,11 @@ class RankingsWidget extends StatelessWidget {
                     child: Text(
                       "${rank ?? stats.rank}",
                       maxLines: 1,
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.w600, height: 1, color: allianceColor),
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
+                          height: 1,
+                          color: allianceColor),
                       textAlign: TextAlign.start,
                     ),
                   ),
@@ -188,7 +194,11 @@ class RankingsWidget extends StatelessWidget {
 }
 
 class EmptyRanking extends StatelessWidget {
-  const EmptyRanking({super.key, required this.teamName, required this.teamID, required this.allianceColor});
+  const EmptyRanking(
+      {super.key,
+      required this.teamName,
+      required this.teamID,
+      required this.allianceColor});
 
   final String teamName;
   final int teamID;
@@ -212,7 +222,11 @@ class EmptyRanking extends StatelessWidget {
         height: 72,
         child: Text(
           teamName,
-          style: TextStyle(fontSize: 40, height: 1, fontWeight: FontWeight.w400, color: allianceColor),
+          style: TextStyle(
+              fontSize: 40,
+              height: 1,
+              fontWeight: FontWeight.w400,
+              color: allianceColor),
         ),
       ),
     );
