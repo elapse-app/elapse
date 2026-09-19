@@ -79,6 +79,20 @@ void main() {
   });
 
   group('ScoutSheetData', () {
+    test('deleted legacy photos stay deleted after a migrated sheet reloads',
+        () {
+      final legacy = <String, dynamic>{
+        'properties': {
+          'Specs': {
+            'photos': ['old-photo']
+          }
+        },
+      };
+      final migrated = ScoutSheetData.fromFirestore(legacy).withPhotos([]);
+      final persisted = {...legacy, ...migrated.toFirestore()};
+      expect(ScoutSheetData.fromFirestore(persisted).photos, isEmpty);
+    });
+
     test('migrates legacy Specs documents without losing answers', () {
       final sheet = ScoutSheetData.fromFirestore({
         'properties': {

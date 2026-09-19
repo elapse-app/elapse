@@ -1,4 +1,5 @@
 import { after, before, beforeEach, test } from 'node:test';
+import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 
 import {
@@ -8,6 +9,7 @@ import {
 } from '@firebase/rules-unit-testing';
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   getDocs,
@@ -16,8 +18,9 @@ import {
   setDoc,
   updateDoc,
   where,
+  writeBatch,
 } from 'firebase/firestore';
-import { getBytes, ref, uploadBytes } from 'firebase/storage';
+import { deleteObject, getBytes, ref, uploadBytes } from 'firebase/storage';
 
 const projectId = 'demo-elapse';
 const bucket = `gs://${projectId}.appspot.com`;
@@ -196,4 +199,79 @@ test('Storage accepts only small team-member image uploads', async () => {
       { contentType: 'image/png' },
     ),
   );
+});
+
+test('group lifecycle: create, join, save, reload, delete photo, leave and revoke access', async () => {
+  const alice = testEnvironment.authenticatedContext('alice', { email: 'alice@example.com' });
+  const bob = testEnvironment.authenticatedContext('bob', { email: 'bob@example.com' });
+  for (const [context, uid] of [[alice, 'alice'], [bob, 'bob']]) {
+    await assertSucceeds(setDoc(doc(context.firestore(), 'users', uid), {
+      email: `${uid}@example.com`, firstName: uid, lastName: 'Tester',
+      team: {}, groupId: [], verified: false,
+    }));
+  }
+  const db = alice.firestore();
+  const group = doc(db, 'teamGroups', 'lifecycle');
+  const create = writeBatch(db);
+  create.set(group, {
+    adminId: 'alice', groupName: 'Lifecycle', joinCode: 'TEST-1234',
+    allowJoin: true, members: { alice: 'Alice' },
+  });
+  create.update(doc(db, 'users', 'alice'), { groupId: ['lifecycle'] });
+  await assertSucceeds(create.commit());
+  const bobDb = bob.firestore();
+  const join = writeBatch(bobDb);
+  join.update(doc(bobDb, 'teamGroups', 'lifecycle'), { 'members.bob': 'Bob' });
+  join.update(doc(bobDb, 'users', 'bob'), { groupId: ['lifecycle'] });
+  await assertSucceeds(join.commit());
+
+  const sheetPath = ['teamGroups', 'lifecycle', 'scoutsheets', 'robot'];
+  await assertSucceeds(setDoc(doc(db, ...sheetPath), {
+    teamID: '10K', tournamentID: '64244', createTime: serverTimestamp(),
+    latestUpdate: serverTimestamp(), schemaVersion: 2,
+    template: { id: 'custom', name: 'Custom', fields: [{ id: 'notes', type: 'longText', label: 'Notes' }] },
+    answers: {}, photos: [], isEditing: true,
+  }));
+  await assertSucceeds(updateDoc(doc(bobDb, ...sheetPath), {
+    answers: { notes: 'Saved by teammate', score: 0, ready: false }, isEditing: false,
+  }));
+  assert.deepEqual((await getDoc(doc(db, ...sheetPath))).data().answers,
+    { notes: 'Saved by teammate', score: 0, ready: false });
+  await assertFails(updateDoc(doc(bobDb, ...sheetPath), { template: { id: 'replacement' } }));
+
+  const photoPath = 'teamGroups/lifecycle/scoutsheets/images/bob/robot.png';
+  const bobPhoto = ref(bob.storage(bucket), photoPath);
+  await assertSucceeds(uploadBytes(bobPhoto, new Uint8Array([137, 80, 78, 71]), { contentType: 'image/png' }));
+  await assertSucceeds(updateDoc(doc(bobDb, ...sheetPath), { photos: [photoPath] }));
+  assert.deepEqual((await getDoc(doc(db, ...sheetPath))).data().photos, [photoPath]);
+  await assertSucceeds(deleteObject(ref(alice.storage(bucket), photoPath)));
+  await assertSucceeds(updateDoc(doc(db, ...sheetPath), { photos: [] }));
+  assert.deepEqual((await getDoc(doc(bobDb, ...sheetPath))).data().photos, []);
+
+  const leave = writeBatch(db);
+  leave.update(group, { members: { bob: 'Bob' }, adminId: 'bob', allowJoin: false });
+  leave.update(doc(db, 'users', 'alice'), { groupId: [] });
+  await assertSucceeds(leave.commit());
+  await assertFails(getDoc(doc(db, ...sheetPath)));
+  await assertSucceeds(getDoc(doc(bobDb, ...sheetPath)));
+  await assertSucceeds(deleteDoc(doc(bobDb, ...sheetPath)));
+  const finish = writeBatch(bobDb);
+  finish.delete(doc(bobDb, 'teamGroups', 'lifecycle'));
+  finish.update(doc(bobDb, 'users', 'bob'), { groupId: [] });
+  await assertSucceeds(finish.commit());
+});
+
+test('security regression: joinable groups cannot be enumerated without a code', async () => {
+  await seedGroup({ allowJoin: true });
+  const outsider = testEnvironment.authenticatedContext('outsider').firestore();
+  await assertFails(getDocs(query(collection(outsider, 'teamGroups'), where('allowJoin', '==', true))));
+});
+
+test('security regression: an admin cannot erase unrelated memberships', async () => {
+  await seedGroup();
+  await testEnvironment.withSecurityRulesDisabled(async (context) => {
+    await setDoc(doc(context.firestore(), 'users', 'bob'), { groupId: ['group-1', 'unrelated-group'] });
+  });
+  const alice = testEnvironment.authenticatedContext('alice').firestore();
+  await assertFails(updateDoc(doc(alice, 'users', 'bob'), { groupId: [] }));
 });

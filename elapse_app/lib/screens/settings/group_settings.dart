@@ -11,6 +11,7 @@ import '../../extras/database.dart';
 import '../../main.dart';
 import '../widgets/app_bar.dart';
 import '../widgets/rounded_top.dart';
+import 'setup_group.dart';
 
 class GroupSettings extends StatefulWidget {
   const GroupSettings({
@@ -93,7 +94,21 @@ class _GroupSettingsState extends State<GroupSettings> {
                               message: "Error loading team group");
                         }
 
-                        TeamGroup group = snapshot.data as TeamGroup;
+                        final group = snapshot.data;
+                        if (group == null) {
+                          return Column(children: [
+                            const Text(
+                                'No group is available. If you just signed up, verify your email and return here. You can also create or join a group below.'),
+                            const SizedBox(height: 16),
+                            FilledButton(
+                                onPressed: () => Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (_) =>
+                                            const GroupSetupPage())),
+                                child: const Text('Create or join a group')),
+                          ]);
+                        }
 
                         return Column(children: [
                           Container(
