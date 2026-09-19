@@ -10,7 +10,6 @@ import 'package:elapse_app/main.dart';
 
 import '../../classes/Team/teamPreview.dart';
 import '../../extras/database.dart';
-import '../configure/theme_setup.dart';
 
 class EnterDetailsPage extends StatefulWidget {
   const EnterDetailsPage({
@@ -31,6 +30,7 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
 
   @override
   void initState() {
+    super.initState();
     currentUser = ElapseUser(
       uid: firebaseUser!.uid,
       email: firebaseUser!.email,
@@ -42,6 +42,7 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
         // backgroundColor: Color.fromARGB(255, 191, 231, 237),
@@ -73,230 +74,247 @@ class _EnterDetailsPageState extends State<EnterDetailsPage> {
         // ),
 
         backgroundColor: Theme.of(context).colorScheme.primary,
-        body: CustomScrollView(physics: const NeverScrollableScrollPhysics(), slivers: [
-          ElapseAppBar(
-            title: Text(
-              'Sign up',
-              style: TextStyle(
-                fontSize: 24,
-                fontFamily: 'Manrope',
-                fontWeight: FontWeight.w600,
-                color: Theme.of(context).colorScheme.onSurface,
-              ),
-            ),
-            maxHeight: 60,
-            backNavigation: false,
-          ),
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Container(
-              height: double.infinity,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
+        body: CustomScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            slivers: [
+              ElapseAppBar(
+                title: Text(
+                  'Sign up',
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontFamily: 'Manrope',
+                    fontWeight: FontWeight.w600,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
                 ),
+                maxHeight: 60,
+                backNavigation: false,
               ),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    SizedBox(height: 46),
-                    Center(
-                      child: Text(
-                        'Enter your details',
-                        style: TextStyle(
-                          fontFamily: "Manrope",
-                          fontSize: 32,
-                          fontWeight: FontWeight.w300,
-                          color: Theme.of(context).colorScheme.secondary,
-                        ),
-                      ),
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Container(
+                  height: double.infinity,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
                     ),
-                    SizedBox(height: 8),
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
-                      child: Center(
-                        child: RichText(
-                          text: TextSpan(
-                            text: 'Please fill in the fields below',
+                  ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 46),
+                        Center(
+                          child: Text(
+                            'Enter your details',
                             style: TextStyle(
-                              fontWeight: FontWeight.w400,
                               fontFamily: "Manrope",
-                              fontSize: 16,
-                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              fontSize: 32,
+                              fontWeight: FontWeight.w300,
+                              color: Theme.of(context).colorScheme.secondary,
                             ),
                           ),
                         ),
-                      ),
-                    ),
-                    SizedBox(height: 32),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
-                      child: TextFormField(
-                        controller: _firstNameController,
-                        onChanged: (value) {
-                          setState(() {
-                            currentUser.fname = value;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(9),
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
-                              width: 2.0,
+                        SizedBox(height: 8),
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(60, 0, 60, 0),
+                          child: Center(
+                            child: RichText(
+                              text: TextSpan(
+                                text: 'Please fill in the fields below',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  fontFamily: "Manrope",
+                                  fontSize: 16,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurfaceVariant,
+                                ),
+                              ),
                             ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(9),
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.primary,
-                              width: 2.0,
-                            ),
-                          ),
-                          errorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.error,
-                              width: 1.0,
-                            ),
-                          ),
-                          focusedErrorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.error,
-                              width: 2.0,
-                            ),
-                          ),
-                          labelText: 'First Name',
-                          labelStyle: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "Manrope",
-                            fontSize: 16,
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your first name';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 12),
-                    Padding(
-                      padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
-                      child: TextFormField(
-                        controller: _lastNameController,
-                        onChanged: (value) {
-                          setState(() {
-                            currentUser.lname = value;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(9),
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
-                              width: 2.0,
+                        SizedBox(height: 32),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
+                          child: TextFormField(
+                            controller: _firstNameController,
+                            onChanged: (value) {
+                              setState(() {
+                                currentUser.fname = value;
+                              });
+                            },
+                            decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(9),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.25),
+                                  width: 2.0,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(9),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 2.0,
+                                ),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.error,
+                                  width: 1.0,
+                                ),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.error,
+                                  width: 2.0,
+                                ),
+                              ),
+                              labelText: 'First Name',
+                              labelStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.w400,
+                                fontFamily: "Manrope",
+                                fontSize: 16,
+                              ),
                             ),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(9),
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.primary,
-                              width: 2.0,
-                            ),
-                          ),
-                          errorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.error,
-                              width: 1.0,
-                            ),
-                          ),
-                          focusedErrorBorder: OutlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Theme.of(context).colorScheme.error,
-                              width: 2.0,
-                            ),
-                          ),
-                          labelText: 'Last Name',
-                          labelStyle: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface,
-                            fontWeight: FontWeight.w400,
-                            fontFamily: "Manrope",
-                            fontSize: 16,
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your first name';
+                              }
+                              return null;
+                            },
                           ),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Please enter your last name';
-                          }
-                          return null;
-                        },
-                      ),
-                    ),
-                    SizedBox(height: 12),
-                    SizedBox(height: 38),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 23.0),
-                      child: LongButton(
-                        text: "Continue",
-                        onPressed: () async {
-                          if (!_formKey.currentState!.validate()) {
-                            return;
-                          }
+                        SizedBox(height: 12),
+                        Padding(
+                          padding: EdgeInsets.fromLTRB(23, 0, 23, 0),
+                          child: TextFormField(
+                            controller: _lastNameController,
+                            onChanged: (value) {
+                              setState(() {
+                                currentUser.lname = value;
+                              });
+                            },
+                            decoration: InputDecoration(
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(9),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.25),
+                                  width: 2.0,
+                                ),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(9),
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  width: 2.0,
+                                ),
+                              ),
+                              errorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.error,
+                                  width: 1.0,
+                                ),
+                              ),
+                              focusedErrorBorder: OutlineInputBorder(
+                                borderSide: BorderSide(
+                                  color: Theme.of(context).colorScheme.error,
+                                  width: 2.0,
+                                ),
+                              ),
+                              labelText: 'Last Name',
+                              labelStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface,
+                                fontWeight: FontWeight.w400,
+                                fontFamily: "Manrope",
+                                fontSize: 16,
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Please enter your last name';
+                              }
+                              return null;
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                        SizedBox(height: 38),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 23.0),
+                          child: LongButton(
+                            text: "Continue",
+                            onPressed: () async {
+                              if (!_formKey.currentState!.validate()) {
+                                return;
+                              }
 
-                          prefs.setString("currentUser", jsonEncode(currentUser.toJson()));
+                              prefs.setString("currentUser",
+                                  jsonEncode(currentUser.toJson()));
 
-                          if (prefs.getBool("isSetUp") ?? false) {
-                            Database database = Database();
-                            await database
-                                .createUser(currentUser, loadTeamPreview(prefs.getString("savedTeam")))
-                                .then((_) => Navigator.of(context)
-                                  ..pop()
-                                  ..pop())
-                                .catchError((onError) {
-                              showDialog(
-                                  barrierDismissible: false,
-                                  context: context,
-                                  builder: (context) {
-                                    return AlertDialog(
-                                      title: Text("Error Occured"),
-                                      content: Text("An error occured when creating your account, please try again"),
+                              if (prefs.getBool("isSetUp") ?? false) {
+                                Database database = Database();
+                                try {
+                                  await database.createUser(
+                                    currentUser,
+                                    loadTeamPreview(
+                                      prefs.getString("savedTeam"),
+                                    ),
+                                  );
+                                  if (!context.mounted) return;
+                                  Navigator.of(context)
+                                    ..pop()
+                                    ..pop();
+                                } catch (_) {
+                                  if (!context.mounted) return;
+                                  await showDialog<void>(
+                                    barrierDismissible: false,
+                                    context: context,
+                                    builder: (dialogContext) => AlertDialog(
+                                      title: const Text("Error Occurred"),
+                                      content: const Text(
+                                        "An error occurred when creating your account. Please try again.",
+                                      ),
                                       actions: [
                                         TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: Text(
-                                              "Cancel",
-                                              style: TextStyle(color: Theme.of(context).colorScheme.secondary),
-                                            ))
+                                          onPressed: () =>
+                                              Navigator.pop(dialogContext),
+                                          child: const Text("Cancel"),
+                                        ),
                                       ],
-                                    );
-                                  });
-                            });
-                          } else {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const JoinTeamPage(),
-                                ));
-                          }
-                        },
-                      ),
+                                    ),
+                                  );
+                                }
+                              } else {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const JoinTeamPage(),
+                                    ));
+                              }
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 12),
+                      ],
                     ),
-                    SizedBox(height: 12),
-                  ],
+                  ),
                 ),
               ),
-            ),
-          ),
-        ]));
+            ]));
   }
 }

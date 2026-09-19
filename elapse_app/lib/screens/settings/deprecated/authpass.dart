@@ -67,7 +67,7 @@ class _AuthPassState extends State<AuthPass> {
 
   Future<void> updatePass() async {
     try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );

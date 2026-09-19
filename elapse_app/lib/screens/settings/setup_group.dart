@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:pinput/pinput.dart';
@@ -16,6 +15,8 @@ import 'create_group.dart';
 import 'group_settings.dart';
 
 class GroupSetupPage extends StatefulWidget {
+  const GroupSetupPage({super.key});
+
   @override
   State<GroupSetupPage> createState() => _GroupSetupPageState();
 }
@@ -53,7 +54,8 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
               child: Column(children: [
             const SizedBox(
               width: double.infinity,
-              child: Text("Join a Group", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+              child: Text("Join a Group",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
             ),
             const SizedBox(height: 18),
             Text(
@@ -68,7 +70,8 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
                     height: 45,
                     textStyle: TextStyle(fontSize: 24),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Theme.of(context).colorScheme.onSurface),
+                      border: Border.all(
+                          color: Theme.of(context).colorScheme.onSurface),
                       borderRadius: BorderRadius.circular(9),
                     )),
                 focusedPinTheme: PinTheme(
@@ -76,14 +79,17 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
                     height: 45,
                     textStyle: TextStyle(fontSize: 24),
                     decoration: BoxDecoration(
-                      border: Border.all(color: Theme.of(context).colorScheme.primary),
+                      border: Border.all(
+                          color: Theme.of(context).colorScheme.primary),
                       borderRadius: BorderRadius.circular(9),
                     )),
                 separatorBuilder: (index) {
                   if (index == 3) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 5),
-                      child: Text("—", style: TextStyle(fontSize: 36, fontWeight: FontWeight.w300)),
+                      child: Text("—",
+                          style: TextStyle(
+                              fontSize: 36, fontWeight: FontWeight.w300)),
                     );
                   }
                   return const SizedBox(width: 5);
@@ -105,7 +111,8 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
               onPressed: () async {
                 Database database = Database();
                 final currentUser = FirebaseAuth.instance.currentUser;
-                TeamGroup group = TeamGroup.fromJson((await database.getGroupInfo("${joinCodeController.text.substring(0, 4)}-${joinCodeController.text.substring(4)}"))!);
+                TeamGroup group = TeamGroup.fromJson((await database.getGroupInfo(
+                    "${joinCodeController.text.substring(0, 4)}-${joinCodeController.text.substring(4)}"))!);
                 if (!group.allowJoin) {
                   showDialog(
                       barrierDismissible: false,
@@ -113,7 +120,8 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
                       builder: (context) {
                         return AlertDialog(
                           title: Text("Unable to Join"),
-                          content: Text("This Team Group does not allow others to join."),
+                          content: Text(
+                              "This Team Group does not allow others to join."),
                           actions: [
                             TextButton(
                                 onPressed: () {
@@ -121,7 +129,10 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
                                 },
                                 child: Text(
                                   "Close",
-                                  style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary),
                                 ))
                           ],
                         );
@@ -130,40 +141,50 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
                 }
 
                 await database
-                    .joinTeamGroup("${joinCodeController.text.substring(0, 4)}-${joinCodeController.text.substring(4)}",
+                    .joinTeamGroup(
+                        "${joinCodeController.text.substring(0, 4)}-${joinCodeController.text.substring(4)}",
                         currentUser!.uid)
                     .then((value) async {
-                      if (value == null) {
-                        await showDialog(
-                            context: context,
-                            builder: (context) {
-                              return AlertDialog(
-                                title: const Text("Invalid Join Code"),
-                                content: const Text("Unable to find a team group with this join code."),
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-                                actions: [
-                                  TextButton(
-                                    child: Text("Close",
-                                        style: TextStyle(color: Theme.of(context).colorScheme.secondary)),
-                                    onPressed: () => Navigator.pop(context),
-                                  ),
-                                ],
-                                actionsPadding: const EdgeInsets.only(bottom: 8, right: 16),
-                                shape: RoundedRectangleBorder(
-                                    side: BorderSide(color: Theme.of(context).colorScheme.primary),
-                                    borderRadius: BorderRadius.circular(18)),
-                              );
-                            });
-                        setState(() {
-                          joinCodeController.text = "";
+                  if (value == null) {
+                    await showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text("Invalid Join Code"),
+                            content: const Text(
+                                "Unable to find a team group with this join code."),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 24, vertical: 10),
+                            actions: [
+                              TextButton(
+                                child: Text("Close",
+                                    style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .secondary)),
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                            ],
+                            actionsPadding:
+                                const EdgeInsets.only(bottom: 8, right: 16),
+                            shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                    color:
+                                        Theme.of(context).colorScheme.primary),
+                                borderRadius: BorderRadius.circular(18)),
+                          );
                         });
-                        return;
-                      }
+                    setState(() {
+                      joinCodeController.text = "";
+                    });
+                    return;
+                  }
                   prefs.setString("teamGroup", jsonEncode(value.toJson()));
                   Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => GroupSettings(uid: currentUser.uid),
+                        builder: (context) =>
+                            GroupSettings(uid: currentUser.uid),
                       ));
                 }).catchError((onError) {
                   showDialog(
@@ -172,7 +193,8 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
                       builder: (context) {
                         return AlertDialog(
                           title: Text("Error Occurred"),
-                          content: Text("An error occurred when creating joining the team group, please try again"),
+                          content: Text(
+                              "An error occurred when creating joining the team group, please try again"),
                           actions: [
                             TextButton(
                                 onPressed: () {
@@ -180,7 +202,10 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
                                 },
                                 child: Text(
                                   "Cancel",
-                                  style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary),
                                 ))
                           ],
                         );
@@ -201,7 +226,12 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
                           height: 36,
                         )),
                   ),
-                  Text("OR", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300, color: Theme.of(context).colorScheme.onSurfaceVariant)),
+                  Text("OR",
+                      style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w300,
+                          color:
+                              Theme.of(context).colorScheme.onSurfaceVariant)),
                   Expanded(
                     child: Container(
                         margin: const EdgeInsets.only(left: 18),
@@ -213,10 +243,13 @@ class _GroupSetupPageState extends State<GroupSetupPage> {
                 ])),
             const SizedBox(
               width: double.infinity,
-              child: Text("Create a Group", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+              child: Text("Create a Group",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
             ),
             const SizedBox(height: 18),
-            Text("If you do not have a group to join, you can create a new group.", style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300)),
+            Text(
+                "If you do not have a group to join, you can create a new group.",
+                style: TextStyle(fontSize: 14, fontWeight: FontWeight.w300)),
             const SizedBox(height: 18),
             LongButton(
               onPressed: () {

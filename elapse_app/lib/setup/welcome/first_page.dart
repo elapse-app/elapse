@@ -1,9 +1,6 @@
 import 'package:elapse_app/screens/widgets/long_button.dart';
-import 'package:elapse_app/setup/signup/login_or_signup.dart';
 import 'package:elapse_app/setup/signup/login_page.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/setup/welcome/features.dart';
 
 // class FirstSetupPage extends StatefulWidget {
@@ -37,12 +34,13 @@ class FirstSetupPage extends StatelessWidget {
               child: SizedBox(
                 width: 88,
                 height: 32.5,
-                child: Image.asset(isDarkMode ? 'assets/dg4x.png' : 'assets/lg4x.png'),
+                child: Image.asset(
+                    isDarkMode ? 'assets/dg4x.png' : 'assets/lg4x.png'),
               ),
             ),
             Flexible(
-              child: Container(),
               flex: 1,
+              child: Container(),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(23.0, 23, 23.0, 0),
@@ -85,8 +83,8 @@ class FirstSetupPage extends StatelessWidget {
               ),
             ),
             Flexible(
-              child: Container(),
               flex: 2,
+              child: Container(),
             ),
             Container(
               decoration: BoxDecoration(

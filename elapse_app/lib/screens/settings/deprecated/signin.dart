@@ -1,4 +1,3 @@
-import 'package:elapse_app/extras/database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -59,7 +58,7 @@ class _AuthSignInState extends State<AuthSignIn> {
 
   Future<void> signIN() async {
     try {
-      final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );
@@ -132,8 +131,7 @@ class _AuthSignInState extends State<AuthSignIn> {
 
   Future<void> signUP() async {
     try {
-      final credential =
-          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      await FirebaseAuth.instance.createUserWithEmailAndPassword(
         email: emailController.text,
         password: passwordController.text,
       );

@@ -48,120 +48,127 @@ class _CompleteSetupPageState extends State<CompleteSetupPage> {
         //     ),
         //   ),
         // ),
-        body: CustomScrollView(physics: const NeverScrollableScrollPhysics(), slivers: [
-          ElapseAppBar(
-            title: Row(children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: const Icon(Icons.arrow_back),
+        body: CustomScrollView(
+            physics: const NeverScrollableScrollPhysics(),
+            slivers: [
+              ElapseAppBar(
+                title: Row(children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Icon(Icons.arrow_back),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Sign up',
+                    style: TextStyle(
+                      fontSize: 24,
+                      fontFamily: 'Manrope',
+                      fontWeight: FontWeight.w600,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+                  ),
+                ]),
+                maxHeight: 60,
               ),
-              const SizedBox(width: 12),
-              Text(
-                'Sign up',
-                style: TextStyle(
-                  fontSize: 24,
-                  fontFamily: 'Manrope',
-                  fontWeight: FontWeight.w600,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
-              ),
-            ]),
-            maxHeight: 60,
-          ),
-          SliverFillRemaining(
-            hasScrollBody: false,
-            child: Container(
-              height: double.infinity,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.surface,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
-                ),
-              ),
-              child: Container(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 23.0),
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        height: 46,
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                        child: Center(
-                          child: RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              text: 'You\'re ready to go',
-                              style: TextStyle(
-                                fontFamily: "Manrope",
-                                fontSize: 32,
-                                fontWeight: FontWeight.w300,
-                                color: Theme.of(context).colorScheme.secondary,
-                              ),
-                            ),
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Container(
+                  height: double.infinity,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.surface,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
+                  child: Container(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 23.0),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            height: 46,
                           ),
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
-                        child: Center(
-                          child: RichText(
-                            textAlign: TextAlign.center,
-                            text: TextSpan(
-                              text: 'All set up!',
-                              style: TextStyle(
-                                fontWeight: FontWeight.w400,
-                                fontFamily: "Manrope",
-                                fontSize: 16,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      Spacer(flex: 1),
-                      Center(
-                        child: Container(
-                          height: MediaQuery.of(context).size.height * 0.50, // Fixed height
-                          width: MediaQuery.of(context).size.height *
-                              0.50 /
-                              (452 / 240), // Fixed width (9:18 aspect ratio)
-                          child: Container(
-                            alignment: Alignment.center,
-                            child: Image.asset(Theme.of(context).brightness == Brightness.dark
-                                ? 'assets/allDoneDark.png'
-                                : 'assets/allDone.png'),
-                          ),
-                        ),
-                      ),
-                      Spacer(flex: 2),
-                      LongButton(
-                          icon: Icons.send_rounded,
-                          gradient: true,
-                          onPressed: () {
-                            prefs.setBool("isSetUp", true);
-                            Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => MyApp(), // Navigate to main app
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                            child: Center(
+                              child: RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  text: 'You\'re ready to go',
+                                  style: TextStyle(
+                                    fontFamily: "Manrope",
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.w300,
+                                    color:
+                                        Theme.of(context).colorScheme.secondary,
+                                  ),
                                 ),
-                                ModalRoute.withName("/Home"));
-                          },
-                          text: "Take me to the app"),
-                      SizedBox(
-                        height: 38,
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          Padding(
+                            padding: const EdgeInsets.fromLTRB(16, 0, 16, 0),
+                            child: Center(
+                              child: RichText(
+                                textAlign: TextAlign.center,
+                                text: TextSpan(
+                                  text: 'All set up!',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w400,
+                                    fontFamily: "Manrope",
+                                    fontSize: 16,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          Spacer(flex: 1),
+                          Center(
+                            child: SizedBox(
+                              height: MediaQuery.of(context).size.height *
+                                  0.50, // Fixed height
+                              width: MediaQuery.of(context).size.height *
+                                  0.50 /
+                                  (452 /
+                                      240), // Fixed width (9:18 aspect ratio)
+                              child: Container(
+                                alignment: Alignment.center,
+                                child: Image.asset(
+                                    Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? 'assets/allDoneDark.png'
+                                        : 'assets/allDone.png'),
+                              ),
+                            ),
+                          ),
+                          Spacer(flex: 2),
+                          LongButton(
+                              icon: Icons.send_rounded,
+                              gradient: true,
+                              onPressed: () async {
+                                await prefs.setBool("isSetUp", true);
+                                if (!context.mounted) {
+                                  return;
+                                }
+                                Navigator.of(context)
+                                    .popUntil((route) => route.isFirst);
+                                myAppKey.currentState?.reloadApp();
+                              },
+                              text: "Take me to the app"),
+                          SizedBox(
+                            height: 38,
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ),
-        ]));
+            ]));
   }
 }

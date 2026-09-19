@@ -1,10 +1,8 @@
 import 'package:elapse_app/main.dart';
-import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/screens/widgets/app_bar.dart';
 import 'package:elapse_app/screens/widgets/long_button.dart';
 import 'package:elapse_app/setup/configure/tournament_mode_setup.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:lottie/lottie.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import '../../classes/Team/teamPreview.dart';
@@ -188,7 +186,7 @@ class _NotifsSetupState extends State<NotifsSetup> {
 Future<void> askForNotifPerms() async {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
-  NotificationSettings settings = await messaging.requestPermission(
+  await messaging.requestPermission(
     alert: true,
     announcement: false,
     badge: true,

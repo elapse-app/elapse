@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:elapse_app/screens/widgets/big_error_message.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../classes/Team/teamPreview.dart';
@@ -63,7 +62,8 @@ class _ManageTeamPageState extends State<ManageTeamPage> {
                     ),
                   ),
                   Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 30, vertical: 10),
                       child: TextField(
                         textInputAction: TextInputAction.search,
                         onSubmitted: (query) {
@@ -98,18 +98,27 @@ class _ManageTeamPageState extends State<ManageTeamPage> {
                       case ConnectionState.active:
                         return const SliverToBoxAdapter(
                             child: Center(
-                                child: Padding(padding: EdgeInsets.only(top: 50), child: CircularProgressIndicator())));
+                                child: Padding(
+                                    padding: EdgeInsets.only(top: 50),
+                                    child: CircularProgressIndicator())));
                       case ConnectionState.done:
                         if (snapshot.hasError) {
                           print(snapshot.error);
                           return const SliverToBoxAdapter(
-                              child: BigErrorMessage(icon: Icons.search_off, message: "Unable to fetch teams"));
+                              child: BigErrorMessage(
+                                  icon: Icons.search_off,
+                                  message: "Unable to fetch teams"));
                         }
 
-                        List<TeamPreview> teams = (snapshot.data as List<TeamPreview>).toSet().toList();
+                        List<TeamPreview> teams =
+                            (snapshot.data as List<TeamPreview>)
+                                .toSet()
+                                .toList();
                         if (teams.isEmpty) {
                           return const SliverToBoxAdapter(
-                              child: BigErrorMessage(icon: Icons.search_off, message: "No teams found"));
+                              child: BigErrorMessage(
+                                  icon: Icons.search_off,
+                                  message: "No teams found"));
                         }
 
                         return SliverList(
@@ -119,7 +128,8 @@ class _ManageTeamPageState extends State<ManageTeamPage> {
                               return Column(children: [
                                 GestureDetector(
                                   onTap: () {
-                                    List<TeamPreview> savedTeams = getSavedTeams();
+                                    List<TeamPreview> savedTeams =
+                                        getSavedTeams();
 
                                     if (savedTeams.contains(team)) {
                                       savedTeams.remove(team);
@@ -128,74 +138,96 @@ class _ManageTeamPageState extends State<ManageTeamPage> {
                                     }
 
                                     if (savedTeams.isEmpty) {
-                                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                        content: Text("Must have at least one saved team"),
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(SnackBar(
+                                        content: Text(
+                                            "Must have at least one saved team"),
                                         duration: Duration(seconds: 1),
                                       ));
                                       return;
                                     }
 
-                                    prefs.setString("savedTeam", jsonEncode(savedTeams[0].toJson()));
-                                    prefs.setStringList("savedTeams",
-                                        savedTeams.sublist(1).map((e) => jsonEncode(e.toJson())).toList());
+                                    prefs.setString("savedTeam",
+                                        jsonEncode(savedTeams[0].toJson()));
+                                    prefs.setStringList(
+                                        "savedTeams",
+                                        savedTeams
+                                            .sublist(1)
+                                            .map((e) => jsonEncode(e.toJson()))
+                                            .toList());
                                     setState(() {
                                       savedTeams = getSavedTeams();
                                     });
                                   },
                                   child: Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 10),
-                                    child: Flex(direction: Axis.horizontal, children: [
-                                      Flexible(
-                                        flex: 6,
-                                        fit: FlexFit.tight,
-                                        child: Text(team.teamNumber,
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
-                                            style: TextStyle(
-                                                fontSize: 40,
-                                                height: 1,
-                                                letterSpacing: -1.5,
-                                                fontWeight: FontWeight.w400,
-                                                color: Theme.of(context).colorScheme.onSurface)),
-                                      ),
-                                      Flexible(
-                                        flex: 7,
-                                        fit: FlexFit.tight,
-                                        child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                          crossAxisAlignment: CrossAxisAlignment.end,
-                                          children: [
-                                            Text(team.teamName ?? "",
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 10),
+                                    child: Flex(
+                                        direction: Axis.horizontal,
+                                        children: [
+                                          Flexible(
+                                            flex: 6,
+                                            fit: FlexFit.tight,
+                                            child: Text(team.teamNumber,
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
-                                                style: const TextStyle(
-                                                  fontSize: 16,
-                                                )),
-                                            Text(
-                                                '${team.location?.city ?? ""}${team.location?.city != null ? "," : ""} ${team.location?.region ?? ""}',
-                                                textAlign: TextAlign.end,
                                                 style: TextStyle(
-                                                  fontSize: 16,
-                                                  color:
-                                                      Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65),
-                                                ))
-                                          ],
-                                        ),
-                                      ),
-                                      Flexible(
-                                        flex: 2,
-                                        fit: FlexFit.tight,
-                                        child: Icon(
-                                          getSavedTeams().contains(team) ? Icons.check : Icons.add,
-                                        ),
-                                      )
-                                    ]),
+                                                    fontSize: 40,
+                                                    height: 1,
+                                                    letterSpacing: -1.5,
+                                                    fontWeight: FontWeight.w400,
+                                                    color: Theme.of(context)
+                                                        .colorScheme
+                                                        .onSurface)),
+                                          ),
+                                          Flexible(
+                                            flex: 7,
+                                            fit: FlexFit.tight,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceEvenly,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: [
+                                                Text(team.teamName ?? "",
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: const TextStyle(
+                                                      fontSize: 16,
+                                                    )),
+                                                Text(
+                                                    '${team.location?.city ?? ""}${team.location?.city != null ? "," : ""} ${team.location?.region ?? ""}',
+                                                    textAlign: TextAlign.end,
+                                                    style: TextStyle(
+                                                      fontSize: 16,
+                                                      color: Theme.of(context)
+                                                          .colorScheme
+                                                          .onSurface
+                                                          .withValues(
+                                                              alpha: 0.65),
+                                                    ))
+                                              ],
+                                            ),
+                                          ),
+                                          Flexible(
+                                            flex: 2,
+                                            fit: FlexFit.tight,
+                                            child: Icon(
+                                              getSavedTeams().contains(team)
+                                                  ? Icons.check
+                                                  : Icons.add,
+                                            ),
+                                          )
+                                        ]),
                                   ),
                                 ),
                                 index != teams.length - 1
                                     ? Divider(
                                         height: 3,
-                                        color: Theme.of(context).colorScheme.surfaceDim,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .surfaceDim,
                                       )
                                     : const SizedBox.shrink(),
                               ]);
@@ -220,16 +252,23 @@ class _ManageTeamPageState extends State<ManageTeamPage> {
                               savedTeams.add(team);
                             }
                             if (savedTeams.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text("Must have at least one saved team"),
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(SnackBar(
+                                content:
+                                    Text("Must have at least one saved team"),
                                 duration: Duration(seconds: 1),
                               ));
                               return;
                             }
 
-                            prefs.setString("savedTeam", jsonEncode(savedTeams[0].toJson()));
+                            prefs.setString("savedTeam",
+                                jsonEncode(savedTeams[0].toJson()));
                             prefs.setStringList(
-                                "savedTeams", savedTeams.sublist(1).map((e) => jsonEncode(e.toJson())).toList());
+                                "savedTeams",
+                                savedTeams
+                                    .sublist(1)
+                                    .map((e) => jsonEncode(e.toJson()))
+                                    .toList());
                             setState(() {});
                           },
                           behavior: HitTestBehavior.translucent,
@@ -247,13 +286,16 @@ class _ManageTeamPageState extends State<ManageTeamPage> {
                                         height: 1,
                                         letterSpacing: -1.5,
                                         fontWeight: FontWeight.w400,
-                                        color: Theme.of(context).colorScheme.onSurface)),
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface)),
                               ),
                               Flexible(
                                 flex: 7,
                                 fit: FlexFit.tight,
                                 child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
                                   crossAxisAlignment: CrossAxisAlignment.end,
                                   children: [
                                     Text(team.teamName ?? "",
@@ -267,7 +309,10 @@ class _ManageTeamPageState extends State<ManageTeamPage> {
                                         textAlign: TextAlign.end,
                                         style: TextStyle(
                                           fontSize: 16,
-                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.65),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.65),
                                         ))
                                   ],
                                 ),
@@ -276,7 +321,9 @@ class _ManageTeamPageState extends State<ManageTeamPage> {
                                 flex: 2,
                                 fit: FlexFit.tight,
                                 child: Icon(
-                                  getSavedTeams().contains(team) ? Icons.check : Icons.add,
+                                  getSavedTeams().contains(team)
+                                      ? Icons.check
+                                      : Icons.add,
                                 ),
                               )
                             ]),

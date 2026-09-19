@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import '../../classes/Users/user.dart';
@@ -13,6 +12,8 @@ import '../widgets/rounded_top.dart';
 import 'group_settings.dart';
 
 class GroupCreatePage extends StatefulWidget {
+  const GroupCreatePage({super.key});
+
   @override
   State<GroupCreatePage> createState() => _GroupCreatePageState();
 }
@@ -50,7 +51,8 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
               child: Column(children: [
             const SizedBox(
               width: double.infinity,
-              child: Text("Enter Details", style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
+              child: Text("Enter Details",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w500)),
             ),
             const SizedBox(height: 18),
             Align(
@@ -67,7 +69,10 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                   enabledBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(9),
                     borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.25),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.25),
                       width: 2.0,
                     ),
                   ),
@@ -105,9 +110,13 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
               onPressed: () async {
                 Database database = Database();
                 final currentUser = FirebaseAuth.instance.currentUser;
-                ElapseUser currentElapseUser = ElapseUser.fromJson(jsonDecode(prefs.getString("currentUser")!));
+                ElapseUser currentElapseUser = ElapseUser.fromJson(
+                    jsonDecode(prefs.getString("currentUser")!));
                 await database
-                    .createTeamGroup(currentUser!.uid, groupNameController.text, currentElapseUser.fname ?? "",
+                    .createTeamGroup(
+                        currentUser!.uid,
+                        groupNameController.text,
+                        currentElapseUser.fname ?? "",
                         currentElapseUser.lname ?? "")
                     .then((value) {
                   print(value?.toJson());
@@ -125,7 +134,8 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                       builder: (context) {
                         return AlertDialog(
                           title: Text("Error Occured"),
-                          content: Text("An error occured when creating your account, please try again"),
+                          content: Text(
+                              "An error occured when creating your account, please try again"),
                           actions: [
                             TextButton(
                                 onPressed: () {
@@ -133,7 +143,10 @@ class _GroupCreatePageState extends State<GroupCreatePage> {
                                 },
                                 child: Text(
                                   "Cancel",
-                                  style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                                  style: TextStyle(
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .secondary),
                                 ))
                           ],
                         );
