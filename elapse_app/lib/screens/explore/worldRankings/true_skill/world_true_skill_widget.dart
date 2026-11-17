@@ -20,7 +20,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        worldTrueSkillPage(context, stats.teamId, stats.teamNum, stats.teamName!, stats);
+        worldTrueSkillPage(context, stats.teamId, stats.teamNum, stats.teamName ?? "", stats);
       },
       child: Container(
           height: 72,
@@ -52,7 +52,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
                                       color: Theme.of(context)
                                           .colorScheme
                                           .onSurface)),
-                              Text(stats.teamName!,
+                              Text(stats.teamName ?? "",
                                 softWrap: false,
                                 overflow: TextOverflow.fade,
                                 style: TextStyle(
@@ -105,11 +105,11 @@ class WorldTrueSkillWidget extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   sort == 0 || sort >= 3
-                                      ? Text("CCWM ${stats.ccwmAvg}",
+                                      ? Text("CCWM ${stats.ccwmAvg.toStringAsFixed(1)}",
                                           style: const TextStyle(
                                             fontSize: 16,
                                           ))
-                                      : Text("OPR ${stats.oprAvg}",
+                                      : Text("OPR ${stats.oprAvg.toStringAsFixed(1)}",
                                           style: const TextStyle(
                                             fontSize: 16,
                                           )),
@@ -125,7 +125,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
                                           style: const TextStyle(
                                             fontSize: 16,
                                           ))
-                                      : Text("DPR ${stats.dprAvg}",
+                                      : Text("DPR ${stats.dprAvg.toStringAsFixed(1)}",
                                           style: const TextStyle(
                                             fontSize: 16,
                                           )),

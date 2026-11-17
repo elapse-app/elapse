@@ -85,6 +85,12 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
 
   late Future<List<WorldSkillsStats>> worldSkillsStats;
   List<VexDexStats>? loadedVexDex;
+  // Tracks which team numbers loadedVexDex was last fetched for. The
+  // tournament often mounts with a partial/preview team list and later
+  // streams in the full roster via didUpdateWidget (not initState), so a
+  // one-shot fetch in initState alone would permanently miss teams that
+  // arrive after that first snapshot.
+  Set<String> _vexDexFetchedForTeamNums = {};
 
   void savedPress() {
     setState(() {
@@ -165,6 +171,29 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
       selectedIndex = 0;
     }
 
+    // The team roster often arrives after this widget's first build (see
+    // _vexDexFetchedForTeamNums), so re-check every time derived state syncs.
+    _refreshVexDexIfNeeded();
+
+  }
+
+  /// Fetches VexDex data for any team in the current roster not already
+  /// covered by loadedVexDex. A no-op once every current team has been
+  /// fetched, so it's cheap to call from every derived-state sync.
+  void _refreshVexDexIfNeeded() {
+    final currentNums =
+        tournament.teams.map((t) => t.teamNumber ?? "").where((n) => n.isNotEmpty).toSet();
+    if (currentNums.isEmpty || currentNums.every(_vexDexFetchedForTeamNums.contains)) {
+      return;
+    }
+    _vexDexFetchedForTeamNums = currentNums;
+    getVexDexTeamsByNumber(tournament.seasonID, currentNums.toList()).then((data) {
+      if (mounted) {
+        setState(() {
+          loadedVexDex = data.values.toList();
+        });
+      }
+    });
   }
 
   /// Updates tournament data while preserving UI state. Calls setState to
@@ -193,16 +222,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
     savedQuery = "";
 
     worldSkillsStats = getWorldSkillsRankings(tournament.seasonID, getGradeLevel(prefs.getString("defaultGrade")));
-    getVexDexTeamsByNumber(
-      tournament.seasonID,
-      tournament.teams.map((t) => t.teamNumber ?? "").where((n) => n.isNotEmpty).toList(),
-    ).then((data) {
-      if (mounted) {
-        setState(() {
-          loadedVexDex = data.values.toList();
-        });
-      }
-    });
+    _refreshVexDexIfNeeded();
 
     // Process games once on init, not every build
     _processGames();
@@ -381,7 +401,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             skills: tournament.tournamentSkills!,
             worldSkills:
                 jsonDecode(worldSkillsData).map<WorldSkillsStats>((e) => WorldSkillsStats.fromJson(e)).toList(),
-            vda: loadedVexDex,
+            vexDex: loadedVexDex,
           );
         }
         return FutureBuilder(
@@ -409,7 +429,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                   filter: filter,
                   skills: tournament.tournamentSkills!,
                   worldSkills: snapshot.data as List<WorldSkillsStats>,
-                  vda: loadedVexDex,
+                  vexDex: loadedVexDex,
                 );
             }
           },
@@ -470,16 +490,10 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                   tournament.seasonID,
                   getGradeLevel(prefs.getString("defaultGrade")),
                 );
-                getVexDexTeamsByNumber(
-                  tournament.seasonID,
-                  tournament.teams.map((t) => t.teamNumber ?? "").where((n) => n.isNotEmpty).toList(),
-                ).then((data) {
-                  if (mounted) {
-                    setState(() {
-                      loadedVexDex = data.values.toList();
-                    });
-                  }
-                });
+                // Force a genuine re-fetch even if the roster is unchanged —
+                // a manual refresh implies the user wants current data.
+                _vexDexFetchedForTeamNums = {};
+                _refreshVexDexIfNeeded();
               }
             } catch (e) {
               if (kDebugMode) debugPrint('Refresh failed: $e');
@@ -489,7 +503,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             controller: _scrollController,
             slivers: [
               ElapseAppBar(
-                showVDAWarning: false,
+                showVexDexWarning: false,
                 title: Row(
                   children: [
                     Text(

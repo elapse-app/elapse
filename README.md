@@ -43,7 +43,7 @@ class firebaseTokens {
 }
 ```  
   
-You will also need to add a `token.dart` file to `/elapse_app/lib/extras` which contains your tokens from the [RobotEvents.com api](https://www.robotevents.com/api/v2). Elapse utilizes several tokens to prevent getting ratelimited by RobotEvents, but only 1 token should be required.
+You will also need to add a `token.dart` file to `/elapse_app/lib/extras` which contains your tokens from the [VEX Events API](https://events.vex.com/api/v2). Elapse utilizes several tokens to prevent getting ratelimited by VEX Events, but only 1 token should be required.
 ```dart
 import 'dart:math';
 

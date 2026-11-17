@@ -42,8 +42,8 @@ class _AllTeamsState extends State<AllTeams> {
 
   Future<List<WorldSkillsStats>>? skillsStats;
   List<WorldSkillsStats>? loadedSkills;
-  Future<Map<String, VexDexStats>>? vdaStats;
-  Map<String, VexDexStats>? loadedVDA;
+  Future<Map<String, VexDexStats>>? vexDexStatsFuture;
+  Map<String, VexDexStats>? loadedVexDex;
 
   WorldRankingsFilter filter = WorldRankingsFilter();
 
@@ -67,13 +67,13 @@ class _AllTeamsState extends State<AllTeams> {
       }
       return data;
     });
-    vdaStats = getVexDexTeamsByNumber(
+    vexDexStatsFuture = getVexDexTeamsByNumber(
       tournament.seasonID,
       tournament.teams.map((t) => t.teamNumber ?? "").where((n) => n.isNotEmpty).toList(),
     ).then((data) {
       if (mounted) {
         setState(() {
-          loadedVDA = data;
+          loadedVexDex = data;
         });
       }
       return data;
@@ -154,26 +154,26 @@ class _AllTeamsState extends State<AllTeams> {
         break;
       case 2:
         teams.sort((a, b) {
-          return (loadedVDA![b.teamNumber]?.oprAvg ?? -1e5)
-              .compareTo(loadedVDA![a.teamNumber]?.oprAvg ?? -1e5);
+          return (loadedVexDex![b.teamNumber]?.oprAvg ?? -1e5)
+              .compareTo(loadedVexDex![a.teamNumber]?.oprAvg ?? -1e5);
         });
         break;
       case 3:
         teams.sort((a, b) {
-          return (loadedVDA![a.teamNumber]?.dprAvg ?? 1e5)
-              .compareTo(loadedVDA![b.teamNumber]?.dprAvg ?? 1e5);
+          return (loadedVexDex![a.teamNumber]?.dprAvg ?? 1e5)
+              .compareTo(loadedVexDex![b.teamNumber]?.dprAvg ?? 1e5);
         });
         break;
       case 4:
         teams.sort((a, b) {
-          return (loadedVDA![b.teamNumber]?.ccwmAvg ?? -1e5)
-              .compareTo(loadedVDA![a.teamNumber]?.ccwmAvg ?? -1e5);
+          return (loadedVexDex![b.teamNumber]?.ccwmAvg ?? -1e5)
+              .compareTo(loadedVexDex![a.teamNumber]?.ccwmAvg ?? -1e5);
         });
         break;
       case 5:
         teams.sort((a, b) {
-          return (loadedVDA![b.teamNumber]?.winPercent ?? -1e5)
-              .compareTo(loadedVDA![a.teamNumber]?.winPercent ?? -1e5);
+          return (loadedVexDex![b.teamNumber]?.winPercent ?? -1e5)
+              .compareTo(loadedVexDex![a.teamNumber]?.winPercent ?? -1e5);
         });
         break;
       case 6:
@@ -184,8 +184,8 @@ class _AllTeamsState extends State<AllTeams> {
         break;
       case 7:
         teams.sort((a, b) {
-          return (loadedVDA![b.teamNumber]?.trueSkill ?? 0)
-              .compareTo(loadedVDA![a.teamNumber]?.trueSkill ?? 0);
+          return (loadedVexDex![b.teamNumber]?.trueSkill ?? 0)
+              .compareTo(loadedVexDex![a.teamNumber]?.trueSkill ?? 0);
         });
         break;
     }
@@ -232,7 +232,7 @@ class _AllTeamsState extends State<AllTeams> {
                             children: List<Widget>.generate(sorts.length, (int index) {
                               if (index >= 2) {
                                 return FutureBuilder(
-                                    future: index == 6 ? skillsStats : vdaStats,
+                                    future: index == 6 ? skillsStats : vexDexStatsFuture,
                                     builder: (context, snapshot) {
                                       return Container(
                                         padding: const EdgeInsets.only(right: 5),
@@ -322,7 +322,7 @@ class _AllTeamsState extends State<AllTeams> {
                           ),
                           onPressed: () async {
                             List<String> regions = loadedSkills?.map((e) => e.eventRegion!.name).toList() ?? [];
-                            regions.addAll(loadedVDA?.values.map((e) => e.region ?? "") ?? []);
+                            regions.addAll(loadedVexDex?.values.map((e) => e.region ?? "") ?? []);
                             regions = regions.toSet().toList();
                             regions.sort();
 
@@ -348,22 +348,22 @@ class _AllTeamsState extends State<AllTeams> {
                       subInfo = '${teams[index].location?.city ?? ""}${teams[index].location?.city != null ? "," : ""} ${teams[index].location?.region ?? ""}';
                       break;
                     case 2:
-                      subInfo = "OPR ${loadedVDA![teams[index].teamNumber]?.oprAvg ?? "—"}";
+                      subInfo = "OPR ${loadedVexDex![teams[index].teamNumber]?.oprAvg.toStringAsFixed(1) ?? "—"}";
                       break;
                     case 3:
-                      subInfo = "DPR ${loadedVDA![teams[index].teamNumber]?.dprAvg ?? "—"}";
+                      subInfo = "DPR ${loadedVexDex![teams[index].teamNumber]?.dprAvg.toStringAsFixed(1) ?? "—"}";
                       break;
                     case 4:
-                      subInfo = "CCWM ${loadedVDA![teams[index].teamNumber]?.ccwmAvg ?? "—"}";
+                      subInfo = "CCWM ${loadedVexDex![teams[index].teamNumber]?.ccwmAvg.toStringAsFixed(1) ?? "—"}";
                       break;
                     case 5:
-                      subInfo = "${loadedVDA![teams[index].teamNumber]?.winPercent ?? "—"}%";
+                      subInfo = "${loadedVexDex![teams[index].teamNumber]?.winPercent.toStringAsFixed(1) ?? "—"}%";
                       break;
                     case 6:
                       subInfo = "${loadedSkills!.singleWhereOrNull((e) => e.teamId == teams[index].id)?.score ?? "—"} pts";
                       break;
                     case 7:
-                      subInfo = loadedVDA![teams[index].teamNumber]?.trueSkill.toString() ?? "—";
+                      subInfo = loadedVexDex![teams[index].teamNumber]?.trueSkill.toStringAsFixed(1) ?? "—";
                       break;
                   }
 

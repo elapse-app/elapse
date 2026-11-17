@@ -1,10 +1,10 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/classes/Team/vexDexStats.dart';
 import 'package:elapse_app/extras/token.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../Filters/gradeLevel.dart';
@@ -57,74 +57,69 @@ TeamPreview loadTeamPreview(teamPreview) {
 }
 
 Future<List<TeamPreview>> fetchTeamPreview(String searchQuery) async {
-  List<TeamPreview> teams = [];
-  Completer<void> robotEventsCompleter = Completer<void>();
-  Completer<void> vexDexCompleter = Completer<void>();
+  final results = await Future.wait([
+    _fetchVexEventsTeam(searchQuery),
+    _fetchVexDexTeams(searchQuery),
+  ]);
 
-  http.get(
-    Uri.parse(
-        'https://events.vex.com/api/v2/teams?number%5B%5D=$searchQuery&program%5B%5D=1&program%5B%5D=4&myTeams=false'),
-    headers: {
-      HttpHeaders.authorizationHeader: getToken(),
-    },
-  ).then((response) {
-    if (response.statusCode == 200) {
-      var responseData = jsonDecode(response.body)["data"];
-      if (responseData.isNotEmpty) {
-        teams.add(TeamPreview(
-            teamNumber: responseData[0]["number"],
-            teamID: responseData[0]["id"],
-            teamName: responseData[0]["team_name"],
-            location: Location(
-              address1: responseData[0]["location"]["address_1"],
-              address2: responseData[0]["location"]["address_2"],
-              city: responseData[0]["location"]["city"],
-              region: responseData[0]["location"]["region"],
-              country: responseData[0]["location"]["country"],
-              venue: responseData[0]["location"]["venue"],
-            ),
-            gradeLevel: gradeLevels[responseData[0]["grade"]],
-        ));
+  return results.expand((r) => r).toSet().toList();
+}
 
-        if (!vexDexCompleter.isCompleted) {
-          vexDexCompleter.complete();
-        }
-      }
-      if (!robotEventsCompleter.isCompleted) {
-        robotEventsCompleter.complete();
-      }
-    } else {
-      throw Exception('Failed to load team preview');
+const Duration _teamSearchTimeout = Duration(seconds: 10);
+
+Future<List<TeamPreview>> _fetchVexEventsTeam(String searchQuery) async {
+  try {
+    final response = await http.get(
+      Uri.parse(
+          'https://events.vex.com/api/v2/teams?number%5B%5D=$searchQuery&program%5B%5D=1&program%5B%5D=4&myTeams=false'),
+      headers: {
+        HttpHeaders.authorizationHeader: getToken(),
+      },
+    ).timeout(_teamSearchTimeout);
+    if (response.statusCode != 200) {
+      debugPrint("VEX Events team search failed (${response.statusCode}) for '$searchQuery'");
+      return [];
     }
-  });
-
-  // VexDex has no substring/name search, only exact-number lookup — this
-  // fallback only catches "typed an exact team number RobotEvents missed",
-  // not the old partial-name-match search VDA used to support.
-  if (searchQuery.isNotEmpty) {
-    getVexDexTeamByNumber(seasons[0].vrcId, searchQuery.toUpperCase()).then((team) {
-      if (!vexDexCompleter.isCompleted && team != null) {
-        teams.add(TeamPreview(
-          teamNumber: team.teamNum,
-          teamID: team.teamId,
-          location: team.region != null ? Location(region: team.region) : null,
-          teamName: team.teamName,
-          gradeLevel: team.gradeLevel,
-        ));
-
-        if (!robotEventsCompleter.isCompleted) {
-          robotEventsCompleter.complete();
-        }
-        vexDexCompleter.complete();
-      }
-    });
+    final responseData = jsonDecode(response.body)["data"];
+    if (responseData.isEmpty) return [];
+    return [
+      TeamPreview(
+        teamNumber: responseData[0]["number"],
+        teamID: responseData[0]["id"],
+        teamName: responseData[0]["team_name"],
+        location: Location(
+          address1: responseData[0]["location"]["address_1"],
+          address2: responseData[0]["location"]["address_2"],
+          city: responseData[0]["location"]["city"],
+          region: responseData[0]["location"]["region"],
+          country: responseData[0]["location"]["country"],
+          venue: responseData[0]["location"]["venue"],
+        ),
+        gradeLevel: gradeLevels[responseData[0]["grade"]],
+      )
+    ];
+  } catch (e) {
+    debugPrint("VEX Events team search failed for '$searchQuery': $e");
+    return [];
   }
+}
 
-  await Future.any([robotEventsCompleter.future, vexDexCompleter.future]);
-  // remove duplicates from teams
-  // Remove duplicates based on teamNumber
-  final uniqueTeams = teams.toSet();
-  teams = uniqueTeams.toList();
-
-  return teams;
+Future<List<TeamPreview>> _fetchVexDexTeams(String searchQuery) async {
+  if (searchQuery.isEmpty) return [];
+  try {
+    final page = await getVexDexLeaderboard(seasons[0].vrcId, search: searchQuery, limit: 20)
+        .timeout(_teamSearchTimeout);
+    return page.items
+        .map((team) => TeamPreview(
+              teamNumber: team.teamNum,
+              teamID: team.teamId,
+              location: team.region != null ? Location(region: team.region) : null,
+              teamName: team.teamName,
+              gradeLevel: team.gradeLevel,
+            ))
+        .toList();
+  } catch (e) {
+    debugPrint("VexDex team search failed for '$searchQuery': $e");
+    return [];
+  }
 }

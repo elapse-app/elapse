@@ -79,7 +79,7 @@ class _InfoPageState extends State<InfoPage> {
                       launchUrl(Uri.https("events.vex.com",
                           "/robot-competitions/vex-robotics-competition/${tournament.sku}.html"));
                     },
-                    child: const Text("View on RobotEvents"),
+                    child: const Text("View on VEX Events"),
                   ),
                   const SizedBox(
                     height: 20,

@@ -456,7 +456,7 @@ List<Widget> Details(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  stats.trueSkill.toString(),
+                                  stats.trueSkill.toStringAsFixed(2),
                                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                 ),
                                 const Text("Score", style: TextStyle(fontSize: 16))
@@ -489,7 +489,7 @@ List<Widget> Details(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  stats.oprAvg.toString(),
+                                  stats.oprAvg.toStringAsFixed(2),
                                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                 ),
                                 const Text("OPR", style: TextStyle(fontSize: 16))
@@ -502,7 +502,7 @@ List<Widget> Details(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  stats.dprAvg.toString(),
+                                  stats.dprAvg.toStringAsFixed(2),
                                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                 ),
                                 const Text("DPR", style: TextStyle(fontSize: 16))
@@ -515,7 +515,7 @@ List<Widget> Details(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  stats.ccwmAvg.toString(),
+                                  stats.ccwmAvg.toStringAsFixed(2),
                                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                 ),
                                 const Text("CCWM", style: TextStyle(fontSize: 16))

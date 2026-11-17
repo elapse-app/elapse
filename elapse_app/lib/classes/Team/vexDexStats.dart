@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../../extras/token.dart';
@@ -156,17 +157,24 @@ Future<VexDexStats?> getVexDexTeamById(int seasonId, int teamId) async {
 /// sort must be one of "ts" | "pick_list" | "ccwm" | "opr" — matches VexDex's
 /// server-side sort options exactly (api.py's _LEADERBOARD_SORTS). There is
 /// no server-side support for sorting by dpr or win percent.
+///
+/// [search], when given, case-insensitively matches teams whose number or
+/// name contains the given substring (server-side, via VexDex's `search`
+/// query param) — the result set is still ordered by [sort] on top of that.
 Future<VexDexLeaderboardPage> getVexDexLeaderboard(
   int seasonId, {
   int limit = 100,
   int offset = 0,
   String sort = "ts",
+  String? search,
 }) async {
-  final uri = Uri.parse("$_vexDexBaseUrl/seasons/$seasonId/teams").replace(queryParameters: {
+  final queryParams = {
     "limit": "$limit",
     "offset": "$offset",
     "sort": sort,
-  });
+  };
+  if (search != null && search.isNotEmpty) queryParams["search"] = search;
+  final uri = Uri.parse("$_vexDexBaseUrl/seasons/$seasonId/teams").replace(queryParameters: queryParams);
   final response = await http.get(uri, headers: _vexDexHeaders());
   if (response.statusCode != 200) {
     throw Exception("VexDex leaderboard request failed (${response.statusCode})");
@@ -180,14 +188,65 @@ Future<VexDexLeaderboardPage> getVexDexLeaderboard(
   );
 }
 
+/// Runs [tasks] with at most [maxConcurrent] in flight at once. VexDex's
+/// Postgres connection pool is small (5 + 5 overflow per gunicorn worker, 2
+/// workers), so firing dozens-to-hundreds of requests at once — as happens
+/// fetching every page of an archived season with 10,000+ teams — can
+/// exhaust it and make the whole fetch fail or hang instead of just being
+/// slower. Batching keeps arbitrarily large fetches reliable at the cost of
+/// some wall-clock time.
+Future<List<T>> _runBatched<T>(List<Future<T> Function()> tasks, {int maxConcurrent = 8}) async {
+  final results = <T>[];
+  for (var i = 0; i < tasks.length; i += maxConcurrent) {
+    final batch = tasks.skip(i).take(maxConcurrent).map((task) => task());
+    results.addAll(await Future.wait(batch));
+  }
+  return results;
+}
+
 /// For a bounded, already-known roster (e.g. one tournament's teams) — avoids
-/// fetching the entire season leaderboard just to filter it down.
+/// fetching the entire season leaderboard just to filter it down. A single
+/// team's lookup failing (network hiccup, transient 5xx) is treated as "no
+/// data for that team" rather than failing the whole roster — otherwise one
+/// bad lookup would silently blank out every other team's data too.
 Future<Map<String, VexDexStats>> getVexDexTeamsByNumber(int seasonId, List<String> teamNums) async {
-  final results = await Future.wait(teamNums.map((n) => getVexDexTeamByNumber(seasonId, n)));
+  final results = await _runBatched(teamNums.map((n) => () async {
+        try {
+          return await getVexDexTeamByNumber(seasonId, n);
+        } catch (e) {
+          debugPrint("getVexDexTeamsByNumber: lookup failed for team $n: $e");
+          return null;
+        }
+      }).toList());
   final Map<String, VexDexStats> map = {};
   for (var i = 0; i < teamNums.length; i++) {
     final r = results[i];
     if (r != null) map[teamNums[i]] = r;
   }
   return map;
+}
+
+/// Every team in a season's leaderboard — for world-rankings-style screens
+/// that (like the Skills tab they sit alongside) load the whole dataset once
+/// rather than paging through it. Fetches the first page to learn `total`,
+/// then fetches the remaining offset-based pages in bounded-concurrency
+/// batches (see [_runBatched]) — a completed/archived season can have
+/// 10,000+ teams (25+ pages), so this can't safely fire every page at once.
+Future<List<VexDexStats>> getAllVexDexTeams(int seasonId, {String sort = "ts"}) async {
+  const pageSize = 500; // VexDex's max `limit` per request.
+  final first = await getVexDexLeaderboard(seasonId, limit: pageSize, offset: 0, sort: sort);
+  if (first.total <= first.items.length) return first.items;
+
+  final remainingOffsets = <int>[
+    for (var offset = pageSize; offset < first.total; offset += pageSize) offset,
+  ];
+  final rest = await _runBatched(
+    remainingOffsets.map((offset) => () => getVexDexLeaderboard(seasonId, limit: pageSize, offset: offset, sort: sort)).toList(),
+  );
+
+  final all = <VexDexStats>[...first.items];
+  for (final page in rest) {
+    all.addAll(page.items);
+  }
+  return all;
 }

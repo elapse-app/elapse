@@ -16,7 +16,7 @@ class ElapseAppBar extends StatelessWidget {
     this.maxHeight = 125,
     this.backBehavior,
     this.settingsCallback,
-    this.showVDAWarning = true,
+    this.showVexDexWarning = true,
   });
   final Widget title;
   final Widget? background;
@@ -24,16 +24,16 @@ class ElapseAppBar extends StatelessWidget {
   final bool backNavigation;
   final Object? returnData;
   final double maxHeight;
-  final bool showVDAWarning;
+  final bool showVexDexWarning;
   final void Function()? backBehavior;
   final void Function()? settingsCallback;
 
   @override
   Widget build(BuildContext context) {
     final remoteConfig = FirebaseRemoteConfigService();
-    final showVDAWarn =
-        !remoteConfig.getBool(FirebaseRemoteConfigKeys.vdaStatusKey);
-    print("PRINT showVDAWarm $showVDAWarn");
+    final showVexDexWarn =
+        !remoteConfig.getBool(FirebaseRemoteConfigKeys.vexDexStatusKey);
+    print("PRINT showVexDexWarn $showVexDexWarn");
     Widget? appBarBackground = background;
     if (includeSettings && background == null) {
       appBarBackground = SafeArea(
@@ -119,7 +119,7 @@ class ElapseAppBar extends StatelessWidget {
               title: Stack(
                 alignment: AlignmentDirectional.centerStart,
                 children: [
-                  showVDAWarning ? Row(
+                  showVexDexWarning ? Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Padding(
@@ -128,7 +128,7 @@ class ElapseAppBar extends StatelessWidget {
                         ),
                         Padding(
                             padding: EdgeInsets.only(right: leftPadding + 5),
-                            child: showVDAWarn
+                            child: showVexDexWarn
                                 ? IconButton(
                                     icon: const Icon(Icons.sync_problem,
                                         size: 24,

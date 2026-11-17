@@ -186,7 +186,7 @@ Future<void> worldTrueSkillPage(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "${stats.oprAvg}",
+                                  stats.oprAvg.toStringAsFixed(1),
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
@@ -204,7 +204,7 @@ Future<void> worldTrueSkillPage(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "${stats.dprAvg}",
+                                  stats.dprAvg.toStringAsFixed(1),
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
@@ -222,7 +222,7 @@ Future<void> worldTrueSkillPage(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "${stats.ccwmAvg}",
+                                  stats.ccwmAvg.toStringAsFixed(1),
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,

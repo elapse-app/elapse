@@ -22,12 +22,12 @@ class RegionFilterPage extends StatefulWidget {
     super.key,
     required this.filter,
     required this.skills,
-    required this.vda,
+    required this.vexDex,
   });
 
   List<String> filter;
   Future<List<WorldSkillsStats>> skills;
-  Future<List<VexDexStats>> vda;
+  Future<List<VexDexStats>> vexDex;
 
   @override
   State<RegionFilterPage> createState() => _RegionFilterPageState();
@@ -37,7 +37,7 @@ class _RegionFilterPageState extends State<RegionFilterPage> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-        future: Future.wait([widget.skills, widget.vda]),
+        future: Future.wait([widget.skills, widget.vexDex]),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const LinearProgressIndicator();

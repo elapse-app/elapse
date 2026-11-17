@@ -395,8 +395,8 @@ class _TMHomePageState extends State<TMHomePage> {
   @override
   Widget build(BuildContext context) {
     final remoteConfig = FirebaseRemoteConfigService();
-    final showVDAWarn =
-        !remoteConfig.getBool(FirebaseRemoteConfigKeys.vdaStatusKey);
+    final showVexDexWarn =
+        !remoteConfig.getBool(FirebaseRemoteConfigKeys.vexDexStatusKey);
 
     String welcomeMessage = "Good Afternoon";
     if (DateTime.now().hour < 12) {
@@ -447,7 +447,7 @@ class _TMHomePageState extends State<TMHomePage> {
                               style: TextStyle(
                                   fontSize: 24, fontWeight: FontWeight.w600),
                             ),
-                            showVDAWarn
+                            showVexDexWarn
                                 ? IconButton(
                                       splashRadius:2,
                                       icon: const Icon(Icons.sync_problem,
