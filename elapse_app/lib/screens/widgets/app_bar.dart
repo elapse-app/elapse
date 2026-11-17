@@ -122,9 +122,11 @@ class ElapseAppBar extends StatelessWidget {
                   showVexDexWarning ? Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Padding(
-                          padding: EdgeInsets.only(left: leftPadding),
-                          child: title,
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(left: leftPadding),
+                            child: title,
+                          ),
                         ),
                         Padding(
                             padding: EdgeInsets.only(right: leftPadding + 5),
