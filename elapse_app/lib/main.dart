@@ -29,6 +29,7 @@ import 'package:elapse_app/database/database_helper.dart';
 
 final GlobalKey<SetupGateState> setupGateKey = GlobalKey<SetupGateState>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 late SharedPreferences prefs;
 late PackageInfo appInfo;
 
@@ -153,6 +154,7 @@ class MyAppState extends State<MyApp> {
 
         return MaterialApp(
           navigatorKey: navigatorKey,
+          navigatorObservers: [routeObserver],
           title: 'Elapse',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(

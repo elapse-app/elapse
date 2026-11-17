@@ -25,7 +25,7 @@ class MyTeams extends StatefulWidget {
   State<MyTeams> createState() => _MyTeamsState();
 }
 
-class _MyTeamsState extends State<MyTeams> {
+class _MyTeamsState extends State<MyTeams> with RouteAware {
   late String savedTeam;
   late TeamPreview savedTeamPreview;
 
@@ -40,6 +40,51 @@ class _MyTeamsState extends State<MyTeams> {
   void initState() {
     super.initState();
     reload();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final route = ModalRoute.of(context);
+    if (route != null) {
+      routeObserver.unsubscribe(this);
+      routeObserver.subscribe(this, route);
+    }
+  }
+
+  @override
+  void didUpdateWidget(MyTeams oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // SetupGate.reloadApp() rebuilds the screen list but keeps this State alive.
+    _reloadIfTeamChanged();
+  }
+
+  @override
+  void didPopNext() {
+    // A route pushed over the app (e.g. Settings) was closed; the saved team may have changed.
+    _reloadIfTeamChanged();
+  }
+
+  @override
+  void dispose() {
+    routeObserver.unsubscribe(this);
+    super.dispose();
+  }
+
+  void _reloadIfTeamChanged() {
+    final String saved = prefs.getString("savedTeam") ?? "";
+    if (saved.isEmpty) return;
+    try {
+      final parsed = jsonDecode(saved);
+      if (parsed["teamID"] != savedTeamPreview.teamID) {
+        setState(() {
+          savedTeamPreviews = [];
+          reload();
+        });
+      }
+    } catch (_) {
+      // Ignore malformed prefs; the manual refresh path will surface errors.
+    }
   }
 
   void reload() {
@@ -132,11 +177,7 @@ class _MyTeamsState extends State<MyTeams> {
                             ]),
                           )),
                       const Spacer(),
-                      SettingsButton(callback: () {
-                        setState(() {
-                          reload();
-                        });
-                      }),
+                      const SettingsButton(),
                     ],
                   ),
                 ),
@@ -925,7 +966,7 @@ class TeamBio extends StatelessWidget {
                   SizedBox(
                     height: 48,
                     child: Align(
-                      alignment: Alignment.bottomLeft,
+                      alignment: Alignment.bottomRight,
                       child: Text(
                         organization,
                         maxLines: 2,
