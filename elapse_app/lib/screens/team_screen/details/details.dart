@@ -329,6 +329,11 @@ List<Widget> Details(
                     if (snapshot.hasError) {
                       return const Text("Skills Data Unavailable");
                     }
+                    // null = the team has no world skills ranking this season
+                    // (no skills runs yet), not an error.
+                    if (snapshot.data == null) {
+                      return const Text("No Skills Runs This Season");
+                    }
 
                     WorldSkillsStats stats = snapshot.data as WorldSkillsStats;
                     return Column(

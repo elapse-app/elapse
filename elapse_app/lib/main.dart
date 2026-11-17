@@ -4,7 +4,7 @@ import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/extras/auth.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/providers/tournament_mode_provider.dart';
-import 'package:elapse_app/screens/error/error_page.dart';
+import 'package:elapse_app/screens/error/inline_error.dart';
 import 'package:elapse_app/screens/explore/explore.dart';
 import 'package:elapse_app/screens/home/home.dart';
 import 'package:elapse_app/screens/my_team/my_team.dart';
@@ -73,8 +73,11 @@ void main() async {
     await checkAccountDeleted();
   }
 
+  // Must be a small widget that lays out under any constraints: it replaces
+  // whichever widget failed, often deep inside a scroll view. A full-page
+  // Scaffold there gets an infinite size and crashes the app.
   ErrorWidget.builder = (FlutterErrorDetails details) {
-    return ErrorPage();
+    return const InlineErrorWidget();
   };
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
