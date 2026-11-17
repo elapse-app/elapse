@@ -26,13 +26,7 @@ class MyTeams extends StatefulWidget {
 }
 
 class _MyTeamsState extends State<MyTeams> with RouteAware {
-  late String savedTeam;
   late TeamPreview savedTeamPreview;
-
-  List<TeamPreview> savedTeamPreviews = [];
-  List<String> savedTeamStrings = [];
-
-  late TeamPreview selectedTeamPreview;
 
   late Season season;
 
@@ -78,7 +72,6 @@ class _MyTeamsState extends State<MyTeams> with RouteAware {
       final parsed = jsonDecode(saved);
       if (parsed["teamID"] != savedTeamPreview.teamID) {
         setState(() {
-          savedTeamPreviews = [];
           reload();
         });
       }
@@ -92,15 +85,6 @@ class _MyTeamsState extends State<MyTeams> with RouteAware {
     final parsed = jsonDecode(savedTeam);
     savedTeamPreview = TeamPreview(teamID: parsed["teamID"], teamNumber: parsed["teamNumber"]);
 
-    savedTeamStrings = prefs.getStringList("savedTeams") ?? [];
-    savedTeamPreviews.add(savedTeamPreview);
-    savedTeamPreviews.addAll(savedTeamStrings
-        .map((e) => TeamPreview(teamID: jsonDecode(e)["teamID"], teamNumber: jsonDecode(e)["teamNumber"]))
-        .toList());
-
-    selectedTeamPreview = savedTeamPreview;
-
-    savedTeamPreviews = savedTeamPreviews.toSet().toList();
     season = seasons[0];
     team = fetchTeam(savedTeamPreview.teamID);
     teamStats = getVexDexTeamByNumber(season.vrcId, savedTeamPreview.teamNumber);
