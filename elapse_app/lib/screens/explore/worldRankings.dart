@@ -95,20 +95,33 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
     futures[0] = futureSkillsStats;
   }
 
-  /// (Re)fetches the whole TrueSkill leaderboard for the current [season].
+  /// (Re)loads the whole TrueSkill leaderboard for the current [season].
   /// VexDex only has VRC data (no VEX U season), so this always uses the VRC
   /// season id; the grade filter is applied client-side in [_trueSkillForGrade].
+  ///
+  /// Stale-while-revalidate: any cached copy (memory/disk) is shown at once,
+  /// then [getAllVexDexTeams] revalidates it with one conditional request (ETag)
+  /// and re-downloads only when the data actually changed.
   void _loadTrueSkill() {
     final requestId = ++_trueSkillRequestId;
     isTrueSkillLoaded = false;
     loadedVexDex = null;
-    futureVexDexStats = getAllVexDexTeams(season.vrcId).then((data) {
-      if (mounted && requestId == _trueSkillRequestId) {
-        setState(() {
-          isTrueSkillLoaded = true;
-          loadedVexDex = data;
-        });
-      }
+    final seasonId = season.vrcId;
+
+    void apply(List<VexDexStats> data) {
+      if (!mounted || requestId != _trueSkillRequestId || identical(data, loadedVexDex)) return;
+      setState(() {
+        isTrueSkillLoaded = true;
+        loadedVexDex = data;
+      });
+    }
+
+    getCachedVexDexTeams(seasonId).then((cached) {
+      // Don't let a slow disk read overwrite fresher network data.
+      if (cached != null && loadedVexDex == null) apply(cached);
+    });
+    futureVexDexStats = getAllVexDexTeams(seasonId).then((data) {
+      apply(data);
       return data;
     });
     futures[1] = futureVexDexStats;

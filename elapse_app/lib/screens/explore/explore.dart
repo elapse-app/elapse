@@ -8,6 +8,8 @@ import 'package:elapse_app/screens/widgets/rounded_top.dart';
 import 'package:flutter/material.dart';
 
 import '../../classes/Filters/levelClass.dart';
+import '../../classes/Filters/season.dart';
+import '../../classes/Team/vexDexStats.dart';
 import '../../classes/Team/teamPreview.dart';
 import '../../main.dart';
 import 'filters.dart';
@@ -21,6 +23,15 @@ class ExploreScreen extends StatefulWidget {
 
 class _ExploreScreenState extends State<ExploreScreen> {
   int _refreshTick = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Warm the current season's TrueSkill leaderboard so World Rankings opens
+    // ready. It's memoized and ETag-revalidated, so this is usually one
+    // bodyless 304, or no request at all.
+    getAllVexDexTeams(seasons[0].vrcId).ignore();
+  }
 
   @override
   Widget build(BuildContext context) {

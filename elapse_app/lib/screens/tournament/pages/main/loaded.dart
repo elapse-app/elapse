@@ -389,9 +389,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
         final gradeLevel = getGradeLevel(prefs.getString("defaultGrade"));
         final seasonId =
             gradeLevel == gradeLevels["College"] ? (seasons[0].vexUId ?? seasons[0].vrcId) : seasons[0].vrcId;
-        final worldSkillsData = prefs.getString("worldSkillsData");
+        final cachedWorldSkills = peekWorldSkillsRankings(seasonId, gradeLevel);
 
-        if (hasCachedWorldSkillsRankings(seasonId, gradeLevel) && worldSkillsData != null) {
+        if (cachedWorldSkills != null) {
           return RankingsPage(
             searchQuery: searchQuery,
             sort: rankingSorts[sortIndex],
@@ -399,8 +399,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             rankings: division.teamStats ?? {},
             filter: filter,
             skills: tournament.tournamentSkills!,
-            worldSkills:
-                jsonDecode(worldSkillsData).map<WorldSkillsStats>((e) => WorldSkillsStats.fromJson(e)).toList(),
+            worldSkills: cachedWorldSkills,
             vexDex: loadedVexDex,
           );
         }

@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
+import '../../database/json_file_cache.dart';
 import '../../extras/token.dart';
 import '../Filters/gradeLevel.dart';
 
@@ -114,6 +115,43 @@ class VexDexStats {
       updatedAt: json["updated_at"] != null ? DateTime.tryParse(json["updated_at"]) : null,
     );
   }
+
+  /// One row of the compact /seasons/{id}/leaderboard response, where [col]
+  /// maps column name to index. It carries only what World Rankings shows.
+  /// Every other field gets a neutral default, and the team screen fetches
+  /// full stats on its own.
+  factory VexDexStats.fromLeaderboardRow(List row, Map<String, int> col) {
+    T? at<T>(String name) {
+      final i = col[name];
+      return i == null ? null : row[i] as T?;
+    }
+
+    double num0(String name) => (at<num>(name) ?? 0).toDouble();
+
+    return VexDexStats(
+      teamId: (at<num>("team_id") ?? 0).toInt(),
+      teamNum: at<String>("team_num") ?? "",
+      teamName: at<String>("team_name"),
+      gradeLevel: gradeLevels[at<String>("grade")],
+      region: at<String>("region"),
+      oprAvg: num0("opr_avg"),
+      oprBest: 0,
+      dprAvg: num0("dpr_avg"),
+      dprBest: 0,
+      ccwmAvg: num0("ccwm_avg"),
+      ccwmBest: 0,
+      wins: 0,
+      losses: 0,
+      draws: 0,
+      matches: (at<num>("matches_played") ?? 0).toInt(),
+      winPercent: num0("total_winrate") * 100,
+      trueSkill: num0("ts_exposed"),
+      trueSkillGlobalRank: (at<num>("ts_rank") ?? 0).toInt(),
+      trueSkillRegionRank: at<num>("region_ts_rank")?.toInt(),
+      regionalQual: false,
+      worldsQual: false,
+    );
+  }
 }
 
 class VexDexLeaderboardPage {
@@ -190,11 +228,8 @@ Future<VexDexLeaderboardPage> getVexDexLeaderboard(
 
 /// Runs [tasks] with at most [maxConcurrent] in flight at once. VexDex's
 /// Postgres connection pool is small (5 + 5 overflow per gunicorn worker, 2
-/// workers), so firing dozens-to-hundreds of requests at once — as happens
-/// fetching every page of an archived season with 10,000+ teams — can
-/// exhaust it and make the whole fetch fail or hang instead of just being
-/// slower. Batching keeps arbitrarily large fetches reliable at the cost of
-/// some wall-clock time.
+/// workers), so firing a whole tournament roster's lookups at once can exhaust
+/// it and make the fetch fail or hang instead of just being slower.
 Future<List<T>> _runBatched<T>(List<Future<T> Function()> tasks, {int maxConcurrent = 8}) async {
   final results = <T>[];
   for (var i = 0; i < tasks.length; i += maxConcurrent) {
@@ -210,14 +245,16 @@ Future<List<T>> _runBatched<T>(List<Future<T> Function()> tasks, {int maxConcurr
 /// data for that team" rather than failing the whole roster — otherwise one
 /// bad lookup would silently blank out every other team's data too.
 Future<Map<String, VexDexStats>> getVexDexTeamsByNumber(int seasonId, List<String> teamNums) async {
-  final results = await _runBatched(teamNums.map((n) => () async {
-        try {
-          return await getVexDexTeamByNumber(seasonId, n);
-        } catch (e) {
-          debugPrint("getVexDexTeamsByNumber: lookup failed for team $n: $e");
-          return null;
-        }
-      }).toList());
+  final results = await _runBatched(teamNums
+      .map((n) => () async {
+            try {
+              return await getVexDexTeamByNumber(seasonId, n);
+            } catch (e) {
+              debugPrint("getVexDexTeamsByNumber: lookup failed for team $n: $e");
+              return null;
+            }
+          })
+      .toList());
   final Map<String, VexDexStats> map = {};
   for (var i = 0; i < teamNums.length; i++) {
     final r = results[i];
@@ -226,27 +263,138 @@ Future<Map<String, VexDexStats>> getVexDexTeamsByNumber(int seasonId, List<Strin
   return map;
 }
 
-/// Every team in a season's leaderboard — for world-rankings-style screens
-/// that (like the Skills tab they sit alongside) load the whole dataset once
-/// rather than paging through it. Fetches the first page to learn `total`,
-/// then fetches the remaining offset-based pages in bounded-concurrency
-/// batches (see [_runBatched]) — a completed/archived season can have
-/// 10,000+ teams (25+ pages), so this can't safely fire every page at once.
-Future<List<VexDexStats>> getAllVexDexTeams(int seasonId, {String sort = "ts"}) async {
-  const pageSize = 500; // VexDex's max `limit` per request.
-  final first = await getVexDexLeaderboard(seasonId, limit: pageSize, offset: 0, sort: sort);
-  if (first.total <= first.items.length) return first.items;
+// --- Whole-season leaderboard (World Rankings) ---------------------------------
+//
+// GET /seasons/{id}/leaderboard returns every team in a season in one compact
+// response: only the columns World Rankings reads, as positional rows, served
+// gzipped. VexDex data changes weekly, so the response is cached in memory and
+// on disk and revalidated with its ETag. Usually the answer is a bodyless 304.
 
-  final remainingOffsets = <int>[
-    for (var offset = pageSize; offset < first.total; offset += pageSize) offset,
-  ];
-  final rest = await _runBatched(
-    remainingOffsets.map((offset) => () => getVexDexLeaderboard(seasonId, limit: pageSize, offset: offset, sort: sort)).toList(),
-  );
+/// Parses a /leaderboard body. Runs in a background isolate via [compute].
+List<VexDexStats> _parseCompactLeaderboard(String body) {
+  final decoded = jsonDecode(body) as Map<String, dynamic>;
+  final columns = (decoded["columns"] as List).cast<String>();
+  final col = {for (var i = 0; i < columns.length; i++) columns[i]: i};
+  return (decoded["rows"] as List).map((row) => VexDexStats.fromLeaderboardRow(row as List, col)).toList();
+}
 
-  final all = <VexDexStats>[...first.items];
-  for (final page in rest) {
-    all.addAll(page.items);
+class _CachedLeaderboard {
+  final String etag;
+  final List<VexDexStats> teams;
+  DateTime validatedAt;
+
+  _CachedLeaderboard(this.etag, this.teams, this.validatedAt);
+}
+
+/// Within this window a season already in memory is returned with no request at all.
+const _leaderboardRevalidateAfter = Duration(minutes: 10);
+const _maxSeasonsInMemory = 3;
+// Insertion-ordered, so the oldest entry is first: a small LRU.
+final Map<int, _CachedLeaderboard> _leaderboardMemory = {};
+final Map<int, Future<List<VexDexStats>>> _leaderboardInFlight = {};
+final Map<int, Future<_CachedLeaderboard?>> _leaderboardDiskReads = {};
+
+String _leaderboardCacheKey(int seasonId) => "vexdex_lb_$seasonId";
+
+void _rememberLeaderboard(int seasonId, _CachedLeaderboard entry) {
+  _leaderboardMemory.remove(seasonId);
+  _leaderboardMemory[seasonId] = entry;
+  while (_leaderboardMemory.length > _maxSeasonsInMemory) {
+    _leaderboardMemory.remove(_leaderboardMemory.keys.first);
   }
-  return all;
+}
+
+bool _clearedLegacyLeaderboardCache = false;
+
+/// Loads the disk copy into memory, unvalidated (validatedAt = epoch). Concurrent
+/// callers share one read.
+Future<_CachedLeaderboard?> _leaderboardFromDisk(int seasonId) {
+  final memory = _leaderboardMemory[seasonId];
+  if (memory != null) return Future.value(memory);
+  return _leaderboardDiskReads[seasonId] ??= () async {
+    final disk = await JsonFileCache.read(_leaderboardCacheKey(seasonId));
+    final etag = disk?.meta["etag"];
+    if (disk == null || etag is! String) return null;
+    try {
+      final teams = await compute(_parseCompactLeaderboard, disk.body);
+      // A network load may have landed while this was parsing. Keep that one.
+      return _leaderboardMemory[seasonId] ??= _CachedLeaderboard(etag, teams, DateTime.fromMillisecondsSinceEpoch(0));
+    } catch (e) {
+      debugPrint("VexDex leaderboard cache for season $seasonId is corrupt: $e");
+      return null;
+    }
+  }()
+      .whenComplete(() {
+    _leaderboardDiskReads
+        .remove(seasonId); // Block body: remove() returns this future, and returning it would self-await.
+  });
+}
+
+/// The last-known leaderboard for [seasonId] from memory or disk, with no
+/// network request. Null if nothing is cached. It may be stale, so pair it with
+/// [getAllVexDexTeams] to show something right away and then refresh.
+Future<List<VexDexStats>?> getCachedVexDexTeams(int seasonId) async => (await _leaderboardFromDisk(seasonId))?.teams;
+
+/// Every team in a season's leaderboard, for World Rankings. Returns the memory
+/// copy if it was validated in the last [_leaderboardRevalidateAfter].
+/// Otherwise it makes one conditional request: a 304 keeps the cached copy, and
+/// a 200 replaces it. If the network fails, any cached copy is returned.
+/// Concurrent calls share one load. When nothing changed, the result is the
+/// same list instance [getCachedVexDexTeams] returned, so callers can skip a
+/// rebuild with `identical`.
+Future<List<VexDexStats>> getAllVexDexTeams(int seasonId) {
+  return _leaderboardInFlight[seasonId] ??= _loadAllVexDexTeams(seasonId).whenComplete(() {
+    _leaderboardInFlight
+        .remove(seasonId); // Block body: remove() returns this future, and returning it would self-await.
+  });
+}
+
+Future<List<VexDexStats>> _loadAllVexDexTeams(int seasonId) async {
+  if (!_clearedLegacyLeaderboardCache) {
+    _clearedLegacyLeaderboardCache = true;
+    JsonFileCache.deleteWhere((key) => key.startsWith("vexdex_leaderboard_")).ignore();
+  }
+
+  final memory = _leaderboardMemory[seasonId];
+  if (memory != null && DateTime.now().difference(memory.validatedAt) < _leaderboardRevalidateAfter) {
+    _rememberLeaderboard(seasonId, memory);
+    return memory.teams;
+  }
+
+  final cached = await _leaderboardFromDisk(seasonId);
+  try {
+    final response = await http.get(
+      Uri.parse("$_vexDexBaseUrl/seasons/$seasonId/leaderboard"),
+      headers: {
+        ..._vexDexHeaders(),
+        if (cached != null) HttpHeaders.ifNoneMatchHeader: cached.etag,
+      },
+    ).timeout(const Duration(seconds: 15));
+
+    if (response.statusCode == 304 && cached != null) {
+      cached.validatedAt = DateTime.now();
+      _rememberLeaderboard(seasonId, cached);
+      return cached.teams;
+    }
+    if (response.statusCode == 404) {
+      return const [];
+    }
+    if (response.statusCode != 200) {
+      throw Exception("VexDex leaderboard request failed (${response.statusCode})");
+    }
+
+    final teams = await compute(_parseCompactLeaderboard, response.body);
+    final etag = response.headers[HttpHeaders.etagHeader];
+    _rememberLeaderboard(seasonId, _CachedLeaderboard(etag ?? "", teams, DateTime.now()));
+    if (etag != null) {
+      await JsonFileCache.write(_leaderboardCacheKey(seasonId), {"etag": etag}, response.body);
+    }
+    return teams;
+  } catch (e) {
+    if (cached != null) {
+      debugPrint("VexDex leaderboard refresh failed, serving cached season $seasonId: $e");
+      return cached.teams;
+    }
+    rethrow;
+  }
 }
