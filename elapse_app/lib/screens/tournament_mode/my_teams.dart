@@ -548,7 +548,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              stats.worldSkillsRank.toString(),
+                              (stats.worldSkillsRank ?? 0).toString(),
                               style: const TextStyle(fontSize: 64, height: 1, letterSpacing: -2),
                             ),
                             const SizedBox(
@@ -567,7 +567,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      stats.skillsScore.toString(),
+                                      (stats.skillsScore ?? 0).toString(),
                                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                     ),
                                     const Text("Score", style: TextStyle(fontSize: 16))
@@ -580,7 +580,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      stats.maxDriver.toString(),
+                                      (stats.maxDriver ?? 0).toString(),
                                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                     ),
                                     const Text("Driver", style: TextStyle(fontSize: 16))

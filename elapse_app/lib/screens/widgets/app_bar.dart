@@ -33,7 +33,6 @@ class ElapseAppBar extends StatelessWidget {
     final remoteConfig = FirebaseRemoteConfigService();
     final showVexDexWarn =
         !remoteConfig.getBool(FirebaseRemoteConfigKeys.vexDexStatusKey);
-    print("PRINT showVexDexWarn $showVexDexWarn");
     Widget? appBarBackground = background;
     if (includeSettings && background == null) {
       appBarBackground = SafeArea(

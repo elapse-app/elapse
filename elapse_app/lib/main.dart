@@ -55,6 +55,13 @@ void main() async {
 
   prefs = await SharedPreferences.getInstance();
 
+  // Remove caches from before the VexDex migration and the file-based world
+  // skills cache. These held multi-MB strings that SharedPreferences loads
+  // into memory in full at every launch.
+  for (final key in const ["vdaData", "vdaExpiry", "worldSkillsData", "worldSkillsExpiry", "worldSkillsGrade"]) {
+    prefs.remove(key);
+  }
+
   // Initialize SQLite database for tournament caching
   await DatabaseHelper().database;
 

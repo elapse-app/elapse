@@ -91,6 +91,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   // one-shot fetch in initState alone would permanently miss teams that
   // arrive after that first snapshot.
   Set<String> _vexDexFetchedForTeamNums = {};
+  // Only the latest roster lookup may apply, so a slow response for an older
+  // roster can't overwrite a newer one.
+  int _vexDexRequestId = 0;
 
   void savedPress() {
     setState(() {
@@ -187,8 +190,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
       return;
     }
     _vexDexFetchedForTeamNums = currentNums;
+    final requestId = ++_vexDexRequestId;
     getVexDexTeamsByNumber(tournament.seasonID, currentNums.toList()).then((data) {
-      if (mounted) {
+      if (mounted && requestId == _vexDexRequestId) {
         setState(() {
           loadedVexDex = data.values.toList();
         });

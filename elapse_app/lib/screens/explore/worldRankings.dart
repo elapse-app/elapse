@@ -15,6 +15,7 @@ import '../../classes/Team/world_skills.dart';
 import '../../classes/Tournament/tournament.dart';
 import '../my_team/my_team.dart';
 import '../widgets/app_bar.dart';
+import '../widgets/big_error_message.dart';
 import '../widgets/custom_tab_bar.dart';
 
 class WorldRankingsScreen extends StatefulWidget {
@@ -39,6 +40,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
 
   late Future<List<VexDexStats>> futureVexDexStats;
   bool isTrueSkillLoaded = false;
+  bool trueSkillFailed = false;
   List<VexDexStats>? loadedVexDex;
 
   int selectedIndex = 0;
@@ -50,7 +52,11 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
 
   double _fadeStart = 0, _fadeEnd = 1;
 
-  WorldRankingsFilter filter = WorldRankingsFilter();
+  // One filter per tab: Skills filters on event region, TrueSkill on VexDex's
+  // team region. Those name sets differ ("California - Region 4" vs
+  // "California"), so a shared filter would blank the other tab.
+  WorldRankingsFilter skillsFilter = WorldRankingsFilter();
+  WorldRankingsFilter trueSkillFilter = WorldRankingsFilter();
 
   Season season = seasons[0];
   GradeLevel grade = getGradeLevel(prefs.getString("defaultGrade"));
@@ -105,6 +111,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
   void _loadTrueSkill() {
     final requestId = ++_trueSkillRequestId;
     isTrueSkillLoaded = false;
+    trueSkillFailed = false;
     loadedVexDex = null;
     final seasonId = season.vrcId;
 
@@ -123,6 +130,14 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
     futureVexDexStats = getAllVexDexTeams(seasonId).then((data) {
       apply(data);
       return data;
+    }, onError: (Object e) {
+      // getAllVexDexTeams already falls back to any cached copy, so this
+      // only happens with nothing cached. Show an error with a retry.
+      debugPrint("TrueSkill load failed for season $seasonId: $e");
+      if (mounted && requestId == _trueSkillRequestId && loadedVexDex == null) {
+        setState(() => trueSkillFailed = true);
+      }
+      return <VexDexStats>[];
     });
     futures[1] = futureVexDexStats;
   }
@@ -255,7 +270,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
           ),
           CustomTabBar(
             tabs: pageTitles,
-            disabledTabs: [!isSkillsLoaded, !isTrueSkillLoaded],
+            disabledTabs: [!isSkillsLoaded, !isTrueSkillLoaded && !trueSkillFailed],
             onPressed: (int v) {
               setState(() {
                 selectedIndex = v;
@@ -359,9 +374,9 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                           regions.sort();
 
                                           WorldRankingsFilter updatedFilter =
-                                              await worldRankingsFilter(context, filter, inTM, regions);
+                                              await worldRankingsFilter(context, skillsFilter, inTM, regions);
                                           setState(() {
-                                            filter = updatedFilter;
+                                            skillsFilter = updatedFilter;
                                           });
                                         });
                                   }
@@ -467,14 +482,18 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                           ),
                                           onPressed: () async {
                                             List<String> regions =
-                                                _trueSkillForGrade.map((e) => e.region ?? "").toList();
+                                                _trueSkillForGrade
+                                                    .map((e) => e.region ?? "")
+                                                    // Teams with no region would show as a blank row.
+                                                    .where((r) => r.isNotEmpty)
+                                                    .toList();
                                             regions = regions.toSet().toList();
                                             regions.sort();
 
                                             WorldRankingsFilter updatedFilter =
-                                                await worldRankingsFilter(context, filter, inTM, regions);
+                                                await worldRankingsFilter(context, trueSkillFilter, inTM, regions);
                                             setState(() {
-                                              filter = updatedFilter;
+                                              trueSkillFilter = updatedFilter;
                                             });
                                           })
                                       : IconButton(
@@ -500,18 +519,30 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
               pages[0] = WorldSkillsPage(
                 rankings: loadedSkills!,
                 sort: sortIndex,
-                filter: filter,
+                filter: skillsFilter,
                 savedTeams: savedTeams,
                 picklistTeams: picklistTeams,
                 tournament: inTM ? _tournament : null,
                 scoutedTeams: const [],
               );
             }
-            if (loadedVexDex != null) {
+            if (trueSkillFailed) {
+              pages[1] = SliverToBoxAdapter(
+                child: Column(children: [
+                  const BigErrorMessage(icon: Icons.cloud_off_outlined, message: "Unable to load TrueSkill rankings"),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.secondary),
+                    onPressed: () => setState(_loadTrueSkill),
+                    child: const Text("Retry"),
+                  ),
+                ]),
+              );
+            } else if (loadedVexDex != null) {
               pages[1] = WorldTrueSkillPage(
                 stats: _trueSkillForGrade,
                 sort: sortIndex,
-                filter: filter,
+                filter: trueSkillFilter,
                 savedTeams: savedTeams,
                 picklistTeams: picklistTeams,
                 tournament: inTM ? _tournament : null,

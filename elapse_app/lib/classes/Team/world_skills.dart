@@ -79,8 +79,6 @@ class _CachedWorldSkills {
 
 final Map<String, _CachedWorldSkills> _worldSkillsMemory = {};
 final Map<String, Future<List<WorldSkillsStats>>> _worldSkillsInFlight = {};
-bool _clearedLegacyWorldSkillsPrefs = false;
-
 String _worldSkillsKey(int seasonID, GradeLevel grade) => "world_skills_${seasonID}_${grade.id}";
 
 /// The current season changes as events report. Past seasons are final.
@@ -113,14 +111,6 @@ List<WorldSkillsStats>? peekWorldSkillsRankings(int seasonID, GradeLevel grade) 
 }
 
 Future<List<WorldSkillsStats>> _loadWorldSkillsRankings(int seasonID, GradeLevel grade, String key) async {
-  if (!_clearedLegacyWorldSkillsPrefs) {
-    // The old single-slot cache kept a multi-MB string in SharedPreferences.
-    _clearedLegacyWorldSkillsPrefs = true;
-    for (final k in ["worldSkillsData", "worldSkillsExpiry", "worldSkillsGrade"]) {
-      prefs.remove(k);
-    }
-  }
-
   final disk = await JsonFileCache.read(key);
   final diskExpiry = DateTime.tryParse("${disk?.meta["expiry"]}");
   if (disk != null && diskExpiry != null && diskExpiry.isAfter(DateTime.now())) {
