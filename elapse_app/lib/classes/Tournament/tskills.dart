@@ -53,7 +53,7 @@ Future<Map<int, TournamentSkills>> getSkillsRankings(
   }));
   requestFutures.add(http.get(
     Uri.parse(
-        "https://www.robotevents.com/api/v2/events/$eventId/skills?per_page=250"),
+        "https://events.vex.com/api/v2/events/$eventId/skills?per_page=250"),
     headers: {
       HttpHeaders.authorizationHeader: getToken(),
     },
@@ -91,7 +91,7 @@ Future<Map<int, TournamentSkills>> getSkillsRankings(
   for (int pg = 2; pg <= teamsLastPage; pg++) {
     Future<void> pgResponse = http.get(
         Uri.parse(
-            "https://www.robotevents.com/api/v2/events/$eventId/skills?page=$pg&per_page=250"),
+            "https://events.vex.com/api/v2/events/$eventId/skills?page=$pg&per_page=250"),
         headers: {
           HttpHeaders.authorizationHeader: getToken(),
         }).then((pgResponse) {

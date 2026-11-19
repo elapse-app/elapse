@@ -25,7 +25,7 @@ class TournamentResult {
 
 /// Where the tournament data came from.
 enum DataSource {
-  api,        // Fresh from RobotEvents API
+  api,        // Fresh from VEX Events API
   cache,      // Valid cached data from SQLite
   staleCache, // Expired cache (API failed, showing old data)
   none,       // No data available

@@ -5,7 +5,7 @@ import 'package:elapse_app/screens/tournament/pages/rankings/tournament_stats_pa
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../../../classes/Team/vdaStats.dart';
+import '../../../../classes/Team/vexDexStats.dart';
 import '../../../../classes/Team/world_skills.dart';
 import '../../../../classes/Tournament/tskills.dart';
 
@@ -21,7 +21,7 @@ class RankingsWidget extends StatelessWidget {
     this.sort = "Rank",
     this.skills,
     this.worldSkills,
-    this.vda,
+    this.vexDex,
   });
 
   final int teamID;
@@ -33,7 +33,7 @@ class RankingsWidget extends StatelessWidget {
   final String sort;
   final TournamentSkills? skills;
   final WorldSkillsStats? worldSkills;
-  final VDAStats? vda;
+  final VexDexStats? vexDex;
 
   @override
   Widget build(BuildContext context) {
@@ -79,9 +79,9 @@ class RankingsWidget extends StatelessWidget {
         break;
       case "TrueSkill":
         val1 = "${stats.wins}-${stats.losses}-${stats.ties}";
-        val2 = "${stats.wp} WP";
-        val3 = vda != null ? "Rank ${vda?.trueSkillGlobalRank}" : "N/A";
-        val4 = vda != null ? "${vda?.trueSkill}" : "N/A";
+        val2 = vexDex != null ? "${vexDex!.ccwmAvg.toStringAsFixed(1)} CCWM" : "N/A";
+        val3 = vexDex != null ? "Rank ${vexDex?.trueSkillGlobalRank}" : "N/A";
+        val4 = vexDex != null ? vexDex!.trueSkill.toStringAsFixed(1) : "N/A";
         break;
     }
 
@@ -147,14 +147,26 @@ class RankingsWidget extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(val1,
-                            style: const TextStyle(
-                              fontSize: 16,
-                            )),
-                        Text(val2,
-                            style: const TextStyle(
-                              fontSize: 16,
-                            )),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(val1,
+                              maxLines: 1,
+                              softWrap: false,
+                              style: const TextStyle(
+                                fontSize: 16,
+                              )),
+                        ),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Text(val2,
+                              maxLines: 1,
+                              softWrap: false,
+                              style: const TextStyle(
+                                fontSize: 16,
+                              )),
+                        ),
                       ],
                     ),
                   ),
@@ -175,16 +187,28 @@ class RankingsWidget extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(val3,
-                            textAlign: TextAlign.right,
-                            style: const TextStyle(
-                              fontSize: 16,
-                            )),
-                        Text(val4,
-                            textAlign: TextAlign.right,
-                            style: const TextStyle(
-                              fontSize: 16,
-                            )),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerRight,
+                          child: Text(val3,
+                              textAlign: TextAlign.right,
+                              maxLines: 1,
+                              softWrap: false,
+                              style: const TextStyle(
+                                fontSize: 16,
+                              )),
+                        ),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerRight,
+                          child: Text(val4,
+                              textAlign: TextAlign.right,
+                              maxLines: 1,
+                              softWrap: false,
+                              style: const TextStyle(
+                                fontSize: 16,
+                              )),
+                        ),
                       ],
                     ),
                   )

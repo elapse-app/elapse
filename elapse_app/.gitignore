@@ -49,6 +49,12 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
+# Gradle's local build cache (machine-specific, regenerated on every build)
+/android/.gradle/
+
+# Machine-specific SDK paths; Flutter regenerates this on every build
+/android/local.properties
+
 /token.txt
 /lib/extras/token.dart
 /lib/extras/firebase_token.dart

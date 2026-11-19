@@ -10,7 +10,7 @@ import 'package:elapse_app/screens/widgets/big_error_message.dart';
 import 'package:flutter/material.dart';
 import 'package:collection/collection.dart';
 
-import '../../../../classes/Team/vdaStats.dart';
+import '../../../../classes/Team/vexDexStats.dart';
 import '../../../../classes/Team/world_skills.dart';
 import '../../../../classes/Tournament/tskills.dart';
 
@@ -24,7 +24,7 @@ class RankingsPage extends StatelessWidget {
     required this.filter,
     required this.skills,
     required this.worldSkills,
-    required this.vda,
+    required this.vexDex,
   });
 
   final String searchQuery;
@@ -34,7 +34,7 @@ class RankingsPage extends StatelessWidget {
   final TournamentRankingsFilter filter;
   final Map<int, TournamentSkills> skills;
   final List<WorldSkillsStats> worldSkills;
-  final List<VDAStats>? vda;
+  final List<VexDexStats>? vexDex;
 
   @override
   Widget build(BuildContext context) {
@@ -115,11 +115,11 @@ class RankingsPage extends StatelessWidget {
             }).score);
       });
     } else if (sort == "TrueSkill") {
-      if (vda != null) {
+      if (vexDex != null) {
         divisionTeams.sort((a, b) {
-          final vdaB = vda!.singleWhereOrNull((e) => e.id == b.id);
-          final vdaA = vda!.singleWhereOrNull((e) => e.id == a.id);
-          return (vdaB?.trueSkill ?? 0).compareTo(vdaA?.trueSkill ?? 0);
+          final vexDexB = vexDex!.singleWhereOrNull((e) => e.teamNum == b.teamNumber);
+          final vexDexA = vexDex!.singleWhereOrNull((e) => e.teamNum == a.teamNumber);
+          return (vexDexB?.trueSkill ?? 0).compareTo(vexDexA?.trueSkill ?? 0);
         });
       } else {
         divisionTeams.sort((a, b) {
@@ -160,7 +160,7 @@ class RankingsPage extends StatelessWidget {
                 allianceColor: Theme.of(context).colorScheme.onSurface,
                 skills: skills[team.id],
                 worldSkills: worldSkills.firstWhereOrNull((e) => e.teamId == team.id),
-                vda: vda?.firstWhereOrNull((e) => e.id == team.id),
+                vexDex: vexDex?.firstWhereOrNull((e) => e.teamNum == team.teamNumber),
               ),
               Divider(
                 color: Theme.of(context).colorScheme.surfaceDim,

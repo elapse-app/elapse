@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../../../classes/Team/vdaStats.dart';
+import '../../../../classes/Team/vexDexStats.dart';
 import '../../../team_screen/team_screen.dart';
 
 Future<void> worldTrueSkillPage(
-    BuildContext context, int teamID, String teamNum, String teamName, VDAStats stats) {
+    BuildContext context, int teamID, String teamNum, String teamName, VexDexStats stats) {
   final DraggableScrollableController dra = DraggableScrollableController();
 
   return showModalBottomSheet<void>(
@@ -122,7 +122,7 @@ Future<void> worldTrueSkillPage(
                           Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(stats.trueSkill?.toStringAsFixed(1) ?? "N/A",
+                                Text(stats.trueSkill.toStringAsFixed(1),
                                     style: const TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.w500,
@@ -140,7 +140,7 @@ Future<void> worldTrueSkillPage(
                           Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("${stats.trueSkillRegionRank == 0 ? "N/A" : stats.trueSkillRegionRank}",
+                                Text("${stats.trueSkillRegionRank == null ? "N/A" : stats.trueSkillRegionRank}",
                                     style: const TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.w500,
@@ -158,7 +158,7 @@ Future<void> worldTrueSkillPage(
                           Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text("${stats.winPercent?.toStringAsFixed(1)} %",
+                                Text("${stats.winPercent.toStringAsFixed(1)} %",
                                     style: const TextStyle(
                                       fontSize: 24,
                                       fontWeight: FontWeight.w500,
@@ -186,7 +186,7 @@ Future<void> worldTrueSkillPage(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "${stats.opr}",
+                                  stats.oprAvg.toStringAsFixed(1),
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
@@ -204,7 +204,7 @@ Future<void> worldTrueSkillPage(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "${stats.dpr}",
+                                  stats.dprAvg.toStringAsFixed(1),
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
@@ -222,7 +222,7 @@ Future<void> worldTrueSkillPage(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  "${stats.ccwm}",
+                                  stats.ccwmAvg.toStringAsFixed(1),
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,

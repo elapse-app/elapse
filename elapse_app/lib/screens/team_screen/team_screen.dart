@@ -7,7 +7,7 @@ import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/classes/ScoutSheet/scoutSheetUi.dart';
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
-import 'package:elapse_app/classes/Team/vdaStats.dart';
+import 'package:elapse_app/classes/Team/vexDexStats.dart';
 import 'package:elapse_app/classes/Team/world_skills.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
@@ -61,7 +61,7 @@ class _TeamScreenState extends State<TeamScreen> {
 
   Future<Tournament>? tournament;
   Future<Team>? team;
-  Future<VDAStats?>? teamStats;
+  Future<VexDexStats?>? teamStats;
   Future<WorldSkillsStats?>? skillsStats;
   Future<List<TournamentPreview>>? teamTournaments;
   Future<List<Award>>? teamAwards;
@@ -90,7 +90,7 @@ class _TeamScreenState extends State<TeamScreen> {
       },
     );
     season = seasons[0];
-    teamStats = getTrueSkillDataForTeam(season.vrcId, widget.teamNumber);
+    teamStats = getVexDexTeamByNumber(season.vrcId, widget.teamNumber);
     skillsStats = getWorldSkillsForTeam(season.vrcId, widget.teamID);
     teamAwards = getAwards(widget.teamID, season.vrcId);
 
@@ -547,7 +547,7 @@ class _TeamScreenState extends State<TeamScreen> {
                     setState(() {
                       season = updated;
                       skillsStats = getWorldSkillsForTeam(season.vrcId, widget.teamID);
-                      teamStats = getTrueSkillDataForTeam(season.vrcId, widget.teamNumber);
+                      teamStats = getVexDexTeamByNumber(season.vrcId, widget.teamNumber);
                       teamTournaments = fetchTeamTournaments(widget.teamID, season.vrcId);
                       teamAwards = getAwards(widget.teamID, season.vrcId);
                     });

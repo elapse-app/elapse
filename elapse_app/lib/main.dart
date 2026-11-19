@@ -4,7 +4,7 @@ import 'package:elapse_app/aesthetics/color_schemes.dart';
 import 'package:elapse_app/extras/auth.dart';
 import 'package:elapse_app/providers/color_provider.dart';
 import 'package:elapse_app/providers/tournament_mode_provider.dart';
-import 'package:elapse_app/screens/error/error_page.dart';
+import 'package:elapse_app/screens/error/inline_error.dart';
 import 'package:elapse_app/screens/explore/explore.dart';
 import 'package:elapse_app/screens/home/home.dart';
 import 'package:elapse_app/screens/my_team/my_team.dart';
@@ -29,6 +29,7 @@ import 'package:elapse_app/database/database_helper.dart';
 
 final GlobalKey<SetupGateState> setupGateKey = GlobalKey<SetupGateState>();
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+final RouteObserver<ModalRoute<void>> routeObserver = RouteObserver<ModalRoute<void>>();
 late SharedPreferences prefs;
 late PackageInfo appInfo;
 
@@ -54,6 +55,13 @@ void main() async {
 
   prefs = await SharedPreferences.getInstance();
 
+  // Remove caches from before the VexDex migration and the file-based world
+  // skills cache. These held multi-MB strings that SharedPreferences loads
+  // into memory in full at every launch.
+  for (final key in const ["vdaData", "vdaExpiry", "worldSkillsData", "worldSkillsExpiry", "worldSkillsGrade"]) {
+    prefs.remove(key);
+  }
+
   // Initialize SQLite database for tournament caching
   await DatabaseHelper().database;
 
@@ -73,8 +81,11 @@ void main() async {
     await checkAccountDeleted();
   }
 
+  // Must be a small widget that lays out under any constraints: it replaces
+  // whichever widget failed, often deep inside a scroll view. A full-page
+  // Scaffold there gets an infinite size and crashes the app.
   ErrorWidget.builder = (FlutterErrorDetails details) {
-    return ErrorPage();
+    return const InlineErrorWidget();
   };
 
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
@@ -150,6 +161,7 @@ class MyAppState extends State<MyApp> {
 
         return MaterialApp(
           navigatorKey: navigatorKey,
+          navigatorObservers: [routeObserver],
           title: 'Elapse',
           debugShowCheckedModeBanner: false,
           theme: ThemeData(

@@ -73,7 +73,7 @@ Future<List<TournamentPreview>> fetchTeamTournaments(
   // Fetch team data
 
   final tournamentInfo = http.get(
-    Uri.parse("https://www.robotevents.com/api/v2/teams/$teamId/events?season%5B%5D=$seasonID&per_page=250"),
+    Uri.parse("https://events.vex.com/api/v2/teams/$teamId/events?season%5B%5D=$seasonID&per_page=250"),
     headers: {
       HttpHeaders.authorizationHeader: getToken(),
     },
@@ -93,11 +93,11 @@ Future<TournamentList> getTournaments(String eventName, ExploreSearchFilter filt
     dynamic parser, regions;
     List<Future<dynamic>> futures = [];
     futures.add(Chaleno().load(
-        "https://www.robotevents.com/robot-competitions/${filters.gradeLevel.id == 4 ? "college-competition" : "vex-robotics-competition"}?country_id=*&seasonId=${filters.gradeLevel.id == 4 ? filters.season.vexUId ?? "" : filters.season.vrcId}&eventType=&name=$eventName&grade_level_id=${filters.gradeLevel.id != 0 ? filters.gradeLevel.id : ""}&level_class_id=${filters.levelClass.id == 0 ? "" : filters.levelClass.id}&from_date=${DateFormat("yyyy-MM-dd").format(filters.startDate)}&to_date=${DateFormat("yyyy-MM-dd").format(filters.endDate)}&event_region=&city=${filters.location != null ? filters.location!.city : ""}&distance=250&page=$page"));
+        "https://events.vex.com/robot-competitions/${filters.gradeLevel.id == 4 ? "college-competition" : "vex-robotics-competition"}?country_id=*&seasonId=${filters.gradeLevel.id == 4 ? filters.season.vexUId ?? "" : filters.season.vrcId}&eventType=&name=$eventName&grade_level_id=${filters.gradeLevel.id != 0 ? filters.gradeLevel.id : ""}&level_class_id=${filters.levelClass.id == 0 ? "" : filters.levelClass.id}&from_date=${DateFormat("yyyy-MM-dd").format(filters.startDate)}&to_date=${DateFormat("yyyy-MM-dd").format(filters.endDate)}&event_region=&city=${filters.location != null ? filters.location!.city : ""}&distance=250&page=$page"));
     if (filters.location != null) {
       futures.add(http.get(
         Uri.parse(
-            "https://www.robotevents.com/api/v2/events?season%5B%5D=${filters.gradeLevel.id == 4 ? filters.season.vexUId ?? "" : filters.season.vrcId}&start=${DateFormat("yyyy-MM-dd").format(filters.startDate)}&end=${DateFormat("yyyy-MM-dd").format(filters.endDate)}&region=${filters.location?.region ?? ""}&myEvents=false"),
+            "https://events.vex.com/api/v2/events?season%5B%5D=${filters.gradeLevel.id == 4 ? filters.season.vexUId ?? "" : filters.season.vrcId}&start=${DateFormat("yyyy-MM-dd").format(filters.startDate)}&end=${DateFormat("yyyy-MM-dd").format(filters.endDate)}&region=${filters.location?.region ?? ""}&myEvents=false"),
         headers: {
           HttpHeaders.authorizationHeader: getToken(),
         },
@@ -122,7 +122,7 @@ Future<TournamentList> getTournaments(String eventName, ExploreSearchFilter filt
         if (pg == page) continue;
 
         pages.add(Chaleno().load(
-            "https://www.robotevents.com/robot-competitions/${filters.gradeLevel.id == 4 ? "college-competition" : "vex-robotics-competition"}?country_id=*&seasonId=${filters.gradeLevel.id == 4 ? filters.season.vexUId ?? "" : filters.season.vrcId}&eventType=&name=$eventName&grade_level_id=${filters.gradeLevel.id != 0 ? filters.gradeLevel.id : ""}&level_class_id=${filters.levelClass.id == 0 ? "" : filters.levelClass.id}&from_date=${DateFormat("yyyy-MM-dd").format(filters.startDate)}&to_date=${DateFormat("yyyy-MM-dd").format(filters.endDate)}&event_region=&city=${filters.location != null ? filters.location!.city : ""}&distance=250&page=$pg"));
+            "https://events.vex.com/robot-competitions/${filters.gradeLevel.id == 4 ? "college-competition" : "vex-robotics-competition"}?country_id=*&seasonId=${filters.gradeLevel.id == 4 ? filters.season.vexUId ?? "" : filters.season.vrcId}&eventType=&name=$eventName&grade_level_id=${filters.gradeLevel.id != 0 ? filters.gradeLevel.id : ""}&level_class_id=${filters.levelClass.id == 0 ? "" : filters.levelClass.id}&from_date=${DateFormat("yyyy-MM-dd").format(filters.startDate)}&to_date=${DateFormat("yyyy-MM-dd").format(filters.endDate)}&event_region=&city=${filters.location != null ? filters.location!.city : ""}&distance=250&page=$pg"));
       }
       await Future.wait(pages).then((v) {
         for (final p in v) {
@@ -172,7 +172,7 @@ Future<TournamentPreview?> itemParse(String? item) async {
   String eventCode = codeMatch?.group(1) ?? "";
 
   final response = await http.get(
-    Uri.parse("https://www.robotevents.com/api/v2/events?sku%5B%5D=$eventCode&myEvents=false"),
+    Uri.parse("https://events.vex.com/api/v2/events?sku%5B%5D=$eventCode&myEvents=false"),
     headers: {
       HttpHeaders.authorizationHeader: getToken(),
     },

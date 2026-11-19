@@ -28,7 +28,7 @@ class FirebaseRemoteConfigService {
 
   Future<void> _setDefaults() async => _remoteConfig.setDefaults(
         const {
-          FirebaseRemoteConfigKeys.vdaStatusKey: true,
+          FirebaseRemoteConfigKeys.vexDexStatusKey: true,
         },
       );
 
@@ -49,9 +49,9 @@ class FirebaseRemoteConfigService {
   }
 }
 
-final vdaStatus = FirebaseRemoteConfigService()
-    .getBool(FirebaseRemoteConfigKeys.vdaStatusKey);
+final vexDexStatus = FirebaseRemoteConfigService()
+    .getBool(FirebaseRemoteConfigKeys.vexDexStatusKey);
 
 class FirebaseRemoteConfigKeys {
-  static const String vdaStatusKey = 'isVDAWorking';
+  static const String vexDexStatusKey = 'isVDAWorking';
 }

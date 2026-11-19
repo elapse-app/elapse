@@ -43,7 +43,7 @@ class firebaseTokens {
 }
 ```  
   
-You will also need to add a `token.dart` file to `/elapse_app/lib/extras` which contains your tokens from the [RobotEvents.com api](https://www.robotevents.com/api/v2). Elapse utilizes several tokens to prevent getting ratelimited by RobotEvents, but only 1 token should be required.
+You will also need to add a `token.dart` file to `/elapse_app/lib/extras` which contains your tokens from the [VEX Events API](https://events.vex.com/api/v2). Elapse utilizes several tokens to prevent getting ratelimited by VEX Events, but only 1 token should be required.
 ```dart
 import 'dart:math';
 
@@ -62,5 +62,9 @@ String getToken() {
   int randomIndex = Random().nextInt(tokens.length);
   return tokens[randomIndex];
 }
+
+String getVexDexToken() {
+  return "Bearer ";
+}
 ```  
-In addition, Elapse pulls data from [https://vrc-data-analysis.com/](https://vrc-data-analysis.com/), which provides TrueSkill information, some skills data, and more.
+In addition, Elapse pulls TrueSkill, OPR/DPR/CCWM, and skills-ranking data from [VexDex](https://github.com/elapse-app/VexDex), our own service hosted at `https://vexdex.fly.dev`. Add the `getVexDexToken()` function above to your `token.dart`, returning a bearer token minted via VexDex's `manage_tokens.py create` CLI against its database.

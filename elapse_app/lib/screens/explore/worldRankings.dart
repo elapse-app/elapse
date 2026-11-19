@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:elapse_app/screens/explore/worldRankings/skills/world_skills.dart';
+import 'package:elapse_app/screens/explore/worldRankings/true_skill/world_true_skill.dart';
 import 'package:elapse_app/screens/explore/worldRankings/world_rankings_filter.dart';
 import 'package:elapse_app/screens/explore/worldRankings/world_rankings_search_screen.dart';
 import 'package:flutter/material.dart';
@@ -9,10 +10,12 @@ import 'package:elapse_app/main.dart';
 import '../../classes/Filters/gradeLevel.dart';
 import '../../classes/Filters/season.dart';
 import '../../classes/Team/teamPreview.dart';
+import '../../classes/Team/vexDexStats.dart';
 import '../../classes/Team/world_skills.dart';
 import '../../classes/Tournament/tournament.dart';
 import '../my_team/my_team.dart';
 import '../widgets/app_bar.dart';
+import '../widgets/big_error_message.dart';
 import '../widgets/custom_tab_bar.dart';
 
 class WorldRankingsScreen extends StatefulWidget {
@@ -35,15 +38,25 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
   List<WorldSkillsStats>? loadedSkills;
   Tournament? _tournament;
 
+  late Future<List<VexDexStats>> futureVexDexStats;
+  bool isTrueSkillLoaded = false;
+  bool trueSkillFailed = false;
+  List<VexDexStats>? loadedVexDex;
+
   int selectedIndex = 0;
-  List<String> pageTitles = ["Skills"];
+  List<String> pageTitles = ["Skills", "TrueSkill"];
 
   int sortIndex = 0;
   List<String> skillsSort = ["Total", "Driver", "Auton", "Highest Driver", "Highest Auton"];
+  List<String> trueSkillSort = ["TrueSkill", "OPR", "DPR", "CCWM", "Win %"];
 
   double _fadeStart = 0, _fadeEnd = 1;
 
-  WorldRankingsFilter filter = WorldRankingsFilter();
+  // One filter per tab: Skills filters on event region, TrueSkill on VexDex's
+  // team region. Those name sets differ ("California - Region 4" vs
+  // "California"), so a shared filter would blank the other tab.
+  WorldRankingsFilter skillsFilter = WorldRankingsFilter();
+  WorldRankingsFilter trueSkillFilter = WorldRankingsFilter();
 
   Season season = seasons[0];
   GradeLevel grade = getGradeLevel(prefs.getString("defaultGrade"));
@@ -53,10 +66,31 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
     super.initState();
     selectedIndex = widget.initIndex.clamp(0, pageTitles.length - 1);
 
+    futures = [Future.value(), Future.value()];
+    _loadSkills();
+    _loadTrueSkill();
+
+    savedTeams = _getSavedTeams();
+    picklistTeams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
+    inTM = prefs.getBool("isTournamentMode") ?? false;
+    _loadTournament();
+  }
+
+  // Incremented on every (re)load. A response is applied only if its id is
+  // still the latest, so a slow request for a previously selected season or
+  // grade can't land after a newer one and overwrite its results.
+  int _skillsRequestId = 0;
+  int _trueSkillRequestId = 0;
+
+  /// (Re)fetches world skills for the current [season] and [grade]. Does not
+  /// call setState itself for the reset, so callers inside setState are fine.
+  void _loadSkills() {
+    final requestId = ++_skillsRequestId;
     isSkillsLoaded = false;
+    loadedSkills = null;
     futureSkillsStats =
-        getWorldSkillsRankings((grade == gradeLevels["College"] ? season.vexUId! : season.vrcId), grade).then((data) {
-      if (mounted) {
+        getWorldSkillsRankings(grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade).then((data) {
+      if (mounted && requestId == _skillsRequestId) {
         setState(() {
           isSkillsLoaded = true;
           loadedSkills = data;
@@ -64,12 +98,53 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
       }
       return data;
     });
-    futures.add(futureSkillsStats);
-    savedTeams = _getSavedTeams();
-    picklistTeams = (prefs.getStringList("picklist") ?? []).map((e) => loadTeamPreview(e)).toList();
-    inTM = prefs.getBool("isTournamentMode") ?? false;
-    _loadTournament();
+    futures[0] = futureSkillsStats;
   }
+
+  /// (Re)loads the whole TrueSkill leaderboard for the current [season].
+  /// VexDex only has VRC data (no VEX U season), so this always uses the VRC
+  /// season id; the grade filter is applied client-side in [_trueSkillForGrade].
+  ///
+  /// Stale-while-revalidate: any cached copy (memory/disk) is shown at once,
+  /// then [getAllVexDexTeams] revalidates it with one conditional request (ETag)
+  /// and re-downloads only when the data actually changed.
+  void _loadTrueSkill() {
+    final requestId = ++_trueSkillRequestId;
+    isTrueSkillLoaded = false;
+    trueSkillFailed = false;
+    loadedVexDex = null;
+    final seasonId = season.vrcId;
+
+    void apply(List<VexDexStats> data) {
+      if (!mounted || requestId != _trueSkillRequestId || identical(data, loadedVexDex)) return;
+      setState(() {
+        isTrueSkillLoaded = true;
+        loadedVexDex = data;
+      });
+    }
+
+    getCachedVexDexTeams(seasonId).then((cached) {
+      // Don't let a slow disk read overwrite fresher network data.
+      if (cached != null && loadedVexDex == null) apply(cached);
+    });
+    futureVexDexStats = getAllVexDexTeams(seasonId).then((data) {
+      apply(data);
+      return data;
+    }, onError: (Object e) {
+      // getAllVexDexTeams already falls back to any cached copy, so this
+      // only happens with nothing cached. Show an error with a retry.
+      debugPrint("TrueSkill load failed for season $seasonId: $e");
+      if (mounted && requestId == _trueSkillRequestId && loadedVexDex == null) {
+        setState(() => trueSkillFailed = true);
+      }
+      return <VexDexStats>[];
+    });
+    futures[1] = futureVexDexStats;
+  }
+
+  /// TrueSkill rankings for the selected grade only. Empty for College since
+  /// VexDex has no VEX U data, which the page shows as "not available".
+  List<VexDexStats> get _trueSkillForGrade => (loadedVexDex ?? []).where((e) => e.gradeLevel == grade).toList();
 
   Future<void> _loadTournament() async {
     if (inTM) {
@@ -129,19 +204,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                             onChanged: (GradeLevel? value) => {
                               setState(() {
                                 grade = value!;
-                                isSkillsLoaded = false;
-                                futureSkillsStats = getWorldSkillsRankings(
-                                        grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade)
-                                    .then((data) {
-                                  if (mounted) {
-                                    setState(() {
-                                      isSkillsLoaded = true;
-                                      loadedSkills = data;
-                                    });
-                                  }
-                                  return data;
-                                });
-                                futures[0] = futureSkillsStats;
+                                _loadSkills();
                               })
                             },
                           ),
@@ -160,19 +223,8 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                               if (!mounted) return;
                               setState(() {
                                 season = updated;
-                                isSkillsLoaded = false;
-                                futureSkillsStats = getWorldSkillsRankings(
-                                        grade == gradeLevels["College"] ? season.vexUId! : season.vrcId, grade)
-                                    .then((data) {
-                                  if (mounted) {
-                                    setState(() {
-                                      isSkillsLoaded = true;
-                                      loadedSkills = data;
-                                    });
-                                  }
-                                  return data;
-                                });
-                                futures[0] = futureSkillsStats;
+                                _loadSkills();
+                                _loadTrueSkill();
                               });
                             },
                             child: Row(children: [
@@ -185,36 +237,30 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                               const Icon(Icons.arrow_right)
                             ])),
                         const SizedBox(width: 8),
-                        FutureBuilder(
-                            future: futureSkillsStats,
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData) {
-                                return IconButton(
-                                    icon: const Icon(
-                                      Icons.search,
+                        (selectedIndex == 0 ? isSkillsLoaded : isTrueSkillLoaded)
+                            ? IconButton(
+                                icon: const Icon(
+                                  Icons.search,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    PageRouteBuilder(
+                                      transitionDuration: const Duration(milliseconds: 300),
+                                      reverseTransitionDuration: const Duration(milliseconds: 300),
+                                      pageBuilder: (context, animation, secondaryAnimation) => selectedIndex == 0
+                                          ? WorldRankingsSearchScreen(skills: loadedSkills!)
+                                          : WorldRankingsSearchScreen(trueSkill: _trueSkillForGrade),
+                                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                        return FadeTransition(
+                                          opacity: animation,
+                                          child: child,
+                                        );
+                                      },
                                     ),
-                                    onPressed: () {
-                                      Navigator.push(
-                                        context,
-                                        PageRouteBuilder(
-                                          transitionDuration: const Duration(milliseconds: 300),
-                                          reverseTransitionDuration: const Duration(milliseconds: 300),
-                                          pageBuilder: (context, animation, secondaryAnimation) =>
-                                              WorldRankingsSearchScreen(
-                                                  skills: snapshot.data as List<WorldSkillsStats>),
-                                          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                            return FadeTransition(
-                                              opacity: animation,
-                                              child: child,
-                                            );
-                                          },
-                                        ),
-                                      );
-                                    });
-                              } else {
-                                return Icon(Icons.search);
-                              }
-                            })
+                                  );
+                                })
+                            : const Icon(Icons.search)
                       ],
                     ),
                   ],
@@ -224,7 +270,7 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
           ),
           CustomTabBar(
             tabs: pageTitles,
-            disabledTabs: [!isSkillsLoaded],
+            disabledTabs: [!isSkillsLoaded, !isTrueSkillLoaded && !trueSkillFailed],
             onPressed: (int v) {
               setState(() {
                 selectedIndex = v;
@@ -328,9 +374,9 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                                           regions.sort();
 
                                           WorldRankingsFilter updatedFilter =
-                                              await worldRankingsFilter(context, filter, inTM, regions);
+                                              await worldRankingsFilter(context, skillsFilter, inTM, regions);
                                           setState(() {
-                                            filter = updatedFilter;
+                                            skillsFilter = updatedFilter;
                                           });
                                         });
                                   }
@@ -349,18 +395,157 @@ class _WorldRankingsState extends State<WorldRankingsScreen> {
                     ),
                   ),
                 )
-              : const SliverToBoxAdapter(),
+              : selectedIndex == 1
+                  ? SliverToBoxAdapter(
+                      child: Container(
+                        padding: const EdgeInsets.only(left: 23),
+                        height: 50,
+                        child: Flex(
+                          direction: Axis.horizontal,
+                          children: [
+                            Flexible(
+                              flex: 6,
+                              child: NotificationListener<ScrollNotification>(
+                                onNotification: (scrollNotification) {
+                                  setState(() {
+                                    _fadeStart = scrollNotification.metrics.pixels / 10;
+                                    _fadeEnd = (scrollNotification.metrics.maxScrollExtent -
+                                            scrollNotification.metrics.pixels) /
+                                        10;
+
+                                    _fadeStart = _fadeStart.clamp(0.0, 1.0);
+                                    _fadeEnd = _fadeEnd.clamp(0.0, 1.0);
+                                  });
+                                  return true;
+                                },
+                                child: Stack(
+                                  children: [
+                                    ListView(
+                                      scrollDirection: Axis.horizontal,
+                                      children: List<Widget>.generate(trueSkillSort.length, (int index) {
+                                        return Container(
+                                          padding: const EdgeInsets.only(right: 5),
+                                          child: ChoiceChip(
+                                            padding: const EdgeInsets.symmetric(horizontal: 5),
+                                            label: Text(trueSkillSort[index],
+                                                style: TextStyle(
+                                                  color: Theme.of(context).colorScheme.onSurface,
+                                                )),
+                                            selected: sortIndex == index,
+                                            shape: RoundedRectangleBorder(
+                                                side: BorderSide(
+                                                    color: Theme.of(context).colorScheme.primary, width: 1.5),
+                                                borderRadius: BorderRadius.circular(10)),
+                                            selectedColor: Theme.of(context).colorScheme.primary,
+                                            chipAnimationStyle: ChipAnimationStyle(
+                                                enableAnimation: AnimationStyle(duration: Duration.zero),
+                                                selectAnimation: AnimationStyle(duration: Duration.zero)),
+                                            onSelected: (bool selected) {
+                                              setState(() {
+                                                sortIndex = index;
+                                              });
+                                            },
+                                          ),
+                                        );
+                                      }).toList(),
+                                    ),
+                                    IgnorePointer(
+                                      ignoring: true,
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [
+                                              Theme.of(context).colorScheme.surface,
+                                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                                              Theme.of(context).colorScheme.surface.withValues(alpha: 0),
+                                              Theme.of(context).colorScheme.surface,
+                                            ],
+                                            stops: [0, 0.05 * _fadeStart, 1 - 0.05 * _fadeEnd, 1.0],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            Flexible(
+                              flex: 1,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  isTrueSkillLoaded
+                                      ? IconButton(
+                                          icon: const Icon(
+                                            Icons.filter_list,
+                                            size: 30,
+                                          ),
+                                          onPressed: () async {
+                                            List<String> regions =
+                                                _trueSkillForGrade
+                                                    .map((e) => e.region ?? "")
+                                                    // Teams with no region would show as a blank row.
+                                                    .where((r) => r.isNotEmpty)
+                                                    .toList();
+                                            regions = regions.toSet().toList();
+                                            regions.sort();
+
+                                            WorldRankingsFilter updatedFilter =
+                                                await worldRankingsFilter(context, trueSkillFilter, inTM, regions);
+                                            setState(() {
+                                              trueSkillFilter = updatedFilter;
+                                            });
+                                          })
+                                      : IconButton(
+                                          icon: const Icon(
+                                            Icons.filter_list,
+                                            size: 30,
+                                          ),
+                                          onPressed: () {}),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  : const SliverToBoxAdapter(),
           Builder(builder: (context) {
-            List<Widget> pages = [SliverToBoxAdapter(child: LinearProgressIndicator())];
+            List<Widget> pages = [
+              const SliverToBoxAdapter(child: LinearProgressIndicator()),
+              const SliverToBoxAdapter(child: LinearProgressIndicator()),
+            ];
             if (loadedSkills != null) {
               pages[0] = WorldSkillsPage(
                 rankings: loadedSkills!,
                 sort: sortIndex,
-                filter: filter,
+                filter: skillsFilter,
                 savedTeams: savedTeams,
                 picklistTeams: picklistTeams,
                 tournament: inTM ? _tournament : null,
                 scoutedTeams: const [],
+              );
+            }
+            if (trueSkillFailed) {
+              pages[1] = SliverToBoxAdapter(
+                child: Column(children: [
+                  const BigErrorMessage(icon: Icons.cloud_off_outlined, message: "Unable to load TrueSkill rankings"),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    style: TextButton.styleFrom(foregroundColor: Theme.of(context).colorScheme.secondary),
+                    onPressed: () => setState(_loadTrueSkill),
+                    child: const Text("Retry"),
+                  ),
+                ]),
+              );
+            } else if (loadedVexDex != null) {
+              pages[1] = WorldTrueSkillPage(
+                stats: _trueSkillForGrade,
+                sort: sortIndex,
+                filter: trueSkillFilter,
+                savedTeams: savedTeams,
+                picklistTeams: picklistTeams,
+                tournament: inTM ? _tournament : null,
               );
             }
 

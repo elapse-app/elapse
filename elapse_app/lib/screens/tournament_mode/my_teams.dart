@@ -6,7 +6,7 @@ import 'package:elapse_app/classes/Filters/season.dart';
 import 'package:elapse_app/classes/Miscellaneous/location.dart';
 import 'package:elapse_app/classes/Team/team.dart';
 import 'package:elapse_app/classes/Team/teamPreview.dart';
-import 'package:elapse_app/classes/Team/vdaStats.dart';
+import 'package:elapse_app/classes/Team/vexDexStats.dart';
 import 'package:elapse_app/classes/Team/world_skills.dart';
 import 'package:elapse_app/classes/Tournament/award.dart';
 import 'package:elapse_app/classes/Tournament/tournament.dart';
@@ -129,7 +129,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
     savedTeamPreviews = savedTeamPreviews.toSet().toList();
     season = seasons[0];
     team = fetchTeam(savedTeamPreview.teamID);
-    teamStats = getTrueSkillDataForTeam(season.vrcId, savedTeamPreview.teamNumber);
+    teamStats = getVexDexTeamByNumber(season.vrcId, savedTeamPreview.teamNumber);
     skillsStats = getWorldSkillsForTeam(season.vrcId, savedTeamPreview.teamID);
     teamTournaments = fetchTeamTournaments(savedTeamPreview.teamID, season.vrcId);
     teamAwards = getAwards(savedTeamPreview.teamID, season.vrcId);
@@ -140,7 +140,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
       setState(() {
         selectedTeamPreview = value;
         team = fetchTeam(value.teamID);
-        teamStats = getTrueSkillDataForTeam(season.vrcId, value.teamNumber);
+        teamStats = getVexDexTeamByNumber(season.vrcId, value.teamNumber);
         skillsStats = getWorldSkillsForTeam(season.vrcId, value.teamID);
         teamTournaments = fetchTeamTournaments(value.teamID, season.vrcId);
         teamAwards = getAwards(value.teamID, season.vrcId);
@@ -149,7 +149,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
   }
 
   Future<Team>? team;
-  Future<VDAStats?>? teamStats;
+  Future<VexDexStats?>? teamStats;
   Future<List<TournamentPreview>>? teamTournaments;
   Future<WorldSkillsStats?>? skillsStats;
   Future<List<Award>>? teamAwards;
@@ -158,7 +158,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
     // Re-fetch all data
     setState(() {
       team = fetchTeam(selectedTeamPreview.teamID);
-      teamStats = getTrueSkillDataForTeam(season.vrcId, selectedTeamPreview.teamNumber);
+      teamStats = getVexDexTeamByNumber(season.vrcId, selectedTeamPreview.teamNumber);
       skillsStats = getWorldSkillsForTeam(season.vrcId, selectedTeamPreview.teamID);
       teamTournaments = fetchTeamTournaments(selectedTeamPreview.teamID, season.vrcId);
       teamAwards = getAwards(selectedTeamPreview.teamID, season.vrcId);
@@ -332,7 +332,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                         setState(() {
                           season = updated;
                           skillsStats = getWorldSkillsForTeam(season.vrcId, savedTeamPreview.teamID);
-                          teamStats = getTrueSkillDataForTeam(season.vrcId, savedTeamPreview.teamNumber);
+                          teamStats = getVexDexTeamByNumber(season.vrcId, savedTeamPreview.teamNumber);
                           teamTournaments = fetchTeamTournaments(savedTeamPreview.teamID, season.vrcId);
                           teamAwards = getAwards(savedTeamPreview.teamID, season.vrcId);
                         });
@@ -425,13 +425,13 @@ class TMMyTeamsState extends State<TMMyTeams> {
                               return const Text("No Data Available");
                             }
 
-                            VDAStats stats = snapshot.data as VDAStats;
+                            VexDexStats stats = snapshot.data as VexDexStats;
                             List<String> qualifications = [];
                             String qualificationString = "";
-                            if (stats.regionalQual == 1) {
+                            if (stats.regionalQual) {
                               qualifications.add("RC");
                             }
-                            if (stats.worldsQual == 1) {
+                            if (stats.worldsQual) {
                               qualifications.add("WC");
                             }
                             for (int i = 0; i < qualifications.length; i++) {
@@ -469,7 +469,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                     ),
                                     const Spacer(),
                                     Text(
-                                      "${stats.winPercent == null ? "" : stats.winPercent!.toStringAsFixed(1)}%",
+                                      "${stats.winPercent.toStringAsFixed(1)}%",
                                       style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w500),
                                     ),
                                   ],
@@ -542,19 +542,13 @@ class TMMyTeamsState extends State<TMMyTeams> {
                     future: teamStats,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        VDAStats stats = snapshot.data as VDAStats;
-                        if (stats.worldSkillsRank == null) {
-                          stats.worldSkillsRank = 0;
-                          stats.skillsScore = 0;
-                          stats.maxDriver = 0;
-                          stats.maxAuto = 0;
-                        }
+                        VexDexStats stats = snapshot.data as VexDexStats;
 
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              stats.worldSkillsRank.toString(),
+                              (stats.worldSkillsRank ?? 0).toString(),
                               style: const TextStyle(fontSize: 64, height: 1, letterSpacing: -2),
                             ),
                             const SizedBox(
@@ -573,7 +567,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      stats.skillsScore.toString(),
+                                      (stats.skillsScore ?? 0).toString(),
                                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                     ),
                                     const Text("Score", style: TextStyle(fontSize: 16))
@@ -586,25 +580,12 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      stats.maxDriver.toString(),
+                                      (stats.maxDriver ?? 0).toString(),
                                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                     ),
                                     const Text("Driver", style: TextStyle(fontSize: 16))
                                   ],
                                 ),
-                                const SizedBox(
-                                  width: 18,
-                                ),
-                                Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      stats.maxAuto.toString(),
-                                      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                                    ),
-                                    const Text("Auto", style: TextStyle(fontSize: 16))
-                                  ],
-                                )
                               ],
                             ),
                           ],
@@ -646,15 +627,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                     future: teamStats,
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
-                        VDAStats stats = snapshot.data as VDAStats;
-                        if (stats.trueSkill == null) {
-                          stats.trueSkillGlobalRank = 0;
-                          stats.trueSkill = 0;
-                          stats.trueSkillRegionRank = 0;
-                          stats.opr = 0;
-                          stats.dpr = 0;
-                          stats.ccwm = 0;
-                        }
+                        VexDexStats stats = snapshot.data as VexDexStats;
                         return Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -678,7 +651,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      stats.trueSkill.toString(),
+                                      stats.trueSkill.toStringAsFixed(2),
                                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                     ),
                                     const Text("Score", style: TextStyle(fontSize: 16))
@@ -691,7 +664,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      stats.trueSkillRegionRank.toString(),
+                                      stats.trueSkillRegionRank?.toString() ?? "N/A",
                                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                     ),
                                     const Text("Region Rank", style: TextStyle(fontSize: 16))
@@ -711,7 +684,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      stats.opr.toString(),
+                                      stats.oprAvg.toStringAsFixed(2),
                                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                     ),
                                     const Text("OPR", style: TextStyle(fontSize: 16))
@@ -724,7 +697,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      stats.dpr.toString(),
+                                      stats.dprAvg.toStringAsFixed(2),
                                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                     ),
                                     const Text("DPR", style: TextStyle(fontSize: 16))
@@ -737,7 +710,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      stats.ccwm.toString(),
+                                      stats.ccwmAvg.toStringAsFixed(2),
                                       style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                     ),
                                     const Text("CCWM", style: TextStyle(fontSize: 16))
@@ -790,13 +763,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                       future: teamStats,
                       builder: (context, snapshot) {
                         if (snapshot.hasData) {
-                          VDAStats stats = snapshot.data as VDAStats;
-                          if (stats.wins == null) {
-                            stats.wins = 0;
-                            stats.losses = 0;
-                            stats.ties = 0;
-                            stats.matches = 0;
-                          }
+                          VexDexStats stats = snapshot.data as VexDexStats;
                           return Row(
                             children: [
                               Column(
@@ -825,7 +792,7 @@ class TMMyTeamsState extends State<TMMyTeams> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    stats.ties.toString(),
+                                    stats.draws.toString(),
                                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                                   ),
                                   const Text("Ties", style: TextStyle(fontSize: 16))
