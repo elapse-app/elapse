@@ -28,6 +28,7 @@ import 'package:provider/provider.dart';
 
 import '../../../../classes/Filters/gradeLevel.dart';
 import '../../../../classes/Filters/season.dart';
+import '../../../../classes/Team/vexDexStats.dart';
 import '../../../../classes/Team/world_skills.dart';
 
 class TournamentLoadedScreen extends StatefulWidget {
@@ -52,7 +53,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   late int selectedIndex;
   int sortIndex = 0;
   List<String> titles = ["Schedule", "Rankings", "Skills", "Info"];
-  List<String> rankingSorts = ["Rank", "AP", "SP", "AWP", "OPR", "DPR", "CCWM", "Skills", "World Skills"];
+  List<String> rankingSorts = ["Rank", "AP", "SP", "AWP", "OPR", "DPR", "CCWM", "Skills", "World Skills", "TrueSkill"];
   List<String> skillsSorts = ["Rank", "Driver", "Auton", "Driver Attempts", "Auton Attempts"];
   TournamentRankingsFilter filter = TournamentRankingsFilter();
 
@@ -83,6 +84,16 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
   List<Widget> widgets = [SliverToBoxAdapter(), SliverToBoxAdapter()];
 
   late Future<List<WorldSkillsStats>> worldSkillsStats;
+  List<VexDexStats>? loadedVexDex;
+  // Tracks which team numbers loadedVexDex was last fetched for. The
+  // tournament often mounts with a partial/preview team list and later
+  // streams in the full roster via didUpdateWidget (not initState), so a
+  // one-shot fetch in initState alone would permanently miss teams that
+  // arrive after that first snapshot.
+  Set<String> _vexDexFetchedForTeamNums = {};
+  // Only the latest roster lookup may apply, so a slow response for an older
+  // roster can't overwrite a newer one.
+  int _vexDexRequestId = 0;
 
   void savedPress() {
     setState(() {
@@ -163,6 +174,30 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
       selectedIndex = 0;
     }
 
+    // The team roster often arrives after this widget's first build (see
+    // _vexDexFetchedForTeamNums), so re-check every time derived state syncs.
+    _refreshVexDexIfNeeded();
+
+  }
+
+  /// Fetches VexDex data for any team in the current roster not already
+  /// covered by loadedVexDex. A no-op once every current team has been
+  /// fetched, so it's cheap to call from every derived-state sync.
+  void _refreshVexDexIfNeeded() {
+    final currentNums =
+        tournament.teams.map((t) => t.teamNumber ?? "").where((n) => n.isNotEmpty).toSet();
+    if (currentNums.isEmpty || currentNums.every(_vexDexFetchedForTeamNums.contains)) {
+      return;
+    }
+    _vexDexFetchedForTeamNums = currentNums;
+    final requestId = ++_vexDexRequestId;
+    getVexDexTeamsByNumber(tournament.seasonID, currentNums.toList()).then((data) {
+      if (mounted && requestId == _vexDexRequestId) {
+        setState(() {
+          loadedVexDex = data.values.toList();
+        });
+      }
+    });
   }
 
   /// Updates tournament data while preserving UI state. Calls setState to
@@ -191,6 +226,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
     savedQuery = "";
 
     worldSkillsStats = getWorldSkillsRankings(tournament.seasonID, getGradeLevel(prefs.getString("defaultGrade")));
+    _refreshVexDexIfNeeded();
 
     // Process games once on init, not every build
     _processGames();
@@ -357,9 +393,9 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
         final gradeLevel = getGradeLevel(prefs.getString("defaultGrade"));
         final seasonId =
             gradeLevel == gradeLevels["College"] ? (seasons[0].vexUId ?? seasons[0].vrcId) : seasons[0].vrcId;
-        final worldSkillsData = prefs.getString("worldSkillsData");
+        final cachedWorldSkills = peekWorldSkillsRankings(seasonId, gradeLevel);
 
-        if (hasCachedWorldSkillsRankings(seasonId, gradeLevel) && worldSkillsData != null) {
+        if (cachedWorldSkills != null) {
           return RankingsPage(
             searchQuery: searchQuery,
             sort: rankingSorts[sortIndex],
@@ -367,9 +403,8 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             rankings: division.teamStats ?? {},
             filter: filter,
             skills: tournament.tournamentSkills!,
-            worldSkills:
-                jsonDecode(worldSkillsData).map<WorldSkillsStats>((e) => WorldSkillsStats.fromJson(e)).toList(),
-            vda: null,
+            worldSkills: cachedWorldSkills,
+            vexDex: loadedVexDex,
           );
         }
         return FutureBuilder(
@@ -397,7 +432,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                   filter: filter,
                   skills: tournament.tournamentSkills!,
                   worldSkills: snapshot.data as List<WorldSkillsStats>,
-                  vda: null,
+                  vexDex: loadedVexDex,
                 );
             }
           },
@@ -458,6 +493,10 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
                   tournament.seasonID,
                   getGradeLevel(prefs.getString("defaultGrade")),
                 );
+                // Force a genuine re-fetch even if the roster is unchanged —
+                // a manual refresh implies the user wants current data.
+                _vexDexFetchedForTeamNums = {};
+                _refreshVexDexIfNeeded();
               }
             } catch (e) {
               if (kDebugMode) debugPrint('Refresh failed: $e');
@@ -467,7 +506,7 @@ class _TournamentLoadedScreenState extends State<TournamentLoadedScreen> {
             controller: _scrollController,
             slivers: [
               ElapseAppBar(
-                showVDAWarning: false,
+                showVexDexWarning: false,
                 title: Row(
                   children: [
                     Text(

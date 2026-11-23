@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:collection/collection.dart';
 import 'package:elapse_app/classes/Team/team.dart';
-import 'package:elapse_app/classes/Team/teamPreview.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 
+import '../../database/json_file_cache.dart';
 import '../../main.dart';
 import '../Filters/gradeLevel.dart';
 import '../Filters/region.dart';
@@ -60,77 +60,95 @@ class WorldSkillsStats {
           country: json["team"]["country"],
         ),
         eventRegion: Region(
-          name: json["team"]["eventRegion"] == "British Columbia"
-              ? "British Columbia (BC)"
-              : json["team"]["eventRegion"],
+          name:
+              json["team"]["eventRegion"] == "British Columbia" ? "British Columbia (BC)" : json["team"]["eventRegion"],
           id: json["team"]["eventRegionId"],
         ));
   }
 }
 
-Future<List<WorldSkillsStats>> getWorldSkillsRankings(
-    int seasonID, GradeLevel grade) async {
-  final String? worldSkillsData = prefs.getString("worldSkillsData");
+List<WorldSkillsStats> _parseWorldSkills(String body) =>
+    (jsonDecode(body) as List).map((e) => WorldSkillsStats.fromJson(e)).toList();
 
-  List<dynamic> parsed = [];
+class _CachedWorldSkills {
+  final DateTime expiry;
+  final List<WorldSkillsStats> rankings;
 
+  _CachedWorldSkills(this.expiry, this.rankings);
+}
+
+final Map<String, _CachedWorldSkills> _worldSkillsMemory = {};
+final Map<String, Future<List<WorldSkillsStats>>> _worldSkillsInFlight = {};
+String _worldSkillsKey(int seasonID, GradeLevel grade) => "world_skills_${seasonID}_${grade.id}";
+
+/// The current season changes as events report. Past seasons are final.
+Duration _worldSkillsTtl(int seasonID) =>
+    seasonID == seasons[0].vrcId || seasonID == seasons[0].vexUId ? const Duration(hours: 2) : const Duration(days: 30);
+
+/// World skills standings for a season and grade. Results are cached in memory
+/// and on disk per (season, grade), and concurrent callers share one request.
+/// If the network fails, an expired cached copy is returned when one exists.
+Future<List<WorldSkillsStats>> getWorldSkillsRankings(int seasonID, GradeLevel grade) {
   if (seasonID < 115) {
     // Starstruck season ID (earliest season that had world skills data)
-    return List<WorldSkillsStats>.empty();
+    return Future.value(List<WorldSkillsStats>.empty());
+  }
+  final cached = peekWorldSkillsRankings(seasonID, grade);
+  if (cached != null) return Future.value(cached);
+
+  final key = _worldSkillsKey(seasonID, grade);
+  return _worldSkillsInFlight[key] ??= _loadWorldSkillsRankings(seasonID, grade, key).whenComplete(() {
+    _worldSkillsInFlight.remove(key); // Block body: remove() returns this future, and returning it would self-await.
+  });
+}
+
+/// Unexpired in-memory world skills for (season, grade), or null. Synchronous,
+/// so build methods can use it without a FutureBuilder flash.
+List<WorldSkillsStats>? peekWorldSkillsRankings(int seasonID, GradeLevel grade) {
+  final cached = _worldSkillsMemory[_worldSkillsKey(seasonID, grade)];
+  if (cached == null || !cached.expiry.isAfter(DateTime.now())) return null;
+  return cached.rankings;
+}
+
+Future<List<WorldSkillsStats>> _loadWorldSkillsRankings(int seasonID, GradeLevel grade, String key) async {
+  final disk = await JsonFileCache.read(key);
+  final diskExpiry = DateTime.tryParse("${disk?.meta["expiry"]}");
+  if (disk != null && diskExpiry != null && diskExpiry.isAfter(DateTime.now())) {
+    try {
+      final rankings = await compute(_parseWorldSkills, disk.body);
+      _worldSkillsMemory[key] = _CachedWorldSkills(diskExpiry, rankings);
+      return rankings;
+    } catch (_) {
+      // Corrupt cache file. Fall through and fetch it again.
+    }
   }
 
-  if (seasonID !=
-          (grade == gradeLevels["College"]
-              ? seasons[0].vexUId
-              : seasons[0].vrcId) ||
-      grade != getGradeLevel(prefs.getString("defaultGrade"))) {
+  try {
     final response = await http.get(
-      Uri.parse(
-          "https://www.robotevents.com/api/seasons/$seasonID/skills?grade_level=${grade.name.replaceAll(" ", "%20")}"),
+      Uri.parse("https://events.vex.com/api/seasons/$seasonID/skills")
+          .replace(queryParameters: {"grade_level": grade.name}),
     );
-
-    parsed = jsonDecode(response.body) as List;
-  } else if (!hasCachedWorldSkillsRankings(seasonID, grade)) {
-    final response = await http.get(
-      Uri.parse(
-          "https://www.robotevents.com/api/seasons/$seasonID/skills?grade_level=${grade.name.replaceAll(" ", "%20")}"),
-    );
-
-    parsed = jsonDecode(response.body) as List;
-    prefs.setString("worldSkillsData", response.body);
-    prefs.setString("worldSkillsExpiry",
-        DateTime.now().add(const Duration(hours: 2)).toString());
-    prefs.setString("worldSkillsGrade", grade.name);
-  } else {
-    parsed = jsonDecode(worldSkillsData!) as List;
+    if (response.statusCode != 200) {
+      throw Exception("World skills request failed (${response.statusCode})");
+    }
+    final rankings = await compute(_parseWorldSkills, response.body);
+    final expiry = DateTime.now().add(_worldSkillsTtl(seasonID));
+    _worldSkillsMemory[key] = _CachedWorldSkills(expiry, rankings);
+    await JsonFileCache.write(key, {"expiry": expiry.toIso8601String()}, response.body);
+    return rankings;
+  } catch (e) {
+    final stale = _worldSkillsMemory[key]?.rankings ??
+        (disk != null ? await compute(_parseWorldSkills, disk.body).catchError((_) => <WorldSkillsStats>[]) : null);
+    if (stale != null && stale.isNotEmpty) {
+      debugPrint("World skills refresh failed, serving stale $key: $e");
+      return stale;
+    }
+    rethrow;
   }
-
-  List<WorldSkillsStats> ranking =
-      parsed.map((e) => WorldSkillsStats.fromJson(e)).toList();
-  return ranking;
 }
 
 Future<WorldSkillsStats?> getWorldSkillsForTeam(int seasonID, int teamID) async {
   GradeLevel grade = (await fetchTeam(teamID)).grade!;
-  List<WorldSkillsStats> rankings =
-      await getWorldSkillsRankings(seasonID, grade);
+  List<WorldSkillsStats> rankings = await getWorldSkillsRankings(seasonID, grade);
   return rankings.singleWhereOrNull((e) => e.teamId == teamID);
-}
-
-bool hasCachedWorldSkillsRankings(int seasonID, GradeLevel grade) {
-  if (seasonID !=
-          (grade == gradeLevels["College"]
-              ? seasons[0].vexUId
-              : seasons[0].vrcId) ||
-      grade != getGradeLevel(prefs.getString("defaultGrade"))) return false;
-
-  final String? worldSkillsData = prefs.getString("worldSkillsData");
-  final String? expiryDate = prefs.getString("worldSkillsExpiry");
-  final String? cachedGrade = prefs.getString("worldSkillsGrade");
-
-  return worldSkillsData != null &&
-      expiryDate != null &&
-      cachedGrade != null &&
-      DateTime.parse(expiryDate).isAfter(DateTime.now()) &&
-      grade == gradeLevels[cachedGrade];
 }

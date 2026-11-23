@@ -24,6 +24,7 @@ class Season {
 }
 
 List<Season> seasons = [
+  Season(vrcId: 204, vexUId: 205, name: "2026-2027 Override", programID: 1, startYear: DateTime(2026), endYear: DateTime(2027)),
   Season(vrcId: 197, vexUId: 198, name: "2025-2026 Push Back", programID: 1, startYear: DateTime(2025), endYear: DateTime(2026)),
   Season(vrcId: 190, vexUId: 191, name: "2024-2025 High Stakes", programID: 1, startYear: DateTime(2024), endYear: DateTime(2025)),
   Season(vrcId: 181, vexUId: 182, name: "2023-2024 Over Under", programID: 1, startYear: DateTime(2023), endYear: DateTime(2024)),

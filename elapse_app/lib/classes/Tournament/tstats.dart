@@ -94,7 +94,7 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
     qualiMatches = m.where((e) => e.roundNum == 2).toList();
   }));
   requestFutures.add(http.get(
-    Uri.parse("https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/rankings?per_page=250"),
+    Uri.parse("https://events.vex.com/api/v2/events/$eventId/divisions/$divisionId/rankings?per_page=250"),
     headers: {
       HttpHeaders.authorizationHeader: getToken(),
     },
@@ -146,7 +146,7 @@ Future<List<dynamic>> calcEventStats(int eventId, int divisionId) async {
   int teamsLastPage = jsonDecode(rankings.body)["meta"]["last_page"];
   for (int pg = 2; pg <= teamsLastPage; pg++) {
     Future<void> pgResponse = http.get(
-        Uri.parse("https://www.robotevents.com/api/v2/events/$eventId/divisions/$divisionId/rankings?page=$pg"),
+        Uri.parse("https://events.vex.com/api/v2/events/$eventId/divisions/$divisionId/rankings?page=$pg"),
         headers: {
           HttpHeaders.authorizationHeader: getToken(),
         }).then((pgResponse) {

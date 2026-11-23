@@ -1,16 +1,20 @@
 import 'package:elapse_app/screens/explore/worldRankings/skills/world_skills_widget.dart';
+import 'package:elapse_app/screens/explore/worldRankings/true_skill/world_true_skill_widget.dart';
 import 'package:elapse_app/screens/widgets/custom_tab_bar.dart';
 import 'package:flutter/material.dart';
 
+import '../../../classes/Team/vexDexStats.dart';
 import '../../../classes/Team/world_skills.dart';
 
 class WorldRankingsSearchScreen extends StatefulWidget {
   const WorldRankingsSearchScreen({
     super.key,
-    required this.skills,
-  });
+    this.skills,
+    this.trueSkill,
+  }) : assert(skills != null || trueSkill != null, "Provide either skills or trueSkill data to search");
 
-  final List<WorldSkillsStats> skills;
+  final List<WorldSkillsStats>? skills;
+  final List<VexDexStats>? trueSkill;
 
   @override
   State<WorldRankingsSearchScreen> createState() => _WorldRankingsSearchScreenState();
@@ -37,10 +41,19 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
 
   @override
   Widget build(BuildContext context) {
-    List<WorldSkillsStats> filteredSkills = widget.skills.where((e) {
-      return (e.teamName.toLowerCase().contains(searchQuery.toLowerCase()) ||
-          e.teamNum.toLowerCase().contains(searchQuery.toLowerCase()));
-    }).toList();
+    final bool isTrueSkill = widget.trueSkill != null;
+
+    List<WorldSkillsStats> filteredSkills = widget.skills?.where((e) {
+          return (e.teamName.toLowerCase().contains(searchQuery.toLowerCase()) ||
+              e.teamNum.toLowerCase().contains(searchQuery.toLowerCase()));
+        }).toList() ??
+        [];
+
+    List<VexDexStats> filteredTrueSkill = widget.trueSkill?.where((e) {
+          return ((e.teamName ?? "").toLowerCase().contains(searchQuery.toLowerCase()) ||
+              e.teamNum.toLowerCase().contains(searchQuery.toLowerCase()));
+        }).toList() ??
+        [];
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.surface,
@@ -138,7 +151,7 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Skills", style: TextStyle(fontSize: 16)),
+                  Text(isTrueSkill ? "TrueSkill" : "Skills", style: const TextStyle(fontSize: 16)),
                   Divider(
                     color: Theme.of(context).colorScheme.surfaceDim,
                     thickness: 1.5,
@@ -150,13 +163,14 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (context, index) {
-                final ranking = filteredSkills[index];
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 23),
                   child: Column(
                     children: [
-                      WorldSkillsWidget(stats: ranking, rank: index + 1),
-                      index != filteredSkills.length - 1
+                      isTrueSkill
+                          ? WorldTrueSkillWidget(stats: filteredTrueSkill[index], rank: index + 1)
+                          : WorldSkillsWidget(stats: filteredSkills[index], rank: index + 1),
+                      index != (isTrueSkill ? filteredTrueSkill.length : filteredSkills.length) - 1
                           ? Divider(
                               height: 3,
                               color: Theme.of(context).colorScheme.surfaceDim,
@@ -166,7 +180,7 @@ class _WorldRankingsSearchScreenState extends State<WorldRankingsSearchScreen> {
                   ),
                 );
               },
-              childCount: filteredSkills.length,
+              childCount: isTrueSkill ? filteredTrueSkill.length : filteredSkills.length,
             ),
           ),
           const SliverToBoxAdapter(

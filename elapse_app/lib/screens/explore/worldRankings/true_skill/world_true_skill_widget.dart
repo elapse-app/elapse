@@ -1,7 +1,7 @@
 import 'package:elapse_app/screens/explore/worldRankings/true_skill/world_true_skill_page.dart';
 import 'package:flutter/material.dart';
 
-import '../../../../classes/Team/vdaStats.dart';
+import '../../../../classes/Team/vexDexStats.dart';
 
 class WorldTrueSkillWidget extends StatelessWidget {
   const WorldTrueSkillWidget({
@@ -11,7 +11,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
     this.sort = 0,
   });
 
-  final VDAStats stats;
+  final VexDexStats stats;
   final int rank;
   final int sort;
 
@@ -20,7 +20,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        worldTrueSkillPage(context, stats.id, stats.teamNum, stats.teamName!, stats);
+        worldTrueSkillPage(context, stats.teamId, stats.teamNum, stats.teamName ?? "", stats);
       },
       child: Container(
           height: 72,
@@ -52,7 +52,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
                                       color: Theme.of(context)
                                           .colorScheme
                                           .onSurface)),
-                              Text(stats.teamName!,
+                              Text(stats.teamName ?? "",
                                 softWrap: false,
                                 overflow: TextOverflow.fade,
                                 style: TextStyle(
@@ -76,7 +76,7 @@ class WorldTrueSkillWidget extends StatelessWidget {
                                 style: const TextStyle(
                                   fontSize: 16,
                                 )),
-                            Text(stats.trueSkill?.toStringAsFixed(1) ?? "N/A",
+                            Text(stats.trueSkill.toStringAsFixed(1),
                                 style: const TextStyle(
                                   fontSize: 16,
                                 )),
@@ -105,11 +105,11 @@ class WorldTrueSkillWidget extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   sort == 0 || sort >= 3
-                                      ? Text("CCWM ${stats.ccwm ?? "N/A"}",
+                                      ? Text("CCWM ${stats.ccwmAvg.toStringAsFixed(1)}",
                                           style: const TextStyle(
                                             fontSize: 16,
                                           ))
-                                      : Text("OPR ${stats.opr ?? "N/A"}",
+                                      : Text("OPR ${stats.oprAvg.toStringAsFixed(1)}",
                                           style: const TextStyle(
                                             fontSize: 16,
                                           )),
@@ -121,11 +121,11 @@ class WorldTrueSkillWidget extends StatelessWidget {
                                 children: [
                                   sort == 0 || sort >= 3
                                       ? Text(
-                                          "WR ${stats.winPercent?.toInt() ?? 0} %",
+                                          "WR ${stats.winPercent.toInt()} %",
                                           style: const TextStyle(
                                             fontSize: 16,
                                           ))
-                                      : Text("DPR ${stats.dpr ?? "N/A"}",
+                                      : Text("DPR ${stats.dprAvg.toStringAsFixed(1)}",
                                           style: const TextStyle(
                                             fontSize: 16,
                                           )),
